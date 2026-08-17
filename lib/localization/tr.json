@@ -144,7 +144,6 @@
   "partner_support_day_1": "1. GÜN",
   "partner_support_phase": "Menstruasyon Dönemi",
   "partner_support_phase_desc": "Döngü: 1-5. Gün • Düşük Enerji Seviyesi",
-  "partner_support_daily_score": "Günlük Puan",
   "partner_support_water_need": "Su İhtiyacı",
   "partner_support_physical": "Fiziksel Destek",
   "partner_support_task_1": "Sıcak Su Torbası",
@@ -560,5 +559,6 @@
   "log_mood_tired": "Yorgun",
   "log_sex_none": "Yok",
   "log_sex_protected": "Korunmalı",
-  "log_sex_unprotected": "Korunmasız"
+  "log_sex_unprotected": "Korunmasız",
+  "partner_support_water_value": "2,5 L"
 }

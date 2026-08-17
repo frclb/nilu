@@ -144,7 +144,6 @@
   "partner_support_day_1": "JOUR 1",
   "partner_support_phase": "Phase menstruelle",
   "partner_support_phase_desc": "Cycle : jours 1-5 • Énergie faible",
-  "partner_support_daily_score": "Score du jour",
   "partner_support_water_need": "Besoin en eau",
   "partner_support_physical": "Soutien physique",
   "partner_support_task_1": "Bouillotte",
@@ -560,5 +559,6 @@
   "log_mood_tired": "Fatiguée",
   "log_sex_none": "Aucune",
   "log_sex_protected": "Protégé",
-  "log_sex_unprotected": "Non protégé"
+  "log_sex_unprotected": "Non protégé",
+  "partner_support_water_value": "2,5 L"
 }

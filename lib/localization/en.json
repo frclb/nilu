@@ -144,7 +144,6 @@
   "partner_support_day_1": "DAY 1",
   "partner_support_phase": "Menstruation Phase",
   "partner_support_phase_desc": "Cycle: Day 1-5 • Low Energy Level",
-  "partner_support_daily_score": "Daily Score",
   "partner_support_water_need": "Water Needs",
   "partner_support_physical": "Physical Support",
   "partner_support_task_1": "Hot Water Bottle",
@@ -560,5 +559,6 @@
   "log_mood_tired": "Tired",
   "log_sex_none": "None",
   "log_sex_protected": "Protected",
-  "log_sex_unprotected": "Unprotected"
+  "log_sex_unprotected": "Unprotected",
+  "partner_support_water_value": "2.5 L"
 }

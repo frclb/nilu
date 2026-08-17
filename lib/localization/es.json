@@ -144,7 +144,6 @@
   "partner_support_day_1": "DÍA 1",
   "partner_support_phase": "Fase menstrual",
   "partner_support_phase_desc": "Ciclo: días 1-5 • Energía baja",
-  "partner_support_daily_score": "Puntuación diaria",
   "partner_support_water_need": "Hidratación",
   "partner_support_physical": "Apoyo físico",
   "partner_support_task_1": "Bolsa de agua caliente",
@@ -560,5 +559,6 @@
   "log_mood_tired": "Cansada",
   "log_sex_none": "Ninguna",
   "log_sex_protected": "Con protección",
-  "log_sex_unprotected": "Sin protección"
+  "log_sex_unprotected": "Sin protección",
+  "partner_support_water_value": "2,5 l"
 }

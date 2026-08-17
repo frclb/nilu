@@ -54,6 +54,36 @@ flutter run -d "iPhone 17"
 Simülatörde **çalışmayanlar:** kamera (QR tarama), push bildirim, gerçek
 satın alma. Bunlar için gerçek cihaz gerekir.
 
+### CocoaPods sorunları (ilk derlemede karşılaşabilirsiniz)
+
+**1. `Unicode Normalization not appropriate for ASCII-8BIT`**
+
+CocoaPods UTF-8 locale ister, bu makinede ayarlı değil. Kalıcı çözüm:
+```bash
+echo 'export LANG=en_US.UTF-8' >> ~/.zshrc
+```
+Tek seferlik:
+```bash
+cd ios && LANG=en_US.UTF-8 pod install && cd ..
+```
+
+**2. `CDN: trunk URL couldn't be downloaded ... 429 Too Many Requests`**
+
+CocoaPods bazı podspec'leri `raw.githubusercontent.com` üzerinden çeker ve
+GitHub bu adresi IP başına saatlik limitler. Kodla ilgisi yoktur.
+
+Önce bayat CDN önbelleğini tazeleyin — çoğu durumda bu yeter:
+```bash
+rm -rf ~/.cocoapods/repos/trunk && cd ios && LANG=en_US.UTF-8 pod install --repo-update
+```
+Hâlâ 429 alıyorsanız limitin sıfırlanmasını bekleyin (~1 saat) veya farklı bir
+ağa geçin (mobil hotspot işe yarar). Limitin kalkıp kalkmadığını şöyle
+anlarsınız:
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" https://raw.githubusercontent.com/CocoaPods/Specs/master/Specs/9/a/d/PurchasesHybridCommon/17.2.0/PurchasesHybridCommon.podspec.json
+```
+`200` dönerse `pod install` geçer, `429` dönerse hâlâ beklemek gerekiyor.
+
 ---
 
 ## 3. Android'de

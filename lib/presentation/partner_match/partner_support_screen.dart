@@ -241,26 +241,19 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
       clipBehavior: Clip.none,
       child: Row(
         children: [
-          _buildSummaryCard(
-            context: context,
-            isDark: isDark,
-            icon: Icons.monitor_heart,
-            iconColor: primaryColor,
-            title: context.tr('partner_support_daily_score'),
-            value: '85/100',
-            surfaceColor: surfaceColor,
-            textMainColor: textMainColor,
-            textMutedColor: textMutedColor,
-            borderColor: borderColor,
-          ),
-          const SizedBox(width: 16),
+          // NOT: Burada eskiden "Günlük Skor 85/100" kartı vardı. Bu değer
+          // hiçbir veriden hesaplanmıyordu — her kullanıcıya aynı uydurma
+          // sağlık skoru gösteriliyordu. Kişiye özel sahte sağlık verisi hem
+          // yanıltıcı hem de mağaza incelemesinde red sebebi olduğu için
+          // kaldırıldı. Gerçek bir skor modeli eklendiğinde geri getirilebilir.
           _buildSummaryCard(
             context: context,
             isDark: isDark,
             icon: Icons.water_drop,
             iconColor: Colors.blue,
             title: context.tr('partner_support_water_need'),
-            value: '2.5L',
+            // Kişiye özel değil, genel günlük su tüketimi önerisi.
+            value: context.tr('partner_support_water_value'),
             surfaceColor: surfaceColor,
             textMainColor: textMainColor,
             textMutedColor: textMutedColor,

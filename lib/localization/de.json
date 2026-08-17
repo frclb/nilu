@@ -144,7 +144,6 @@
   "partner_support_day_1": "TAG 1",
   "partner_support_phase": "Menstruationsphase",
   "partner_support_phase_desc": "Zyklus: Tag 1–5 • Niedriges Energieniveau",
-  "partner_support_daily_score": "Tagesscore",
   "partner_support_water_need": "Flüssigkeitsbedarf",
   "partner_support_physical": "Körperliche Unterstützung",
   "partner_support_task_1": "Wärmflasche",
@@ -560,5 +559,6 @@
   "log_mood_tired": "Müde",
   "log_sex_none": "Keine",
   "log_sex_protected": "Geschützt",
-  "log_sex_unprotected": "Ungeschützt"
+  "log_sex_unprotected": "Ungeschützt",
+  "partner_support_water_value": "2,5 l"
 }
