@@ -1,0 +1,16 @@
+# Release imzalama şablonu.
+#
+# Kullanım:
+#   1. Bu dosyayı `key.properties` adıyla kopyalayın.
+#   2. Bir keystore üretin:
+#        keytool -genkey -v -keystore ~/rcapp-release.jks \
+#          -keyalg RSA -keysize 2048 -validity 10000 -alias rcapp
+#   3. Aşağıdaki değerleri doldurun.
+#
+# `key.properties` ve `.jks` dosyaları .gitignore'dadır — repoya EKLEMEYİN.
+# Keystore'u kaybederseniz uygulamanın mağaza güncellemelerini yayınlayamazsınız.
+
+storePassword=
+keyPassword=
+keyAlias=rcapp
+storeFile=/absolute/path/to/rcapp-release.jks
