@@ -201,7 +201,22 @@ GoRouter createAppRouter(
               ),
             ],
           ),
-          // Tab 3: Health Library / Partner Rehberi
+          // Tab 3: İçgörüler.
+          //
+          // Bu ekran daha önce kök seviyede bir rotaydı ama hiçbir yerden
+          // bağlantısı yoktu — kullanıcı ona hiçbir zaman ulaşamıyordu.
+          // Sekmeye alındı; partner modunda gösterilmez (bkz.
+          // `CustomBottomNav`, partner listesi bu dalı atlar).
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/insights',
+                name: RouteNames.insights,
+                builder: (context, state) => const InsightsScreen(),
+              ),
+            ],
+          ),
+          // Tab 4: Health Library / Partner Rehberi
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -216,7 +231,7 @@ GoRouter createAppRouter(
               ),
             ],
           ),
-          // Tab 4: Profil
+          // Tab 5: Profil
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -254,12 +269,6 @@ GoRouter createAppRouter(
             );
           },
         ),
-      ),
-
-      GoRoute(
-        path: '/insights',
-        name: RouteNames.insights,
-        builder: (context, state) => const InsightsScreen(),
       ),
 
       GoRoute(

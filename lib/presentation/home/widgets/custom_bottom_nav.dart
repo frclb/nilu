@@ -1,8 +1,109 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../domain/view_models/user_view_model.dart';
 import '../../../localization/app_localizations.dart';
 
+/// Alt menüdeki tek bir hedef.
+///
+/// [branchIndex] `StatefulShellRoute` dalının sırasıdır, listedeki sırası
+/// değil. İkisi ayrı olmak zorunda: partner modu İçgörüler dalını atlar, yani
+/// listedeki 3. öğe 4 numaralı dala gider.
+class NavDestination {
+  final int branchIndex;
+  final IconData icon;
+
+  /// Seçiliyken kullanılan dolu varyant. Simgeyi yalnızca renkle ayırmak
+  /// renk körlüğünde ayırt edilemiyordu.
+  final IconData activeIcon;
+
+  /// Lokalizasyon anahtarı. Çözülmüş metin değil: hedef listesi widget ağacı
+  /// kurmadan test edilebilsin diye `BuildContext` gerektirmiyor.
+  final String labelKey;
+
+  const NavDestination({
+    required this.branchIndex,
+    required this.icon,
+    required this.activeIcon,
+    required this.labelKey,
+  });
+}
+
+/// Alt menüdeki hedefler.
+///
+/// Saf fonksiyon: dal eşlemesi (özellikle partner modunun 2 numaralı dalı
+/// atlaması) burada test edilir.
+List<NavDestination> navDestinations({required bool isPartner}) =>
+    isPartner ? _partnerDestinations : _standardDestinations;
+
+/// Etiketler kısa tutulur: bunlar sekme adı, ekran başlığı değil. Eskiden
+/// 3. sekme `health_library_title` ("Sağlık Kütüphanesi") kullanıyordu; iki
+/// satıra taşıp diğer etiketlerle hizasını bozuyordu.
+const List<NavDestination> _standardDestinations = [
+  NavDestination(
+    branchIndex: 0,
+    icon: Icons.home_outlined,
+    activeIcon: Icons.home_filled,
+    labelKey: 'nav_home',
+  ),
+  NavDestination(
+    branchIndex: 1,
+    icon: Icons.calendar_month_outlined,
+    activeIcon: Icons.calendar_month,
+    labelKey: 'nav_calendar',
+  ),
+  NavDestination(
+    branchIndex: 2,
+    icon: Icons.insights_outlined,
+    activeIcon: Icons.insights,
+    labelKey: 'nav_insights',
+  ),
+  NavDestination(
+    branchIndex: 3,
+    icon: Icons.auto_stories_outlined,
+    activeIcon: Icons.auto_stories,
+    labelKey: 'nav_library',
+  ),
+  NavDestination(
+    branchIndex: 4,
+    icon: Icons.person_outline,
+    activeIcon: Icons.person,
+    labelKey: 'nav_profile',
+  ),
+];
+
+/// Partner modunda İçgörüler dalı (2) atlanır: partnerin cihazında
+/// gösterilecek kendi döngü verisi yok, takip edilen kişinin verisi ise
+/// yalnızca paylaşım ayarlarının izin verdiği kadarıyla ve partner
+/// ekranlarından görünür.
+const List<NavDestination> _partnerDestinations = [
+  NavDestination(
+    branchIndex: 0,
+    icon: Icons.favorite_border,
+    activeIcon: Icons.favorite,
+    labelKey: 'partner_nav_dashboard',
+  ),
+  NavDestination(
+    branchIndex: 1,
+    icon: Icons.calendar_month_outlined,
+    activeIcon: Icons.calendar_month,
+    labelKey: 'partner_nav_calendar',
+  ),
+  NavDestination(
+    branchIndex: 3,
+    icon: Icons.handshake_outlined,
+    activeIcon: Icons.handshake,
+    labelKey: 'partner_nav_support',
+  ),
+  NavDestination(
+    branchIndex: 4,
+    icon: Icons.person_outline,
+    activeIcon: Icons.person,
+    labelKey: 'nav_profile',
+  ),
+];
+
+/// Kalıcı alt menü çubuğu.
 class CustomBottomNav extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int>? onTap;
@@ -12,8 +113,8 @@ class CustomBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final userViewModel = context.watch<UserViewModel>();
-    final isPartner = userViewModel.isPartner;
+    final isPartner = context.watch<UserViewModel>().isPartner;
+    final destinations = navDestinations(isPartner: isPartner);
 
     return Container(
       decoration: BoxDecoration(
@@ -35,126 +136,34 @@ class CustomBottomNav extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: isPartner
-                ? _buildPartnerNavItems(context)
-                : _buildStandardNavItems(context),
+            children: [
+              for (final destination in destinations)
+                Expanded(
+                  child: _NavItem(
+                    destination: destination,
+                    isActive: selectedIndex == destination.branchIndex,
+                    onTap: () => onTap?.call(destination.branchIndex),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
     );
   }
-
-  List<Widget> _buildStandardNavItems(BuildContext context) {
-    return [
-      Expanded(
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => onTap?.call(0),
-          child: _NavItem(
-            icon: Icons.home_filled,
-            label: context.tr('nav_home'),
-            isActive: selectedIndex == 0,
-          ),
-        ),
-      ),
-      Expanded(
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => onTap?.call(1),
-          child: _NavItem(
-            icon: Icons.calendar_month,
-            label: context.tr('nav_calendar'),
-            isActive: selectedIndex == 1,
-          ),
-        ),
-      ),
-      Expanded(
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => onTap?.call(2),
-          child: _NavItem(
-            icon: Icons.auto_stories,
-            label: context.tr('health_library_title'),
-            isActive: selectedIndex == 2,
-          ),
-        ),
-      ),
-      Expanded(
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => onTap?.call(3),
-          child: _NavItem(
-            icon: Icons.person,
-            label: context.tr('nav_profile'),
-            isActive: selectedIndex == 3,
-          ),
-        ),
-      ),
-    ];
-  }
-
-  List<Widget> _buildPartnerNavItems(BuildContext context) {
-    return [
-      Expanded(
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => onTap?.call(0),
-          child: _NavItem(
-            icon: Icons.favorite,
-            label: context.tr('partner_nav_dashboard'),
-            isActive: selectedIndex == 0,
-          ),
-        ),
-      ),
-      Expanded(
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => onTap?.call(1),
-          child: _NavItem(
-            icon: Icons.calendar_month,
-            label: context.tr('partner_nav_calendar'),
-            isActive: selectedIndex == 1,
-          ),
-        ),
-      ),
-      Expanded(
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => onTap?.call(2),
-          child: _NavItem(
-            icon: Icons.handshake,
-            label: context.tr('partner_nav_support'),
-            isActive: selectedIndex == 2,
-          ),
-        ),
-      ),
-      Expanded(
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => onTap?.call(3),
-          child: _NavItem(
-            icon: Icons.person,
-            label: context.tr('nav_profile'),
-            isActive: selectedIndex == 3,
-          ),
-        ),
-      ),
-    ];
-  }
 }
 
 class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
+  final NavDestination destination;
   final bool isActive;
+  final VoidCallback onTap;
 
   const _NavItem({
-    required this.icon,
-    required this.label,
+    required this.destination,
     required this.isActive,
+    required this.onTap,
   });
 
   @override
@@ -162,29 +171,74 @@ class _NavItem extends StatelessWidget {
     final theme = Theme.of(context);
     final primary = theme.colorScheme.primary;
     final muted = theme.textTheme.labelLarge?.color ?? Colors.grey;
+    final color = isActive ? primary : muted;
+    final label = context.tr(destination.labelKey);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 48,
-          height: 32,
-          decoration: BoxDecoration(
-            color: isActive ? theme.colorScheme.secondary : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
+    return Semantics(
+      // Ekran okuyucu "sekme, seçili" diye okusun. Önce yalnızca bir
+      // GestureDetector vardı: ne düğme olduğu ne de hangisinin seçili
+      // olduğu duyuruluyordu.
+      button: true,
+      selected: isActive,
+      label: label,
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: () {
+          if (isActive) {
+            // Seçili sekmeye tekrar basmak kök ekrana döner; bu bir gezinme
+            // değil, o yüzden hafif geri bildirim.
+            HapticFeedback.selectionClick();
+          } else {
+            HapticFeedback.lightImpact();
+          }
+          onTap();
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeOut,
+                width: 56,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: isActive
+                      ? theme.colorScheme.secondary
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Icon(
+                  isActive ? destination.activeIcon : destination.icon,
+                  color: color,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(height: 4),
+              // Etiket sistem yazı ölçeğiyle büyüyor ama bir yere kadar:
+              // ölçeksiz bırakılırsa en büyük erişilebilirlik ayarında satır
+              // taşıyor, tamamen sabitlenirse düşük görmeyen kullanıcı için
+              // okunmuyor.
+              MediaQuery.withClampedTextScaling(
+                maxScaleFactor: 1.3,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                    color: color,
+                  ),
+                ),
+              ),
+            ],
           ),
-          child: Icon(icon, color: isActive ? primary : muted, size: 24),
         ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w500,
-            color: isActive ? primary : muted,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

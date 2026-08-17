@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import '../../../../localization/app_localizations.dart';
-import '../../../../core/navigation/route_names.dart';
+import 'package:provider/provider.dart';
+import '../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
+import '../../../domain/models/log_vocabulary.dart';
+import '../../../domain/services/insights_service.dart';
+import '../../calendar/view_models/calendar_view_model.dart';
 
+/// Kullanıcının en sık kaydettiği belirtiler.
+///
+/// Bu kart eskiden dört sabit çubuk gösteriyordu: Kramp %85, Baş Ağrısı %62,
+/// Yorgunluk %45, Şişkinlik %20. Sayılar koda gömülüydü; kullanıcı hiç kayıt
+/// girmemiş olsa bile aynı grafiği görüyordu. Sağlık verisi sunan bir ekranda
+/// "makul görünen" bir sayı, yanlış sayıdan daha tehlikeli.
+///
+/// Artık her yüzde, kullanıcının kayıt girdiği gün sayısına oranla o belirtiyi
+/// kaç günde işaretlediğini gösterir; kayıt yoksa kart bunu söyler.
 class SymptomAnalysisCard extends StatelessWidget {
   const SymptomAnalysisCard({super.key});
 
@@ -11,6 +22,12 @@ class SymptomAnalysisCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final viewModel = context.watch<CalendarViewModel>();
+
+    final frequencies = InsightsService.symptomFrequencies(
+      viewModel.dailyLogs,
+    );
+    final loggedDays = InsightsService.loggedDayCount(viewModel.dailyLogs);
 
     final cardBgColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
     final borderColor = isDark
@@ -40,221 +57,159 @@ class SymptomAnalysisCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    context.tr('insights_symptoms_title'),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    context.tr('insights_symptoms_subtitle'),
-                    style: TextStyle(fontSize: 12, color: subtitleColor),
-                  ),
-                ],
-              ),
-              GestureDetector(
-                onTap: () {
-                  context.pushNamed(RouteNames.calendar);
-                },
-                child: Row(
-                  children: [
-                    Text(
-                      context.tr('insights_symptoms_details'),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: isDark
-                            ? Colors.white
-                            : theme.colorScheme.primary,
-                      ),
-                    ),
-                    Icon(
-                      Icons.chevron_right,
-                      size: 20,
-                      color: isDark ? Colors.white : theme.colorScheme.primary,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-
-          // Bars
-          _buildBar(
-            context,
-            context.tr('log_symptom_cramp'),
-            85,
-            theme.colorScheme.primary,
-            textColor,
-            subtitleColor,
-            isDark,
-          ),
-          const SizedBox(height: 20),
-          _buildBar(
-            context,
-            context.tr('log_symptom_headache'),
-            62,
-            theme.colorScheme.primary.withAlpha(153),
-            textColor,
-            subtitleColor,
-            isDark,
-          ),
-          const SizedBox(height: 20),
-          _buildBar(
-            context,
-            context.tr('log_symptom_fatigue'),
-            45,
-            theme.colorScheme.primary.withAlpha(102),
-            textColor,
-            subtitleColor,
-            isDark,
-          ),
-          const SizedBox(height: 20),
-          _buildBar(
-            context,
-            context.tr('log_symptom_bloating'),
-            20,
-            theme.colorScheme.primary.withAlpha(51),
-            textColor,
-            subtitleColor,
-            isDark,
-          ),
-
-          const SizedBox(height: 24),
-
-          // Tip section
-          Container(
-            padding: const EdgeInsets.only(top: 16),
-            decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: borderColor)),
+          Text(
+            context.tr('insights_symptoms_title'),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: textColor,
             ),
-            child: Row(
+          ),
+          const SizedBox(height: 4),
+          Text(
+            frequencies.isEmpty
+                ? context.tr('insights_symptoms_subtitle')
+                : context.tr(
+                    'insights_symptoms_basis',
+                    params: {'days': '$loggedDays'},
+                  ),
+            style: TextStyle(fontSize: 12, color: subtitleColor),
+          ),
+
+          const SizedBox(height: 24),
+
+          if (frequencies.isEmpty)
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade100,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.lightbulb,
-                    color: Colors.orange.shade600,
-                    size: 20,
-                  ),
+                Icon(
+                  Icons.edit_note_outlined,
+                  size: 20,
+                  color: subtitleColor,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        context.tr('insights_tip_title'),
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: textColor,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        context.tr('insights_tip_text'),
-                        style: TextStyle(fontSize: 12, color: subtitleColor),
-                      ),
-                    ],
+                  child: Text(
+                    context.tr('insights_symptoms_empty'),
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 1.5,
+                      color: subtitleColor,
+                    ),
                   ),
                 ),
               ],
-            ),
-          ),
+            )
+          else
+            for (var i = 0; i < frequencies.length; i++) ...[
+              if (i > 0) const SizedBox(height: 20),
+              _SymptomBar(
+                label: context.tr(
+                  LogVocabulary.symptomKey(frequencies[i].code),
+                ),
+                percentage: frequencies[i].percentage,
+                dayCount: frequencies[i].dayCount,
+                // En sık görülen en koyu; sıra aşağı indikçe soluyor.
+                color: theme.colorScheme.primary.withAlpha(
+                  [255, 200, 150, 105][i.clamp(0, 3)],
+                ),
+                textColor: textColor,
+                subtitleColor: subtitleColor,
+                trackColor: isDark
+                    ? AppColors.borderDark
+                    : AppColors.borderGrayLight,
+              ),
+            ],
         ],
       ),
     );
   }
+}
 
-  Widget _buildBar(
-    BuildContext context,
-    String label,
-    int percentage,
-    Color color,
-    Color textColor,
-    Color subtitleColor,
-    bool isDark,
-  ) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                  ),
+class _SymptomBar extends StatelessWidget {
+  final String label;
+  final int percentage;
+  final int dayCount;
+  final Color color;
+  final Color textColor;
+  final Color subtitleColor;
+  final Color trackColor;
+
+  const _SymptomBar({
+    required this.label,
+    required this.percentage,
+    required this.dayCount,
+    required this.color,
+    required this.textColor,
+    required this.subtitleColor,
+    required this.trackColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: context.tr(
+        'insights_symptoms_semantics',
+        params: {
+          'symptom': label,
+          'percent': '$percentage',
+          'days': '$dayCount',
+        },
+      ),
+      excludeSemantics: true,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(width: 8),
-                Text(
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
                   label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: textColor,
                   ),
                 ),
-              ],
-            ),
-            Text(
-              '$percentage%',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: subtitleColor,
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        Container(
-          height: 10,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.borderDark : AppColors.borderGrayLight,
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width:
-                    MediaQuery.of(context).size.width *
-                    (percentage / 100) *
-                    0.7, // Approx width based on screen and padding
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(5),
+              const SizedBox(width: 8),
+              // Ham gün sayısı da gösteriliyor: tek kayıtlı günde "%100"
+              // tek başına yanıltıcı, "%100 · 1 gün" değil.
+              Text(
+                context.tr(
+                  'insights_symptoms_count',
+                  params: {'percent': '$percentage', 'days': '$dayCount'},
+                ),
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: subtitleColor,
                 ),
               ),
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(5),
+            child: LinearProgressIndicator(
+              value: percentage / 100,
+              minHeight: 10,
+              backgroundColor: trackColor,
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
