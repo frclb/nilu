@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../../core/navigation/navigation_service.dart';
-import '../../../../core/navigation/route_names.dart';
 import '../../../design_system/app_colors.dart';
 
 class HealthLibraryFeaturedArticle extends StatelessWidget {
@@ -16,7 +14,10 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
       padding: const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 8),
       child: GestureDetector(
         onTap: () {
-          NavigationService().push(RouteNames.recipeDetail);
+          // Makale detay ekranı henüz yok — bkz. health_library_article_list.
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(context.tr('article_coming_soon'))),
+          );
         },
         child: Container(
           decoration: BoxDecoration(

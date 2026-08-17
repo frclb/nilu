@@ -67,7 +67,6 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final vm = context.watch<PartnerViewModel>();
-    final userVm = context.watch<UserViewModel>();
 
     final bgColor = isDark
         ? AppColors.backgroundDark
@@ -110,9 +109,10 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
         automaticallyImplyLeading: false,
         centerTitle: true,
         title: Text(
-          userVm.partnerId != null
-              ? "${userVm.partnerId!} Durumu"
-              : context.tr('pv_header_title'),
+          // Partner'ın adı hiçbir yerde saklanmıyor; burada `partnerId`
+          // kullanılıyordu ve kullanıcıya ham UUID gösteriliyordu
+          // ("a3f2b8c1-... Durumu"). Ad alanı eklenene kadar genel başlık.
+          context.tr('pv_header_title'),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,

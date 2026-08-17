@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../../core/navigation/navigation_service.dart';
-import '../../../../core/navigation/route_names.dart';
 import '../../../design_system/app_colors.dart';
 
 class HealthLibraryArticleList extends StatelessWidget {
@@ -104,7 +102,12 @@ class HealthLibraryArticleList extends StatelessWidget {
   ) {
     return GestureDetector(
       onTap: () {
-        NavigationService().push(RouteNames.recipeDetail);
+        // Makale detay ekranı henüz yok. Buradan tarif ekranına gidiliyordu:
+        // "PMS için 5 besin"e dokunan kullanıcı somonlu kinoa tarifiyle
+        // karşılaşıyordu. Alakasız bir ekran açmaktansa dürüst mesaj.
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.tr('article_coming_soon'))),
+        );
       },
       child: Container(
         padding: const EdgeInsets.all(12),
