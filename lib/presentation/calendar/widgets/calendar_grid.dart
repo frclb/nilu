@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
-import '../../../../localization/app_localizations.dart';
-import '../../../../localization/date_names.dart';
-import '../../../../design_system/app_colors.dart';
+import '../../../localization/app_localizations.dart';
+import '../../../localization/date_names.dart';
+import '../../../design_system/app_colors.dart';
 import '../../../domain/models/daily_log.dart';
 
 import 'package:provider/provider.dart';
 import '../view_models/calendar_view_model.dart';
-import 'day_detail_bottom_sheet.dart';
 
+/// Ayın ızgarası ve açıklama satırı.
+///
+/// Yalnızca takvimi gösterir: seçili günün bilgisi ve o güne uygulanan
+/// eylemler [CalendarDayHeader]'ın işi. Eskiden ikisi de burada duruyordu ve
+/// seçili gün bilgisi, alttaki özet bölümüyle birebir tekrar ediyordu.
 class CalendarGrid extends StatelessWidget {
   const CalendarGrid({super.key});
 
@@ -54,18 +58,6 @@ class CalendarGrid extends StatelessWidget {
 
     final currentMonthName = context.monthName(month);
 
-    // Seçili gün bilgisi
-    final selectedDate = viewModel.selectedDate;
-    final selectedCycleDay = viewModel.getCycleDayForDate(selectedDate);
-    final selectedIsFertile = viewModel.cycleInfo.isFertile(selectedDate);
-    final selectedIsOvulation = viewModel.cycleInfo.isOvulationDay(
-      selectedDate,
-    );
-    final selectedIsPeriod = viewModel.isPeriodDay(selectedDate);
-    final selectedIsPredicted = viewModel.cycleInfo.isPredictedPeriod(
-      selectedDate,
-    );
-
     return Container(
       decoration: BoxDecoration(
         color: isDark ? AppColors.backgroundDark : Colors.white,
@@ -83,46 +75,74 @@ class CalendarGrid extends StatelessWidget {
         children: [
           // Ay Navigasyonu
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+            padding: const EdgeInsets.only(top: 12, bottom: 8, left: 4),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
                   onPressed: () => viewModel.previousMonth(),
                   icon: const Icon(Icons.chevron_left),
                   color: theme.textTheme.labelLarge?.color,
+                  tooltip: context.tr('calendar_previous_month'),
                 ),
-                Text(
-                  context.tr(
-                    'calendar_month_year',
-                    params: {
-                      'month': currentMonthName,
-                      'year': year.toString(),
-                    },
-                  ),
-                  style: theme.textTheme.displayLarge?.copyWith(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    context.tr(
+                      'calendar_month_year',
+                      params: {
+                        'month': currentMonthName,
+                        'year': year.toString(),
+                      },
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.displayLarge?.copyWith(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 IconButton(
                   onPressed: () => viewModel.nextMonth(),
                   icon: const Icon(Icons.chevron_right),
                   color: theme.textTheme.labelLarge?.color,
+                  tooltip: context.tr('calendar_next_month'),
                 ),
               ],
             ),
           ),
 
-          // Haftanın Günleri Başlığı
+          // "Bugüne dön" — yalnızca başka bir aya gidildiğinde görünür.
+          // Aksi halde kullanıcı ok düğmesine ay sayısı kadar basmak zorunda.
+          if (!viewModel.isViewingCurrentMonth)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: TextButton.icon(
+                onPressed: viewModel.goToToday,
+                icon: const Icon(Icons.today, size: 16),
+                label: Text(context.tr('calendar_jump_today')),
+                style: TextButton.styleFrom(
+                  minimumSize: const Size(0, 40),
+                  foregroundColor: theme.colorScheme.primary,
+                  textStyle: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+
+          // Haftanın Günleri Başlığı.
+          // Sabit 48px genişlik yerine eşit paylaşım: dar ekranlarda
+          // (7 × 48 = 336px) satır taşıyordu.
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: daysOfWeek.map((day) {
-              return SizedBox(
-                width: 48,
+              return Expanded(
                 child: Text(
                   day.toUpperCase(),
                   textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.labelLarge?.copyWith(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
@@ -140,11 +160,14 @@ class CalendarGrid extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: totalItems,
+            // Hücre içeriği 47px (36 daire + 3 boşluk + 8 nokta). 0.85 oranı
+            // hücreyi 62px yapıyor, boşa giden 15px × 6 satır yüzünden eylem
+            // düğmeleri ekranın altında kalıyordu.
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
               mainAxisSpacing: 2,
               crossAxisSpacing: 0,
-              childAspectRatio: 0.85,
+              childAspectRatio: 1.0,
             ),
             itemBuilder: (context, index) {
               final DateTime date;
@@ -171,284 +194,39 @@ class CalendarGrid extends StatelessWidget {
           const SizedBox(height: 12),
 
           // Açıklamalar (Legend)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildLegendItem(
-                context,
-                AppColors.flowMedium,
-                context.tr('calendar_legend_period'),
-              ),
-              const SizedBox(width: 12),
-              _buildLegendItem(
-                context,
-                AppColors.flowLight,
-                context.tr('calendar_legend_predicted'),
-              ),
-              const SizedBox(width: 12),
-              _buildLegendItem(
-                context,
-                isDark ? AppColors.secondaryPinkDark : AppColors.fertileLight,
-                context.tr('calendar_legend_fertility'),
-              ),
-              const SizedBox(width: 12),
-              _buildLegendItem(
-                context,
-                Colors.deepPurple.shade300,
-                context.tr('calendar_legend_ovulation'),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Hızlı Aksiyon Butonları — "Regli düzenle" & "Not ekle"
+          //
+          // Sabit bir Row idi; dört etiket tek satıra sığmak zorundaydı.
+          // Uzun çevirilerde (ör. Almanca "Fruchtbares Fenster") taşıyordu.
+          // Wrap ile gerektiğinde alt satıra iniyor.
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Row(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 14,
+              runSpacing: 8,
               children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
-                      // Direkt regl toggle — sheet açmadan
-                      final isPeriodNow = viewModel.isPeriodDay(selectedDate);
-                      final success = await viewModel.togglePeriodDay(
-                        selectedDate,
-                      );
-                      if (context.mounted) {
-                        if (success) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                context.tr(
-                                  isPeriodNow
-                                      ? 'calendar_period_unmarked'
-                                      : 'calendar_period_marked',
-                                  params: {
-                                    'date':
-                                        '${selectedDate.day}/${selectedDate.month}',
-                                  },
-                                ),
-                              ),
-                              backgroundColor: isPeriodNow
-                                  ? Colors.grey.shade700
-                                  : AppColors.flowMedium,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              duration: const Duration(seconds: 2),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                context.tr('calendar_future_date_error'),
-                              ),
-                              backgroundColor: Colors.red.shade400,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          );
-                        }
-                      }
-                    },
-                    icon: Icon(
-                      selectedIsPeriod
-                          ? Icons.water_drop
-                          : Icons.water_drop_outlined,
-                      size: 18,
-                      color: selectedIsPeriod
-                          ? AppColors.flowMedium
-                          : theme.colorScheme.primary,
-                    ),
-                    label: Text(
-                      context.tr(
-                        selectedIsPeriod
-                            ? 'calendar_unmark_period'
-                            : 'calendar_mark_period',
-                      ),
-                      style: TextStyle(
-                        color: selectedIsPeriod
-                            ? AppColors.flowMedium
-                            : theme.colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: BorderSide(
-                        color: selectedIsPeriod
-                            ? AppColors.flowMedium.withAlpha(102)
-                            : theme.colorScheme.primary.withAlpha(76),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
+                _buildLegendItem(
+                  context,
+                  AppColors.flowMedium,
+                  context.tr('calendar_legend_period'),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        useSafeArea: true,
-                        backgroundColor: Colors.transparent,
-                        builder: (context) =>
-                            DayDetailBottomSheet(date: selectedDate),
-                      );
-                    },
-                    icon: const Icon(Icons.edit_note, size: 18),
-                    label: Text(
-                      context.tr('calendar_add_note'),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
-                    ),
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      backgroundColor: isDark
-                          ? theme.colorScheme.primary.withAlpha(51)
-                          : theme.colorScheme.primary.withAlpha(25),
-                      foregroundColor: theme.colorScheme.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
+                _buildLegendItem(
+                  context,
+                  AppColors.flowLight,
+                  context.tr('calendar_legend_predicted'),
+                ),
+                _buildLegendItem(
+                  context,
+                  isDark ? AppColors.secondaryPinkDark : AppColors.fertileLight,
+                  context.tr('calendar_legend_fertility'),
+                ),
+                _buildLegendItem(
+                  context,
+                  Colors.deepPurple.shade300,
+                  context.tr('calendar_legend_ovulation'),
                 ),
               ],
             ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Seçili Gün Bilgisi
-          _buildSelectedDayInfo(
-            context,
-            selectedDate,
-            selectedCycleDay,
-            selectedIsPeriod,
-            selectedIsPredicted,
-            selectedIsFertile,
-            selectedIsOvulation,
-            isDark,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSelectedDayInfo(
-    BuildContext context,
-    DateTime date,
-    int? cycleDay,
-    bool isPeriod,
-    bool isPredicted,
-    bool isFertile,
-    bool isOvulation,
-    bool isDark,
-  ) {
-    final theme = Theme.of(context);
-
-    // Durum metni ve rengi
-    String statusText;
-    Color statusColor;
-    IconData statusIcon;
-
-    if (isPeriod) {
-      statusText = context.tr('calendar_status_period');
-      statusColor = AppColors.flowMedium;
-      statusIcon = Icons.water_drop;
-    } else if (isOvulation) {
-      statusText = context.tr('calendar_status_ovulation');
-      statusColor = Colors.deepPurple.shade400;
-      statusIcon = Icons.star;
-    } else if (isFertile) {
-      statusText = context.tr('calendar_status_fertile');
-      statusColor = Colors.pink.shade300;
-      statusIcon = Icons.favorite;
-    } else if (isPredicted) {
-      statusText = context.tr('calendar_status_predicted');
-      statusColor = AppColors.flowLight;
-      statusIcon = Icons.water_drop_outlined;
-    } else {
-      statusText = context.tr('calendar_status_normal');
-      statusColor = Colors.grey;
-      statusIcon = Icons.circle_outlined;
-    }
-
-    final dateStr = '${date.day} ${context.shortMonthName(date.month)}';
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.white.withAlpha(10) : Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? Colors.white.withAlpha(15) : Colors.grey.shade200,
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                dateStr,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-              if (cycleDay != null)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withAlpha(25),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    context.tr(
-                      'calendar_cycle_day',
-                      params: {'day': '$cycleDay'},
-                    ),
-                    style: TextStyle(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Icon(statusIcon, size: 18, color: statusColor),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  statusText,
-                  style: TextStyle(
-                    color: statusColor,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 13,
-                  ),
-                ),
-              ),
-            ],
           ),
         ],
       ),
@@ -458,6 +236,7 @@ class CalendarGrid extends StatelessWidget {
   Widget _buildLegendItem(BuildContext context, Color color, String label) {
     final theme = Theme.of(context);
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           width: 8,
@@ -465,7 +244,12 @@ class CalendarGrid extends StatelessWidget {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 4),
-        Text(label, style: theme.textTheme.labelLarge?.copyWith(fontSize: 10)),
+        Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.labelLarge?.copyWith(fontSize: 11),
+        ),
       ],
     );
   }
@@ -553,138 +337,149 @@ class _DayTile extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: () {
-        viewModel.selectDate(date);
-      },
+      onTap: () => viewModel.selectDate(date),
       behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 48,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // ── Period bağlantı barı ──
-            if (isPeriod && (hasPeriodBefore || hasPeriodAfter))
-              Positioned(
-                left: hasPeriodBefore ? 0 : 12,
-                right: hasPeriodAfter ? 0 : 12,
-                top: 10,
-                bottom: 14,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.flowMedium,
-                    borderRadius: BorderRadius.horizontal(
-                      left: hasPeriodBefore
-                          ? Radius.zero
-                          : const Radius.circular(20),
-                      right: hasPeriodAfter
-                          ? Radius.zero
-                          : const Radius.circular(20),
-                    ),
-                  ),
-                ),
-              ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Gün dairesi ve ardışık günleri birleştiren bant.
+          //
+          // Bant, dairenin bulunduğu 36px'lik şeridin *içinde* duruyor.
+          // Eskiden hücrenin tamamına göre sabit değerlerle (top: 10,
+          // bottom: 14) konumlanıyordu; hücre yüksekliği değiştiğinde
+          // daireyle hizası kayıyordu.
+          SizedBox(
+            height: 36,
+            // Bant hücrenin iki ucuna kadar uzanabilmeli. Genişlik
+            // verilmezse Stack yalnızca daire kadar (36px) geniş oluyor ve
+            // ardışık günler arasında boşluk kalıyor.
+            width: double.infinity,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                // Bandın yuvarlak ucu tam dairenin kenarında başlasın:
+                // hücre genişliği cihazdan cihaza değişiyor.
+                final inset = ((constraints.maxWidth - 36) / 2).clamp(
+                  0.0,
+                  24.0,
+                );
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    if (isPeriod && (hasPeriodBefore || hasPeriodAfter))
+                      _buildConnector(
+                        color: AppColors.flowMedium,
+                        openLeft: hasPeriodBefore,
+                        openRight: hasPeriodAfter,
+                        inset: inset,
+                      ),
 
-            // ── Predicted period bağlantı barı ──
-            if (isPredicted &&
-                !isPeriod &&
-                (hasPredictedBefore || hasPredictedAfter))
-              Positioned(
-                left: hasPredictedBefore ? 0 : 12,
-                right: hasPredictedAfter ? 0 : 12,
-                top: 10,
-                bottom: 14,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.flowLight.withAlpha(isDark ? 30 : 50),
-                    borderRadius: BorderRadius.horizontal(
-                      left: hasPredictedBefore
-                          ? Radius.zero
-                          : const Radius.circular(20),
-                      right: hasPredictedAfter
-                          ? Radius.zero
-                          : const Radius.circular(20),
-                    ),
-                  ),
-                ),
-              ),
+                    if (isPredicted &&
+                        !isPeriod &&
+                        (hasPredictedBefore || hasPredictedAfter))
+                      _buildConnector(
+                        color: AppColors.flowLight.withAlpha(isDark ? 30 : 50),
+                        openLeft: hasPredictedBefore,
+                        openRight: hasPredictedAfter,
+                        inset: inset,
+                      ),
 
-            // ── Ana gün hücresi ──
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Gün numarası dairesi
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOut,
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    // Arka plan rengi
-                    color: _getCircleBgColor(
-                      isPeriod,
-                      isSelected,
-                      isPredicted,
-                      isFertile,
-                      isDark,
-                      theme,
-                    ),
-                    shape: BoxShape.circle,
-                    // Seçim halkası — her zaman görünür
-                    border: _getCircleBorder(
-                      isSelected,
-                      isPeriod,
-                      isToday,
-                      isFaded,
-                      theme,
-                      isDark,
-                    ),
-                    // Seçim gölge efekti
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: isPeriod
-                                  ? AppColors.flowMedium.withAlpha(80)
-                                  : theme.colorScheme.primary.withAlpha(60),
-                              blurRadius: 8,
-                              spreadRadius: 1,
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Center(
-                    child: Text(
-                      date.day.toString(),
-                      style: TextStyle(
-                        color: textColor,
-                        fontWeight: (isSelected || isPeriod || isToday)
-                            ? FontWeight.bold
-                            : FontWeight.w500,
-                        fontSize: 14,
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOut,
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: _getCircleBgColor(
+                          isPeriod,
+                          isSelected,
+                          isPredicted,
+                          isFertile,
+                          isDark,
+                          theme,
+                        ),
+                        shape: BoxShape.circle,
+                        // Seçim halkası — her zaman görünür
+                        border: _getCircleBorder(
+                          isSelected,
+                          isPeriod,
+                          isToday,
+                          isFaded,
+                          theme,
+                          isDark,
+                        ),
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: isPeriod
+                                      ? AppColors.flowMedium.withAlpha(80)
+                                      : theme.colorScheme.primary.withAlpha(60),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: Center(
+                        child: Text(
+                          date.day.toString(),
+                          style: TextStyle(
+                            color: textColor,
+                            fontWeight: (isSelected || isPeriod || isToday)
+                                ? FontWeight.bold
+                                : FontWeight.w500,
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-
-                const SizedBox(height: 3),
-
-                // Alt gösterge noktaları
-                SizedBox(
-                  height: 8,
-                  child: _buildBottomIndicator(
-                    isOvulation: isOvulation,
-                    isFertile: isFertile,
-                    isPeriod: isPeriod,
-                    hasLog: hasLog,
-                    isToday: isToday,
-                    isSelected: isSelected,
-                    isFaded: isFaded,
-                    theme: theme,
-                    isDark: isDark,
-                  ),
-                ),
-              ],
+                  ],
+                );
+              },
             ),
-          ],
+          ),
+
+          const SizedBox(height: 3),
+
+          // Alt gösterge noktaları
+          SizedBox(
+            height: 8,
+            child: _buildBottomIndicator(
+              isOvulation: isOvulation,
+              isFertile: isFertile,
+              isPeriod: isPeriod,
+              hasLog: hasLog,
+              isFaded: isFaded,
+              theme: theme,
+              isDark: isDark,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Ardışık regl (veya tahmin) günlerini görsel olarak birleştiren bant.
+  ///
+  /// Bant, komşu gün de aynı türdeyse o yöne doğru hücre kenarına kadar
+  /// uzanır ve köşesi düz kalır; değilse dairenin hizasında yuvarlanır.
+  Widget _buildConnector({
+    required Color color,
+    required bool openLeft,
+    required bool openRight,
+    required double inset,
+  }) {
+    return Positioned(
+      left: openLeft ? 0 : inset,
+      right: openRight ? 0 : inset,
+      top: 0,
+      bottom: 0,
+      child: Container(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.horizontal(
+            left: openLeft ? Radius.zero : const Radius.circular(20),
+            right: openRight ? Radius.zero : const Radius.circular(20),
+          ),
         ),
       ),
     );
@@ -743,8 +538,6 @@ class _DayTile extends StatelessWidget {
     required bool isFertile,
     required bool isPeriod,
     required bool hasLog,
-    required bool isToday,
-    required bool isSelected,
     required bool isFaded,
     required ThemeData theme,
     required bool isDark,

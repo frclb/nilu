@@ -39,7 +39,6 @@
   "calendar_legend_fertility": "Janela fértil",
   "calendar_cycle_day": "Dia {day} do ciclo",
   "calendar_today_summary": "RESUMO DE HOJE",
-  "calendar_sleep_add": "Adicionar sono",
   "calendar_daily_suggestion": "Sugestão do dia",
   "calendar_daily_suggestion_text": "Hoje seu corpo pode precisar de mais descanso. Que tal um yoga leve ou uma caminhada?",
   "log_title": "Adicionar registro",
@@ -585,5 +584,9 @@
   "premium_restore_none": "Nenhuma assinatura encontrada para restaurar.",
   "favorite_removed": "Removido dos favoritos",
   "favorite_remove": "Remover dos favoritos",
-  "insights_tab_coming_soon": "O conteúdo de {tab} chegará em breve"
+  "insights_tab_coming_soon": "O conteúdo de {tab} chegará em breve",
+  "calendar_day_summary": "RESUMO DO DIA",
+  "calendar_jump_today": "Voltar para hoje",
+  "calendar_previous_month": "Mês anterior",
+  "calendar_next_month": "Próximo mês"
 }

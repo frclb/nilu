@@ -39,7 +39,6 @@
   "calendar_legend_fertility": "Ventana fértil",
   "calendar_cycle_day": "Día {day} del ciclo",
   "calendar_today_summary": "RESUMEN DE HOY",
-  "calendar_sleep_add": "Añadir sueño",
   "calendar_daily_suggestion": "Sugerencia del día",
   "calendar_daily_suggestion_text": "Hoy tu cuerpo puede necesitar algo más de descanso. Prueba con yoga suave o un paseo.",
   "log_title": "Añadir registro",
@@ -585,5 +584,9 @@
   "premium_restore_none": "No se encontró ninguna suscripción para restaurar.",
   "favorite_removed": "Eliminado de favoritos",
   "favorite_remove": "Quitar de favoritos",
-  "insights_tab_coming_soon": "El contenido de {tab} llegará pronto"
+  "insights_tab_coming_soon": "El contenido de {tab} llegará pronto",
+  "calendar_day_summary": "RESUMEN DEL DÍA",
+  "calendar_jump_today": "Volver a hoy",
+  "calendar_previous_month": "Mes anterior",
+  "calendar_next_month": "Mes siguiente"
 }

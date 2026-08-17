@@ -39,7 +39,6 @@
   "calendar_legend_fertility": "Fenêtre de fertilité",
   "calendar_cycle_day": "Jour {day} du cycle",
   "calendar_today_summary": "RÉSUMÉ DU JOUR",
-  "calendar_sleep_add": "Ajouter le sommeil",
   "calendar_daily_suggestion": "Suggestion du jour",
   "calendar_daily_suggestion_text": "Ton corps a peut-être besoin d'un peu plus de repos aujourd'hui. Essaie un yoga doux ou une marche.",
   "log_title": "Ajouter une entrée",
@@ -585,5 +584,9 @@
   "premium_restore_none": "Aucun abonnement à restaurer.",
   "favorite_removed": "Retiré des favoris",
   "favorite_remove": "Retirer des favoris",
-  "insights_tab_coming_soon": "Le contenu {tab} arrive bientôt"
+  "insights_tab_coming_soon": "Le contenu {tab} arrive bientôt",
+  "calendar_day_summary": "RÉSUMÉ DU JOUR",
+  "calendar_jump_today": "Revenir à aujourd'hui",
+  "calendar_previous_month": "Mois précédent",
+  "calendar_next_month": "Mois suivant"
 }

@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/log_vocabulary.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../../localization/date_names.dart';
 import '../../../../design_system/app_colors.dart';
 import '../view_models/calendar_view_model.dart';
 import 'day_detail_bottom_sheet.dart';
 
+/// Seçili günün kayıt özeti.
+///
+/// Tarih ve döngü günü başlığı burada değil [CalendarDayHeader]'da; bu bölüm
+/// yalnızca o güne girilmiş veriyi (akış, ruh hâli, semptom, not) gösterir.
 class CalendarSummarySection extends StatelessWidget {
   const CalendarSummarySection({super.key});
 
@@ -16,12 +19,11 @@ class CalendarSummarySection extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final viewModel = context.watch<CalendarViewModel>();
     final selectedDate = viewModel.selectedDate;
-    final cycleDay = viewModel.getCycleDay();
     final dailyLog = viewModel.getDailyLogForDate(selectedDate);
 
-    final dateStr =
-        '${selectedDate.day} ${context.monthName(selectedDate.month)}';
-    final weekdayStr = context.weekdayName(selectedDate.weekday);
+    // Başlık seçili güne göre değişir: başka bir gün seçiliyken "Bugünün
+    // özeti" demek yanıltıcı oluyordu.
+    final isToday = DateUtils.isSameDay(selectedDate, DateTime.now());
 
     // Gerçek veri kontrolü
     final hasFlow = dailyLog.flowIntensity != null;
@@ -31,52 +33,10 @@ class CalendarSummarySection extends StatelessWidget {
     final hasAnyData = hasFlow || hasMoods || hasSymptoms || hasNotes;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Date Header
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      dateStr,
-                      style: theme.textTheme.displayLarge?.copyWith(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      weekdayStr,
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                if (cycleDay != null)
-                  Text(
-                    context.tr(
-                      'calendar_cycle_day',
-                      params: {'day': cycleDay.toString()},
-                    ),
-                    style: TextStyle(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
           // Summary Card
           Container(
             padding: const EdgeInsets.all(20),
@@ -98,27 +58,26 @@ class CalendarSummarySection extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      context.tr('calendar_today_summary'),
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
+                    Expanded(
+                      child: Text(
+                        context.tr(
+                          isToday
+                              ? 'calendar_today_summary'
+                              : 'calendar_day_summary',
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
                       ),
                     ),
                     IconButton(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          useSafeArea: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) =>
-                              DayDetailBottomSheet(date: selectedDate),
-                        );
-                      },
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                      onPressed: () =>
+                          showDayDetailSheet(context, selectedDate),
+                      tooltip: context.tr('calendar_add_note'),
                       icon: Icon(
                         Icons.edit,
                         size: 20,
@@ -190,7 +149,6 @@ class CalendarSummarySection extends StatelessWidget {
                                     : const Color(0xFFF3E8FF),
                               ),
                             ),
-                      _buildAddSleepChip(context, isDark),
                     ],
                   )
                 else
@@ -341,41 +299,6 @@ class CalendarSummarySection extends StatelessWidget {
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: textColor,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAddSleepChip(BuildContext context, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.borderSlateDark.withAlpha(76)
-            : const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(32),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.bedtime,
-            size: 18,
-            color: isDark
-                ? AppColors.textMutedSlate
-                : AppColors.textMutedSlateDark,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            context.tr('calendar_sleep_add'),
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: isDark
-                  ? AppColors.textMutedSlateDark
-                  : AppColors.textMutedSlate,
             ),
           ),
         ],

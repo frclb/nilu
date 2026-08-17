@@ -39,7 +39,6 @@
   "calendar_legend_fertility": "Doğurganlık",
   "calendar_cycle_day": "Döngü günü {day}",
   "calendar_today_summary": "BUGÜNÜN ÖZETİ",
-  "calendar_sleep_add": "Uyku Ekle",
   "calendar_daily_suggestion": "Günlük Öneri",
   "calendar_daily_suggestion_text": "Vücudun bugün biraz daha dinlenmeye ihtiyaç duyabilir. Hafif yoga veya yürüyüş yapmayı deneyebilirsin.",
   "log_title": "Kayıt Ekle",
@@ -585,5 +584,9 @@
   "premium_restore_none": "Geri yüklenecek bir abonelik bulunamadı.",
   "favorite_removed": "Favorilerden çıkarıldı",
   "favorite_remove": "Favorilerden Çıkar",
-  "insights_tab_coming_soon": "{tab} içerikleri yakında eklenecek"
+  "insights_tab_coming_soon": "{tab} içerikleri yakında eklenecek",
+  "calendar_day_summary": "GÜNÜN ÖZETİ",
+  "calendar_jump_today": "Bugüne dön",
+  "calendar_previous_month": "Önceki ay",
+  "calendar_next_month": "Sonraki ay"
 }

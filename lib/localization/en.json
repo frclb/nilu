@@ -39,7 +39,6 @@
   "calendar_legend_fertility": "Fertility Window",
   "calendar_cycle_day": "Cycle day {day}",
   "calendar_today_summary": "TODAY'S SUMMARY",
-  "calendar_sleep_add": "Add Sleep",
   "calendar_daily_suggestion": "Daily Suggestion",
   "calendar_daily_suggestion_text": "Your body might need a bit more rest today. Consider some light yoga or a walk.",
   "log_title": "Add Log",
@@ -585,5 +584,9 @@
   "premium_restore_none": "No subscription found to restore.",
   "favorite_removed": "Removed from favorites",
   "favorite_remove": "Remove from Favorites",
-  "insights_tab_coming_soon": "{tab} content is coming soon"
+  "insights_tab_coming_soon": "{tab} content is coming soon",
+  "calendar_day_summary": "DAY SUMMARY",
+  "calendar_jump_today": "Back to today",
+  "calendar_previous_month": "Previous month",
+  "calendar_next_month": "Next month"
 }

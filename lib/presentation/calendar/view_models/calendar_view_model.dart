@@ -80,6 +80,23 @@ class CalendarViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Görünen ayı ve seçili günü bugüne döndürür.
+  ///
+  /// Kullanıcı ileri/geri oklarıyla uzaklaştığında tek dokunuşla dönebilmeli;
+  /// aksi halde ok düğmesine ay sayısı kadar basmak gerekiyor.
+  void goToToday() {
+    final now = DateTime.now();
+    _currentMonth = DateTime(now.year, now.month);
+    _selectedDate = now;
+    notifyListeners();
+  }
+
+  /// Görünen ay, içinde bulunduğumuz ay mı?
+  bool get isViewingCurrentMonth {
+    final now = DateTime.now();
+    return _currentMonth.year == now.year && _currentMonth.month == now.month;
+  }
+
   /// Seçili gün için döngü gününü hesaplar.
   int? getCycleDay() {
     return getCycleDayForDate(_selectedDate);

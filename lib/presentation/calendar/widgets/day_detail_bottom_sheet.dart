@@ -6,6 +6,27 @@ import '../../../domain/models/log_vocabulary.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../../design_system/app_colors.dart';
 
+/// Gün detay sayfasını açar.
+///
+/// Sayfa birden fazla yerden açılıyor; `showModalBottomSheet` ayarlarının
+/// (tam yükseklik, güvenli alan, şeffaf zemin) hepsinde aynı kalması için
+/// çağrı tek bir yerde toplandı.
+///
+/// `useRootNavigator` şart: sekme gövdesinin navigatöründe açılırsa alt menü
+/// çubuğu sayfanın **üstüne** çiziliyor, notlar alanının altını kapatıyor ve
+/// karartma perdesinin dışında kaldığı için yanlışlıkla sekme değiştirmeye
+/// açık duruyor.
+Future<void> showDayDetailSheet(BuildContext context, DateTime date) {
+  return showModalBottomSheet<void>(
+    context: context,
+    useRootNavigator: true,
+    isScrollControlled: true,
+    useSafeArea: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => DayDetailBottomSheet(date: date),
+  );
+}
+
 class DayDetailBottomSheet extends StatefulWidget {
   final DateTime date;
 

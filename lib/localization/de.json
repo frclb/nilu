@@ -39,7 +39,6 @@
   "calendar_legend_fertility": "Fruchtbares Fenster",
   "calendar_cycle_day": "Zyklustag {day}",
   "calendar_today_summary": "ZUSAMMENFASSUNG HEUTE",
-  "calendar_sleep_add": "Schlaf hinzufügen",
   "calendar_daily_suggestion": "Tagesempfehlung",
   "calendar_daily_suggestion_text": "Dein Körper braucht heute vielleicht etwas mehr Ruhe. Wie wäre es mit leichtem Yoga oder einem Spaziergang?",
   "log_title": "Eintrag hinzufügen",
@@ -585,5 +584,9 @@
   "premium_restore_none": "Kein Abo zum Wiederherstellen gefunden.",
   "favorite_removed": "Aus Favoriten entfernt",
   "favorite_remove": "Aus Favoriten entfernen",
-  "insights_tab_coming_soon": "{tab}-Inhalte folgen in Kürze"
+  "insights_tab_coming_soon": "{tab}-Inhalte folgen in Kürze",
+  "calendar_day_summary": "TAGESÜBERSICHT",
+  "calendar_jump_today": "Zurück zu heute",
+  "calendar_previous_month": "Vorheriger Monat",
+  "calendar_next_month": "Nächster Monat"
 }
