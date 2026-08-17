@@ -51,12 +51,17 @@
 	     Connect'te ihracat uyum belgesi doldurmanız gerekir. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
-	<!-- App Store'da listelenecek diller. Uygulamanın gerçekten çevrildiği
-	     dillerle aynı olmalıdır; eksik çevrili bir dili buraya eklemeyin. -->
+	<!-- App Store'da listelenecek diller. Altısı da tam çevrilidir
+	     (562/562 anahtar); `dart run tool/check_localization.dart` doğrular.
+	     Yeni bir dil eklemeden önce çevirisini tamamlayın. -->
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>tr</string>
 		<string>en</string>
+		<string>de</string>
+		<string>es</string>
+		<string>fr</string>
+		<string>pt</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

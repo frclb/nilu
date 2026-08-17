@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../localization/app_localizations.dart';
 import '../../design_system/app_colors.dart';
 import '../../core/navigation/route_names.dart';
@@ -214,7 +215,7 @@ class PremiumScreen extends StatelessWidget {
                   children: [
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed('/privacy_policy');
+                        context.pushNamed(RouteNames.privacyPolicy);
                       },
                       child: Text(
                         context.tr('premium_privacy'),
@@ -237,7 +238,7 @@ class PremiumScreen extends StatelessWidget {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed('/terms_of_service');
+                        context.pushNamed(RouteNames.termsOfService);
                       },
                       child: Text(
                         context.tr('premium_terms'),

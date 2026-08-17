@@ -13,6 +13,7 @@ App Store ve Google Play yüklemesi için gereken adımlar. ✅ = kodda hazır,
 | Görünen ad | Period Tracker | Period Tracker | ✅ |
 | Sürüm | `1.0.0` (build 1) | `1.0.0` (versionCode 1) | ✅ `pubspec.yaml:19` |
 | Minimum sürüm | iOS 15.0 | API 24 | ✅ |
+| Desteklenen diller | tr, en, de, es, fr, pt | aynı | ✅ altısı da 562/562 |
 
 > iOS deployment target 13.0'dı ama Podfile ve Firebase 15.0 istiyor — düzeltildi.
 > Uyumsuz kalsaydı App Store doğrulaması reddederdi.
@@ -39,21 +40,31 @@ uygulamanın güncellemelerini bir daha yayınlayamazsınız** — yedekleyin.
 
 ---
 
-## 3. Görseller ⬜
+## 3. Görseller
 
-Şu anda **her iki platformda da Flutter'ın varsayılan ikonu** duruyor.
-Bu haliyle yüklerseniz Apple reddeder, Play'de amatör görünür.
+**App ikonu** ✅ — marka lotusu üretildi ve tüm platform boyutlarına uygulandı.
+
+| Öğe | Durum |
+|---|---|
+| iOS app ikonu (21 boyut, 1024 alfasız) | ✅ |
+| Android adaptive icon (foreground + #551B26 zemin) | ✅ |
+
+İkonu değiştirmek isterseniz:
+```bash
+python3 tool/generate_icon.py && dart run flutter_launcher_icons
+```
+Kendi tasarımınızı kullanacaksanız `assets/icon/app_icon.png` dosyasını
+(1024×1024, şeffaflıksız) değiştirip yalnızca ikinci komutu çalıştırın.
+
+**Ekran görüntüleri** ⬜ — mağaza formlarında hâlâ sizden isteniyor:
 
 | Gerekli | Ölçü |
 |---|---|
-| iOS app ikonu | 1024×1024 (şeffaflık yok, köşe yuvarlama yok) |
-| Android adaptive icon | 432×432 foreground + background |
 | iPhone ekran görüntüsü | 6.7" ve 6.5" — her biri 3-10 adet |
 | Android ekran görüntüsü | telefon için en az 2 adet |
 | Play özellik grafiği | 1024×500 |
 
-Kolay yol: `flutter_launcher_icons` paketi tek bir 1024×1024 PNG'den tüm
-boyutları üretir. Ekran görüntülerini §7'deki simülatör akışıyla alabilirsiniz.
+Ekran görüntülerini [TESTING.md](TESTING.md) §5'teki simülatör akışıyla alabilirsiniz.
 
 ---
 
