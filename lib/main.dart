@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'design_system/app_theme.dart';
 import 'localization/app_localizations.dart';
@@ -46,16 +47,30 @@ void main() async {
   runApp(PeriodTrackerApp(userViewModel: userViewModel));
 }
 
-class PeriodTrackerApp extends StatelessWidget {
+class PeriodTrackerApp extends StatefulWidget {
   final UserViewModel userViewModel;
 
   const PeriodTrackerApp({super.key, required this.userViewModel});
 
   @override
+  State<PeriodTrackerApp> createState() => _PeriodTrackerAppState();
+}
+
+class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
+  /// Router **bir kez** kurulur.
+  ///
+  /// Daha önce `build` içindeki bir `Builder`'da üretiliyordu; UserViewModel
+  /// her `notifyListeners()` çağırdığında (ProxyProvider'lar yüzünden bu sık
+  /// oluyor) yeni bir GoRouter oluşuyor ve gezinme yığını sıfırlanıyordu.
+  /// Çıkış yapıp onboarding'e gidildikten sonra kullanıcının ana ekrana geri
+  /// sıçramasının sebebi buydu.
+  late final GoRouter _router = createAppRouter(widget.userViewModel);
+
+  @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: userViewModel),
+        ChangeNotifierProvider.value(value: widget.userViewModel),
         ChangeNotifierProvider(create: (_) => CalendarViewModel()),
         ChangeNotifierProvider(create: (_) => SubscriptionViewModel()),
 
@@ -78,32 +93,27 @@ class PeriodTrackerApp extends StatelessWidget {
           },
         ),
       ],
-      child: Builder(
-        builder: (context) {
-          final router = createAppRouter(context.read<UserViewModel>());
-          return MaterialApp.router(
-            title: 'Period Tracker',
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: ThemeMode.system,
-            debugShowCheckedModeBanner: false,
-            supportedLocales: const [
-              Locale('tr', ''),
-              Locale('en', ''),
-              Locale('de', ''),
-              Locale('fr', ''),
-              Locale('es', ''),
-              Locale('pt', ''),
-            ],
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            routerConfig: router,
-          );
-        },
+      child: MaterialApp.router(
+        title: 'Period Tracker',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.system,
+        debugShowCheckedModeBanner: false,
+        supportedLocales: const [
+          Locale('tr', ''),
+          Locale('en', ''),
+          Locale('de', ''),
+          Locale('fr', ''),
+          Locale('es', ''),
+          Locale('pt', ''),
+        ],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        routerConfig: _router,
       ),
     );
   }

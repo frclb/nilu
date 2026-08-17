@@ -212,9 +212,7 @@ class ProfileSettingsScreen extends StatelessWidget {
 
             // Logout Button
             TextButton.icon(
-              onPressed: () {
-                context.goNamed(RouteNames.onboarding);
-              },
+              onPressed: () => _confirmAndSignOut(context),
               icon: Icon(
                 Icons.logout,
                 size: 20,
@@ -349,5 +347,57 @@ class ProfileSettingsScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Onay alır ve gerçekten oturumu kapatır.
+  ///
+  /// Eskiden bu düğme yalnızca `/onboarding`'e gidiyordu: uzak oturum açık
+  /// kalıyor, `onboarding_complete` bayrağı true kalıyordu. Sonuç olarak
+  /// uygulama yeniden açıldığında doğruca ana ekrana dönülüyor, hatta durum
+  /// her değiştiğinde kullanıcı ana ekrana geri sıçrıyordu.
+  Future<void> _confirmAndSignOut(BuildContext context) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          dialogContext.tr('logout_confirm_title'),
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          dialogContext.tr('logout_confirm_desc'),
+          style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[700]),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(dialogContext.tr('cancel')),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(dialogContext.tr('profile_logout')),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    // Oturumu kapat. Router `refreshListenable` üzerinden durumu görüp
+    // kullanıcıyı onboarding'e yönlendirir — elle gezinmeye gerek yok.
+    await context.read<UserViewModel>().signOut();
   }
 }

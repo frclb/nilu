@@ -560,5 +560,7 @@
   "log_sex_none": "None",
   "log_sex_protected": "Protected",
   "log_sex_unprotected": "Unprotected",
-  "partner_support_water_value": "2.5 L"
+  "partner_support_water_value": "2.5 L",
+  "logout_confirm_title": "Log out?",
+  "logout_confirm_desc": "Your session will end and you will return to the welcome screen. Your saved health data stays on this device."
 }

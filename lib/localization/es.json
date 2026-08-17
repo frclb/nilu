@@ -560,5 +560,7 @@
   "log_sex_none": "Ninguna",
   "log_sex_protected": "Con protección",
   "log_sex_unprotected": "Sin protección",
-  "partner_support_water_value": "2,5 l"
+  "partner_support_water_value": "2,5 l",
+  "logout_confirm_title": "¿Cerrar sesión?",
+  "logout_confirm_desc": "Tu sesión terminará y volverás a la pantalla de bienvenida. Tus datos de salud guardados permanecen en este dispositivo."
 }

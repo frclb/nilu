@@ -1,4 +1,5 @@
 class RouteNames {
+  static const String splash = 'splash';
   static const String onboarding = 'onboarding_welcome';
   static const String onboardingLastPeriod = 'onboarding_last_period';
   static const String onboardingCycleLength = 'onboarding_cycle_length';

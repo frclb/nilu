@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
 import '../../domain/view_models/user_view_model.dart';
@@ -11,13 +10,15 @@ class OnboardingSuccessScreen extends StatelessWidget {
   const OnboardingSuccessScreen({super.key});
 
   Future<void> _completeOnboarding(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('onboarding_complete', true);
+    final userViewModel = context.read<UserViewModel>();
 
     // Normal kullanıcı girişinde partner modunu sıfırla
-    if (context.mounted) {
-      await context.read<UserViewModel>().resetPartnerState();
-    }
+    await userViewModel.resetPartnerState();
+
+    // Bayrağı doğrudan SharedPreferences'a yazmıyoruz: ViewModel üzerinden
+    // yazmak bellek içi durumu da güncelliyor, aksi hâlde router eski değeri
+    // görmeye devam ediyordu.
+    await userViewModel.markOnboardingComplete();
 
     if (context.mounted) {
       context.goNamed(RouteNames.home);

@@ -560,5 +560,7 @@
   "log_sex_none": "Yok",
   "log_sex_protected": "Korunmalı",
   "log_sex_unprotected": "Korunmasız",
-  "partner_support_water_value": "2,5 L"
+  "partner_support_water_value": "2,5 L",
+  "logout_confirm_title": "Çıkış yapılsın mı?",
+  "logout_confirm_desc": "Oturumunuz kapatılacak ve karşılama ekranına döneceksiniz. Kayıtlı sağlık verileriniz cihazda kalır."
 }

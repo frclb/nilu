@@ -4,11 +4,20 @@ import 'package:uuid/uuid.dart';
 import '../../data/datasources/remote/firebase_auth_datasource.dart';
 import '../../data/datasources/remote/firestore_datasource.dart';
 import '../../data/datasources/remote/notification_service.dart';
+import '../services/subscription_service.dart';
 
 class UserViewModel extends ChangeNotifier {
   final FirebaseAuthDataSource _authDS = FirebaseAuthDataSource();
   final FirestoreDataSource _firestoreDS = FirestoreDataSource();
   final NotificationService _notificationService = NotificationService();
+
+  /// Durum yerel depodan okunana kadar false kalır.
+  ///
+  /// Router bunu bekler: okuma bitmeden yönlendirme yaparsak dönen kullanıcıyı
+  /// yanlışlıkla onboarding'e düşürürüz (okuma asenkron olduğu için başlangıçta
+  /// tüm bayraklar varsayılan değerindedir).
+  bool _isLoaded = false;
+  bool get isLoaded => _isLoaded;
 
   // ─── Onboarding ───
   bool _onboardingComplete = false;
@@ -45,6 +54,49 @@ class UserViewModel extends ChangeNotifier {
       _notificationService.initialize(user.uid);
     }
 
+    _isLoaded = true;
+    notifyListeners();
+  }
+
+  /// Onboarding'in tamamlandığını işaretler.
+  ///
+  /// Ekranlar `SharedPreferences`'a doğrudan yazmamalıdır: o yol bellek içi
+  /// durumu güncellemediği için router eski değeri görmeye devam eder.
+  Future<void> markOnboardingComplete() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboarding_complete', true);
+    _onboardingComplete = true;
+    notifyListeners();
+  }
+
+  /// Oturumu kapatır.
+  ///
+  /// Uzak oturumu (Firebase, RevenueCat) sonlandırır, oturuma ait yerel
+  /// bayrakları sıfırlar ve kullanıcıyı onboarding'e döndürür.
+  ///
+  /// **Sağlık verisini silmez** — o, Profil → Gizlilik → "Hesabımı Sil"
+  /// akışının işidir. Çıkış yalnızca oturumu bitirir.
+  Future<void> signOut() async {
+    try {
+      await _authDS.signOut();
+      await SubscriptionService.logout();
+    } catch (e) {
+      // Uzak taraf başarısız olsa da yerel oturum kapatılmalı.
+      debugPrint('Sign out (remote) failed: $e');
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboarding_complete', false);
+    await prefs.setBool('isPartner', false);
+    await prefs.setBool('hasPartner', false);
+    await prefs.remove('partnerId');
+    await prefs.remove('myId');
+
+    _onboardingComplete = false;
+    _isPartner = false;
+    _hasPartner = false;
+    _partnerId = null;
+    _myId = null;
     notifyListeners();
   }
 
@@ -157,6 +209,7 @@ class UserViewModel extends ChangeNotifier {
     _partnerId = null;
     _myId = null;
     _hasPartner = false;
+    _isLoaded = false;
     notifyListeners();
     await _loadState();
   }

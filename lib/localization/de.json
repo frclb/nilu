@@ -560,5 +560,7 @@
   "log_sex_none": "Keine",
   "log_sex_protected": "Geschützt",
   "log_sex_unprotected": "Ungeschützt",
-  "partner_support_water_value": "2,5 l"
+  "partner_support_water_value": "2,5 l",
+  "logout_confirm_title": "Abmelden?",
+  "logout_confirm_desc": "Deine Sitzung wird beendet und du kehrst zum Startbildschirm zurück. Deine gespeicherten Gesundheitsdaten bleiben auf dem Gerät."
 }

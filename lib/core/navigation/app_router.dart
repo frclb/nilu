@@ -9,6 +9,7 @@ import '../../domain/view_models/user_view_model.dart';
 import '../../presentation/partner_match/partner_dashboard_screen.dart';
 
 // Screens
+import '../../presentation/splash/splash_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_welcome_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_last_period_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_cycle_length_screen.dart';
@@ -38,16 +39,95 @@ import '../../presentation/legal/privacy_policy_screen.dart';
 import '../../presentation/legal/terms_of_service_screen.dart';
 import '../../presentation/premium/premium_screen.dart';
 
-/// go_router yapılandırması — UserViewModel durumuna göre initialLocation belirlenir.
-GoRouter createAppRouter(UserViewModel userViewModel) {
+/// Onboarding tamamlanmadan da erişilebilen yollar.
+///
+/// `/partner_scan` buradadır çünkü partner, karşılama ekranından QR okutarak
+/// giriş yapar; `/splash` durum yüklenirken beklenen yerdir.
+const Set<String> preOnboardingPaths = {
+  '/splash',
+  '/onboarding',
+  '/onboarding_last_period',
+  '/onboarding_cycle_length',
+  '/onboarding_success',
+  '/partner_scan',
+  '/privacy_policy',
+  '/terms_of_service',
+};
+
+const String splashPath = '/splash';
+const String onboardingPath = '/onboarding';
+const String homePath = '/home';
+
+/// Yönlendirme kararı — saf fonksiyon.
+///
+/// Router'ın `redirect` geri çağrısından ayrı tutulur ki widget ağacı
+/// kurmadan, tüm durum bileşimleri için test edilebilsin.
+///
+/// Dönen değer null ise gezinmeye izin verilir.
+String? resolveRedirect({
+  required bool isLoaded,
+  required bool onboardingComplete,
+  required String location,
+}) {
+  // Durum depodan okunana kadar splash'te bekle. Erken karar verirsek dönen
+  // kullanıcıyı yanlışlıkla onboarding'e düşürürüz.
+  if (!isLoaded) {
+    return location == splashPath ? null : splashPath;
+  }
+
+  // Okuma bitti: splash'ten gidilecek yere geç.
+  if (location == splashPath) {
+    return onboardingComplete ? homePath : onboardingPath;
+  }
+
+  // Onboarding tamamlanmadan uygulamanın gövdesine girilemez.
+  // (Çıkış yapıldığında bayrak sıfırlandığı için kullanıcı burada kalır.)
+  if (!onboardingComplete && !preOnboardingPaths.contains(location)) {
+    return onboardingPath;
+  }
+
+  return null;
+}
+
+/// go_router yapılandırması.
+///
+/// Yönlendirme `initialLocation` ile değil `redirect` ile yapılır: durum
+/// depodan **asenkron** okunduğu için router kurulurken `onboardingComplete`
+/// henüz varsayılan değerindedir. `redirect` her gezinmede güncel durumu
+/// okur ve `refreshListenable` sayesinde durum değişince yeniden çalışır.
+///
+/// ⚠️ Bu fonksiyon uygulama ömrü boyunca **bir kez** çağrılmalıdır
+/// (bkz. `main.dart`). Her build'de yeniden çağrılırsa yeni bir GoRouter
+/// üretilir; gezinme yığını sıfırlanır ve kullanıcı bulunduğu ekrandan
+/// koparılır — çıkış yaptıktan sonra ana ekrana geri sıçramasının sebebi buydu.
+///
+/// [navigatorKey] yalnızca testler için vardır: `NavigationService` bir
+/// singleton olduğu için aynı `GlobalKey`'i paylaşan iki router aynı süreçte
+/// yaşayamaz. Uygulamada varsayılan bırakılmalıdır.
+GoRouter createAppRouter(
+  UserViewModel userViewModel, {
+  GlobalKey<NavigatorState>? navigatorKey,
+}) {
   return GoRouter(
-    navigatorKey: NavigationService().navigatorKey,
-    initialLocation: userViewModel.onboardingComplete ? '/home' : '/onboarding',
+    navigatorKey: navigatorKey ?? NavigationService().navigatorKey,
+    initialLocation: splashPath,
     refreshListenable: userViewModel,
+    redirect: (context, state) => resolveRedirect(
+      isLoaded: userViewModel.isLoaded,
+      onboardingComplete: userViewModel.onboardingComplete,
+      location: state.matchedLocation,
+    ),
     // Rota loglarını yalnızca debug derlemede yaz — release'te gürültü ve
     // gereksiz bilgi sızıntısı olmasın.
     debugLogDiagnostics: kDebugMode,
     routes: [
+      // Durum yüklenirken beklenen ara ekran.
+      GoRoute(
+        path: '/splash',
+        name: RouteNames.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
+
       // -----------------------------------------
       // 1️⃣ Onboarding Akışı
       // -----------------------------------------
