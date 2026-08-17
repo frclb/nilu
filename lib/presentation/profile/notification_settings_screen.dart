@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../../data/local/reminder_scheduler.dart';
 import '../../data/repositories/notification_settings_repository.dart';
 import '../../domain/models/notification_settings.dart';
+import '../../domain/services/reminder_planner.dart';
 import '../../localization/app_localizations.dart';
+import '../calendar/view_models/calendar_view_model.dart';
 import '../../design_system/app_colors.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
@@ -36,11 +40,46 @@ class _NotificationSettingsScreenState
     });
   }
 
-  /// Her değişiklik anında kalıcılaştırılır — bu ekranda ayrı bir "Kaydet"
-  /// düğmesi yok.
+  /// Her değişiklik anında kalıcılaştırılır ve **hatırlatıcılar yeniden
+  /// planlanır**.
+  ///
+  /// Eskiden yalnızca tercih kaydediliyordu; hiçbir bildirim planlanmadığı
+  /// için kullanıcı hatırlatıcıyı açsa da bildirim almıyordu.
   Future<void> _update(GeneralNotificationSettings next) async {
     setState(() => _settings = next);
     await _repository.saveGeneralSettings(next);
+    await _reschedule(next);
+  }
+
+  Future<void> _reschedule(GeneralNotificationSettings settings) async {
+    final cycleInfo = context.read<CalendarViewModel>().cycleInfo;
+    final localize = context.tr;
+
+    final scheduler = ReminderScheduler();
+
+    // Kullanıcı ilk kez bir hatırlatıcı açtığında izin iste.
+    final wantsReminders =
+        settings.periodReminders ||
+        settings.fertileWindow ||
+        settings.dailyLogs;
+    if (wantsReminders) {
+      final granted = await scheduler.requestPermission();
+      if (!granted) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(localize('notif_permission_denied'))),
+        );
+        return;
+      }
+    }
+
+    final plan = ReminderPlanner.plan(
+      cycleInfo: cycleInfo,
+      settings: settings,
+      now: DateTime.now(),
+    );
+
+    await scheduler.apply(plan, localize: localize);
   }
 
   @override

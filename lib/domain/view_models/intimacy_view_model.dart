@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../../data/repositories/intimacy_repository.dart';
+import '../../data/repositories/share_settings_repository.dart';
 import '../models/intimacy_status.dart';
 import '../services/intimacy_share_service.dart';
 
@@ -9,6 +10,8 @@ import '../services/intimacy_share_service.dart';
 class IntimacyViewModel extends ChangeNotifier {
   final IntimacyRepository _repository = IntimacyRepository();
   final IntimacyShareService _shareService = IntimacyShareService();
+  final ShareSettingsRepository _shareSettings =
+      const ShareSettingsRepository();
 
   // ─── State ───
   String? _selectedSexualDesire;
@@ -125,6 +128,16 @@ class IntimacyViewModel extends ChangeNotifier {
   Future<void> _performShare() async {
     if (_currentUserId == null) {
       _shareError = 'not_logged_in';
+      notifyListeners();
+      return;
+    }
+
+    // Gizlilik kontrolü: kullanıcı paylaşım ayarlarında her şeyi kapattıysa
+    // hiçbir veri gönderilmez. Bu ayarlar bir gizlilik sözüdür; sessizce
+    // yok sayılamaz.
+    final settings = await _shareSettings.load();
+    if (!settings.sharesAnything) {
+      _shareError = 'sharing_disabled';
       notifyListeners();
       return;
     }

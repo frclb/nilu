@@ -1,48 +1,24 @@
 import 'package:flutter/material.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
+import '../../../domain/models/article.dart';
 
 class HealthLibraryArticleList extends StatelessWidget {
-  const HealthLibraryArticleList({super.key});
+  final List<Article> articles;
 
-  /// Başlıklar dile bağlı olduğu için liste `build` içinde, aktif dile göre
-  /// kurulur — sınıf alanı olarak tutulamaz.
-  List<Map<String, String>> _articles(BuildContext context) => [
-    {
-      'tag': context.tr('library_cat_nutrition'),
-      'title': context.tr('library_article_pms'),
-      'time': '4',
-      'image':
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuDg5vgbdAao9ao_4kx1A5rrTfnPPCuPc2WpEAwq2kGd0BnM-8znBiqvy2JPn9uOnPXk5PQwqglq7VpHlnveeQ5NPIOCTNBJ-GGImlCqHNL3NjueI_Dznb3KoryB5O46bul-pwKHs4j8CmO_X7_zMrpUvt-47S0RICZmlFwH7jxNrpMakT-GD0QsFp1MDHjmggTOzaTxKJj31l89TA2TCtQ_c3B82sSSzUCKwn2q5lbxCefYSf1LSJEfUEF08ecl9XV_WgIBB5FpOwY',
-    },
-    {
-      'tag': context.tr('library_cat_relationships'),
-      'title': context.tr('library_article_partner'),
-      'time': '7',
-      'image':
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuDhn9fpLKSfBwJpmS0ZJLCRGCcjQ1jYb8ACMIOhfPHTK_lXvXP6Kt29-FvwKXl-Q9lmFYMKvo2EzRsUuzCrALRxS09bDgAjQ6X_iSSPPOGbS4ehYUO5oKCDRhSmP1yt8jAGy2hs0REvWX1DHZxXh1dOxlnd2pR97VKkG5hxAC1RvU3BJpUFSYaeRpuWiUTK7IjE6v0eF7JH9GfV1tvWmRVNIElS1XW6VSmGv0x4YjLz2O1-eAGlsGIESwk5HUipv6c2sW5_vOa8s3k',
-    },
-    {
-      'tag': context.tr('library_cat_psychology'),
-      'title': context.tr('library_article_mood'),
-      'time': '5',
-      'image':
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuAoW707rVS7RDxsprckZ9rCktPcWj_2_xebEVnylauP9BYeu8k5ZC37jgguMZOVMWnTyqLtKGQ6YWDl4QRhpW4JThFLTPUbuilihET4yA_YBE8h6YK21B8sLG-XYVLmdLRRqKFnvFgID6MqweT7C4Uu4nbyQnCJ8nNYG7DQGpTaCHV2RtlY6FsaLfO1t9u4SdvfQ3IJb8GElFIEFW24nR-VZ1zMdSo-2D3YvZ-rzFxELc3ktdTwnjcwYQK-xiAAx3s-NOkqkQpcjO4',
-    },
-    {
-      'tag': context.tr('library_cat_health'),
-      'title': context.tr('library_article_iron'),
-      'time': '5',
-      'image':
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuARjqhhUD_Xy75rqi_5FJCPKk45dHKkfPOvjxEO5APBx93T39eZ0aMj7VIkOmvEYZOdXowAx926UmexpuEwxuCesWzcd-hsYMGQgFOZmWj68OwBMOVaO0bCakdOuU9cD3GPgz4kPKS6SXpGqVEnHWVXVxdAE1W_9MN8vRMx8PfTrpImnAVAivTFSBaAB1B_9ykPyK9zj968HKdPYKfIU8u3Mo5JrOD5IWqpyqyvjziUEeI54KgcYDFeFtS8_HkFBSY1nCoytsOmSdQ',
-    },
-  ];
+  /// Boş sonuç mesajında gösterilecek arama metni.
+  final String emptyQuery;
+
+  const HealthLibraryArticleList({
+    super.key,
+    required this.articles,
+    this.emptyQuery = '',
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final mockArticles = _articles(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,24 +55,41 @@ class HealthLibraryArticleList extends StatelessWidget {
             ],
           ),
         ),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          itemCount: mockArticles.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 16),
-          itemBuilder: (context, index) {
-            final article = mockArticles[index];
-            return _buildArticleCard(context, article, theme, isDark);
-          },
-        ),
+        if (articles.isEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+            child: Center(
+              child: Text(
+                emptyQuery.isEmpty
+                    ? context.tr('library_empty')
+                    : context.tr(
+                        'library_no_results',
+                        params: {'query': emptyQuery},
+                      ),
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium,
+              ),
+            ),
+          )
+        else
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            itemCount: articles.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 16),
+            itemBuilder: (context, index) {
+              final article = articles[index];
+              return _buildArticleCard(context, article, theme, isDark);
+            },
+          ),
       ],
     );
   }
 
   Widget _buildArticleCard(
     BuildContext context,
-    Map<String, String> article,
+    Article article,
     ThemeData theme,
     bool isDark,
   ) {
@@ -134,7 +127,7 @@ class HealthLibraryArticleList extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
-                article['image']!,
+                article.imageUrl,
                 width: 96,
                 height: 96,
                 fit: BoxFit.cover,
@@ -155,7 +148,7 @@ class HealthLibraryArticleList extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      article['tag']!,
+                      context.tr(article.tagKey),
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -167,7 +160,7 @@ class HealthLibraryArticleList extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      article['title']!,
+                      context.tr(article.titleKey),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -194,7 +187,10 @@ class HealthLibraryArticleList extends StatelessWidget {
                             Text(
                               context
                                   .tr('health_library_read_time_short')
-                                  .replaceAll('{min}', article['time']!),
+                                  .replaceAll(
+                                    '{min}',
+                                    '${article.readMinutes}',
+                                  ),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: isDark

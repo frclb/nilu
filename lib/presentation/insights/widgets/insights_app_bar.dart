@@ -125,7 +125,14 @@ class InsightsAppBar extends StatelessWidget implements PreferredSizeWidget {
         onTap: () {
           if (!isActive) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('$title içerikleri yakında eklenecek')),
+              SnackBar(
+                content: Text(
+                  context.tr(
+                    'insights_tab_coming_soon',
+                    params: {'tab': title},
+                  ),
+                ),
+              ),
             );
           }
         },

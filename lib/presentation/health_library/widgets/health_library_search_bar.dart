@@ -3,7 +3,14 @@ import '../../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
 
 class HealthLibrarySearchBar extends StatelessWidget {
-  const HealthLibrarySearchBar({super.key});
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+
+  const HealthLibrarySearchBar({
+    super.key,
+    required this.controller,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +32,9 @@ class HealthLibrarySearchBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
         ),
         child: TextField(
+          controller: controller,
+          onChanged: onChanged,
+          textInputAction: TextInputAction.search,
           style: TextStyle(
             color: isDark ? Colors.white : Colors.black,
             fontSize: 14,
@@ -43,6 +53,15 @@ class HealthLibrarySearchBar extends StatelessWidget {
                   ? theme.colorScheme.primary.withAlpha(204)
                   : theme.colorScheme.primary.withAlpha(153),
             ),
+            suffixIcon: controller.text.isEmpty
+                ? null
+                : IconButton(
+                    icon: const Icon(Icons.close, size: 18),
+                    onPressed: () {
+                      controller.clear();
+                      onChanged('');
+                    },
+                  ),
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 16),
           ),

@@ -136,6 +136,40 @@ void main() {
   });
 
   group('onboarding tamamlandıktan sonra', () {
+    test('karşılama ekranında takılıp kalınmaz', () {
+      // Regresyon: uygulama her zaman splash'ten başlamıyor. Web'de URL
+      // hash'i, mobilde derin bağlantı doğrudan /onboarding'e düşürebiliyor;
+      // dönen kullanıcı karşılama ekranında kilitleniyordu.
+      expect(
+        resolveRedirect(
+          isLoaded: true,
+          onboardingComplete: true,
+          location: onboardingPath,
+        ),
+        homePath,
+      );
+    });
+
+    test('akışın ara adımları zorla yönlendirilmez', () {
+      // Başarı ekranı onboarding'i tamamlar tamamlamaz kendisi /home'a gider;
+      // redirect araya girip ekranı yarıda kesmemeli.
+      for (final location in [
+        '/onboarding_last_period',
+        '/onboarding_cycle_length',
+        '/onboarding_success',
+      ]) {
+        expect(
+          resolveRedirect(
+            isLoaded: true,
+            onboardingComplete: true,
+            location: location,
+          ),
+          isNull,
+          reason: location,
+        );
+      }
+    });
+
     test('tüm ekranlar serbesttir', () {
       for (final location in [
         '/home',

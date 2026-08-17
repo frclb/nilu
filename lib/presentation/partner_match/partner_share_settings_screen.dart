@@ -5,7 +5,9 @@ import 'package:provider/provider.dart';
 import '../../../domain/view_models/user_view_model.dart';
 import '../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
+import '../../data/repositories/share_settings_repository.dart';
 import '../../design_system/app_colors.dart';
+import '../../domain/models/share_settings.dart';
 
 class PartnerShareSettingsScreen extends StatefulWidget {
   const PartnerShareSettingsScreen({super.key});
@@ -17,11 +19,32 @@ class PartnerShareSettingsScreen extends StatefulWidget {
 
 class _PartnerShareSettingsScreenState
     extends State<PartnerShareSettingsScreen> {
-  // Toggle states based on HTML design
-  bool _phaseInfoEnabled = true;
-  bool _symptomDetailsEnabled = true;
-  bool _moodEnabled = false;
-  bool _predictionsEnabled = true;
+  static const ShareSettingsRepository _repository = ShareSettingsRepository();
+
+  ShareSettings _settings = const ShareSettings();
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final settings = await _repository.load();
+    if (!mounted) return;
+    setState(() {
+      _settings = settings;
+      _isLoading = false;
+    });
+  }
+
+  /// Her değişiklik anında kalıcılaştırılır — bu bir gizlilik kontrolü,
+  /// ekrandan çıkınca kaybolmamalı.
+  Future<void> _update(ShareSettings next) async {
+    setState(() => _settings = next);
+    await _repository.save(next);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +93,9 @@ class _PartnerShareSettingsScreenState
           child: Container(color: borderColor, height: 1.0),
         ),
       ),
-      body: !userViewModel.hasPartner
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : !userViewModel.hasPartner
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -269,8 +294,8 @@ class _PartnerShareSettingsScreenState
                 icon: Icons.bedtime,
                 title: context.tr('partner_share_phase_info'),
                 subtitle: context.tr('partner_share_phase_info_desc'),
-                value: _phaseInfoEnabled,
-                onChanged: (val) => setState(() => _phaseInfoEnabled = val),
+                value: _settings.phaseInfo,
+                onChanged: (val) => _update(_settings.copyWith(phaseInfo: val)),
                 primaryColor: primaryColor,
                 textMainColor: textMainColor,
                 textMutedColor: textMutedColor,
@@ -281,9 +306,9 @@ class _PartnerShareSettingsScreenState
                 icon: Icons.healing,
                 title: context.tr('partner_share_symptom_details'),
                 subtitle: context.tr('partner_share_symptom_details_desc'),
-                value: _symptomDetailsEnabled,
+                value: _settings.symptomDetails,
                 onChanged: (val) =>
-                    setState(() => _symptomDetailsEnabled = val),
+                    _update(_settings.copyWith(symptomDetails: val)),
                 primaryColor: primaryColor,
                 textMainColor: textMainColor,
                 textMutedColor: textMutedColor,
@@ -294,8 +319,8 @@ class _PartnerShareSettingsScreenState
                 icon: Icons.sentiment_satisfied,
                 title: context.tr('partner_share_mood'),
                 subtitle: context.tr('partner_share_mood_desc'),
-                value: _moodEnabled,
-                onChanged: (val) => setState(() => _moodEnabled = val),
+                value: _settings.mood,
+                onChanged: (val) => _update(_settings.copyWith(mood: val)),
                 primaryColor: primaryColor,
                 textMainColor: textMainColor,
                 textMutedColor: textMutedColor,
@@ -306,8 +331,9 @@ class _PartnerShareSettingsScreenState
                 icon: Icons.calendar_month,
                 title: context.tr('partner_share_predictions'),
                 subtitle: context.tr('partner_share_predictions_desc'),
-                value: _predictionsEnabled,
-                onChanged: (val) => setState(() => _predictionsEnabled = val),
+                value: _settings.predictions,
+                onChanged: (val) =>
+                    _update(_settings.copyWith(predictions: val)),
                 primaryColor: primaryColor,
                 textMainColor: textMainColor,
                 textMutedColor: textMutedColor,

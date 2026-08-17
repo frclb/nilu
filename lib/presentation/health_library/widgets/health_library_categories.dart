@@ -1,40 +1,35 @@
 import 'package:flutter/material.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
+import '../../../domain/models/article.dart';
 
-class HealthLibraryCategories extends StatefulWidget {
-  const HealthLibraryCategories({super.key});
+/// Kategori şeridi. Seçim durumu ekranda tutulur; burada tutulduğunda
+/// makale listesi seçimden haberdar olmuyordu.
+class HealthLibraryCategories extends StatelessWidget {
+  final ArticleCategory selected;
+  final ValueChanged<ArticleCategory> onSelected;
 
-  @override
-  State<HealthLibraryCategories> createState() =>
-      _HealthLibraryCategoriesState();
-}
-
-class _HealthLibraryCategoriesState extends State<HealthLibraryCategories> {
-  int _selectedIndex = 0;
+  const HealthLibraryCategories({
+    super.key,
+    required this.selected,
+    required this.onSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final categories = [
-      context.tr('health_library_cat_popular'),
-      context.tr('health_library_cat_period'),
-      context.tr('health_library_cat_nutrition'),
-      context.tr('health_library_cat_psychology'),
-      context.tr('health_library_cat_exercise'),
-    ];
+    const categories = ArticleCategory.values;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       child: Row(
-        children: categories.asMap().entries.map((entry) {
-          final index = entry.key;
-          final title = entry.value;
-          final isSelected = index == _selectedIndex;
+        children: categories.map((category) {
+          final title = context.tr(category.labelKey);
+          final isSelected = category == selected;
 
           final bgColor = isSelected
               ? theme.colorScheme.primary
@@ -58,11 +53,7 @@ class _HealthLibraryCategoriesState extends State<HealthLibraryCategories> {
                   ? theme.colorScheme.primary.withAlpha(76)
                   : Colors.transparent,
               child: InkWell(
-                onTap: () {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
+                onTap: () => onSelected(category),
                 borderRadius: BorderRadius.circular(24),
                 child: Container(
                   padding: const EdgeInsets.symmetric(

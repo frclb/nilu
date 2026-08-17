@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/favorite_button.dart';
 import 'widgets/yoga_video_player.dart';
 import 'widgets/yoga_content_section.dart';
 import '../../localization/app_localizations.dart';
@@ -52,16 +53,7 @@ class YogaDetailScreen extends StatelessWidget {
                     color: isDark ? Colors.white : AppColors.textMainSlate,
                   ),
                 ),
-                actions: [
-                  IconButton(
-                    icon: Icon(Icons.bookmark_border, color: primaryColor),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(context.tr('saved'))),
-                      );
-                    },
-                  ),
-                ],
+                actions: [const FavoriteButton(contentId: 'yoga_gentle_flow')],
                 bottom: PreferredSize(
                   preferredSize: const Size.fromHeight(1),
                   child: Container(height: 1, color: headerBorder),

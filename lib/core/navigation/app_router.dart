@@ -80,6 +80,17 @@ String? resolveRedirect({
     return onboardingComplete ? homePath : onboardingPath;
   }
 
+  // Onboarding tamamlanmışken karşılama ekranında kalınmaz.
+  //
+  // Uygulama her zaman splash'ten başlamayabilir: web'de URL hash'i, mobilde
+  // derin bağlantı doğrudan `/onboarding`'e düşürebilir. Bu kural olmadan
+  // dönen kullanıcı karşılama ekranında takılıp kalıyordu.
+  // (Akışın ara adımları hariç tutulur; onboarding tamamlanır tamamlanmaz
+  // başarı ekranından atılmamak için.)
+  if (onboardingComplete && location == onboardingPath) {
+    return homePath;
+  }
+
   // Onboarding tamamlanmadan uygulamanın gövdesine girilemez.
   // (Çıkış yapıldığında bayrak sıfırlandığı için kullanıcı burada kalır.)
   if (!onboardingComplete && !preOnboardingPaths.contains(location)) {

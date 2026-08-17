@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../widgets/favorite_button.dart';
 import 'package:go_router/go_router.dart';
-import '../../../localization/app_localizations.dart';
 
 class ExerciseHeroHeader extends StatelessWidget {
   final String imageUrl;
@@ -66,18 +66,15 @@ class ExerciseHeroHeader extends StatelessWidget {
                     },
                   ),
                 ),
-                Builder(
-                  builder: (ctx) => _buildCircleButton(
-                    icon: Icons.bookmark_border,
-                    onTap: () {
-                      ScaffoldMessenger.of(ctx).showSnackBar(
-                        SnackBar(
-                          content: Text(context.tr('saved')),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    },
+                // Kaydetme artık kalıcı (bkz. FavoriteButton).
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withAlpha(76),
+                    shape: BoxShape.circle,
                   ),
+                  child: const FavoriteButton(contentId: 'exercise_light_flow'),
                 ),
               ],
             ),

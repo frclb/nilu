@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
+
+import '../../domain/view_models/subscription_view_model.dart';
 import '../../localization/app_localizations.dart';
 import '../../design_system/app_colors.dart';
 import '../../core/navigation/route_names.dart';
@@ -441,22 +445,55 @@ class PremiumScreen extends StatelessWidget {
     );
   }
 
-  void _handlePurchase(BuildContext context, String planType) {
-    // TODO: StoreKit / RevenueCat ile gerçek satın alma işlemi
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(context.tr('premium_purchase_coming_soon')),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+  /// RevenueCat teklifleri içinde istenen planı bulur.
+  ///
+  /// Teklif kimlikleri RevenueCat panelinden gelir; paket bulunamazsa
+  /// (ör. yapılandırma eksik) null döner ve kullanıcıya açık mesaj gösterilir.
+  static Package? _packageFor(Offerings? offerings, String planType) {
+    final current = offerings?.current;
+    if (current == null) return null;
+
+    return switch (planType) {
+      'yearly' => current.annual,
+      'monthly' => current.monthly,
+      'weekly' => current.weekly,
+      _ => null,
+    };
   }
 
-  void _handleRestore(BuildContext context) {
-    // TODO: Satın alım geri yükleme
-    ScaffoldMessenger.of(context).showSnackBar(
+  Future<void> _handlePurchase(BuildContext context, String planType) async {
+    final viewModel = context.read<SubscriptionViewModel>();
+    final messenger = ScaffoldMessenger.of(context);
+    final unavailable = context.tr('premium_unavailable');
+    final success = context.tr('premium_purchase_success');
+    final failed = context.tr('premium_purchase_failed');
+
+    final package = _packageFor(viewModel.offerings, planType);
+    if (package == null) {
+      _show(messenger, unavailable);
+      return;
+    }
+
+    final purchased = await viewModel.purchasePackage(package);
+    _show(messenger, purchased ? success : failed);
+  }
+
+  Future<void> _handleRestore(BuildContext context) async {
+    final viewModel = context.read<SubscriptionViewModel>();
+    final messenger = ScaffoldMessenger.of(context);
+    final checking = context.tr('premium_restore_checking');
+    final restored = context.tr('premium_restore_success');
+    final nothing = context.tr('premium_restore_none');
+
+    _show(messenger, checking);
+    final ok = await viewModel.restorePurchases();
+    _show(messenger, ok ? restored : nothing);
+  }
+
+  static void _show(ScaffoldMessengerState messenger, String message) {
+    messenger.showSnackBar(
       SnackBar(
-        content: Text(context.tr('premium_restore_checking')),
+        content: Text(message),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),

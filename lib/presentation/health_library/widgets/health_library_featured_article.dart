@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
+import '../../../domain/models/article.dart';
 
 class HealthLibraryFeaturedArticle extends StatelessWidget {
-  const HealthLibraryFeaturedArticle({super.key});
+  final Article article;
+
+  const HealthLibraryFeaturedArticle({super.key, required this.article});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +46,7 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 Image.network(
-                  'https://lh3.googleusercontent.com/aida-public/AB6AXuCenyJDry4u1pEvRNlp0yQs-hXXDyd-IBsxqWIgiVeBaOhLFgjeBauDC4hk82fAdKp6jhYe42BQ5MM4U_lL3FfajPCtw0mN5TeOH_AJeppG0pom75rQ4N2VHFwINFL2qiYBKm8rL3rQ5eKZY68UsqIXzH6DSEA68F2GH1MpoQOn9P61x9clJu8J_d1titXe27MC8P9NT3d-5N5Bc9ispT5UfPTSOgtIX9AWEEXhMd0BXaD74pkrSUhG2QAFYKsar_tuVZVhMK0y54Y',
+                  article.imageUrl,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
                     color: Colors.grey.shade300,
@@ -115,7 +118,7 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          context.tr('library_cat_hormones'),
+                          context.tr(article.tagKey),
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 10,
@@ -126,7 +129,7 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        context.tr('library_article_hormones'),
+                        context.tr(article.titleKey),
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,

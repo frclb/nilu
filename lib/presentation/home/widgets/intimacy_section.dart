@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../domain/view_models/intimacy_view_model.dart';
 import '../../../localization/app_localizations.dart';
+import '../../../localization/relative_time.dart';
 import '../../../design_system/app_colors.dart';
 
 /// Ana ekrandaki duygusal yakınlık bölümü — iki küçük kompakt kart.
@@ -19,13 +20,173 @@ class IntimacySection extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Kart 1 — Cinsel İstek
-          Expanded(child: _MiniDesireCard(viewModel: viewModel)),
-          const SizedBox(width: 12),
-          // Kart 2 — Sevgi İhtiyacı
-          Expanded(child: _MiniAffectionCard(viewModel: viewModel)),
+          Row(
+            children: [
+              // Kart 1 — Cinsel İstek
+              Expanded(child: _MiniDesireCard(viewModel: viewModel)),
+              const SizedBox(width: 12),
+              // Kart 2 — Sevgi İhtiyacı
+              Expanded(child: _MiniAffectionCard(viewModel: viewModel)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _ShareControls(viewModel: viewModel),
+        ],
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// PAYLAŞIM KONTROLLERİ
+//
+// Bu bölüm eksikti: kullanıcı seçimlerini yapıyor ama partnerine hiç
+// gönderilmiyordu. Otomatik paylaşım varsayılan olarak kapalıydı ve açacak
+// bir arayüz yoktu; manuel gönderme düğmesi de yoktu. ViewModel tarafındaki
+// manualShare / isSharing / shareError / remainingShares hiçbir yerde
+// kullanılmıyordu.
+// ══════════════════════════════════════════════════════════════
+
+class _ShareControls extends StatelessWidget {
+  final IntimacyViewModel viewModel;
+
+  const _ShareControls({required this.viewModel});
+
+  bool get _hasSelection =>
+      viewModel.selectedSexualDesire != null ||
+      viewModel.selectedAffectionNeeds.isNotEmpty;
+
+  String? _errorMessage(BuildContext context) {
+    switch (viewModel.shareError) {
+      case 'rate_limit_exceeded':
+        return context.tr('intimacy_rate_limit_msg');
+      case 'share_failed':
+        return context.tr('intimacy_share_failed_msg');
+      case 'sharing_disabled':
+        return context.tr('intimacy_sharing_disabled_msg');
+      case 'not_logged_in':
+        return context.tr('intimacy_no_partner_desc');
+      default:
+        return null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final error = _errorMessage(context);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withAlpha(10) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withAlpha(15)
+              : theme.colorScheme.outline,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Otomatik paylaşım
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.tr('intimacy_auto_share_label'),
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      context.tr('intimacy_auto_share_desc'),
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+              Switch(
+                value: viewModel.isAutoShareEnabled,
+                onChanged: viewModel.setAutoShareEnabled,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // Manuel paylaşım
+          FilledButton.icon(
+            onPressed: (viewModel.isSharing || !_hasSelection)
+                ? null
+                : viewModel.manualShare,
+            icon: viewModel.isSharing
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.send_rounded, size: 18),
+            label: Text(context.tr('intimacy_share_button')),
+          ),
+
+          // Son paylaşım / kalan hak
+          if (viewModel.lastSharedAt != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              '${context.tr('intimacy_last_shared')}: '
+              '${context.relativeTime(DateTime.now().difference(viewModel.lastSharedAt!))}',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall,
+            ),
+          ],
+          if (viewModel.canShare && viewModel.lastSharedAt != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              context.tr(
+                'intimacy_remaining_shares',
+                params: {'count': '${viewModel.remainingShares}'},
+              ),
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall,
+            ),
+          ],
+
+          // Hata
+          if (error != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 16,
+                  color: theme.colorScheme.error,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    error,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: viewModel.clearError,
+                  icon: const Icon(Icons.close, size: 16),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

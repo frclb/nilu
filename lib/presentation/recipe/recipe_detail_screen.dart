@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import '../widgets/favorite_button.dart';
 import 'widgets/recipe_hero_header.dart';
 import 'widgets/recipe_content_section.dart';
-import '../../localization/app_localizations.dart';
 import '../../design_system/app_colors.dart';
 
 class RecipeDetailScreen extends StatelessWidget {
@@ -15,9 +15,6 @@ class RecipeDetailScreen extends StatelessWidget {
     final bgColor = isDark
         ? AppColors.backgroundDeepDark
         : AppColors.backgroundLight;
-    final primaryColor = isDark
-        ? const Color(0xFF551C25)
-        : AppColors.primaryLight;
     final bottomBarBg = bgColor;
 
     return Scaffold(
@@ -61,33 +58,11 @@ class RecipeDetailScreen extends StatelessWidget {
                   stops: const [0.0, 0.65, 1.0],
                 ),
               ),
-              child: SizedBox(
+              child: const SizedBox(
                 height: 56,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(context.tr('recipe_favorited'))),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 56),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 8,
-                    shadowColor: primaryColor.withAlpha(127),
-                  ),
-                  icon: const Icon(Icons.favorite, size: 22),
-                  label: Text(
-                    context.tr('recipe_favorite'),
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
+                child: FavoriteButton(
+                  contentId: 'recipe_salmon_quinoa',
+                  expanded: true,
                 ),
               ),
             ),
