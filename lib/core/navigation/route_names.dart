@@ -10,6 +10,7 @@ class RouteNames {
   static const String profile = 'profile';
   static const String logEntry = 'log_entry';
   static const String insights = 'insights';
+  static const String appearance = 'appearance';
   static const String healthLibrary = 'health_library';
   static const String premium = 'premium';
   static const String notificationSettings = 'notification_settings';

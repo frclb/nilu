@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../localization/app_localizations.dart';
@@ -157,6 +158,15 @@ class ProfileSettingsScreen extends StatelessWidget {
                       : const Color(0xFFFFFBEB),
                   onTap: () {
                     context.pushNamed(RouteNames.notificationSettings);
+                  },
+                ),
+                SettingsItem(
+                  title: context.tr('appearance_title'),
+                  icon: Icons.palette_outlined,
+                  iconColor: context.tokens.accent,
+                  iconBgColor: context.tokens.accentTint,
+                  onTap: () {
+                    context.pushNamed(RouteNames.appearance);
                   },
                 ),
                 SettingsItem(

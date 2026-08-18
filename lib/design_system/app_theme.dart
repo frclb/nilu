@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'app_flavor.dart';
 import 'app_palette.dart';
 import 'app_tokens.dart';
 
@@ -12,10 +13,14 @@ import 'app_tokens.dart';
 class AppTheme {
   const AppTheme._();
 
-  static ThemeData get lightTheme => _build(AppTokens.light, Brightness.light);
-  static ThemeData get darkTheme => _build(AppTokens.dark, Brightness.dark);
+  static ThemeData light(AppFlavor flavor) => _build(flavor, Brightness.light);
+  static ThemeData dark(AppFlavor flavor) => _build(flavor, Brightness.dark);
 
-  static ThemeData _build(AppTokens t, Brightness brightness) {
+  static ThemeData _build(AppFlavor flavor, Brightness brightness) {
+    final t = AppTokens.of(flavor, brightness);
+    final brand = brightness == Brightness.light
+        ? flavor.brand
+        : flavor.brandDark;
     final isLight = brightness == Brightness.light;
     final base = isLight ? ThemeData.light() : ThemeData.dark();
 
@@ -57,10 +62,10 @@ class AppTheme {
 
     final scheme =
         ColorScheme.fromSeed(
-          seedColor: AppPalette.plum700,
+          seedColor: flavor.brand,
           brightness: brightness,
         ).copyWith(
-          primary: isLight ? AppPalette.plum700 : AppPalette.plum300,
+          primary: brand,
           onPrimary: isLight ? Colors.white : AppPalette.night900,
           secondary: t.brandTint,
           onSecondary: t.text,

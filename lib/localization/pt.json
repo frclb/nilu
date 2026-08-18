@@ -623,5 +623,11 @@
   "phase_luteal": "antes do período",
   "phase_unknown": "num momento pouco claro",
   "partner_scan_camera_denied": "O acesso à câmara não foi concedido. Podes permiti-lo em Definições → Period Tracker → Câmara e tentar de novo.",
-  "partner_scan_camera_missing": "Não foi encontrada nenhuma câmara utilizável neste dispositivo, por isso o código QR não pode ser lido."
+  "partner_scan_camera_missing": "Não foi encontrada nenhuma câmara utilizável neste dispositivo, por isso o código QR não pode ser lido.",
+  "appearance_title": "Aparência",
+  "appearance_desc": "Escolhe uma cor de tema. As cores do período e da ovulação no calendário mantêm-se iguais em todos os temas.",
+  "flavor_plum": "Ameixa",
+  "flavor_ocean": "Oceano",
+  "flavor_forest": "Floresta",
+  "flavor_graphite": "Grafite"
 }

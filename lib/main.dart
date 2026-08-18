@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'design_system/app_theme.dart';
 import 'localization/app_localizations.dart';
 import 'core/navigation/app_router.dart';
+import 'domain/view_models/theme_view_model.dart';
 import 'presentation/lock/app_lock_gate.dart';
 import 'presentation/calendar/view_models/calendar_view_model.dart';
 import 'domain/view_models/intimacy_view_model.dart';
@@ -75,6 +76,17 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
         ChangeNotifierProvider(create: (_) => CalendarViewModel()),
         ChangeNotifierProvider(create: (_) => SubscriptionViewModel()),
 
+        // Abonelik durumu temayı besler: abonelik bitince premium tema
+        // ücretsiz temaya düşmeli.
+        ChangeNotifierProxyProvider<SubscriptionViewModel, ThemeViewModel>(
+          create: (_) => ThemeViewModel(),
+          update: (_, subscription, theme) {
+            final vm = theme ?? ThemeViewModel();
+            vm.setPremium(subscription.isPremium);
+            return vm;
+          },
+        ),
+
         // ProxyProvider ile UserViewModel'daki ID'leri diğer ViewModel'lara enjekte ediyoruz
         ChangeNotifierProxyProvider<UserViewModel, IntimacyViewModel>(
           create: (_) => IntimacyViewModel(),
@@ -94,32 +106,41 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
           },
         ),
       ],
-      child: MaterialApp.router(
-        title: 'Period Tracker',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
-        debugShowCheckedModeBanner: false,
-        supportedLocales: const [
-          Locale('tr', ''),
-          Locale('en', ''),
-          Locale('de', ''),
-          Locale('fr', ''),
-          Locale('es', ''),
-          Locale('pt', ''),
-        ],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        routerConfig: _router,
-        // Kilit kapısı `MaterialApp`'in **içinde**: lokalizasyon ve tema
-        // buradan geliyor. Yönlendirilen tüm içeriğin üstünde durur, yani
-        // hangi ekranda olunursa olunsun kilit uygulanır.
-        builder: (context, child) =>
-            AppLockGate(child: child ?? const SizedBox.shrink()),
+      // Tema çeşidi provider'dan okunuyor. `_router` State üzerinde
+      // `late final` olduğu için bu yeniden kurulum router'ı etkilemiyor —
+      // eskiden burada bir Builder vardı ve her bildirimde yeni GoRouter
+      // üretip gezinme yığınını sıfırlıyordu.
+      child: Consumer<ThemeViewModel>(
+        builder: (context, themeViewModel, _) {
+          final flavor = themeViewModel.flavor;
+          return MaterialApp.router(
+            title: 'Period Tracker',
+            theme: AppTheme.light(flavor),
+            darkTheme: AppTheme.dark(flavor),
+            themeMode: ThemeMode.system,
+            debugShowCheckedModeBanner: false,
+            supportedLocales: const [
+              Locale('tr', ''),
+              Locale('en', ''),
+              Locale('de', ''),
+              Locale('fr', ''),
+              Locale('es', ''),
+              Locale('pt', ''),
+            ],
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            routerConfig: _router,
+            // Kilit kapısı `MaterialApp`'in **içinde**: lokalizasyon ve tema
+            // buradan geliyor. Yönlendirilen tüm içeriğin üstünde durur, yani
+            // hangi ekranda olunursa olunsun kilit uygulanır.
+            builder: (context, child) =>
+                AppLockGate(child: child ?? const SizedBox.shrink()),
+          );
+        },
       ),
     );
   }

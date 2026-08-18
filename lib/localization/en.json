@@ -623,5 +623,11 @@
   "phase_luteal": "before your period",
   "phase_unknown": "at an unclear time",
   "partner_scan_camera_denied": "Camera access was not granted. You can allow it in Settings → Period Tracker → Camera and try again.",
-  "partner_scan_camera_missing": "No usable camera was found on this device, so the QR code cannot be scanned."
+  "partner_scan_camera_missing": "No usable camera was found on this device, so the QR code cannot be scanned.",
+  "appearance_title": "Appearance",
+  "appearance_desc": "Choose a theme colour. Period and ovulation colours in the calendar stay the same in every theme.",
+  "flavor_plum": "Plum",
+  "flavor_ocean": "Ocean",
+  "flavor_forest": "Forest",
+  "flavor_graphite": "Graphite"
 }

@@ -17,6 +17,7 @@ import '../../presentation/onboarding_welcome/onboarding_success_screen.dart';
 import '../../presentation/home/home_screen.dart';
 import '../../presentation/calendar/calendar_screen.dart';
 import '../../presentation/log_entry/log_entry_screen.dart';
+import '../../presentation/appearance/appearance_screen.dart';
 import '../../presentation/insights/insights_screen.dart';
 import '../../presentation/profile/notification_settings_screen.dart';
 import '../../presentation/profile/personal_info_screen.dart';
@@ -269,6 +270,12 @@ GoRouter createAppRouter(
             );
           },
         ),
+      ),
+
+      GoRoute(
+        path: '/appearance',
+        name: RouteNames.appearance,
+        builder: (context, state) => const AppearanceScreen(),
       ),
 
       GoRoute(

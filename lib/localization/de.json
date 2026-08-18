@@ -623,5 +623,11 @@
   "phase_luteal": "vor deiner Periode",
   "phase_unknown": "zu einem unklaren Zeitpunkt",
   "partner_scan_camera_denied": "Kein Kamerazugriff. Du kannst ihn unter Einstellungen → Period Tracker → Kamera erlauben und es erneut versuchen.",
-  "partner_scan_camera_missing": "Auf diesem Gerät wurde keine nutzbare Kamera gefunden, der QR-Code kann nicht gescannt werden."
+  "partner_scan_camera_missing": "Auf diesem Gerät wurde keine nutzbare Kamera gefunden, der QR-Code kann nicht gescannt werden.",
+  "appearance_title": "Darstellung",
+  "appearance_desc": "Wähle eine Themenfarbe. Perioden- und Eisprungfarben im Kalender bleiben in jedem Thema gleich.",
+  "flavor_plum": "Pflaume",
+  "flavor_ocean": "Ozean",
+  "flavor_forest": "Wald",
+  "flavor_graphite": "Graphit"
 }

@@ -56,6 +56,27 @@ class AppPalette {
   static const nightInk = Color(0xFFF2E9EE);
   static const nightInkMuted = Color(0xFFB9A8B3);
 
+  // ── Tema çeşitleri ──
+  //
+  // Her tema yalnızca **marka ailesini** değiştirir; nötrler, akış ve
+  // yumurtlama renkleri sabit kalır. Böylece takvim okuması temadan temaya
+  // kaymaz — kullanıcı regl rengini her temada aynı yerde görür.
+  //
+  // Tonlar aynı yöntemle seçildi: beyaz metinle 4.5:1'i geçen bir "700",
+  // koyu temada zemine karşı 4.5:1'i geçen bir "300".
+
+  /// Okyanus — soğuk mavi-yeşil.
+  static const ocean700 = Color(0xFF1F5F6B);
+  static const ocean300 = Color(0xFF8FC4CE);
+
+  /// Orman — derin yeşil.
+  static const forest700 = Color(0xFF2E5F3E);
+  static const forest300 = Color(0xFF9CC7A9);
+
+  /// Gece — grafit; renk istemeyen kullanıcı için.
+  static const graphite700 = Color(0xFF3F4550);
+  static const graphite300 = Color(0xFFB6BCC7);
+
   // ── Durum ──
   static const success = Color(0xFF3E8E7E);
   static const warning = Color(0xFFB8862F);

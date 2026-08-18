@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_flavor.dart';
 import 'app_palette.dart';
 
 /// Role göre renkler.
@@ -86,6 +87,17 @@ class AppTokens extends ThemeExtension<AppTokens> {
     required this.warning,
     required this.danger,
   });
+
+  /// Seçili çeşide göre rol renkleri.
+  ///
+  /// Yalnızca marka rengi ve tonu değişir; nötrler, akış ve yumurtlama
+  /// sabit kalır (bkz. [AppFlavor]).
+  static AppTokens of(AppFlavor flavor, Brightness brightness) {
+    final base = brightness == Brightness.light ? light : dark;
+    return base.copyWith(
+      brandTint: brightness == Brightness.light ? flavor.tint : base.brandTint,
+    );
+  }
 
   static const light = AppTokens(
     background: AppPalette.sand50,

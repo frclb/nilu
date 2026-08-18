@@ -623,5 +623,11 @@
   "phase_luteal": "avant tes règles",
   "phase_unknown": "à un moment indéterminé",
   "partner_scan_camera_denied": "L’accès à l’appareil photo n’a pas été autorisé. Tu peux l’activer dans Réglages → Period Tracker → Appareil photo puis réessayer.",
-  "partner_scan_camera_missing": "Aucun appareil photo utilisable n’a été trouvé sur cet appareil, le code QR ne peut pas être scanné."
+  "partner_scan_camera_missing": "Aucun appareil photo utilisable n’a été trouvé sur cet appareil, le code QR ne peut pas être scanné.",
+  "appearance_title": "Apparence",
+  "appearance_desc": "Choisis une couleur de thème. Les couleurs des règles et de l’ovulation restent identiques dans tous les thèmes.",
+  "flavor_plum": "Prune",
+  "flavor_ocean": "Océan",
+  "flavor_forest": "Forêt",
+  "flavor_graphite": "Graphite"
 }
