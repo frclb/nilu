@@ -7,7 +7,7 @@ import '../../domain/models/notification_settings.dart';
 import '../../domain/services/reminder_planner.dart';
 import '../../localization/app_localizations.dart';
 import '../calendar/view_models/calendar_view_model.dart';
-import '../../design_system/app_colors.dart';
+import '../../design_system/app_tokens.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
@@ -85,29 +85,24 @@ class _NotificationSettingsScreenState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark
-          ? AppColors.backgroundNavyDark
-          : AppColors.backgroundLightAlt,
+      backgroundColor: context.tokens.background,
       appBar: AppBar(
         title: Text(
           context.tr('notif_general_title'),
           style: theme.textTheme.titleMedium?.copyWith(
-            color: isDark ? Colors.white : Colors.black87,
+            color: context.tokens.text,
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: isDark
-            ? AppColors.backgroundNavyDark
-            : AppColors.backgroundLightAlt,
+        backgroundColor: context.tokens.background,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new,
-            color: isDark ? Colors.white : Colors.black87,
+            color: context.tokens.text,
             size: 20,
           ),
           onPressed: () => context.pop(),
@@ -120,13 +115,9 @@ class _NotificationSettingsScreenState
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceNavyDark : Colors.white,
+                    color: context.tokens.surface,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark
-                          ? Colors.blueGrey[800]!.withAlpha(127)
-                          : Colors.grey[200]!,
-                    ),
+                    border: Border.all(color: context.tokens.border),
                   ),
                   child: Column(
                     children: [
@@ -135,7 +126,6 @@ class _NotificationSettingsScreenState
                         _settings.periodReminders,
                         (val) =>
                             _update(_settings.copyWith(periodReminders: val)),
-                        isDark,
                         Icons.water_drop_outlined,
                         true,
                       ),
@@ -144,7 +134,6 @@ class _NotificationSettingsScreenState
                         _settings.fertileWindow,
                         (val) =>
                             _update(_settings.copyWith(fertileWindow: val)),
-                        isDark,
                         Icons.child_care,
                         true,
                       ),
@@ -152,7 +141,6 @@ class _NotificationSettingsScreenState
                         context.tr('notif_daily_logs'),
                         _settings.dailyLogs,
                         (val) => _update(_settings.copyWith(dailyLogs: val)),
-                        isDark,
                         Icons.edit_note,
                         true,
                       ),
@@ -161,7 +149,6 @@ class _NotificationSettingsScreenState
                         _settings.partnerUpdates,
                         (val) =>
                             _update(_settings.copyWith(partnerUpdates: val)),
-                        isDark,
                         Icons.group_outlined,
                         false,
                       ),
@@ -177,30 +164,19 @@ class _NotificationSettingsScreenState
     String title,
     bool value,
     ValueChanged<bool> onChanged,
-    bool isDark,
     IconData icon,
     bool hasBorder,
   ) {
     return Container(
       decoration: BoxDecoration(
         border: hasBorder
-            ? Border(
-                bottom: BorderSide(
-                  color: isDark
-                      ? Colors.blueGrey[800]!.withAlpha(127)
-                      : Colors.grey[200]!,
-                ),
-              )
+            ? Border(bottom: BorderSide(color: context.tokens.border))
             : null,
       ),
       child: SwitchListTile(
         title: Row(
           children: [
-            Icon(
-              icon,
-              size: 20,
-              color: isDark ? Colors.grey[400] : Colors.grey[600],
-            ),
+            Icon(icon, size: 20, color: context.tokens.textMuted),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -208,7 +184,7 @@ class _NotificationSettingsScreenState
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white : Colors.black87,
+                  color: context.tokens.text,
                 ),
               ),
             ),
@@ -216,10 +192,10 @@ class _NotificationSettingsScreenState
         ),
         value: value,
         onChanged: onChanged,
-        activeThumbColor: AppColors.accentAmber,
-        activeTrackColor: AppColors.accentAmber.withAlpha(127),
-        inactiveThumbColor: Colors.white,
-        inactiveTrackColor: isDark ? Colors.blueGrey[700] : Colors.grey[300],
+        activeThumbColor: Theme.of(context).colorScheme.primary,
+        activeTrackColor: Theme.of(context).colorScheme.primary.withAlpha(127),
+        inactiveThumbColor: context.tokens.surface,
+        inactiveTrackColor: context.tokens.border,
       ),
     );
   }

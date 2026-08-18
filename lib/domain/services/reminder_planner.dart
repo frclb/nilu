@@ -54,6 +54,30 @@ class ReminderPlanner {
   static const int _fertileIdBase = 2000;
   static const int _dailyLogId = 3000;
 
+  /// Planı etkileyen girdilerin özeti.
+  ///
+  /// Hatırlatıcılar tahminlere bağlı; kullanıcı takvimde bir gün işaretlediğinde
+  /// tahminler kayar ve planın yenilenmesi gerekir. Her yeniden hesapta bekleyen
+  /// tüm bildirimleri iptal edip yeniden yazmak pahalı ve gereksiz — bu imza
+  /// değişmediyse plan da değişmez.
+  static String signature({
+    required CycleInfo cycleInfo,
+    required GeneralNotificationSettings settings,
+  }) {
+    String d(DateTime? value) =>
+        value == null ? '-' : '${value.year}-${value.month}-${value.day}';
+
+    return [
+      settings.periodReminders,
+      settings.fertileWindow,
+      settings.dailyLogs,
+      d(cycleInfo.predictedNextPeriod),
+      d(cycleInfo.fertileWindowStart),
+      ...cycleInfo.futurePredictions.map((p) => d(p.startDate)),
+      ...cycleInfo.futurePredictions.map((p) => d(p.fertileStart)),
+    ].join('|');
+  }
+
   /// [now] anından sonraki hatırlatıcıları döndürür (zamana göre sıralı).
   static List<ScheduledReminder> plan({
     required CycleInfo cycleInfo,

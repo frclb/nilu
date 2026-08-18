@@ -1,0 +1,113 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../data/local/reminder_scheduler.dart';
+import '../../data/repositories/notification_settings_repository.dart';
+import '../../domain/services/reminder_planner.dart';
+import '../../localization/app_localizations.dart';
+import '../../domain/view_models/user_view_model.dart';
+import '../calendar/view_models/calendar_view_model.dart';
+
+/// Döngü tahminleri değiştikçe hatırlatıcı planını tazeler.
+///
+/// Plan eskiden **yalnızca** bildirim ayarları ekranından kuruluyordu. İki
+/// sonucu vardı:
+///
+/// - Kullanıcı takvimde regl işaretleyince tahminler kayıyor ama planlanmış
+///   bildirimler eski tarihte kalıyordu; regl başladıktan sonra "regl
+///   yaklaşıyor" bildirimi geliyordu.
+/// - Plan en fazla üç döngü ileri gittiği için yaklaşık üç ay sonra
+///   hatırlatıcılar tamamen susuyordu. Kullanıcı ayar ekranına dönmedikçe bir
+///   daha hiç bildirim almıyordu.
+///
+/// Uygulama açılışında ve her yeniden hesapta çalışır. Bildirim metinleri
+/// cihazda üretildiği için çeviri burada, `MaterialApp` altında çözülüyor.
+class ReminderSync extends StatefulWidget {
+  const ReminderSync({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  State<ReminderSync> createState() => _ReminderSyncState();
+}
+
+class _ReminderSyncState extends State<ReminderSync> {
+  final NotificationSettingsRepository _repository =
+      NotificationSettingsRepository();
+  final ReminderScheduler _scheduler = ReminderScheduler();
+
+  /// En son uygulanan planın imzası. Aynı imzayla yeniden yazmıyoruz.
+  String? _applied;
+
+  /// Aynı anda birden fazla planlama çalışmasın.
+  bool _running = false;
+
+  Future<void> _sync(CalendarViewModel viewModel) async {
+    if (_running) return;
+    _running = true;
+
+    try {
+      final settings = await _repository.getGeneralSettings();
+      if (!mounted) return;
+
+      final signature = ReminderPlanner.signature(
+        cycleInfo: viewModel.cycleInfo,
+        settings: settings,
+      );
+      if (signature == _applied) return;
+
+      final wantsReminders =
+          settings.periodReminders ||
+          settings.fertileWindow ||
+          settings.dailyLogs;
+      if (!wantsReminders) {
+        _applied = signature;
+        return;
+      }
+
+      final plan = ReminderPlanner.plan(
+        cycleInfo: viewModel.cycleInfo,
+        settings: settings,
+        now: DateTime.now(),
+      );
+      if (plan.isEmpty) return;
+
+      // İzin buradan isteniyor çünkü regl ve doğurganlık hatırlatıcıları
+      // varsayılan olarak açık: ayar ekranına hiç girmeyen kullanıcı
+      // anahtarları "açık" görüyor ama kendisinden izin hiç istenmediği için
+      // tek bir bildirim bile almıyordu.
+      //
+      // Plan boşken sormuyoruz — hatırlatacak bir şey yokken izin istemek
+      // kullanıcıya anlamsız gelir. İlk kurulum tamamlanıp tahminler
+      // oluştuğunda soruluyor. iOS sistem istemini yalnızca bir kez gösterir.
+      final granted = await _scheduler.requestPermission();
+      if (!granted || !mounted) return;
+
+      await _scheduler.apply(plan, localize: context.tr);
+      _applied = signature;
+    } finally {
+      _running = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = context.watch<CalendarViewModel>();
+
+    // Kurulum bitmeden dokunmuyoruz. Onboarding'in ortasında bildirim izni
+    // istemek hem erken hem kaba: kullanıcı henüz uygulamanın ne yaptığını
+    // görmedi.
+    final onboarded = context.select<UserViewModel, bool>(
+      (vm) => vm.onboardingComplete,
+    );
+
+    // Yükleme sürerken tahminler henüz boş; o hâli planlamak anlamsız.
+    if (onboarded && !viewModel.isLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _sync(viewModel);
+      });
+    }
+
+    return widget.child;
+  }
+}

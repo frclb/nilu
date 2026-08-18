@@ -8,6 +8,7 @@ import 'localization/app_localizations.dart';
 import 'core/navigation/app_router.dart';
 import 'domain/view_models/theme_view_model.dart';
 import 'presentation/lock/app_lock_gate.dart';
+import 'presentation/reminders/reminder_sync.dart';
 import 'presentation/calendar/view_models/calendar_view_model.dart';
 import 'domain/view_models/intimacy_view_model.dart';
 import 'domain/view_models/partner_view_model.dart';
@@ -137,8 +138,11 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
             // Kilit kapısı `MaterialApp`'in **içinde**: lokalizasyon ve tema
             // buradan geliyor. Yönlendirilen tüm içeriğin üstünde durur, yani
             // hangi ekranda olunursa olunsun kilit uygulanır.
-            builder: (context, child) =>
-                AppLockGate(child: child ?? const SizedBox.shrink()),
+            // ReminderSync kilidin içinde: bildirim planı ekran kilitliyken
+            // de tazelenmeli, kullanıcı uygulamayı açmasa bile.
+            builder: (context, child) => AppLockGate(
+              child: ReminderSync(child: child ?? const SizedBox.shrink()),
+            ),
           );
         },
       ),

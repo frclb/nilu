@@ -269,4 +269,97 @@ void main() {
       }
     });
   });
+
+  group('imza', () {
+    const on = GeneralNotificationSettings(
+      periodReminders: true,
+      fertileWindow: true,
+      dailyLogs: true,
+    );
+
+    test('aynı girdi aynı imzayı verir', () {
+      final info = cycle(
+        nextPeriod: DateTime(2026, 4, 1),
+        fertileStart: DateTime(2026, 3, 12),
+      );
+      expect(
+        ReminderPlanner.signature(cycleInfo: info, settings: on),
+        ReminderPlanner.signature(cycleInfo: info, settings: on),
+      );
+    });
+
+    test('tahmin kayınca imza değişir', () {
+      // Düzeltilen hata: kullanıcı takvimde regl işaretleyince tahminler
+      // kayıyor ama planlanmış bildirimler eski tarihte kalıyordu.
+      expect(
+        ReminderPlanner.signature(
+          cycleInfo: cycle(nextPeriod: DateTime(2026, 4, 1)),
+          settings: on,
+        ),
+        isNot(
+          ReminderPlanner.signature(
+            cycleInfo: cycle(nextPeriod: DateTime(2026, 3, 25)),
+            settings: on,
+          ),
+        ),
+      );
+    });
+
+    test('doğurganlık penceresi kayınca imza değişir', () {
+      expect(
+        ReminderPlanner.signature(
+          cycleInfo: cycle(fertileStart: DateTime(2026, 3, 12)),
+          settings: on,
+        ),
+        isNot(
+          ReminderPlanner.signature(
+            cycleInfo: cycle(fertileStart: DateTime(2026, 3, 15)),
+            settings: on,
+          ),
+        ),
+      );
+    });
+
+    test('ileri tahminler değişince imza değişir', () {
+      expect(
+        ReminderPlanner.signature(cycleInfo: cycle(), settings: on),
+        isNot(
+          ReminderPlanner.signature(
+            cycleInfo: cycle(
+              future: [PredictedCycle(startDate: DateTime(2026, 5, 1))],
+            ),
+            settings: on,
+          ),
+        ),
+      );
+    });
+
+    test('ayar değişince imza değişir', () {
+      final info = cycle(nextPeriod: DateTime(2026, 4, 1));
+      expect(
+        ReminderPlanner.signature(cycleInfo: info, settings: on),
+        isNot(
+          ReminderPlanner.signature(
+            cycleInfo: info,
+            settings: on.copyWith(periodReminders: false),
+          ),
+        ),
+      );
+    });
+
+    test('günün saati imzayı değiştirmez', () {
+      // İmza yalnızca tarihe bakmalı; yoksa her yeniden hesapta bekleyen tüm
+      // bildirimler gereksizce iptal edilip yeniden yazılırdı.
+      expect(
+        ReminderPlanner.signature(
+          cycleInfo: cycle(nextPeriod: DateTime(2026, 4, 1, 3)),
+          settings: on,
+        ),
+        ReminderPlanner.signature(
+          cycleInfo: cycle(nextPeriod: DateTime(2026, 4, 1, 22)),
+          settings: on,
+        ),
+      );
+    });
+  });
 }
