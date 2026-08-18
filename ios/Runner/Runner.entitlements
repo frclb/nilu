@@ -10,6 +10,14 @@
 -->
 <plist version="1.0">
 <dict>
+	<!--
+	  Widget ayrı bir süreç; uygulamanın belleğine erişemiyor. Döngü özeti
+	  bu grup üzerinden paylaşılıyor.
+	-->
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.furkan.rcperiodtracker</string>
+	</array>
 	<key>com.apple.developer.healthkit</key>
 	<true/>
 	<key>com.apple.developer.healthkit.access</key>

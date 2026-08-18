@@ -5,7 +5,9 @@ import '../../../domain/models/cycle_info.dart';
 import '../../../domain/services/period_service.dart';
 import '../../../domain/services/prediction_service.dart';
 import '../../../data/repositories/period_repository.dart';
+import '../../../data/datasources/widget_datasource.dart';
 import '../../../data/repositories/cycle_settings_repository.dart';
+import '../../../domain/services/widget_snapshot.dart';
 
 /// Takvim ekranının durumunu yöneten ve iş mantığını bağlayan ViewModel.
 class CalendarViewModel extends ChangeNotifier {
@@ -13,6 +15,7 @@ class CalendarViewModel extends ChangeNotifier {
   final PeriodService _periodService = PeriodService();
   final PredictionService _predictionService = PredictionService();
   final CycleSettingsRepository _settingsRepo = CycleSettingsRepository();
+  final WidgetDatasource _widget = const WidgetDatasource();
 
   List<PeriodLog> _periodLogs = [];
   List<DailyLog> _dailyLogs = [];
@@ -170,6 +173,14 @@ class CalendarViewModel extends ChangeNotifier {
     return sorted.first;
   }
 
+  /// Ana ekran widget'ını günceller.
+  ///
+  /// Hesap her değiştiğinde çağrılır; kullanıcı uygulamayı açmadan da doğru
+  /// sayıyı görmeli.
+  void _publishWidget() {
+    _widget.publish(WidgetSnapshot.from(_cycleInfo));
+  }
+
   void _recalculate() {
     _cycleInfo = _predictionService.getCycleInfo(
       _periodLogs,
@@ -177,6 +188,7 @@ class CalendarViewModel extends ChangeNotifier {
       userPeriodLength: _userPeriodLength,
       settingsUpdatedAt: _settingsUpdatedAt,
     );
+    _publishWidget();
   }
 
   /// Belirli bir günün regl olup olmadığını kontrol eder.
