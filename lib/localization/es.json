@@ -638,5 +638,15 @@
   "premium_retry": "Reintentar",
   "premium_banner_title": "Hazte Premium",
   "premium_banner_desc": "Todo tu historial de ciclos, análisis síntoma–fase, exportación y temas personalizados.",
-  "premium_banner_cta": "Ver funciones"
+  "premium_banner_cta": "Ver funciones",
+  "health_sync_title": "Apple Salud",
+  "health_sync_desc": "Importa tus registros de regla desde la app Salud. Tú das el permiso y puedes retirarlo cuando quieras.",
+  "health_sync_point_watch": "Los datos del Apple Watch y otras apps llegan a través de Salud.",
+  "health_sync_point_merge": "Los días que marcaste se conservan; solo se añaden los periodos que faltan.",
+  "health_sync_point_local": "Los datos no salen de tu dispositivo.",
+  "health_import_button": "Importar desde Salud",
+  "health_permission_denied": "No se concedió el permiso, no se importó nada.",
+  "health_import_none": "No hay registros nuevos para importar.",
+  "health_import_done": "{count} periodos importados.",
+  "health_unavailable": "Los datos de salud no están disponibles en este dispositivo."
 }

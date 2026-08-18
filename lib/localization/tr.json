@@ -638,5 +638,15 @@
   "premium_retry": "Tekrar dene",
   "premium_banner_title": "Premium'a Geç",
   "premium_banner_desc": "Tüm döngü geçmişin, belirti–evre analizi, dışa aktarma ve özel temalar.",
-  "premium_banner_cta": "Özellikleri gör"
+  "premium_banner_cta": "Özellikleri gör",
+  "health_sync_title": "Apple Sağlık",
+  "health_sync_desc": "Sağlık uygulamasındaki regl kayıtlarını içeri aktar. İzni sen verirsin, istediğin zaman geri alabilirsin.",
+  "health_sync_point_watch": "Apple Watch ve diğer uygulamaların verisi Sağlık üzerinden gelir.",
+  "health_sync_point_merge": "Kendi işaretlediğin günler korunur; yalnızca eksik dönemler eklenir.",
+  "health_sync_point_local": "Veri cihazından çıkmaz.",
+  "health_import_button": "Sağlık'tan içeri aktar",
+  "health_permission_denied": "İzin verilmedi, hiçbir şey aktarılmadı.",
+  "health_import_none": "Aktarılacak yeni kayıt bulunamadı.",
+  "health_import_done": "{count} dönem içeri aktarıldı.",
+  "health_unavailable": "Bu cihazda sağlık verisi kullanılamıyor."
 }

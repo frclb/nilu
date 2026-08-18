@@ -59,6 +59,7 @@ dependencies:
   # Veri dışa aktarma: dosya olarak paylaş. Sağlık verisi panoya konmamalı.
   share_plus: ^13.3.0
   path_provider: ^2.1.5
+  health: ^13.3.2
 
 
 dev_dependencies:

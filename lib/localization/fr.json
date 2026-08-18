@@ -638,5 +638,15 @@
   "premium_retry": "Réessayer",
   "premium_banner_title": "Passer à Premium",
   "premium_banner_desc": "Tout ton historique de cycles, l’analyse symptôme–phase, l’export et les thèmes personnalisés.",
-  "premium_banner_cta": "Voir les fonctions"
+  "premium_banner_cta": "Voir les fonctions",
+  "health_sync_title": "Apple Santé",
+  "health_sync_desc": "Importe tes relevés de règles depuis l’app Santé. Tu donnes l’autorisation et peux la retirer à tout moment.",
+  "health_sync_point_watch": "Les données de l’Apple Watch et d’autres apps arrivent via Santé.",
+  "health_sync_point_merge": "Les jours que tu as marqués sont conservés ; seules les règles manquantes sont ajoutées.",
+  "health_sync_point_local": "Les données ne quittent pas ton appareil.",
+  "health_import_button": "Importer depuis Santé",
+  "health_permission_denied": "Autorisation non accordée, rien n’a été importé.",
+  "health_import_none": "Aucun nouveau relevé à importer.",
+  "health_import_done": "{count} règles importées.",
+  "health_unavailable": "Les données de santé ne sont pas disponibles sur cet appareil."
 }

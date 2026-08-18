@@ -137,6 +137,15 @@ class ProfileSettingsScreen extends StatelessWidget {
                   },
                 ),
                 SettingsItem(
+                  title: context.tr('health_sync_title'),
+                  icon: Icons.favorite_outline,
+                  iconColor: Theme.of(context).colorScheme.primary,
+                  iconBgColor: context.tokens.brandTint,
+                  onTap: () {
+                    context.pushNamed(RouteNames.healthSync);
+                  },
+                ),
+                SettingsItem(
                   title: context.tr('appearance_title'),
                   icon: Icons.palette_outlined,
                   iconColor: context.tokens.accent,

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  HealthKit yetkisi.
+
+  Apple Developer hesabında da HealthKit capability açık olmalı, yoksa
+  imzalama başarısız olur. Apple Watch ve diğer uygulamaların verisi
+  HealthKit üzerinden geliyor: ayrı bir "giyilebilir cihaz" entegrasyonu
+  gerekmiyor.
+-->
+<plist version="1.0">
+<dict>
+	<key>com.apple.developer.healthkit</key>
+	<true/>
+	<key>com.apple.developer.healthkit.access</key>
+	<array/>
+</dict>
+</plist>
