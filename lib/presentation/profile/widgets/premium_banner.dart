@@ -32,7 +32,7 @@ class PremiumBanner extends StatelessWidget {
               height: 160,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withAlpha(25),
+                color: Theme.of(context).colorScheme.onPrimary.withAlpha(25),
               ),
             ),
           ),
@@ -44,7 +44,7 @@ class PremiumBanner extends StatelessWidget {
               height: 128,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withAlpha(25),
+                color: Theme.of(context).colorScheme.onPrimary.withAlpha(25),
               ),
             ),
           ),
@@ -64,7 +64,7 @@ class PremiumBanner extends StatelessWidget {
                           Text(
                             context.tr('premium_banner_title'),
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               letterSpacing: -0.5,
@@ -78,7 +78,9 @@ class PremiumBanner extends StatelessWidget {
                             // Türkçe çıkıyordu.
                             context.tr('premium_banner_desc'),
                             style: TextStyle(
-                              color: Colors.white.withAlpha(204),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onPrimary.withAlpha(204),
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                               height: 1.4,
@@ -87,9 +89,9 @@ class PremiumBanner extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const Icon(
+                    Icon(
                       Icons.workspace_premium_outlined,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       size: 32,
                     ),
                   ],
@@ -102,7 +104,7 @@ class PremiumBanner extends StatelessWidget {
                       NavigationService().push(RouteNames.premium);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
+                      backgroundColor: Theme.of(context).colorScheme.onPrimary,
                       foregroundColor: Theme.of(context).colorScheme.primary,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
