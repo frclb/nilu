@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../localization/app_localizations.dart';
 import 'cycle_trend_chart.dart';
 import '../../../presentation/calendar/view_models/calendar_view_model.dart';
 import '../../../design_system/app_colors.dart';
+import '../../../core/navigation/route_names.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../domain/services/insights_service.dart';
+import '../../../domain/services/premium_gate.dart';
+import '../../../domain/view_models/subscription_view_model.dart';
 
 /// Kullanıcının gözlenmiş döngü uzunlukları.
 ///
@@ -21,7 +26,19 @@ class CycleTrendCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final viewModel = context.watch<CalendarViewModel>();
 
-    final points = InsightsService.cycleLengths(viewModel.periodLogs);
+    final isPremium = context.watch<SubscriptionViewModel>().isPremium;
+
+    // Tüm gözlenmiş döngüler hesaplanır, ekranda gösterilen kırpılır:
+    // "daha fazlası var" derken elimizde olmayan veriyi ima etmeyelim.
+    final allPoints = InsightsService.cycleLengths(
+      viewModel.periodLogs,
+      limit: 24,
+    );
+    final points = PremiumGate.visibleCycles(allPoints, isPremium: isPremium);
+    final trimmed = PremiumGate.historyIsTrimmed(
+      isPremium: isPremium,
+      observedCycles: allPoints.length,
+    );
     final average = InsightsService.averageLength(points);
     final variation = InsightsService.variation(points);
     final regularity = InsightsService.regularity(points);
@@ -149,6 +166,10 @@ class CycleTrendCard extends StatelessWidget {
               const SizedBox(height: 12),
               _ConsultationNote(isDark: isDark),
             ],
+            if (trimmed) ...[
+              const SizedBox(height: 12),
+              _UnlockHistoryNote(hidden: allPoints.length - points.length),
+            ],
           ],
         ],
       ),
@@ -219,6 +240,56 @@ class _ConsultationNote extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Ücretsiz sürümde gizlenen döngüleri bildirir.
+class _UnlockHistoryNote extends StatelessWidget {
+  final int hidden;
+
+  const _UnlockHistoryNote({required this.hidden});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+
+    return Material(
+      color: t.brandTint,
+      borderRadius: BorderRadius.circular(AppRadius.sm),
+      child: InkWell(
+        onTap: () => context.pushNamed(RouteNames.premium),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            children: [
+              Icon(
+                Icons.lock_outline,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  context.tr(
+                    'insights_history_locked',
+                    params: {'count': '$hidden'},
+                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: t.text, height: 1.4),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -1,20 +1,18 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-
+import 'package:share_plus/share_plus.dart';
 import '../../core/navigation/route_names.dart';
 import '../../data/repositories/privacy_settings_repository.dart';
-import 'dart:io';
-
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
-
+import '../../design_system/app_colors.dart';
 import '../../domain/services/app_lock_service.dart';
 import '../../domain/services/data_export_service.dart';
+import '../../domain/services/premium_gate.dart';
+import '../../domain/view_models/subscription_view_model.dart';
 import '../../domain/view_models/user_view_model.dart';
 import '../../localization/app_localizations.dart';
-import '../../design_system/app_colors.dart';
 
 class PrivacySecurityScreen extends StatefulWidget {
   const PrivacySecurityScreen({super.key});
@@ -376,6 +374,19 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
   /// Üç dosya birlikte veriliyor — okunabilir özet (muayenede telefondan
   /// okunur), CSV (tablo programı) ve tam JSON (kayıpsız yedek).
   Future<void> _exportAndShare() async {
+    // Not: verinin kendisi her zaman kullanıcınındır — "Hesabımı Sil" ve
+    // yerel kayıtlar kilitli değil. Premium olan yalnızca biçimlendirilmiş
+    // dosya üretme kolaylığı.
+    if (!PremiumGate.canExport(
+      isPremium: context.read<SubscriptionViewModel>().isPremium,
+    )) {
+      final message = context.tr('insights_export_locked');
+      final router = GoRouter.of(context);
+      _showMessage(message);
+      router.pushNamed(RouteNames.premium);
+      return;
+    }
+
     final messenger = ScaffoldMessenger.of(context);
     final failedMessage = context.tr('privacy_export_failed');
 

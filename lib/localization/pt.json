@@ -629,5 +629,8 @@
   "flavor_plum": "Ameixa",
   "flavor_ocean": "Oceano",
   "flavor_forest": "Floresta",
-  "flavor_graphite": "Grafite"
+  "flavor_graphite": "Grafite",
+  "insights_history_locked": "Vê mais {count} ciclos com o Premium.",
+  "insights_phase_locked": "Vê com o Premium em que fase do ciclo os teus sintomas se concentram.",
+  "insights_export_locked": "Exportar os teus registos como ficheiros é uma função Premium."
 }

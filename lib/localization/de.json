@@ -629,5 +629,8 @@
   "flavor_plum": "Pflaume",
   "flavor_ocean": "Ozean",
   "flavor_forest": "Wald",
-  "flavor_graphite": "Graphit"
+  "flavor_graphite": "Graphit",
+  "insights_history_locked": "Sieh mit Premium {count} weitere Zyklen.",
+  "insights_phase_locked": "Sieh mit Premium, in welcher Zyklusphase sich deine Symptome häufen.",
+  "insights_export_locked": "Der Export deiner Aufzeichnungen als Datei ist eine Premium-Funktion."
 }

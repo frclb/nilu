@@ -629,5 +629,8 @@
   "flavor_plum": "Erik",
   "flavor_ocean": "Okyanus",
   "flavor_forest": "Orman",
-  "flavor_graphite": "Grafit"
+  "flavor_graphite": "Grafit",
+  "insights_history_locked": "Premium ile {count} döngü daha görebilirsin.",
+  "insights_phase_locked": "Belirtilerinin döngünün hangi evresinde yoğunlaştığını Premium ile gör.",
+  "insights_export_locked": "Kayıtlarını dosya olarak dışa aktarmak Premium ile."
 }

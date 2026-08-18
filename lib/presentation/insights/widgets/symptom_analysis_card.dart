@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../domain/models/cycle_info.dart';
 import '../../../domain/models/log_vocabulary.dart';
+import '../../../core/navigation/route_names.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../domain/services/insights_service.dart';
+import '../../../domain/services/premium_gate.dart';
+import '../../../domain/view_models/subscription_view_model.dart';
 import '../../calendar/view_models/calendar_view_model.dart';
 
 /// Kullanıcının en sık kaydettiği belirtiler.
@@ -28,9 +33,12 @@ class SymptomAnalysisCard extends StatelessWidget {
     final frequencies = InsightsService.symptomFrequencies(viewModel.dailyLogs);
     final loggedDays = InsightsService.loggedDayCount(viewModel.dailyLogs);
 
+    final isPremium = context.watch<SubscriptionViewModel>().isPremium;
+    final canSeePhase = PremiumGate.canSeePhaseBreakdown(isPremium: isPremium);
+
     // En sık görülen belirtinin hangi evrede toplandığı. Yeterli gözlem ya da
     // net bir çoğunluk yoksa null döner ve hiçbir şey söylenmez.
-    final dominant = frequencies.isEmpty
+    final dominant = (frequencies.isEmpty || !canSeePhase)
         ? null
         : InsightsService.dominantPhase(
             frequencies.first.code,
@@ -127,6 +135,15 @@ class SymptomAnalysisCard extends StatelessWidget {
               ),
             ],
 
+          // Kilitli ve gösterilecek veri varsa kapıyı göster; veri yoksa
+          // olmayan bir şeyi satmayalım.
+          if (!canSeePhase && frequencies.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            Divider(color: borderColor, height: 1),
+            const SizedBox(height: 16),
+            _PhaseLocked(),
+          ],
+
           if (dominant != null) ...[
             const SizedBox(height: 20),
             Divider(color: borderColor, height: 1),
@@ -175,6 +192,49 @@ class SymptomAnalysisCard extends StatelessWidget {
     CyclePhase.luteal => 'phase_luteal',
     CyclePhase.unknown => 'phase_unknown',
   };
+}
+
+/// Evre kırılımının premium olduğunu bildirir.
+class _PhaseLocked extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+
+    return Material(
+      color: t.brandTint,
+      borderRadius: BorderRadius.circular(AppRadius.sm),
+      child: InkWell(
+        onTap: () => context.pushNamed(RouteNames.premium),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            children: [
+              Icon(
+                Icons.timeline,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  context.tr('insights_phase_locked'),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: t.text, height: 1.4),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _SymptomBar extends StatelessWidget {

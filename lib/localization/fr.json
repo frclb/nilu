@@ -629,5 +629,8 @@
   "flavor_plum": "Prune",
   "flavor_ocean": "Océan",
   "flavor_forest": "Forêt",
-  "flavor_graphite": "Graphite"
+  "flavor_graphite": "Graphite",
+  "insights_history_locked": "Vois {count} cycles de plus avec Premium.",
+  "insights_phase_locked": "Vois avec Premium à quelle phase de ton cycle tes symptômes se concentrent.",
+  "insights_export_locked": "Exporter tes relevés sous forme de fichiers est une fonction Premium."
 }

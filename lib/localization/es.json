@@ -629,5 +629,8 @@
   "flavor_plum": "Ciruela",
   "flavor_ocean": "Océano",
   "flavor_forest": "Bosque",
-  "flavor_graphite": "Grafito"
+  "flavor_graphite": "Grafito",
+  "insights_history_locked": "Con Premium puedes ver {count} ciclos más.",
+  "insights_phase_locked": "Con Premium puedes ver en qué fase del ciclo se concentran tus síntomas.",
+  "insights_export_locked": "Exportar tus registros como archivos es una función Premium."
 }
