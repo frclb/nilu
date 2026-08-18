@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 /// Sağlık kütüphanesi kategorileri.
 enum ArticleCategory {
   popular,
@@ -25,7 +27,14 @@ class Article {
   final String tagKey;
   final ArticleCategory category;
   final int readMinutes;
-  final String imageUrl;
+
+  /// Makale görselinin simgesi.
+  ///
+  /// Eskiden burada `imageUrl` vardı ve beş makalenin beşi de Google'ın
+  /// geçici mockup adreslerini gösteriyordu; öne çıkan makalenin adresi
+  /// çoktan HTTP 400 dönmeye başlamıştı. Görsel artık uygulama içinde
+  /// çiziliyor (bkz. `ContentIllustration`).
+  final IconData icon;
 
   /// Öne çıkan makale kartında gösterilir.
   final bool isFeatured;
@@ -35,7 +44,7 @@ class Article {
     required this.tagKey,
     required this.category,
     required this.readMinutes,
-    required this.imageUrl,
+    required this.icon,
     this.isFeatured = false,
   });
 }
@@ -54,8 +63,7 @@ class ArticleCatalog {
       tagKey: 'library_cat_hormones',
       category: ArticleCategory.period,
       readMinutes: 8,
-      imageUrl:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuBhVchXwSzfa9gpXHrqLxKdOvDx5aRHBpjHFVLJmmzKfXsFtxvHRxCfXBEzUKTtGRUXKktMHzZcvbSPLGkkl3CIYYPQwsAFwPBLTOZQmFvWLDVaLDPYQxT_9DKMHxRUgqZfLQlnvNIxDDpNSTdyxLXvIJqAtMFLGjXQGnJHnQZzqFHsvxlYsUBLBUgS',
+      icon: Icons.spa_outlined,
       isFeatured: true,
     ),
     Article(
@@ -63,32 +71,28 @@ class ArticleCatalog {
       tagKey: 'library_cat_nutrition',
       category: ArticleCategory.nutrition,
       readMinutes: 4,
-      imageUrl:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuDg5vgbdAao9ao_4kx1A5rrTfnPPCuPc2WpEAwq2kGd0BnM-8znBiqvy2JPn9uOnPXk5PQwqglq7VpHlnveeQ5NPIOCTNBJ-GGImlCqHNL3NjueI_Dznb3KoryB5O46bul-pwKHs4j8CmO_X7_zMrpUvt-47S0RICZmlFwH7jxNrpMakT-GD0QsFp1MDHjmggTOzaTxKJj31l89TA2TCtQ_c3B82sSSzUCKwn2q5lbxCefYSf1LSJEfUEF08ecl9XV_WgIBB5FpOwY',
+      icon: Icons.restaurant_menu,
     ),
     Article(
       titleKey: 'library_article_partner',
       tagKey: 'library_cat_relationships',
       category: ArticleCategory.psychology,
       readMinutes: 7,
-      imageUrl:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuDhn9fpLKSfBwJpmS0ZJLCRGCcjQ1jYb8ACMIOhfPHTK_lXvXP6Kt29-FvwKXl-Q9lmFYMKvo2EzRsUuzCrALRxS09bDgAjQ6X_iSSPPOGbS4ehYUO5oKCDRhSmP1yt8jAGy2hs0REvWX1DHZxXh1dOxlnd2pR97VKkG5hxAC1RvU3BJpUFSYaeRpuWiUTK7IjE6v0eF7JH9GfV1tvWmRVNIElS1XW6VSmGv0x4YjLz2O1-eAGlsGIESwk5HUipv6c2sW5_vOa8s3k',
+      icon: Icons.favorite_outline,
     ),
     Article(
       titleKey: 'library_article_mood',
       tagKey: 'library_cat_psychology',
       category: ArticleCategory.psychology,
       readMinutes: 5,
-      imageUrl:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuAoW707rVS7RDxsprckZ9rCktPcWj_2_xebEVnylauP9BYeu8k5ZC37jgguMZOVMWnTyqLtKGQ6YWDl4QRhpW4JThFLTPUbuilihET4yA_YBE8h6YK21B8sLG-XYVLmdLRRqKFnvFgID6MqweT7C4Uu4nbyQnCJ8nNYG7DQGpTaCHV2RtlY6FsaLfO1t9u4SdvfQ3IJb8GElFIEFW24nR-VZ1zMdSo-2D3YvZ-rzFxELc3ktdTwnjcwYQK-xiAAx3s-NOkqkQpcjO4',
+      icon: Icons.psychology_outlined,
     ),
     Article(
       titleKey: 'library_article_iron',
       tagKey: 'library_cat_health',
       category: ArticleCategory.nutrition,
       readMinutes: 5,
-      imageUrl:
-          'https://lh3.googleusercontent.com/aida-public/AB6AXuARjqhhUD_Xy75rqi_5FJCPKk45dHKkfPOvjxEO5APBx93T39eZ0aMj7VIkOmvEYZOdXowAx926UmexpuEwxuCesWzcd-hsYMGQgFOZmWj68OwBMOVaO0bCakdOuU9cD3GPgz4kPKS6SXpGqVEnHWVXVxdAE1W_9MN8vRMx8PfTrpImnAVAivTFSBaAB1B_9ykPyK9zj968HKdPYKfIU8u3Mo5JrOD5IWqpyqyvjziUEeI54KgcYDFeFtS8_HkFBSY1nCoytsOmSdQ',
+      icon: Icons.local_dining_outlined,
     ),
   ];
 

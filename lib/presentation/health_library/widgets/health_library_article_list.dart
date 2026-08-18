@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/content_illustration.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../domain/models/article.dart';
@@ -126,16 +127,12 @@ class HealthLibraryArticleList extends StatelessWidget {
             // Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                article.imageUrl,
+              child: SizedBox(
                 width: 96,
                 height: 96,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: 96,
-                  height: 96,
-                  color: Colors.grey.shade300,
-                  child: const Icon(Icons.image, color: Colors.grey),
+                child: ContentIllustration(
+                  seed: article.titleKey,
+                  icon: article.icon,
                 ),
               ),
             ),

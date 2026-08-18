@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../../design_system/content_illustration.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../domain/view_models/user_view_model.dart';
@@ -184,33 +185,9 @@ class _PartnerShareSettingsScreenState
         Stack(
           alignment: Alignment.bottomRight,
           children: [
-            Container(
-              width: 96,
-              height: 96,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: primaryColor, width: 2),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: ClipOval(
-                  child: Image.network(
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuB65IMTKrrECbjyWOIhOLB1goFUIuwxpRKSVkitQdhkYlN9H9qmh_MXJzi5TB4zvZDM9HB-ZDCPUtuCI34t2P3kndZwBunG4stjPZDEJjQzeNjanNFHS0-wT_A9Gwzgx0rFIgMhrKhGNq6vuKd9njPkjU3oBCYtbX9KI2sbzsCUt_5FhW5egbz4NwLJbFurIj9ZWuh9rXSHHRm-wF_4jsjq4MVUDoJ3hQ46qXqA7TeMAlWuLb_IiGhzoqD9HQyuwL1FwTYqM-7IBBU',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: isDark
-                          ? Colors.white.withAlpha(25)
-                          : Colors.grey[200],
-                      child: Icon(
-                        Icons.person,
-                        size: 48,
-                        color: textMutedColor,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            // Partner avatarı sabit bir uzak fotoğraftı: her kullanıcıya aynı
+            // yüzü gösteriyordu ve adres ölünce boş kalıyordu.
+            const InitialAvatar(name: null, size: 96),
             Container(
               width: 24,
               height: 24,

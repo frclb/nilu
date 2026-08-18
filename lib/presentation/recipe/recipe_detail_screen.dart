@@ -26,10 +26,7 @@ class RecipeDetailScreen extends StatelessWidget {
             physics: const BouncingScrollPhysics(),
             child: Column(
               children: [
-                const RecipeHeroHeader(
-                  imageUrl:
-                      'https://lh3.googleusercontent.com/aida-public/AB6AXuAEuevEoUgOhPQdWgv1noD1YT026Uaiip4IgLvqqydRb15J_hhO-Ec_eYZoqRUMBpJlEWlUOqvIIUQEmsOK0_cVCRjnHgwMBGZZ5mNzMLmzGIRpQx_f3Gj3Bty8mZLdBVCVLdmyA6awwIyQ4IK9XBlk6s2WTqZ7nib_TKZeH4Ee2JknbkFkZ4nhC66KknFZA3nyO_jOXtpuzGqvn4sTBKR_zhLphX5F4l3ybkArZtDYr1pBlIi4MWQk56DiFCBYPa8hBEz3ggYemD4',
-                ),
+                const RecipeHeroHeader(),
                 Transform.translate(
                   offset: const Offset(0, -40),
                   child: const RecipeContentSection(),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/content_illustration.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
 
@@ -572,16 +573,13 @@ class YogaContentSection extends StatelessWidget {
         children: [
           // Avatar
           ClipOval(
-            child: Image.network(
-              'https://lh3.googleusercontent.com/aida-public/AB6AXuCdf-CLFvMkhiYaX2lu2w4BeyQ7BLDFF9ORUrj_wbfUEMKr2KV_3owepkZror0b2WzXV20c313vo9rjqeYG3yFdDGQ1A_MEdL4JMgMUVjqMQUjWgkfypoks1mB_FlwyZJ62sDT0ZIazzFgoOO278StCcA7Bc2mMZEygQS8uD8j47Mcktp5QDy2Xs3ZwNMF0PaI3o6tRuJRaVOztCOAdimhAbzG-NkbLUziuL2LrLiYDKcu4p6DMd3sMhzXTZkEXTzavl5AEXoOEB_c',
+            child: SizedBox(
               width: 48,
               height: 48,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                width: 48,
-                height: 48,
-                color: Colors.grey.shade300,
-                child: const Icon(Icons.person, color: Colors.grey),
+              // Eğitmen fotoğrafı da geçici mockup adresindeydi.
+              child: ContentIllustration(
+                seed: 'yoga_instructor',
+                icon: Icons.self_improvement,
               ),
             ),
           ),

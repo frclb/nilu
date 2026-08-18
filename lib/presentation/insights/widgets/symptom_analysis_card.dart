@@ -24,9 +24,7 @@ class SymptomAnalysisCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final viewModel = context.watch<CalendarViewModel>();
 
-    final frequencies = InsightsService.symptomFrequencies(
-      viewModel.dailyLogs,
-    );
+    final frequencies = InsightsService.symptomFrequencies(viewModel.dailyLogs);
     final loggedDays = InsightsService.loggedDayCount(viewModel.dailyLogs);
 
     final cardBgColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
@@ -82,11 +80,7 @@ class SymptomAnalysisCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.edit_note_outlined,
-                  size: 20,
-                  color: subtitleColor,
-                ),
+                Icon(Icons.edit_note_outlined, size: 20, color: subtitleColor),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
@@ -164,10 +158,7 @@ class _SymptomBar extends StatelessWidget {
               Container(
                 width: 8,
                 height: 8,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               ),
               const SizedBox(width: 8),
               Expanded(

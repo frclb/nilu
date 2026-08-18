@@ -1,17 +1,18 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../../../design_system/content_illustration.dart';
 import '../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 class YogaVideoPlayer extends StatelessWidget {
-  final String imageUrl;
+  /// Gerçek fotoğraf tedarik edilince buraya bir adres verilir; adres ölürse
+  /// ya da cihaz çevrimdışıysa uygulama içinde çizilen illüstrasyona düşer.
+  /// Daha önce burada Google'ın geçici mockup adresi sabit olarak duruyordu.
+  final String? imageUrl;
 
-  const YogaVideoPlayer({super.key, required this.imageUrl});
+  const YogaVideoPlayer({super.key, this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Padding(
       padding: const EdgeInsets.all(16),
       child: ClipRRect(
@@ -22,23 +23,12 @@ class YogaVideoPlayer extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               // Background Image
-              Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: isDark
-                        ? AppColors.surfaceWarmDark
-                        : Colors.grey.shade200,
-                    child: Center(
-                      child: Icon(
-                        Icons.self_improvement,
-                        size: 48,
-                        color: isDark ? Colors.white38 : Colors.grey,
-                      ),
-                    ),
-                  );
-                },
+              SafeNetworkImage(
+                url: imageUrl,
+                fallback: const ContentIllustration(
+                  seed: 'yoga_hero',
+                  icon: Icons.self_improvement,
+                ),
               ),
 
               // Gradient Overlay

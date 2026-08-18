@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/content_illustration.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../domain/models/article.dart';
@@ -45,18 +46,7 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Image.network(
-                  article.imageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: Colors.grey.shade300,
-                    child: const Icon(
-                      Icons.image,
-                      size: 50,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
+                ContentIllustration(seed: article.titleKey, icon: article.icon),
                 Container(
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(

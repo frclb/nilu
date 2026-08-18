@@ -29,10 +29,7 @@ class ExerciseDetailScreen extends StatelessWidget {
             physics: const BouncingScrollPhysics(),
             child: Column(
               children: [
-                const ExerciseHeroHeader(
-                  imageUrl:
-                      'https://lh3.googleusercontent.com/aida-public/AB6AXuDvJCvf0QqqLDpObKKoAsH2um3xBDTo4tNtcHWTZpwjYCuz1-I8KHNhEVxcI2KmH8UD6aJeG-9xkln30UHxmHuMiVIzCwIiZlEKsSfkFdzm81iE-VvU2Tjtbupj8Gc5qgdS2ixUj_sG8oObLsy44kvZwlnOEr5KedQMptAlJIqG__oTPj11SbnF06wJM9UXFMZJToFs6dBaLwY5QkGns3tPHWzJ_HlN8a32ol-qCGDQj7VmIHHqb2X_WXbdoATpSXGl2k1u_DFisD8',
-                ),
+                const ExerciseHeroHeader(),
                 Transform.translate(
                   offset: const Offset(0, -32), // Pull up to overlap header
                   child: const ExerciseContentSection(),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/content_illustration.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../localization/app_localizations.dart';
@@ -135,25 +136,11 @@ class OnboardingSuccessScreen extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  // Network Image (falling back to Icon if offline)
-                                  Image.network(
-                                    'https://lh3.googleusercontent.com/aida-public/AB6AXuDOU43gg-EGAuvUdNtmc9JMDMAVOlOaYV4s4npYSY03mUaCd60MoyCoFfzuZGtsNnwld1Ed8FpLEvJWhzqxy5BBBmDjCsAZGO2Ycv2puOjkXNjC6bmHI6wz6s8OxV3kKLMqZv1bhJhUoqjV0iJ9CFDeNeDmoixqpEjzq1EoejeMi7cm9tXEDDa2Nm3SC6CG4sPugLRwReAgQ42CCI1RxcUglK2G49v-UlNOOgfRtcpwOYCCYgvbQLHUfMC7Mq6o6K5a_vD_RGGwbg4',
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    color: Colors.white.withValues(alpha: 0.1),
-                                    colorBlendMode: BlendMode.lighten,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Center(
-                                        child: Icon(
-                                          Icons.local_florist,
-                                          size: 100,
-                                          color: primaryColor.withValues(
-                                            alpha: 0.3,
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                  // Karşılama illüstrasyonu uygulama içinde çiziliyor: onboarding'in
+                                  // son adımı ağ bağlantısına bağlı olmamalı.
+                                  const ContentIllustration(
+                                    seed: 'onboarding_success',
+                                    icon: Icons.local_florist,
                                   ),
                                 ],
                               ),

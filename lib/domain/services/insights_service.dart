@@ -76,9 +76,7 @@ class InsightsService {
       if (length < minPlausibleCycleDays || length > maxPlausibleCycleDays) {
         continue;
       }
-      points.add(
-        CycleLengthPoint(startDate: starts[i], lengthInDays: length),
-      );
+      points.add(CycleLengthPoint(startDate: starts[i], lengthInDays: length));
     }
 
     if (points.length <= limit) return points;

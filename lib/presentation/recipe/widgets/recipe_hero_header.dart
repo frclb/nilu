@@ -1,12 +1,16 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../../../design_system/content_illustration.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
 
 class RecipeHeroHeader extends StatelessWidget {
-  final String imageUrl;
+  /// Gerçek fotoğraf tedarik edilince buraya bir adres verilir; adres ölürse
+  /// ya da cihaz çevrimdışıysa uygulama içinde çizilen illüstrasyona düşer.
+  /// Daha önce burada Google'ın geçici mockup adresi sabit olarak duruyordu.
+  final String? imageUrl;
 
-  const RecipeHeroHeader({super.key, required this.imageUrl});
+  const RecipeHeroHeader({super.key, this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -22,21 +26,12 @@ class RecipeHeroHeader extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           // Background Image
-          Image.network(
-            imageUrl,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                color: isDark ? const Color(0xFF2A151F) : Colors.grey.shade200,
-                child: Center(
-                  child: Icon(
-                    Icons.restaurant,
-                    size: 48,
-                    color: isDark ? Colors.white38 : Colors.grey,
-                  ),
-                ),
-              );
-            },
+          SafeNetworkImage(
+            url: imageUrl,
+            fallback: const ContentIllustration(
+              seed: 'recipe_hero',
+              icon: Icons.restaurant_menu,
+            ),
           ),
 
           // Gradient Overlay

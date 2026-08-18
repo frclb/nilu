@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/content_illustration.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:math' as math;
 import '../../localization/app_localizations.dart';
@@ -424,11 +425,7 @@ class WidgetsPreviewScreen extends StatelessWidget {
                           width: 2,
                         ),
                       ),
-                      child: const CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          "https://lh3.googleusercontent.com/aida-public/AB6AXuCvAmnum8sjWAUqeVu2wdX7pMwGpFgSo7nL1scC28Y23hhBkjVPa-HcrtIG__IeH0hOuGsEDxkc5ciTeh51ZBN8Wj8rZ9p-QaEeyiMB4OkHu-RgVzSQ65Go6SdfgqBf7y36R-WZlUzuWyxLm-3zpIzELUyeb3DXfRHkEbDnyuo3XJJqH4DatPCNhxZABFwsmBplIiINN_adZSXAWhgb5OgRTBmBDQYY5gaurLQmNkvGtikUF-hYgdnbdnvQ5sVPCPTteRQqV9i3kgw",
-                        ),
-                      ),
+                      child: const InitialAvatar(name: null, size: 64),
                     ),
                     Positioned(
                       bottom: 0,

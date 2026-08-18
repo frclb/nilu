@@ -64,10 +64,7 @@ class YogaDetailScreen extends StatelessWidget {
               SliverToBoxAdapter(
                 child: Column(
                   children: [
-                    const YogaVideoPlayer(
-                      imageUrl:
-                          'https://lh3.googleusercontent.com/aida-public/AB6AXuAuOivrDk4ol2gFrgrkaeHOjAmU8eD_5Lqef293WrLOsSO1EBLaDpa8y8egTpVu2x9mpEWw6HTJ2VP-weChSGlzdAvHa8xIbDQ-hXTXcXzIbfAOS2k60C0kliH-9hRh0MXdcqjITvejx73APVwxaLk27B4pCug-lJsR7s4Ucq_e8f78IzLmZO0ApgdhNvIe1Ldan2kE7OgW51mNY812T8GHNpkRdTTNJe-5MiYtddBfvUudPdSQ7ApHqz61qXWnQsRDNV_tZfoL--8',
-                    ),
+                    const YogaVideoPlayer(),
                     const YogaContentSection(),
                     const SizedBox(height: 100), // Space for bottom button
                   ],

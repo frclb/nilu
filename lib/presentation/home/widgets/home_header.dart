@@ -4,6 +4,7 @@ import '../../../core/navigation/navigation_service.dart';
 import '../../../core/navigation/route_names.dart';
 import '../../../data/repositories/profile_repository.dart';
 import '../../../domain/view_models/user_view_model.dart';
+import '../../../design_system/content_illustration.dart';
 import '../../../localization/app_localizations.dart';
 
 class HomeHeader extends StatefulWidget {
@@ -31,7 +32,6 @@ class _HomeHeaderState extends State<HomeHeader> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final userViewModel = context.watch<UserViewModel>();
     final isPartner = userViewModel.isPartner;
 
@@ -72,30 +72,10 @@ class _HomeHeaderState extends State<HomeHeader> {
             onTap: () {
               NavigationService().go(RouteNames.profile);
             },
-            child: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isDark ? Colors.white.withAlpha(12) : Colors.white,
-                border: Border.all(
-                  color: theme
-                      .colorScheme
-                      .secondary, // primary/50 in dark, secondary-pink in light
-                  width: 2,
-                ),
-                image: const DecorationImage(
-                  image: NetworkImage(
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuA5FKMkf2k4fb7FSXjTldPpWAWGko7c9UcqpvVUiX9WwOjTdAIKPTTKFjQvCEvmivxh8DxaW02P-_Ik32mpQlVoyTVpEbc9FrNRUQxeSGEqCKe75uN0BBQmF1gIBP9j1hV_ltMVfPwBYWtxy6MHD0mwWIkbcVmVEzg-KvN8hNF4GDYeF06I3sNlm8qSD8f44tolT-t8m5P3h33BHfqvevoGaHtqsZuTFPgvA6RTdmLurQ-_HPjea5EsDOO6ymUqcvQvAu6WCI5xzsA',
-                  ),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: const Icon(
-                Icons.person_outline,
-                color: Colors.grey,
-              ), // Fallback icon
-            ),
+            // Avatar da uzak bir adresten geliyordu — üstelik her kullanıcıya
+            // **aynı** fotoğrafı gösteriyordu. Kullanıcının kendi adının baş
+            // harfi hem doğru hem çevrimdışı çalışıyor.
+            child: InitialAvatar(name: _name),
           ),
         ],
       ),

@@ -214,9 +214,7 @@ class _InsightBox extends StatelessWidget {
           Icon(
             Icons.info_outline,
             size: 20,
-            color: isDark
-                ? const Color(0xFF7A2A38)
-                : theme.colorScheme.primary,
+            color: isDark ? const Color(0xFF7A2A38) : theme.colorScheme.primary,
           ),
           const SizedBox(width: 12),
           Expanded(

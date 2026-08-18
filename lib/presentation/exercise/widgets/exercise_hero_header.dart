@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/content_illustration.dart';
 import '../../widgets/favorite_button.dart';
 import 'package:go_router/go_router.dart';
 
 class ExerciseHeroHeader extends StatelessWidget {
-  final String imageUrl;
+  /// Gerçek fotoğraf tedarik edilince buraya bir adres verilir; adres ölürse
+  /// ya da cihaz çevrimdışıysa uygulama içinde çizilen illüstrasyona düşer.
+  /// Daha önce burada Google'ın geçici mockup adresi sabit olarak duruyordu.
+  final String? imageUrl;
 
-  const ExerciseHeroHeader({super.key, required this.imageUrl});
+  const ExerciseHeroHeader({super.key, this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -16,21 +20,12 @@ class ExerciseHeroHeader extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           // Background Image
-          Image.network(
-            imageUrl,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                color: Colors.grey.shade300,
-                child: const Center(
-                  child: Icon(
-                    Icons.image_not_supported,
-                    size: 48,
-                    color: Colors.grey,
-                  ),
-                ),
-              );
-            },
+          SafeNetworkImage(
+            url: imageUrl,
+            fallback: const ContentIllustration(
+              seed: 'exercise_hero',
+              icon: Icons.fitness_center,
+            ),
           ),
 
           // Gradient Overlay
