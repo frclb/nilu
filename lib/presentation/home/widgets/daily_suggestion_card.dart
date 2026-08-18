@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../core/navigation/navigation_service.dart';
 import '../../../core/navigation/route_names.dart';
-import '../../../domain/models/cycle_info.dart';
+import '../../../domain/services/phase_guide.dart';
 import '../../calendar/view_models/calendar_view_model.dart';
 
 class DailySuggestionCard extends StatelessWidget {
@@ -16,7 +16,7 @@ class DailySuggestionCard extends StatelessWidget {
     final theme = Theme.of(context);
     final viewModel = context.watch<CalendarViewModel>();
     final phase = viewModel.cycleInfo.currentPhase;
-    final suggestion = _getSuggestionForPhase(context, phase);
+    final guidance = PhaseGuide.forPhase(phase);
     final phaseColor = phase.color(context.tokens);
 
     return Padding(
@@ -75,7 +75,11 @@ class DailySuggestionCard extends StatelessWidget {
                     ),
                   ),
                   child: Center(
-                    child: Icon(suggestion.icon, size: 40, color: phaseColor),
+                    child: Icon(
+                      _iconFor(guidance.activity),
+                      size: 40,
+                      color: phaseColor,
+                    ),
                   ),
                 ),
                 Padding(
@@ -88,7 +92,7 @@ class DailySuggestionCard extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              suggestion.title,
+                              context.tr(guidance.activityTitleKey),
                               style: theme.textTheme.displayLarge?.copyWith(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -106,7 +110,10 @@ class DailySuggestionCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                suggestion.duration,
+                                context.tr(
+                                  'duration_minutes',
+                                  params: {'n': '${guidance.activityMinutes}'},
+                                ),
                                 style: theme.textTheme.labelLarge?.copyWith(
                                   fontSize: 10,
                                 ),
@@ -117,7 +124,7 @@ class DailySuggestionCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        suggestion.description,
+                        context.tr(guidance.activityDescKey),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.labelLarge?.copyWith(
@@ -162,60 +169,15 @@ class DailySuggestionCard extends StatelessWidget {
     );
   }
 
-  _PhaseSuggestion _getSuggestionForPhase(
-    BuildContext context,
-    CyclePhase phase,
-  ) {
-    switch (phase) {
-      case CyclePhase.menstruation:
-        return _PhaseSuggestion(
-          title: context.tr('suggestion_yin_yoga_title'),
-          description: context.tr('suggestion_yin_yoga_desc'),
-          duration: context.tr('duration_minutes', params: {'n': '15'}),
-          icon: Icons.self_improvement,
-        );
-      case CyclePhase.follicular:
-        return _PhaseSuggestion(
-          title: context.tr('suggestion_energy_title'),
-          description: context.tr('suggestion_energy_desc'),
-          duration: context.tr('duration_minutes', params: {'n': '25'}),
-          icon: Icons.fitness_center,
-        );
-      case CyclePhase.ovulation:
-        return _PhaseSuggestion(
-          title: context.tr('suggestion_hiit_title'),
-          description: context.tr('suggestion_hiit_desc'),
-          duration: context.tr('duration_minutes', params: {'n': '30'}),
-          icon: Icons.directions_run,
-        );
-      case CyclePhase.luteal:
-        return _PhaseSuggestion(
-          title: context.tr('suggestion_meditation_title'),
-          description: context.tr('suggestion_meditation_desc'),
-          duration: context.tr('duration_minutes', params: {'n': '10'}),
-          icon: Icons.spa,
-        );
-      case CyclePhase.unknown:
-        return _PhaseSuggestion(
-          title: context.tr('suggestion_wellness_title'),
-          description: context.tr('suggestion_wellness_desc'),
-          duration: context.tr('duration_minutes', params: {'n': '15'}),
-          icon: Icons.favorite_border,
-        );
-    }
-  }
-}
-
-class _PhaseSuggestion {
-  final String title;
-  final String description;
-  final String duration;
-  final IconData icon;
-
-  _PhaseSuggestion({
-    required this.title,
-    required this.description,
-    required this.duration,
-    required this.icon,
-  });
+  /// Aktivite türünü ikona çevirir.
+  ///
+  /// İkon seçimi sunum katmanının işi; [PhaseGuide] `material` içe aktarmadan
+  /// saf kalsın diye eşleme burada.
+  IconData _iconFor(PhaseActivity activity) => switch (activity) {
+    PhaseActivity.yinYoga => Icons.self_improvement,
+    PhaseActivity.strength => Icons.fitness_center,
+    PhaseActivity.cardio => Icons.directions_run,
+    PhaseActivity.meditation => Icons.spa,
+    PhaseActivity.gentle => Icons.favorite_border,
+  };
 }

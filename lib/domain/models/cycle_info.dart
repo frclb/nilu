@@ -100,6 +100,61 @@ class CycleInfo {
     return CyclePhase.luteal;
   }
 
+  /// Belirli bir tarihin hangi evreye düştüğünü belirler.
+  ///
+  /// [loggedStart] o tarihten önceki en son **kayıtlı** regl başlangıcı.
+  ///
+  /// Yalnızca son kayıttan itibaren gün saymak gelecek tarihlerde bozuluyordu:
+  /// 28 günlük bir döngüde 20 gün sonrasına bakan kullanıcı 35. güne düşüyor,
+  /// [getPhaseForDay] de bunu luteal sayıyordu. Oysa o tarih bir sonraki
+  /// döngünün regl günü. Tahmin edilen başlangıçları da çapa saydığımızda
+  /// takvimin boyadığı renk ile gösterilen evre aynı şeyi söylüyor.
+  CyclePhase phaseForDate(
+    DateTime date, {
+    DateTime? loggedStart,
+    DateTime? now,
+  }) {
+    final day = cycleDayForDate(date, loggedStart: loggedStart, now: now);
+    if (day == null) return CyclePhase.unknown;
+    return getPhaseForDay(day);
+  }
+
+  /// Belirli bir tarihin, ait olduğu döngüdeki kaçıncı gün olduğunu döndürür.
+  ///
+  /// [phaseForDate] ile aynı çapayı kullanır; başlıkta "30. gün" yazarken
+  /// içeriğin "regl dönemi" demesi kullanıcıyı şaşırtıyordu.
+  ///
+  /// Tahmin edilen başlangıçlar yalnızca **gelecek** tarihler için çapa sayılır.
+  /// Bugün için de saysaydık, regl geciktiğinde sayaç "3. gün"e döner ve
+  /// kullanıcının doğrulamadığı bir şeyi — reglin başladığını — iddia ederdi.
+  /// Gecikmede 30. günde kalması doğru davranış.
+  int? cycleDayForDate(DateTime date, {DateTime? loggedStart, DateTime? now}) {
+    final target = DateTime(date.year, date.month, date.day);
+    final reference = now ?? DateTime.now();
+    final today = DateTime(reference.year, reference.month, reference.day);
+    final isFuture = target.isAfter(today);
+
+    final anchors = <DateTime>[
+      ?loggedStart,
+      if (isFuture) ...[
+        ?predictedNextPeriod,
+        ...futurePredictions.map((p) => p.startDate),
+      ],
+    ].map((d) => DateTime(d.year, d.month, d.day)).toList()..sort();
+
+    DateTime? anchor;
+    for (final candidate in anchors) {
+      if (!candidate.isAfter(target)) {
+        anchor = candidate;
+      } else {
+        break;
+      }
+    }
+    if (anchor == null) return null;
+
+    return target.difference(anchor).inDays + 1;
+  }
+
   bool isPredictedPeriod(DateTime date) {
     if (predictedNextPeriod == null) return false;
     final end = predictedNextPeriod!.add(

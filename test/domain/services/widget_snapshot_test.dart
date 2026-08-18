@@ -33,9 +33,11 @@ void main() {
       PeriodLog(id: '1', startDate: DateTime.now()),
     ]);
 
-    expect(
-      WidgetSnapshot.from(info).toMap().keys.toSet(),
-      {'cycleDay', 'daysUntilPeriod', 'phaseKey', 'hasData'},
-    );
+    expect(WidgetSnapshot.from(info).toMap().keys.toSet(), {
+      'cycleDay',
+      'daysUntilPeriod',
+      'phaseKey',
+      'hasData',
+    });
   });
 }

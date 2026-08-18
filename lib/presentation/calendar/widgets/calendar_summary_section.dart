@@ -4,6 +4,10 @@ import 'package:provider/provider.dart';
 import '../../../../domain/models/log_vocabulary.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../../design_system/app_colors.dart';
+import '../../../../design_system/phase_colors.dart';
+import '../../../../design_system/app_tokens.dart';
+import '../../../../domain/models/cycle_info.dart';
+import '../../../../domain/services/phase_guide.dart';
 import '../view_models/calendar_view_model.dart';
 import 'day_detail_bottom_sheet.dart';
 
@@ -32,6 +36,8 @@ class CalendarSummarySection extends StatelessWidget {
     final hasSymptoms = dailyLog.symptoms.isNotEmpty;
     final hasNotes = dailyLog.notes != null && dailyLog.notes!.isNotEmpty;
     final hasAnyData = hasFlow || hasMoods || hasSymptoms || hasNotes;
+
+    final phase = viewModel.phaseForDate(selectedDate);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
@@ -219,53 +225,15 @@ class CalendarSummarySection extends StatelessWidget {
                       ),
                     ],
                   ),
-                ] else ...[
-                  // Suggestion
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? AppColors.suggestionTealText.withAlpha(51)
-                              : AppColors.suggestionTealBg,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.self_improvement,
-                          color: isDark
-                              ? const Color(0xFF5EEAD4)
-                              : AppColors.suggestionTealText,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              context.tr('calendar_daily_suggestion'),
-                              style: theme.textTheme.displayLarge?.copyWith(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              context.tr('calendar_daily_suggestion_text'),
-                              style: theme.textTheme.labelLarge?.copyWith(
-                                fontSize: 12,
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
+
+                if (hasNotes) const SizedBox(height: 20),
+
+                // Seçili günün evresine göre içerik.
+                //
+                // Burada eskiden her gün için aynı sabit öneri yazıyordu;
+                // hangi güne dokunulursa dokunulsun metin değişmiyordu.
+                _PhaseGuidanceBlock(phase: phase, isDark: isDark),
               ],
             ),
           ),
@@ -304,6 +272,91 @@ class CalendarSummarySection extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Seçili günün evresine göre "vücudunda ne oluyor" ve kısa öneri.
+///
+/// Renk evreden geliyor; takvimde o günün boyandığı renkle aynı olsun diye.
+class _PhaseGuidanceBlock extends StatelessWidget {
+  const _PhaseGuidanceBlock({required this.phase, required this.isDark});
+
+  final CyclePhase phase;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final guidance = PhaseGuide.forPhase(phase);
+    final phaseColor = phase.color(context.tokens);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: phaseColor.withAlpha(isDark ? 51 : 30),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.spa_outlined, color: phaseColor),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    context.tr(guidance.titleKey),
+                    style: theme.textTheme.displayLarge?.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    context.tr(guidance.bodyKey),
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontSize: 12,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: phaseColor.withAlpha(isDark ? 30 : 18),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.lightbulb_outline, size: 18, color: phaseColor),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  context.tr(guidance.tipKey),
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontSize: 12,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

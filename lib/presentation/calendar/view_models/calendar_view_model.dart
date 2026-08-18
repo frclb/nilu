@@ -106,13 +106,14 @@ class CalendarViewModel extends ChangeNotifier {
   }
 
   /// Belirli bir gün için döngü gününü hesaplar.
+  ///
+  /// Yalnızca son kayıttan saymak gelecek tarihlerde 30., 40. güne uzuyordu;
+  /// tahmin edilen başlangıçlar da çapa sayılıyor.
   int? getCycleDayForDate(DateTime date) {
-    final lastStart = _periodService.getLastPeriodStartBefore(
-      _periodLogs,
+    return _cycleInfo.cycleDayForDate(
       date,
+      loggedStart: _periodService.getLastPeriodStartBefore(_periodLogs, date),
     );
-    if (lastStart == null) return null;
-    return date.difference(lastStart).inDays + 1;
   }
 
   /// Bir günü regl günü olarak işaretler veya kaldırır. Başarılıysa true döner.
@@ -171,6 +172,16 @@ class CalendarViewModel extends ChangeNotifier {
     final sorted = List<DailyLog>.from(_dailyLogs)
       ..sort((a, b) => b.date.compareTo(a.date));
     return sorted.first;
+  }
+
+  /// Seçili günün döngü evresini döndürür.
+  ///
+  /// Takvimde başka bir güne dokunulduğunda içerik o güne göre değişsin diye;
+  /// öncesinde her gün için bugünün evresi gösteriliyordu.
+  CyclePhase phaseForDate(DateTime date) {
+    final day = getCycleDayForDate(date);
+    if (day == null) return CyclePhase.unknown;
+    return _cycleInfo.getPhaseForDay(day);
   }
 
   /// Ana ekran widget'ını günceller.
