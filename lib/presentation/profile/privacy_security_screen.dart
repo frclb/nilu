@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/navigation/route_names.dart';
 import '../../data/repositories/privacy_settings_repository.dart';
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+
+import '../../domain/services/app_lock_service.dart';
+import '../../domain/services/data_export_service.dart';
 import '../../domain/view_models/user_view_model.dart';
 import '../../localization/app_localizations.dart';
 import '../../design_system/app_colors.dart';
@@ -20,8 +27,10 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
   final PrivacySettingsRepository _repository =
       const PrivacySettingsRepository();
 
-  bool _faceIdEnabled = false;
-  bool _pinEnabled = false;
+  final AppLockService _lockService = AppLockService();
+
+  bool _lockEnabled = false;
+  LockCapability _capability = LockCapability.none;
   bool _isLoading = true;
 
   @override
@@ -31,14 +40,52 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
   }
 
   Future<void> _load() async {
-    final biometric = await _repository.getBiometricEnabled();
-    final pin = await _repository.getPinEnabled();
+    final enabled = await _lockService.isEnabled();
+    final capability = await _lockService.capability();
     if (!mounted) return;
     setState(() {
-      _faceIdEnabled = biometric;
-      _pinEnabled = pin;
+      _lockEnabled = enabled;
+      _capability = capability;
       _isLoading = false;
     });
+  }
+
+  /// Kilidi açıp kapatır.
+  ///
+  /// Açarken doğrulama istenir: kullanıcının kilidi gerçekten açabildiğini
+  /// **açmadan önce** görmek gerekiyor, yoksa kendi verisinden kilitlenir.
+  /// Kapatırken de istenir; telefonu eline geçiren biri kilidi sessizce
+  /// kaldıramasın.
+  Future<void> _toggleLock(bool value) async {
+    if (value && !_capability.isAvailable) {
+      _showMessage(context.tr('lock_unavailable'));
+      return;
+    }
+
+    final ok = await _lockService.authenticate(
+      reason: value
+          ? context.tr('lock_reason_enable')
+          : context.tr('lock_reason_disable'),
+    );
+    if (!mounted) return;
+
+    if (!ok) {
+      _showMessage(context.tr('lock_auth_failed'));
+      return;
+    }
+
+    await _lockService.setEnabled(value);
+    if (!mounted) return;
+    setState(() => _lockEnabled = value);
+    _showMessage(
+      value ? context.tr('lock_enabled') : context.tr('lock_disabled'),
+    );
+  }
+
+  void _showMessage(String text) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(text)));
   }
 
   @override
@@ -89,38 +136,37 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                   ),
                   child: Column(
                     children: [
+                      // Eskiden burada iki anahtar vardı — "Biyometrik
+                      // Kilit" ve "PIN Kodu" — ve ikisi de yalnızca bir
+                      // tercih kaydediyordu. Tek anahtara indirildi:
+                      // uygulama kendi PIN'ini saklamıyor, cihazın kimlik
+                      // doğrulamasını kullanıyor (biyometri, yoksa cihaz
+                      // şifresi). Parola saklamamak, saklamanın her
+                      // türlüsünden güvenli.
                       _buildSwitchTile(
-                        context.tr('privacy_biometric'),
-                        _faceIdEnabled,
-                        (val) async {
-                          setState(() => _faceIdEnabled = val);
-                          await _repository.setBiometricEnabled(val);
-                        },
+                        context.tr('privacy_app_lock'),
+                        _lockEnabled,
+                        _toggleLock,
                         isDark,
-                        Icons.face_retouching_natural,
+                        Icons.lock_outline,
                         true,
-                      ),
-                      _buildSwitchTile(
-                        context.tr('privacy_pin'),
-                        _pinEnabled,
-                        (val) async {
-                          setState(() => _pinEnabled = val);
-                          await _repository.setPinEnabled(val);
-                        },
-                        isDark,
-                        Icons.pin,
-                        false,
                       ),
                     ],
                   ),
                 ),
 
-                // Kilit tercihi kaydedilir ama henüz uygulama açılışında
-                // zorunlu tutulmaz; kullanıcıyı yanıltmamak için açıkça yazılır.
                 Padding(
                   padding: const EdgeInsets.only(top: 8, left: 4, right: 4),
                   child: Text(
-                    context.tr('privacy_lock_not_enforced'),
+                    switch (_capability) {
+                      LockCapability.biometric => context.tr(
+                        'lock_hint_biometric',
+                      ),
+                      LockCapability.deviceCredential => context.tr(
+                        'lock_hint_device',
+                      ),
+                      LockCapability.none => context.tr('lock_unavailable'),
+                    },
                     style: TextStyle(
                       fontSize: 12,
                       color: isDark ? Colors.grey[500] : Colors.grey[600],
@@ -304,14 +350,8 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
-              final messenger = ScaffoldMessenger.of(context);
-              final doneMessage = context.tr('privacy_export_done');
               Navigator.of(ctx).pop();
-
-              final json = await _repository.exportDataAsJson();
-              await Clipboard.setData(ClipboardData(text: json));
-
-              messenger.showSnackBar(SnackBar(content: Text(doneMessage)));
+              await _exportAndShare();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF0D9488),
@@ -325,6 +365,67 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
         ],
       ),
     );
+  }
+
+  /// Veriyi dosya olarak dışa aktarır ve sistem paylaşım sayfasını açar.
+  ///
+  /// Eskiden JSON panoya kopyalanıyordu: sistem panosunu okuyabilen her
+  /// uygulama sağlık verisini görebiliyordu ve binlerce satırı bir yere
+  /// yapıştırmak pratikte kullanılamıyordu.
+  ///
+  /// Üç dosya birlikte veriliyor — okunabilir özet (muayenede telefondan
+  /// okunur), CSV (tablo programı) ve tam JSON (kayıpsız yedek).
+  Future<void> _exportAndShare() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final failedMessage = context.tr('privacy_export_failed');
+
+    // Çeviri fonksiyonu senkron olmalı; async boşluktan sonra context
+    // kullanılamaz diye şimdiden yakalanıyor.
+    String translate(String key, {Map<String, String>? params}) =>
+        context.tr(key, params: params);
+
+    try {
+      final data = await _repository.loadExportData();
+      final json = await _repository.exportDataAsJson();
+      final now = DateTime.now();
+
+      final summary = DataExportService.buildSummary(
+        periodLogs: data.periodLogs,
+        dailyLogs: data.dailyLogs,
+        generatedAt: now,
+        translate: translate,
+      );
+      final csv = DataExportService.buildCsv(
+        dailyLogs: data.dailyLogs,
+        periodLogs: data.periodLogs,
+      );
+
+      // Geçici dizin: paylaşım bittikten sonra sistem temizler, veri
+      // cihazda kalıcı bir yerde birikmez.
+      final dir = await getTemporaryDirectory();
+      final stamp =
+          '${now.year}${now.month.toString().padLeft(2, '0')}'
+          '${now.day.toString().padLeft(2, '0')}';
+
+      final files = <XFile>[
+        await _writeTemp(dir.path, 'dongu-ozeti-$stamp.txt', summary),
+        await _writeTemp(dir.path, 'dongu-kayitlari-$stamp.csv', csv),
+        await _writeTemp(dir.path, 'dongu-yedek-$stamp.json', json),
+      ];
+
+      await SharePlus.instance.share(
+        ShareParams(files: files, subject: translate('export_title')),
+      );
+    } catch (e) {
+      debugPrint('Export failed: $e');
+      messenger.showSnackBar(SnackBar(content: Text(failedMessage)));
+    }
+  }
+
+  Future<XFile> _writeTemp(String dir, String name, String content) async {
+    final file = File('$dir/$name');
+    await file.writeAsString(content);
+    return XFile(file.path);
   }
 
   void _showDeleteAccountDialog(BuildContext context, bool isDark) {

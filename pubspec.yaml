@@ -53,6 +53,13 @@ dependencies:
   flutter_local_notifications: ^22.3.0
   timezone: ^0.11.1
 
+  # Uygulama kilidi: Face ID / Touch ID / parmak izi, cihaz şifresine düşer.
+  # Kendi PIN'imizi saklamıyoruz — parola saklamamak en güvenlisi.
+  local_auth: ^2.3.0
+  # Veri dışa aktarma: dosya olarak paylaş. Sağlık verisi panoya konmamalı.
+  share_plus: ^13.3.0
+  path_provider: ^2.1.5
+
 
 dev_dependencies:
   flutter_test:

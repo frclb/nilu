@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../domain/models/daily_log.dart';
+import '../../domain/models/period_log.dart';
 import '../local/secure_store.dart';
 import 'period_repository.dart';
 
@@ -44,8 +46,20 @@ class PrivacySettingsRepository {
 
   // ─── Veri yönetimi ───
 
-  /// Kullanıcının tüm sağlık verisini okunabilir JSON olarak döndürür.
-  /// Ekran bunu panoya kopyalar; harici bir servise gönderilmez.
+  /// Dışa aktarılacak ham veri.
+  ///
+  /// Biçimlendirme `DataExportService`'in işi; burada yalnızca okuma var.
+  Future<({List<PeriodLog> periodLogs, List<DailyLog> dailyLogs})>
+  loadExportData() async {
+    return (
+      periodLogs: await _periodRepository.getPeriodLogs(),
+      dailyLogs: await _periodRepository.getDailyLogs(),
+    );
+  }
+
+  /// Yedekten geri yüklenebilecek tam JSON.
+  ///
+  /// Okunabilir özet ve CSV kullanıcı içindir; bu, verinin kayıpsız hâli.
   Future<String> exportDataAsJson() async {
     final periodLogs = await _periodRepository.getPeriodLogs();
     final dailyLogs = await _periodRepository.getDailyLogs();

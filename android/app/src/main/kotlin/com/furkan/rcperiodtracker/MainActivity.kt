@@ -1,5 +1,7 @@
 package com.furkan.rcperiodtracker
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 
-class MainActivity : FlutterActivity()
+/// `local_auth` biyometrik istemi bir FragmentActivity üzerinde gösteriyor;
+/// `FlutterActivity` ile uygulama kilidi Android'de çalışmaz.
+class MainActivity : FlutterFragmentActivity()

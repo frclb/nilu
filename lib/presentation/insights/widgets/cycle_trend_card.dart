@@ -24,6 +24,7 @@ class CycleTrendCard extends StatelessWidget {
     final points = InsightsService.cycleLengths(viewModel.periodLogs);
     final average = InsightsService.averageLength(points);
     final variation = InsightsService.variation(points);
+    final regularity = InsightsService.regularity(points);
 
     final cardBgColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
     final borderColor = isDark
@@ -141,6 +142,13 @@ class CycleTrendCard extends StatelessWidget {
               isDark: isDark,
               textColor: textColor,
             ),
+            // Belirgin sapmada kullanıcı bilgilendirilir. Teşhis değil:
+            // uygulamanın söylediği tek şey kendi kayıtlarının ne kadar
+            // oynadığı ve isterse hekimine danışabileceği.
+            if (regularity?.shouldSuggestConsultation ?? false) ...[
+              const SizedBox(height: 12),
+              _ConsultationNote(isDark: isDark),
+            ],
           ],
         ],
       ),
@@ -156,6 +164,62 @@ class CycleTrendCard extends StatelessWidget {
     return context.tr(
       variation <= 3 ? 'insights_trend_steady' : 'insights_trend_variable',
       params: {'days': '$variation'},
+    );
+  }
+}
+
+/// Döngüler belirgin biçimde oynadığında çıkan bilgilendirme.
+class _ConsultationNote extends StatelessWidget {
+  final bool isDark;
+
+  const _ConsultationNote({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final amber = isDark ? const Color(0xFFFDBA74) : AppColors.moodOrangeText;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.moodOrangeText.withAlpha(38)
+            : AppColors.moodOrangeBg,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: amber.withAlpha(60)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.medical_information_outlined, size: 20, color: amber),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.tr('insights_consult_title'),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: amber,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  context.tr('insights_consult_text'),
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.5,
+                    color: isDark
+                        ? AppColors.textMutedWarmDark
+                        : AppColors.textMutedLight,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

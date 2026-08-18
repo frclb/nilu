@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:period_tracker/domain/models/daily_log.dart';
 import 'package:period_tracker/domain/models/period_log.dart';
+import 'package:period_tracker/domain/models/cycle_info.dart';
 import 'package:period_tracker/domain/services/insights_service.dart';
 
 PeriodLog _period(String id, DateTime start, {DateTime? end}) =>
@@ -21,6 +22,8 @@ DailyLog _log(
 );
 
 void main() {
+  _regularityAndPhaseTests();
+
   group('cycleLengths', () {
     test('tek regl kaydından döngü uzunluğu çıkarılamaz', () {
       // Döngünün bitmesi için bir sonrakinin başlaması gerekir.
@@ -228,6 +231,194 @@ void main() {
       ];
 
       expect(InsightsService.loggedDayCount(logs), 3);
+    });
+  });
+}
+
+/// Bu bölüm sonradan eklenen düzenlilik ve evre analizini kapsar.
+void _regularityAndPhaseTests() {
+  CycleLengthPoint point(int length) =>
+      CycleLengthPoint(startDate: DateTime(2026, 1, 1), lengthInDays: length);
+
+  group('regularity', () {
+    test('iki ölçümden az varsa değerlendirme yapılmaz', () {
+      expect(InsightsService.regularity(const []), isNull);
+      expect(InsightsService.regularity([point(28)]), isNull);
+    });
+
+    test('eşikler', () {
+      expect(
+        InsightsService.regularity([point(28), point(31)]),
+        CycleRegularity.steady,
+      );
+      expect(
+        InsightsService.regularity([point(28), point(35)]),
+        CycleRegularity.typical,
+      );
+      expect(
+        InsightsService.regularity([point(26), point(36)]),
+        CycleRegularity.irregular,
+      );
+    });
+
+    test('yalnızca düzensiz durumda hekim önerisi çıkar', () {
+      expect(CycleRegularity.steady.shouldSuggestConsultation, isFalse);
+      expect(CycleRegularity.typical.shouldSuggestConsultation, isFalse);
+      expect(CycleRegularity.irregular.shouldSuggestConsultation, isTrue);
+    });
+  });
+
+  group('symptomsByPhase', () {
+    final periods = [
+      PeriodLog(id: '1', startDate: DateTime(2026, 3, 1)),
+      PeriodLog(id: '2', startDate: DateTime(2026, 3, 29)),
+    ];
+
+    test('regl kaydı yoksa boş döner', () {
+      expect(
+        InsightsService.symptomsByPhase(
+          'cramp',
+          dailyLogs: [
+            DailyLog(date: DateTime(2026, 3, 2), symptoms: const ['cramp']),
+          ],
+          periodLogs: const [],
+          periodLength: 5,
+        ),
+        isEmpty,
+      );
+    });
+
+    test('günler doğru evreye yerleşir', () {
+      final logs = [
+        DailyLog(
+          date: DateTime(2026, 3, 2),
+          symptoms: const ['cramp'],
+        ), // gün 2
+        DailyLog(
+          date: DateTime(2026, 3, 8),
+          symptoms: const ['cramp'],
+        ), // gün 8
+        DailyLog(
+          date: DateTime(2026, 3, 14),
+          symptoms: const ['cramp'],
+        ), // gün 14
+        DailyLog(
+          date: DateTime(2026, 3, 25),
+          symptoms: const ['cramp'],
+        ), // gün 25
+      ];
+
+      final counts = InsightsService.symptomsByPhase(
+        'cramp',
+        dailyLogs: logs,
+        periodLogs: periods,
+        periodLength: 5,
+      );
+
+      expect(counts[CyclePhase.menstruation], 1);
+      expect(counts[CyclePhase.follicular], 1);
+      expect(counts[CyclePhase.ovulation], 1);
+      expect(counts[CyclePhase.luteal], 1);
+    });
+
+    test('ilk regl kaydından önceki günler sayılmaz', () {
+      // Döngü günü hesaplanamıyor; bir yere zorla koymak veriyi bozar.
+      final counts = InsightsService.symptomsByPhase(
+        'cramp',
+        dailyLogs: [
+          DailyLog(date: DateTime(2026, 2, 20), symptoms: const ['cramp']),
+        ],
+        periodLogs: periods,
+        periodLength: 5,
+      );
+
+      expect(counts, isEmpty);
+    });
+
+    test('takip arası uzun boşluktaki kayıt sayılmaz', () {
+      final counts = InsightsService.symptomsByPhase(
+        'cramp',
+        dailyLogs: [
+          // Son regl başlangıcından 200 gün sonra: bir döngüye ait değil.
+          DailyLog(date: DateTime(2026, 10, 15), symptoms: const ['cramp']),
+        ],
+        periodLogs: periods,
+        periodLength: 5,
+      );
+
+      expect(counts, isEmpty);
+    });
+
+    test('aranmayan belirti sayılmaz', () {
+      final counts = InsightsService.symptomsByPhase(
+        'headache',
+        dailyLogs: [
+          DailyLog(date: DateTime(2026, 3, 2), symptoms: const ['cramp']),
+        ],
+        periodLogs: periods,
+        periodLength: 5,
+      );
+
+      expect(counts, isEmpty);
+    });
+  });
+
+  group('dominantPhase', () {
+    final periods = [PeriodLog(id: '1', startDate: DateTime(2026, 3, 1))];
+
+    DailyLog cramp(int day) =>
+        DailyLog(date: DateTime(2026, 3, day), symptoms: const ['cramp']);
+
+    test('gözlem azken sonuç verilmez', () {
+      // İki kayıttan "çoğunlukla şu evrede" demek yanıltıcı olur.
+      expect(
+        InsightsService.dominantPhase(
+          'cramp',
+          dailyLogs: [cramp(1), cramp(2)],
+          periodLogs: periods,
+          periodLength: 5,
+        ),
+        isNull,
+      );
+    });
+
+    test('baskın evre yoksa sonuç verilmez', () {
+      // 2 regl / 2 luteal: "çoğunlukla" diyebilmek için çoğunluk gerekiyor.
+      expect(
+        InsightsService.dominantPhase(
+          'cramp',
+          dailyLogs: [cramp(1), cramp(2), cramp(20), cramp(21)],
+          periodLogs: periods,
+          periodLength: 5,
+        ),
+        isNull,
+      );
+    });
+
+    test('baskın evre ve payı döner', () {
+      final result = InsightsService.dominantPhase(
+        'cramp',
+        dailyLogs: [cramp(1), cramp(2), cramp(3), cramp(20)],
+        periodLogs: periods,
+        periodLength: 5,
+      );
+
+      expect(result, isNotNull);
+      expect(result!.phase, CyclePhase.menstruation);
+      expect(result.count, 3);
+      expect(result.total, 4);
+    });
+
+    test('kayıt yokken null döner', () {
+      expect(
+        InsightsService.dominantPhase(
+          'cramp',
+          dailyLogs: const [],
+          periodLogs: periods,
+          periodLength: 5,
+        ),
+        isNull,
+      );
     });
   });
 }

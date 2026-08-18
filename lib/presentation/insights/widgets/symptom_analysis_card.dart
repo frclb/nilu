@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
+import '../../../domain/models/cycle_info.dart';
 import '../../../domain/models/log_vocabulary.dart';
 import '../../../domain/services/insights_service.dart';
 import '../../calendar/view_models/calendar_view_model.dart';
@@ -26,6 +27,17 @@ class SymptomAnalysisCard extends StatelessWidget {
 
     final frequencies = InsightsService.symptomFrequencies(viewModel.dailyLogs);
     final loggedDays = InsightsService.loggedDayCount(viewModel.dailyLogs);
+
+    // En sık görülen belirtinin hangi evrede toplandığı. Yeterli gözlem ya da
+    // net bir çoğunluk yoksa null döner ve hiçbir şey söylenmez.
+    final dominant = frequencies.isEmpty
+        ? null
+        : InsightsService.dominantPhase(
+            frequencies.first.code,
+            dailyLogs: viewModel.dailyLogs,
+            periodLogs: viewModel.periodLogs,
+            periodLength: viewModel.cycleInfo.averagePeriodLength,
+          );
 
     final cardBgColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
     final borderColor = isDark
@@ -114,10 +126,55 @@ class SymptomAnalysisCard extends StatelessWidget {
                     : AppColors.borderGrayLight,
               ),
             ],
+
+          if (dominant != null) ...[
+            const SizedBox(height: 20),
+            Divider(color: borderColor, height: 1),
+            const SizedBox(height: 16),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.timeline,
+                  size: 20,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    context.tr(
+                      'insights_symptom_phase',
+                      params: {
+                        'symptom': context.tr(
+                          LogVocabulary.symptomKey(frequencies.first.code),
+                        ),
+                        'phase': context.tr(_phaseKey(dominant.phase)),
+                        'count': '${dominant.count}',
+                        'total': '${dominant.total}',
+                      },
+                    ),
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 1.5,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
   }
+
+  static String _phaseKey(CyclePhase phase) => switch (phase) {
+    CyclePhase.menstruation => 'phase_menstruation',
+    CyclePhase.follicular => 'phase_follicular',
+    CyclePhase.ovulation => 'phase_ovulation',
+    CyclePhase.luteal => 'phase_luteal',
+    CyclePhase.unknown => 'phase_unknown',
+  };
 }
 
 class _SymptomBar extends StatelessWidget {
