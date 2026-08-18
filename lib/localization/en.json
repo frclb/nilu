@@ -692,5 +692,12 @@
   "phase_title_follicular": "Follicular Phase",
   "phase_title_ovulation": "Ovulation",
   "phase_title_luteal": "Luteal Phase",
-  "phase_title_unknown": "Cycle Phase"
+  "phase_title_unknown": "Cycle Phase",
+  "session_step_of": "STEP {n} OF {total}",
+  "session_skip": "Skip",
+  "session_pause": "Pause",
+  "session_resume": "Resume",
+  "session_done_title": "Session complete",
+  "session_done_body": "You gave yourself {duration}. Jot down how it felt in your log.",
+  "session_close": "Close"
 }

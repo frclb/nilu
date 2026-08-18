@@ -692,5 +692,12 @@
   "phase_title_follicular": "Phase folliculaire",
   "phase_title_ovulation": "Ovulation",
   "phase_title_luteal": "Phase lutéale",
-  "phase_title_unknown": "Phase du cycle"
+  "phase_title_unknown": "Phase du cycle",
+  "session_step_of": "ÉTAPE {n} SUR {total}",
+  "session_skip": "Passer",
+  "session_pause": "Pause",
+  "session_resume": "Reprendre",
+  "session_done_title": "Séance terminée",
+  "session_done_body": "Tu t'es accordé {duration}. Note dans ton journal comment tu t'es sentie.",
+  "session_close": "Fermer"
 }

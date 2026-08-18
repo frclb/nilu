@@ -692,5 +692,12 @@
   "phase_title_follicular": "Foliküler Faz",
   "phase_title_ovulation": "Yumurtlama Dönemi",
   "phase_title_luteal": "Luteal Faz",
-  "phase_title_unknown": "Döngü Evresi"
+  "phase_title_unknown": "Döngü Evresi",
+  "session_step_of": "{n} / {total}. ADIM",
+  "session_skip": "Geç",
+  "session_pause": "Duraklat",
+  "session_resume": "Devam et",
+  "session_done_title": "Seans tamamlandı",
+  "session_done_body": "{duration} boyunca kendine vakit ayırdın. Nasıl hissettiğini günlüğüne not edebilirsin.",
+  "session_close": "Kapat"
 }

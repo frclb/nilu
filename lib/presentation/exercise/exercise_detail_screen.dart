@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import '../../../core/navigation/route_names.dart';
+import '../../domain/services/session_plan.dart';
+import '../session/session_screen.dart';
 import '../../../localization/app_localizations.dart';
 import 'widgets/exercise_hero_header.dart';
 import 'widgets/exercise_content_section.dart';
@@ -59,9 +59,14 @@ class ExerciseDetailScreen extends StatelessWidget {
                 ),
               ),
               child: ElevatedButton.icon(
-                onPressed: () {
-                  context.pushNamed(RouteNames.yogaDetail);
-                },
+                // Bu düğme yoga detay ekranına atıyordu; kullanıcı orada
+                // ikinci bir "Başlat"a basmak zorunda kalıyordu. İki ekran da
+                // aynı akışı anlatıyor, seans doğrudan buradan başlıyor.
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const SessionScreen(plan: SessionPlan.yoga),
+                  ),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.colorScheme.primary,
                   foregroundColor: Colors.white,

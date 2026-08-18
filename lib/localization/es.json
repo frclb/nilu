@@ -692,5 +692,12 @@
   "phase_title_follicular": "Fase folicular",
   "phase_title_ovulation": "Ovulación",
   "phase_title_luteal": "Fase lútea",
-  "phase_title_unknown": "Fase del ciclo"
+  "phase_title_unknown": "Fase del ciclo",
+  "session_step_of": "PASO {n} DE {total}",
+  "session_skip": "Saltar",
+  "session_pause": "Pausar",
+  "session_resume": "Continuar",
+  "session_done_title": "Sesión completada",
+  "session_done_body": "Te has dedicado {duration}. Anota en tu diario cómo te has sentido.",
+  "session_close": "Cerrar"
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../domain/services/session_plan.dart';
+import '../session/session_screen.dart';
 import '../widgets/favorite_button.dart';
 import 'widgets/yoga_video_player.dart';
 import 'widgets/yoga_content_section.dart';
@@ -96,11 +98,14 @@ class YogaDetailScreen extends StatelessWidget {
               child: SizedBox(
                 height: 56,
                 child: ElevatedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(context.tr('exercise_starting'))),
-                    );
-                  },
+                  // Bu düğme eskiden yalnızca "başlıyor" bildirim çubuğu
+                  // gösteriyordu; hiçbir şey başlamıyordu.
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) =>
+                          const SessionScreen(plan: SessionPlan.yoga),
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     foregroundColor: Colors.white,

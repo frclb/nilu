@@ -692,5 +692,12 @@
   "phase_title_follicular": "Follikelphase",
   "phase_title_ovulation": "Eisprung",
   "phase_title_luteal": "Lutealphase",
-  "phase_title_unknown": "Zyklusphase"
+  "phase_title_unknown": "Zyklusphase",
+  "session_step_of": "SCHRITT {n} VON {total}",
+  "session_skip": "Überspringen",
+  "session_pause": "Pause",
+  "session_resume": "Weiter",
+  "session_done_title": "Einheit abgeschlossen",
+  "session_done_body": "Du hast dir {duration} genommen. Notier in deinem Tagebuch, wie es sich angefühlt hat.",
+  "session_close": "Schließen"
 }

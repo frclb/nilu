@@ -1,7 +1,5 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../../design_system/content_illustration.dart';
-import '../../../localization/app_localizations.dart';
 
 class YogaVideoPlayer extends StatelessWidget {
   /// Gerçek fotoğraf tedarik edilince buraya bir adres verilir; adres ölürse
@@ -47,63 +45,10 @@ class YogaVideoPlayer extends StatelessWidget {
                 ),
               ),
 
-              // Play Button
-              Center(
-                child: Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(51),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withAlpha(76),
-                      width: 1.5,
-                    ),
-                  ),
-                  child: ClipOval(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                      child: const Center(
-                        child: Icon(
-                          Icons.play_arrow,
-                          size: 32,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              // Bottom label
-              Positioned(
-                bottom: 12,
-                left: 16,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withAlpha(102),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                      child: Text(
-                        context.tr('preview'),
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white70,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              // Ortada bir oynat düğmesi duruyordu ama hiçbir yere
+              // bağlı değildi — uygulamada video diye bir şey yok. Video
+              // oynatıcı görüntüsü vermek, olmayan bir içerik vaat ediyordu.
+              // Rehberli seans aşağıdaki "Başlat" düğmesinden açılıyor.
             ],
           ),
         ),
