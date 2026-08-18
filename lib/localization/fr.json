@@ -621,5 +621,7 @@
   "phase_follicular": "après tes règles",
   "phase_ovulation": "autour de l’ovulation",
   "phase_luteal": "avant tes règles",
-  "phase_unknown": "à un moment indéterminé"
+  "phase_unknown": "à un moment indéterminé",
+  "partner_scan_camera_denied": "L’accès à l’appareil photo n’a pas été autorisé. Tu peux l’activer dans Réglages → Period Tracker → Appareil photo puis réessayer.",
+  "partner_scan_camera_missing": "Aucun appareil photo utilisable n’a été trouvé sur cet appareil, le code QR ne peut pas être scanné."
 }

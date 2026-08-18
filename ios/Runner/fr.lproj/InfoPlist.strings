@@ -1,0 +1,6 @@
+/* Sistem izin kutularinda gorunen metinler.
+   Info.plist icindekiler yalnizca yedek; cihaz dili buradan okur. */
+
+"NSCameraUsageDescription" = "L’appareil photo sert à scanner le code QR de ta partenaire. Aucune image n’est conservée.";
+"NSPhotoLibraryUsageDescription" = "L’accès à tes photos te permet de choisir une image de code QR enregistrée.";
+"NSFaceIDUsageDescription" = "Face ID garantit que toi seule accèdes à tes données de santé lorsque le verrouillage est actif.";

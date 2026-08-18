@@ -13,7 +13,7 @@ App Store ve Google Play yüklemesi için gereken adımlar. ✅ = kodda hazır,
 | Görünen ad | Period Tracker | Period Tracker | ✅ |
 | Sürüm | `1.0.0` (build 1) | `1.0.0` (versionCode 1) | ✅ `pubspec.yaml:19` |
 | Minimum sürüm | iOS 15.0 | API 24 | ✅ |
-| Desteklenen diller | tr, en, de, es, fr, pt | aynı | ✅ altısı da 562/562 |
+| Desteklenen diller | tr, en, de, es, fr, pt | aynı | ✅ altısı da eşit (`dart run tool/check_localization.dart`) |
 
 > iOS deployment target 13.0'dı ama Podfile ve Firebase 15.0 istiyor — düzeltildi.
 > Uyumsuz kalsaydı App Store doğrulaması reddederdi.
@@ -150,3 +150,59 @@ yükleyin. (APK değil, AAB istiyor.)
 ```bash
 flutter analyze --fatal-infos && flutter test && dart run tool/check_localization.dart
 ```
+
+
+---
+
+## Gizlilik bildirimi ve izin metinleri
+
+**`ios/Runner/PrivacyInfo.xcprivacy`** ✅
+
+Mayıs 2024'ten beri zorunlu. Uygulama hedefinde yoksa App Store Connect
+yüklemeyi **ITMS-91053** ile reddediyor; Pod'ların kendi bildirimleri bunun
+yerine geçmiyor. Dosya oluşturuldu ve Xcode hedefine (Copy Bundle Resources)
+eklendi.
+
+Beyan edilenler koddan çıkarıldı:
+
+| Veri | Nereye gidiyor |
+|---|---|
+| Yakınlık durumu (sağlık) | `intimacy/{uid}` — yalnızca partner paylaşımı açıkken |
+| Kullanıcı kimliği | Firebase anonim UID |
+| Cihaz kimliği | FCM jetonu (bildirim için) |
+| Satın alma geçmişi | RevenueCat |
+
+**Cihazdan çıkmayanlar:** günlük sağlık kayıtları (`saveDailyLog` tanımlı ama
+hiçbir yerden çağrılmıyor), ad, e-posta, doğum tarihi (hepsi `SecureStore`).
+
+Gerekçeli API olarak yalnızca `UserDefaults` (CA92.1) beyan edildi —
+`shared_preferences` bunu kullanıyor.
+
+> App Store Connect'teki "App Privacy" formunu da bu tabloya göre doldurun;
+> iki beyan tutarsız olursa inceleme takılır.
+
+**Yerelleştirilmiş izin metinleri** ✅
+
+`ios/Runner/<dil>.lproj/InfoPlist.strings` — kamera, fotoğraf ve Face ID
+açıklamaları altı dilde. Öncesinde `Info.plist` içindeki İngilizce metin
+Türkçe cihazda da İngilizce çıkıyordu.
+
+---
+
+## Reklam
+
+Şu an **hiçbir reklam SDK'sı yok** ve `NSPrivacyTracking` `false` beyan
+edildi. Reklam eklenecekse aşağıdakiler zorunlu olur:
+
+1. `PrivacyInfo.xcprivacy` içinde `NSPrivacyTracking` `true`, ilgili veri
+   tipleri `NSPrivacyCollectedDataTypeTracking` `true`, ve reklam ağının
+   alan adları `NSPrivacyTrackingDomains` listesine.
+2. `Info.plist` içine `NSUserTrackingUsageDescription` ve uygulama içinde
+   ATT izin isteği (`AppTrackingTransparency`). İzin alınmadan IDFA
+   kullanılamaz.
+3. App Store Connect "App Privacy" formunda "Used for Tracking" işaretlemesi.
+
+**Dikkat:** Bu bir regl takip uygulaması. Sağlık verisi GDPR'da özel nitelikli
+veri (Md. 9), KVKK'da da özel nitelikli kişisel veri. Bu veriyi reklam
+hedeflemesinde kullanmak ya da reklam ağına aktarmak ayrı bir açık rıza
+gerektirir ve emsali kötüdür. Kişiselleştirilmemiş reklam bu riski taşımaz.

@@ -1,0 +1,6 @@
+/* Sistem izin kutularinda gorunen metinler.
+   Info.plist icindekiler yalnizca yedek; cihaz dili buradan okur. */
+
+"NSCameraUsageDescription" = "Die Kamera wird verwendet, um den QR-Code deiner Partnerin zu scannen. Es werden keine Kameraaufnahmen gespeichert.";
+"NSPhotoLibraryUsageDescription" = "Der Zugriff auf deine Fotos ermöglicht die Auswahl eines gespeicherten QR-Code-Bildes.";
+"NSFaceIDUsageDescription" = "Face ID sorgt dafür, dass bei aktiver App-Sperre nur du auf deine Gesundheitsdaten zugreifen kannst.";

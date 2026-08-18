@@ -621,5 +621,7 @@
   "phase_follicular": "after your period",
   "phase_ovulation": "around ovulation",
   "phase_luteal": "before your period",
-  "phase_unknown": "at an unclear time"
+  "phase_unknown": "at an unclear time",
+  "partner_scan_camera_denied": "Camera access was not granted. You can allow it in Settings → Period Tracker → Camera and try again.",
+  "partner_scan_camera_missing": "No usable camera was found on this device, so the QR code cannot be scanned."
 }

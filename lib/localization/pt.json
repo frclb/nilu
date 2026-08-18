@@ -621,5 +621,7 @@
   "phase_follicular": "depois do período",
   "phase_ovulation": "perto da ovulação",
   "phase_luteal": "antes do período",
-  "phase_unknown": "num momento pouco claro"
+  "phase_unknown": "num momento pouco claro",
+  "partner_scan_camera_denied": "O acesso à câmara não foi concedido. Podes permiti-lo em Definições → Period Tracker → Câmara e tentar de novo.",
+  "partner_scan_camera_missing": "Não foi encontrada nenhuma câmara utilizável neste dispositivo, por isso o código QR não pode ser lido."
 }

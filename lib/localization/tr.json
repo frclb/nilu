@@ -621,5 +621,7 @@
   "phase_follicular": "regl sonrası dönemde",
   "phase_ovulation": "yumurtlama döneminde",
   "phase_luteal": "regl öncesi dönemde",
-  "phase_unknown": "belirsiz dönemde"
+  "phase_unknown": "belirsiz dönemde",
+  "partner_scan_camera_denied": "Kamera izni verilmedi. Ayarlar → Period Tracker → Kamera bölümünden izin verip tekrar deneyebilirsin.",
+  "partner_scan_camera_missing": "Bu cihazda kullanılabilir bir kamera bulunamadı, QR kodu okutulamıyor."
 }

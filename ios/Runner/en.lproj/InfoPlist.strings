@@ -1,0 +1,6 @@
+/* Sistem izin kutularinda gorunen metinler.
+   Info.plist icindekiler yalnizca yedek; cihaz dili buradan okur. */
+
+"NSCameraUsageDescription" = "The camera is used to scan your partner’s QR code. No camera footage is stored.";
+"NSPhotoLibraryUsageDescription" = "Your photos are accessed so you can pick a saved QR code image.";
+"NSFaceIDUsageDescription" = "Face ID is used so that only you can reach your health data while App Lock is on.";

@@ -8,6 +8,54 @@ import '../../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
 import '../../design_system/app_colors.dart';
 
+/// Kamera kullanılamadığında gösterilen ekran.
+///
+/// İki farklı sebebi ayırır: izin verilmemiş olması (kullanıcı bunu ayarlardan
+/// düzeltebilir) ve cihazda kamera bulunmaması (düzeltemez).
+class _ScanUnavailable extends StatelessWidget {
+  final MobileScannerException error;
+
+  const _ScanUnavailable({required this.error});
+
+  @override
+  Widget build(BuildContext context) {
+    final denied = error.errorCode == MobileScannerErrorCode.permissionDenied;
+
+    return ColoredBox(
+      color: Colors.black,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                denied ? Icons.no_photography_outlined : Icons.videocam_off,
+                size: 48,
+                color: Colors.white70,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                context.tr(
+                  denied
+                      ? 'partner_scan_camera_denied'
+                      : 'partner_scan_camera_missing',
+                ),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class PartnerScanScreen extends StatefulWidget {
   const PartnerScanScreen({super.key});
 
@@ -247,7 +295,15 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          MobileScanner(controller: _scannerController, onDetect: _onDetect),
+          MobileScanner(
+            controller: _scannerController,
+            onDetect: _onDetect,
+            // Paketin kendi hata ekranı İngilizce sabit metin gösteriyor
+            // ("Scanning is not supported on this device"). Kullanıcı kamera
+            // iznini reddettiğinde de bu ekran çıkıyor, yani gerçek cihazda
+            // ulaşılabilir bir durum.
+            errorBuilder: (context, error) => _ScanUnavailable(error: error),
+          ),
           // Scanner overlay
           Positioned.fill(
             child: Container(

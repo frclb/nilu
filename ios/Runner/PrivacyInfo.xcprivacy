@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Apple gizlilik bildirimi.
+
+  Mayıs 2024'ten beri zorunlu. Uygulama hedefinde bu dosya yoksa App Store
+  Connect yüklemeyi ITMS-91053 ile reddediyor — Pod'ların kendi bildirimleri
+  bunun yerine geçmiyor.
+
+  Buradaki beyanlar kodun gerçekten yaptığı işten çıkarıldı:
+  - Günlük sağlık kayıtları (`users/{uid}/logs`) CİHAZDAN ÇIKMIYOR.
+    `FirestoreDataSource.saveDailyLog` tanımlı ama hiçbir yerden
+    çağrılmıyor; kayıtlar şifreli yerel depoda duruyor.
+  - Ad, e-posta, doğum tarihi de yerel (`ProfileRepository` → `SecureStore`).
+  - Cihazdan çıkan: yakınlık durumu (partner paylaşımı açıkken),
+    Firebase anonim kimliği, FCM cihaz jetonu ve RevenueCat satın alma
+    geçmişi.
+
+  Firebase ve RevenueCat yapılandırılmadan yayınlanırsa bu dört madde de
+  fiilen toplanmaz; beyanı daraltmak isterseniz ilgili blokları çıkarın.
+  Eksik beyan ret sebebi, fazla beyan değil.
+-->
+<plist version="1.0">
+<dict>
+	<!-- Reklam SDK'sı yok, çapraz uygulama takibi yapılmıyor. -->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array>
+		<!-- Yakınlık durumu: partner paylaşımı açıkken `intimacy/{uid}`
+		     dokümanına yazılıyor. -->
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeHealth</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<true/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
+
+		<!-- Firebase anonim kullanıcı kimliği. -->
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeUserID</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<true/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
+
+		<!-- Bildirim gönderebilmek için FCM jetonu. -->
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeDeviceID</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<true/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
+
+		<!-- Premium aboneliğin doğrulanması (RevenueCat). -->
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypePurchaseHistory</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<true/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
+		</dict>
+	</array>
+
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<!-- `shared_preferences` → UserDefaults. Yalnızca uygulamanın kendi
+		     tercihleri okunuyor/yazılıyor, başka uygulamanınki değil. -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
