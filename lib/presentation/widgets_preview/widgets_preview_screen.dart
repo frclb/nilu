@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import '../../design_system/content_illustration.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:math' as math;
@@ -17,10 +18,10 @@ class WidgetsPreviewScreen extends StatelessWidget {
     final bgColor = isDark
         ? AppColors.backgroundDark
         : AppColors.backgroundLight;
-    final primaryColor = AppColors.primaryLight; // #551b26 HTML
+    final primaryColor = Theme.of(context).colorScheme.primary; // #551b26 HTML
     final accentSoft = isDark
-        ? const Color(0xFF3B1A20)
-        : const Color(0xFFF8E7E9); // #F8E7E9 HTML
+        ? context.tokens.surfaceAlt
+        : context.tokens.brandTint;
 
     final textMainColor = isDark ? Colors.white : Colors.black87;
 
@@ -326,7 +327,7 @@ class WidgetsPreviewScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
                         color: Theme.of(context).brightness == Brightness.dark
-                            ? const Color(0xFF1E293B)
+                            ? context.tokens.text
                             : Colors.white,
                         shape: BoxShape.circle,
                         boxShadow: [

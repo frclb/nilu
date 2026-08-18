@@ -113,7 +113,7 @@ class CalendarSummarySection extends StatelessWidget {
                               : theme.colorScheme.primary,
                           bgColor: isDark
                               ? AppColors.secondaryPinkDark
-                              : AppColors.primaryLightTint,
+                              : context.tokens.brandTint,
                           borderColor: isDark
                               ? theme.colorScheme.primary.withAlpha(25)
                               : AppPalette.rose200,
@@ -132,7 +132,7 @@ class CalendarSummarySection extends StatelessWidget {
                                 : AppColors.moodOrangeBg,
                             borderColor: isDark
                                 ? AppColors.moodOrangeIcon.withAlpha(51)
-                                : const Color(0xFFFFEDD5),
+                                : theme.colorScheme.tertiary.withAlpha(38),
                           ),
                         ),
                       if (hasSymptoms)
@@ -145,15 +145,13 @@ class CalendarSummarySection extends StatelessWidget {
                                 label: context.tr(
                                   LogVocabulary.symptomKey(symptom),
                                 ),
-                                textColor: isDark
-                                    ? const Color(0xFFE9D5FF)
-                                    : AppColors.energyPurpleText,
+                                textColor: context.tokens.ovulation,
                                 bgColor: isDark
                                     ? AppColors.energyPurpleText.withAlpha(51)
                                     : AppColors.energyPurpleBg,
-                                borderColor: isDark
-                                    ? AppColors.energyPurpleIcon.withAlpha(51)
-                                    : const Color(0xFFF3E8FF),
+                                borderColor: context.tokens.ovulation.withAlpha(
+                                  51,
+                                ),
                               ),
                             ),
                     ],
@@ -190,7 +188,7 @@ class CalendarSummarySection extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isDark
                               ? AppColors.borderSlateDark.withAlpha(76)
-                              : const Color(0xFFF8FAFC),
+                              : context.tokens.surfaceAlt,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(

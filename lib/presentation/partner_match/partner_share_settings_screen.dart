@@ -7,7 +7,7 @@ import '../../../domain/view_models/user_view_model.dart';
 import '../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
 import '../../data/repositories/share_settings_repository.dart';
-import '../../design_system/app_colors.dart';
+import '../../design_system/app_tokens.dart';
 import '../../domain/models/share_settings.dart';
 
 class PartnerShareSettingsScreen extends StatefulWidget {
@@ -53,19 +53,16 @@ class _PartnerShareSettingsScreenState
     final isDark = theme.brightness == Brightness.dark;
     final userViewModel = context.watch<UserViewModel>();
 
-    // Custom colors from HTML design
-    final primaryColor = const Color(0xFF135BEC);
-    final bgColor = isDark
-        ? AppColors.backgroundNavyDark
-        : AppColors.backgroundLightAlt;
-    final surfaceColor = isDark ? AppColors.surfaceNavyDark : Colors.white;
-    final textMainColor = isDark ? Colors.white : AppColors.textMainSlate;
-    final textMutedColor = isDark
-        ? AppColors.textMutedSlateDark
-        : AppColors.textMutedSlate;
-    final borderColor = isDark
-        ? Colors.white.withAlpha(12)
-        : AppColors.borderSlateLight;
+    // Renkler tasarım token'larından. Buradaki değerler bir HTML taslağından
+    // olduğu gibi kopyalanmıştı — vurgu rengi mavi (#135BEC) kalmıştı ve
+    // premium tema çeşitleri bu ekrana hiç uygulanmıyordu.
+    final t = context.tokens;
+    final primaryColor = t.accent;
+    final bgColor = t.background;
+    final surfaceColor = t.surface;
+    final textMainColor = t.text;
+    final textMutedColor = t.textMuted;
+    final borderColor = t.border;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -192,7 +189,7 @@ class _PartnerShareSettingsScreenState
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                color: const Color(0xFF22C55E), // green-500
+                color: context.tokens.success,
                 shape: BoxShape.circle,
                 border: Border.all(color: bgColor, width: 4),
               ),
@@ -451,13 +448,9 @@ class _PartnerShareSettingsScreenState
     bool isDark,
     Color textMutedColor,
   ) {
-    final redColor = const Color(0xFFDC2626); // red-600
-    final redBgColor = isDark
-        ? redColor.withAlpha(25)
-        : const Color(0xFFFEF2F2); // red-50
-    final redBorderColor = isDark
-        ? redColor.withAlpha(76)
-        : const Color(0xFFFECACA); // red-200
+    final redColor = context.tokens.danger;
+    final redBgColor = redColor.withAlpha(isDark ? 25 : 20);
+    final redBorderColor = redColor.withAlpha(isDark ? 76 : 64);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(

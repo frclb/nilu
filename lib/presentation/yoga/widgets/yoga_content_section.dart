@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../design_system/app_palette.dart';
 import '../../../design_system/content_illustration.dart';
 import '../../../localization/app_localizations.dart';
@@ -21,16 +22,14 @@ class YogaContentSection extends StatelessWidget {
     final borderColor = isDark
         ? Colors.white.withAlpha(12)
         : AppColors.borderSlateLight;
-    final primaryColor = AppColors.primaryDeep;
+    final primaryColor = Theme.of(context).colorScheme.primary;
     final primaryBgColor = isDark
         ? primaryColor.withAlpha(25)
         : primaryColor.withAlpha(25);
     final tagSecondaryBg = isDark
         ? Colors.white.withAlpha(25)
         : AppColors.borderSlate;
-    final tagSecondaryText = isDark
-        ? const Color(0xFFCBD5E1)
-        : const Color(0xFF475569);
+    final tagSecondaryText = context.tokens.textMuted;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),

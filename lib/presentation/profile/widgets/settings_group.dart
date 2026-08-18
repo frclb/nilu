@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../design_system/app_palette.dart';
 
 class SettingsItem {
@@ -44,7 +45,7 @@ class SettingsGroup extends StatelessWidget {
         ),
         Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF18181B) : Colors.white,
+            color: context.tokens.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isDark ? AppPalette.night700 : Colors.grey[100]!,

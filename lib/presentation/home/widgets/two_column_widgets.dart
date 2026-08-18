@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import 'package:provider/provider.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../core/navigation/navigation_service.dart';
@@ -72,11 +73,7 @@ class TwoColumnWidgets extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: theme.colorScheme.secondary,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: theme.brightness == Brightness.light
-                        ? const Color(0xFFFDE8EC)
-                        : theme.colorScheme.outline,
-                  ),
+                  border: Border.all(color: context.tokens.border),
                 ),
                 child: Stack(
                   clipBehavior: Clip.none,

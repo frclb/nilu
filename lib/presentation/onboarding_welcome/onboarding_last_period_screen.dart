@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/navigation/route_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -58,9 +59,7 @@ class _OnboardingLastPeriodScreenState
         : AppColors.backgroundLight;
     final cardColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
     final textMainColor = isDark ? Colors.white : AppColors.textMainLight;
-    final textSecondaryColor = isDark
-        ? Colors.grey[400]!
-        : const Color(0xFF6B5D5F);
+    final textSecondaryColor = context.tokens.textMuted;
     final primaryColor = theme.colorScheme.primary;
 
     return Scaffold(

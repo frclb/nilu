@@ -77,7 +77,9 @@ class _PartnerNotificationSettingsScreenState
     final bgColor = isDark
         ? AppColors.backgroundDark
         : AppColors.backgroundLight;
-    final primaryColor = AppColors.primaryDeep; // Primary color from design
+    final primaryColor = Theme.of(
+      context,
+    ).colorScheme.primary; // Primary color from design
     final textMainColor = isDark ? Colors.white : Colors.black87;
     final textMutedColor = isDark ? Colors.grey[400] : Colors.grey[500];
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../localization/app_localizations.dart';
-import '../../../../design_system/app_colors.dart';
 import '../../../../core/navigation/navigation_service.dart';
 import '../../../../core/navigation/route_names.dart';
 
@@ -12,11 +11,11 @@ class PremiumBanner extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.primaryLight,
+        color: Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryLight.withAlpha(76),
+            color: Theme.of(context).colorScheme.primary.withAlpha(76),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -104,7 +103,7 @@ class PremiumBanner extends StatelessWidget {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: AppColors.primaryLight,
+                      foregroundColor: Theme.of(context).colorScheme.primary,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),

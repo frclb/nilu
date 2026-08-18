@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -79,9 +80,7 @@ class _OnboardingCycleLengthScreenState
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final bgColor = isDark
-        ? const Color(0xFF221013)
-        : AppColors.backgroundLight;
+    final bgColor = context.tokens.background;
     final textColor = isDark ? Colors.white : AppColors.textMainSlate;
     final textSecondaryColor = isDark ? Colors.grey[400]! : Colors.grey[600]!;
     final primaryColor = theme.colorScheme.primary;
@@ -273,9 +272,7 @@ class _OnboardingCycleLengthScreenState
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF221013).withAlpha(242)
-                    : Colors.white,
+                color: context.tokens.surface,
                 border: Border(
                   top: BorderSide(
                     color: isDark

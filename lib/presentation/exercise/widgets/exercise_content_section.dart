@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
 
@@ -195,11 +196,11 @@ class ExerciseContentSection extends StatelessWidget {
     bool isDark,
     ThemeData theme,
   ) {
-    final itemBgNode = isDark ? const Color(0xFF2A2426) : Colors.white;
+    final itemBgNode = context.tokens.surface;
     final itemBorder = isDark
         ? AppColors.surfaceDark
         : AppColors.borderGrayLight;
-    final iconBg = const Color(0xFFFCEFEE); // primary pale
+    final iconBg = context.tokens.brandTint;
     final titleColor = isDark ? Colors.white : AppColors.textMainSlate;
     final descColor = isDark ? Colors.grey.shade400 : Colors.grey.shade500;
 

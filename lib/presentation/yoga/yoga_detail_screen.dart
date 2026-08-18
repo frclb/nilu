@@ -16,7 +16,7 @@ class YogaDetailScreen extends StatelessWidget {
     final bgColor = isDark
         ? AppColors.backgroundDark
         : AppColors.backgroundLight;
-    final primaryColor = AppColors.primaryDeep;
+    final primaryColor = Theme.of(context).colorScheme.primary;
     final headerBorder = isDark
         ? Colors.white.withAlpha(12)
         : primaryColor.withAlpha(25);

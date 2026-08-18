@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../design_system/app_palette.dart';
+import '../../design_system/app_tokens.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -73,10 +74,10 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
         ? AppColors.backgroundDark
         : AppColors.backgroundLight;
     final surfaceColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
-    final primaryColor = AppColors.primaryDeep;
-    final warmAccent = isDark
-        ? const Color(0xFF8B3A44)
-        : const Color(0xFFD4717A);
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    // Marka pembesi sabit yazılıydı; premium tema çeşitleri bu ekranda
+    // uygulanmıyordu.
+    final warmAccent = context.tokens.flowSoft;
     final textMainColor = isDark ? Colors.white : AppColors.textMainSlate;
     final textMutedColor = isDark
         ? AppPalette.nightInkMuted
@@ -84,7 +85,7 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
     final borderColor = isDark
         ? Colors.white.withAlpha(12)
         : AppColors.borderSlateLight;
-    final warmBg = isDark ? AppPalette.night800 : AppColors.primaryLightTint;
+    final warmBg = isDark ? AppPalette.night800 : context.tokens.brandTint;
 
     // Pulse animasyonu tetikle
     if (vm.hasNewUpdate) {
@@ -382,18 +383,18 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: AppPalette.clay100,
+          color: context.tokens.warning.withAlpha(30),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFFED7AA)),
+          border: Border.all(color: context.tokens.warning.withAlpha(76)),
         ),
         child: Row(
           children: [
-            const Icon(Icons.schedule, size: 16, color: AppPalette.clay600),
+            Icon(Icons.schedule, size: 16, color: context.tokens.warning),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 context.tr('pv_old_data_warning'),
-                style: const TextStyle(fontSize: 12, color: Color(0xFF9A3412)),
+                style: TextStyle(fontSize: 12, color: context.tokens.text),
               ),
             ),
           ],
@@ -431,9 +432,7 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: isDark
-                ? [AppPalette.night800, const Color(0xFF321E24)]
-                : [AppColors.primaryLightTint, const Color(0xFFFCE7EA)],
+            colors: [context.tokens.brandTint, context.tokens.flowTint],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

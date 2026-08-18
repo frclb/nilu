@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
@@ -53,11 +54,12 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
     final isDark = theme.brightness == Brightness.dark;
 
     // Custom colors from HTML design
-    final primaryColor = const Color(0xFFEE2B4E);
+    // Vurgu rengi sabit yazılıydı; premium tema çeşitleri uygulanmıyordu.
+    final primaryColor = Theme.of(context).colorScheme.primary;
     final bgColor = isDark
-        ? const Color(0xFF12090A)
+        ? context.tokens.background
         : AppColors.backgroundLight;
-    final surfaceColor = isDark ? const Color(0xFF241114) : Colors.white;
+    final surfaceColor = context.tokens.surface;
     final textMainColor = isDark ? Colors.white : AppColors.textMainSlate;
     final textMutedColor = isDark
         ? Colors.white.withAlpha(153)

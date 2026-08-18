@@ -130,7 +130,7 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                     border: Border.all(
                       color: isDark
                           ? Colors.white.withAlpha(25)
-                          : AppColors.accentRose.withAlpha(38),
+                          : Theme.of(context).colorScheme.primary.withAlpha(38),
                     ),
                   ),
                   child: Row(
@@ -139,7 +139,9 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                       Icon(
                         Icons.info_outline,
                         size: 18,
-                        color: isDark ? Colors.grey[400] : AppColors.accentRose,
+                        color: isDark
+                            ? Colors.grey[400]
+                            : Theme.of(context).colorScheme.primary,
                       ),
                       const SizedBox(width: 8),
                       Expanded(
@@ -159,7 +161,7 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                 ElevatedButton(
                   onPressed: _saveSettings,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.accentRose,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -213,10 +215,10 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
               ),
               Text(
                 valueText,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.accentRose,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],
@@ -226,7 +228,7 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
             value: value,
             min: min,
             max: max,
-            activeColor: AppColors.accentRose,
+            activeColor: Theme.of(context).colorScheme.primary,
             inactiveColor: isDark ? Colors.blueGrey[800] : Colors.grey[300],
             onChanged: onChanged,
           ),

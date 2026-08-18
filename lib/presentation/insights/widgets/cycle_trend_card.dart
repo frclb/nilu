@@ -333,13 +333,12 @@ class _InsightBox extends StatelessWidget {
     final message = text;
     if (message == null) return const SizedBox.shrink();
 
-    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isDark
             ? AppColors.surfaceDark.withAlpha(127)
-            : AppColors.primaryLightTint,
+            : context.tokens.brandTint,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -348,7 +347,7 @@ class _InsightBox extends StatelessWidget {
           Icon(
             Icons.info_outline,
             size: 20,
-            color: isDark ? const Color(0xFF7A2A38) : theme.colorScheme.primary,
+            color: Theme.of(context).colorScheme.primary,
           ),
           const SizedBox(width: 12),
           Expanded(

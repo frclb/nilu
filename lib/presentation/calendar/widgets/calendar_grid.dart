@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../localization/date_names.dart';
 import '../../../design_system/app_colors.dart';
@@ -333,7 +334,7 @@ class _DayTile extends StatelessWidget {
     } else if (isToday) {
       textColor = theme.colorScheme.primary;
     } else {
-      textColor = isDark ? Colors.white : const Color(0xFF1E293B);
+      textColor = context.tokens.text;
     }
 
     return GestureDetector(

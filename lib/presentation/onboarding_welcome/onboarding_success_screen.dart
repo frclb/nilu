@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import '../../design_system/app_palette.dart';
 import '../../design_system/content_illustration.dart';
 import 'package:go_router/go_router.dart';
@@ -33,7 +34,7 @@ class OnboardingSuccessScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final bgColor = isDark ? AppColors.backgroundDeepDark : Colors.white;
-    final textColor = isDark ? AppPalette.rose50 : const Color(0xFF181114);
+    final textColor = context.tokens.text;
     final textSecondaryColor = isDark ? Colors.grey[400]! : Colors.grey[600]!;
     final primaryColor =
         theme.colorScheme.primary; // Often #f04299 based on provided HTML
@@ -163,9 +164,7 @@ class OnboardingSuccessScreen extends StatelessWidget {
                                     ),
                                   ],
                                   border: Border.all(
-                                    color: isDark
-                                        ? const Color(0xFF221019)
-                                        : const Color(0xFFF8F6F7),
+                                    color: context.tokens.surfaceAlt,
                                     width: 4,
                                   ),
                                 ),

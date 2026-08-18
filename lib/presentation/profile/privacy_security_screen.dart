@@ -352,7 +352,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               await _exportAndShare();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF0D9488),
+              backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/app_palette.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
 
@@ -16,16 +17,10 @@ class RecipeContentSection extends StatelessWidget {
         ? AppColors.backgroundDeepDark
         : AppColors.backgroundLight;
     final textColor = isDark ? AppPalette.rose50 : AppColors.textMainLight;
-    final mutedColor = isDark
-        ? const Color(0xFFCFB6BD)
-        : AppColors.textMutedLight;
-    final surfaceColor = isDark ? const Color(0xFF2A151F) : Colors.white;
-    final borderColor = isDark
-        ? Colors.white.withAlpha(12)
-        : AppColors.borderGrayLight;
-    final primaryColor = isDark
-        ? const Color(0xFF551C25)
-        : AppColors.primaryLight;
+    final mutedColor = context.tokens.textMuted;
+    final surfaceColor = context.tokens.surface;
+    final borderColor = context.tokens.border;
+    final primaryColor = Theme.of(context).colorScheme.primary;
     final dotColor = isDark ? Colors.white.withAlpha(51) : Colors.grey.shade300;
 
     return Container(
@@ -43,7 +38,7 @@ class RecipeContentSection extends StatelessWidget {
               _buildBadge(
                 label: context.tr('recipe_phase_follicular'),
                 bgColor: primaryColor.withAlpha(51),
-                textColor: isDark ? const Color(0xFFFBCFE8) : primaryColor,
+                textColor: primaryColor,
                 borderColor: primaryColor.withAlpha(76),
               ),
               const SizedBox(width: 8),
@@ -88,12 +83,9 @@ class RecipeContentSection extends StatelessWidget {
                 context.tr('recipe_difficulty_easy'),
                 style: TextStyle(fontSize: 14, color: mutedColor),
               ),
-              const SizedBox(width: 12),
-              _dot(dotColor),
-              const SizedBox(width: 12),
-              Icon(Icons.star, size: 18, color: const Color(0xFFEAB308)),
-              const SizedBox(width: 6),
-              Text('4.9', style: TextStyle(fontSize: 14, color: mutedColor)),
+              // Buradaki yıldız ve "4.9" puanı sabit yazılıydı: uygulamada
+              // değerlendirme diye bir şey yok, her tarif aynı puanı
+              // gösteriyordu. Olmayan bir veriyi göstermektense kaldırdım.
             ],
           ),
           const SizedBox(height: 24),
@@ -124,12 +116,8 @@ class RecipeContentSection extends StatelessWidget {
                     Expanded(
                       child: _buildBenefitItem(
                         icon: Icons.monitor_heart,
-                        iconBgColor: isDark
-                            ? AppPalette.iris500.withAlpha(25)
-                            : const Color(0xFFEEF2FF),
-                        iconColor: isDark
-                            ? const Color(0xFFA5B4FC)
-                            : AppPalette.iris500,
+                        iconBgColor: context.tokens.ovulationTint,
+                        iconColor: context.tokens.ovulation,
                         title: context.tr('recipe_magnesium'),
                         subtitle: context.tr('recipe_magnesium_desc'),
                         textColor: textColor,
