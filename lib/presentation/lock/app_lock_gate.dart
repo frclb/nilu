@@ -16,8 +16,18 @@ class AppLockGate extends StatefulWidget {
   final Widget child;
   final AppLockService service;
 
-  AppLockGate({super.key, required this.child, AppLockService? service})
-    : service = service ?? AppLockService();
+  /// Şimdiki zaman. Tolerans süresi zamana bağlı olduğu için testte
+  /// ileri sarılabilmesi gerekiyor; gerçek saatle 30 saniyelik senaryo
+  /// widget testinde hiç oluşmaz ve test boşuna geçer.
+  final DateTime Function() clock;
+
+  AppLockGate({
+    super.key,
+    required this.child,
+    AppLockService? service,
+    DateTime Function()? clock,
+  }) : service = service ?? AppLockService(),
+       clock = clock ?? DateTime.now;
 
   @override
   State<AppLockGate> createState() => _AppLockGateState();
@@ -27,6 +37,12 @@ class _AppLockGateState extends State<AppLockGate> with WidgetsBindingObserver {
   /// Kilit durumu bilinene kadar içerik örtülü kalır. Varsayılan `true`:
   /// bilinmeyen durumda açık bırakmak, kilidin hiç olmaması demekti.
   bool _locked = true;
+
+  /// Ayar okunana kadar null. Örtü var ama kilit ekranı **yok**: kilidi hiç
+  /// açmamış kullanıcıya her açılışta "Uygulama kilitli" yazısı yanıp
+  /// sönüyordu.
+  bool? _lockEnabled;
+
   bool _authenticating = false;
   DateTime? _backgroundedAt;
 
@@ -47,6 +63,8 @@ class _AppLockGateState extends State<AppLockGate> with WidgetsBindingObserver {
     final enabled = await widget.service.isEnabled();
     if (!mounted) return;
 
+    setState(() => _lockEnabled = enabled);
+
     if (!enabled) {
       setState(() => _locked = false);
       return;
@@ -59,7 +77,11 @@ class _AppLockGateState extends State<AppLockGate> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.paused:
       case AppLifecycleState.hidden:
-        _backgroundedAt = DateTime.now();
+        // Sistem kimlik doğrulama istemi de uygulamayı örtüyor. Bunu arka
+        // plana çıkma saymak iki yerde ikinci bir istem doğuruyordu:
+        // kapının kendi isteminde ve gizlilik ekranındaki anahtarda.
+        if (widget.service.isSystemPromptActive) break;
+        _backgroundedAt = widget.clock();
       case AppLifecycleState.resumed:
         _evaluateOnResume();
       case AppLifecycleState.inactive:
@@ -69,11 +91,18 @@ class _AppLockGateState extends State<AppLockGate> with WidgetsBindingObserver {
   }
 
   Future<void> _evaluateOnResume() async {
-    if (_locked || _authenticating) return;
-
     final since = _backgroundedAt;
+
+    // Damga her dönüşte tüketilir. Bırakılsaydı: tolerans içinde dönülen
+    // eski bir damga yerinde kalır, kullanıcı bir süre uygulamayı kullanır
+    // ve ardından yalnızca kısa bir `inactive`'den döndüğünde (Denetim
+    // Merkezi, paylaşım sayfası, izin kutusu) eski damgayla karşılaştırılıp
+    // kilit tetiklenirdi.
+    _backgroundedAt = null;
+
+    if (_locked || _authenticating) return;
     if (since == null) return;
-    if (DateTime.now().difference(since) < AppLockService.graceperiod) return;
+    if (widget.clock().difference(since) < AppLockService.graceperiod) return;
 
     final enabled = await widget.service.isEnabled();
     if (!mounted || !enabled) return;
@@ -110,9 +139,27 @@ class _AppLockGateState extends State<AppLockGate> with WidgetsBindingObserver {
         if (_locked)
           // Örtü içeriği tamamen kapatır; şeffaflık yok.
           Positioned.fill(
-            child: _LockScreen(busy: _authenticating, onUnlock: _unlock),
+            child: _lockEnabled == null
+                ? const _Curtain()
+                : _LockScreen(busy: _authenticating, onUnlock: _unlock),
           ),
       ],
+    );
+  }
+}
+
+/// Ayar okunurken içeriği örten düz zemin.
+///
+/// Kilit ekranı değil: kilidi kapalı olan kullanıcı hiçbir zaman "Uygulama
+/// kilitli" yazısını görmemeli.
+class _Curtain extends StatelessWidget {
+  const _Curtain();
+
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: const SizedBox.expand(),
     );
   }
 }

@@ -34,6 +34,29 @@ class AppLockService {
   /// ya da fotoğraf seçmek her seferinde kilit ekranı getirirdi.
   static const Duration graceperiod = Duration(seconds: 30);
 
+  /// Sistem istemi kapandıktan sonra "hâlâ istem yüzünden" sayılacak süre.
+  ///
+  /// `resumed` olayı istem kapandıktan hemen sonra geliyor; sıfır olsaydı
+  /// yarış nedeniyle bazen arka plana çıkılmış sayılırdı.
+  static const Duration promptSettleWindow = Duration(seconds: 2);
+
+  /// Ekranda bir sistem kimlik doğrulama istemi var mı.
+  ///
+  /// Statik, çünkü istemi kapı da açıyor (`AppLockGate`) gizlilik ekranındaki
+  /// anahtar da; ikisi ayrı `AppLockService` örneği kullanıyor ama ekranda
+  /// tek bir istem var. Kapı, kendi açmadığı bir istemi de "arka plana
+  /// çıkıldı" saymamalı — yoksa kullanıcı ayarı değiştirir değiştirmez
+  /// ikinci bir istem geliyordu.
+  static bool _promptOnScreen = false;
+  static DateTime? _promptEndedAt;
+
+  bool get isSystemPromptActive {
+    if (_promptOnScreen) return true;
+    final ended = _promptEndedAt;
+    return ended != null &&
+        DateTime.now().difference(ended) < promptSettleWindow;
+  }
+
   final LocalAuthentication _auth;
 
   AppLockService({LocalAuthentication? auth})
@@ -72,6 +95,7 @@ class AppLockService {
   ///
   /// [reason] sistem iletişim kutusunda görünür, lokalize gelmeli.
   Future<bool> authenticate({required String reason}) async {
+    _promptOnScreen = true;
     try {
       return await _auth.authenticate(
         localizedReason: reason,
@@ -87,6 +111,9 @@ class AppLockService {
       // İptal, çok fazla deneme, donanım hatası — hepsinde kilitli kal.
       debugPrint('Authentication failed: $e');
       return false;
+    } finally {
+      _promptOnScreen = false;
+      _promptEndedAt = DateTime.now();
     }
   }
 }
