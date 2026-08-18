@@ -589,5 +589,9 @@
   "insights_symptoms_basis": "Basierend auf den {days} erfassten Tagen",
   "insights_symptoms_empty": "Noch keine Symptome erfasst. Wähle im Kalender einen Tag und trage ein, wie du dich gefühlt hast — deine häufigsten Symptome erscheinen dann hier.",
   "insights_symptoms_count": "{percent}% · {days} Tage",
-  "insights_symptoms_semantics": "{symptom}: {percent} Prozent der erfassten Tage, {days} Tage"
+  "insights_symptoms_semantics": "{symptom}: {percent} Prozent der erfassten Tage, {days} Tage",
+  "partner_scan_error_empty": "QR-Code konnte nicht gelesen werden, bitte erneut versuchen.",
+  "partner_scan_error_own_code": "Das ist dein eigener Code. Scanne stattdessen den Code deiner Partnerin.",
+  "partner_scan_error_already": "Du bist bereits mit dieser Partnerin verbunden.",
+  "partner_scan_error_malformed": "Das ist kein Kopplungscode. Scanne den QR-Code aus der App deiner Partnerin."
 }

@@ -589,5 +589,9 @@
   "insights_symptoms_basis": "Según los {days} días que registraste",
   "insights_symptoms_empty": "Aún no has registrado síntomas. Elige un día en el calendario y añade cómo te sentiste; tus síntomas más frecuentes aparecerán aquí.",
   "insights_symptoms_count": "{percent}% · {days} días",
-  "insights_symptoms_semantics": "{symptom}: {percent} por ciento de los días registrados, {days} días"
+  "insights_symptoms_semantics": "{symptom}: {percent} por ciento de los días registrados, {days} días",
+  "partner_scan_error_empty": "No se pudo leer el código QR, inténtalo de nuevo.",
+  "partner_scan_error_own_code": "Ese es tu propio código. Escanea el de tu pareja.",
+  "partner_scan_error_already": "Ya estás conectada con esta pareja.",
+  "partner_scan_error_malformed": "Ese no es un código de vinculación. Escanea el código QR de la app de tu pareja."
 }

@@ -201,6 +201,29 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Hesabın uzak verisini siler.
+  ///
+  /// "Hesabımı Sil" yalnızca cihazdaki veriyi siliyordu; Firestore'daki profil,
+  /// loglar ve yakınlık dokümanı yerinde kalıyordu — bağlı partner hesap
+  /// silindikten sonra da veriyi okumaya devam edebiliyordu.
+  ///
+  /// Yerel silmeden **önce** çağrılmalı: `_myId` temizlendikten sonra hangi
+  /// dokümanın silineceği bilinemez.
+  Future<void> deleteRemoteData() async {
+    final uid = _myId;
+    if (uid == null || uid.isEmpty) return;
+
+    await _firestoreDS.deleteUserData(uid, partnerId: _partnerId);
+
+    try {
+      await _authDS.signOut();
+      await SubscriptionService.logout();
+    } catch (e) {
+      // Uzak veri silindi; oturum kapatma başarısız olsa da akış sürmeli.
+      debugPrint('Sign out after data deletion failed: $e');
+    }
+  }
+
   /// Yerel veri tamamen silindikten sonra durumu sıfırdan okur.
   /// (Profil → "Hesabımı Sil" akışı bunu çağırır.)
   Future<void> reloadAfterDataWipe() async {

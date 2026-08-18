@@ -137,4 +137,38 @@ class FirestoreDataSource {
       debugPrint("Error disconnecting partner: $e");
     }
   }
+
+  /// Kullanıcının uzak verisini kalıcı olarak siler.
+  ///
+  /// "Hesabımı Sil" akışı yalnızca cihazdaki veriyi siliyordu; Firestore'daki
+  /// `users/{uid}`, günlük logları ve `intimacy/{uid}` dokümanı yerinde
+  /// kalıyordu. İki sonucu vardı: bağlı partner, hesap silindikten sonra da
+  /// yakınlık verisini okumaya devam ediyordu; ve hem App Store hem Play
+  /// Store, hesap silmenin sunucudaki veriyi de silmesini şart koşuyor.
+  ///
+  /// Partner bağlantısı önce kesilir: doküman silinse bile karşı tarafın
+  /// profilinde asılı kalan `partnerId` temizlenmiş olur.
+  Future<void> deleteUserData(String uid, {String? partnerId}) async {
+    if (!_available) return;
+    try {
+      if (partnerId != null && partnerId.isNotEmpty) {
+        await disconnectPartner(uid, partnerId);
+      }
+
+      // Alt koleksiyon dokümanı silmekle gitmiyor; logları tek tek sil.
+      final logs = await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('logs')
+          .get();
+      for (final doc in logs.docs) {
+        await doc.reference.delete();
+      }
+
+      await _firestore.collection('intimacy').doc(uid).delete();
+      await _firestore.collection('users').doc(uid).delete();
+    } catch (e) {
+      debugPrint("Error deleting user data: $e");
+    }
+  }
 }

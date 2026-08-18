@@ -13,10 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// gelmesi kolay; test onu derleme aşamasında yakalar.
 void main() {
   /// Tasarım aracı çıktısı olan, kalıcılığı garanti edilmeyen adresler.
-  const forbiddenHosts = [
-    'lh3.googleusercontent.com',
-    'aida-public',
-  ];
+  const forbiddenHosts = ['lh3.googleusercontent.com', 'aida-public'];
 
   late List<File> dartFiles;
 
@@ -62,7 +59,9 @@ void main() {
     // gri bir boşluk görüyordu.
     // `SafeNetworkImage` sarmalayıcısının kendisi eşleşmesin: adı
     // `NetworkImage(` dizesini içeriyor.
-    final bareNetworkImage = RegExp(r'(?<![A-Za-z])(Image\.network|NetworkImage)\(');
+    final bareNetworkImage = RegExp(
+      r'(?<![A-Za-z])(Image\.network|NetworkImage)\(',
+    );
     final offenders = <String>[];
 
     for (final file in dartFiles) {

@@ -589,5 +589,9 @@
   "insights_symptoms_basis": "Com base nos {days} dias que registaste",
   "insights_symptoms_empty": "Ainda não registaste sintomas. Escolhe um dia no calendário e regista como te sentiste — os sintomas mais frequentes aparecerão aqui.",
   "insights_symptoms_count": "{percent}% · {days} dias",
-  "insights_symptoms_semantics": "{symptom}: {percent} por cento dos dias registados, {days} dias"
+  "insights_symptoms_semantics": "{symptom}: {percent} por cento dos dias registados, {days} dias",
+  "partner_scan_error_empty": "Não foi possível ler o código QR, tenta novamente.",
+  "partner_scan_error_own_code": "Esse é o teu próprio código. Digitaliza o da tua parceira.",
+  "partner_scan_error_already": "Já estás ligada a esta parceira.",
+  "partner_scan_error_malformed": "Isso não é um código de emparelhamento. Digitaliza o código QR da app da tua parceira."
 }

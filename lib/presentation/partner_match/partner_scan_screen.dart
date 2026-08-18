@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import '../../../domain/services/partner_code.dart';
 import '../../../domain/view_models/user_view_model.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
@@ -29,18 +30,60 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     if (_isProcessing) return;
 
     final List<Barcode> barcodes = capture.barcodes;
-    if (barcodes.isNotEmpty && barcodes.first.rawValue != null) {
-      final code = barcodes.first.rawValue!;
+    if (barcodes.isEmpty) return;
 
-      setState(() {
-        _isProcessing = true;
-      });
+    final raw = barcodes.first.rawValue;
 
-      // Pause scanner while showing dialog
-      _scannerController.stop();
+    // Eskiden okunan **her** QR doğrudan partnerId olarak kaydediliyordu:
+    // afişteki bir bağlantı ya da kişinin kendi kodu da dahil.
+    final userViewModel = context.read<UserViewModel>();
+    final status = PartnerCode.validate(
+      raw,
+      myId: userViewModel.myId,
+      currentPartnerId: userViewModel.partnerId,
+    );
 
-      _showConfirmationDialog(code);
+    if (!status.isValid) {
+      // Kamera açık kalsın: kullanıcı doğru kodu okutmayı sürdürebilsin.
+      _showScanError(status);
+      return;
     }
+
+    setState(() {
+      _isProcessing = true;
+    });
+
+    // Pause scanner while showing dialog
+    _scannerController.stop();
+
+    _showConfirmationDialog(raw!.trim());
+  }
+
+  /// Geçersiz kodu bildirir ve taramaya devam eder.
+  ///
+  /// Aynı geçersiz QR kare kare tekrar okunduğu için mesaj sürekli
+  /// yenilenmesin diye kısa bir bekleme konuyor.
+  DateTime? _lastErrorAt;
+
+  void _showScanError(PartnerCodeStatus status) {
+    final now = DateTime.now();
+    final last = _lastErrorAt;
+    if (last != null && now.difference(last) < const Duration(seconds: 3)) {
+      return;
+    }
+    _lastErrorAt = now;
+
+    if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(context.tr(status.messageKey!)),
+        backgroundColor: Colors.red.shade400,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   void _showConfirmationDialog(String code) {

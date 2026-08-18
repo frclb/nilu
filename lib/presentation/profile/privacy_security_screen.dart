@@ -359,7 +359,9 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               final doneMessage = context.tr('privacy_delete_done');
               Navigator.of(ctx).pop();
 
-              // Cihazdaki tüm veriyi gerçekten sil, ardından onboarding'e dön.
+              // Önce uzak veri: yerel silme `myId`'yi temizliyor, ondan
+              // sonra hangi dokümanın silineceği bilinemez.
+              await userViewModel.deleteRemoteData();
               await _repository.deleteAllLocalData();
               await userViewModel.reloadAfterDataWipe();
 

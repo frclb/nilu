@@ -802,9 +802,27 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
             child: Text(context.tr('pv_cancel')),
           ),
           TextButton(
-            onPressed: () {
-              vm.disconnect();
+            onPressed: () async {
+              // Buradaki tek çağrı `vm.disconnect()` idi ve o yalnızca
+              // bellekteki durumu temizliyordu: `partnerId` hâlâ
+              // SharedPreferences'ta, `isPartner` hâlâ true kalıyordu.
+              // Uygulama yeniden açıldığında partner bağlı geliyor, uzak
+              // taraftaki bağlantı da hiç kopmuyordu — oysa uyarı metni
+              // "bu işlem geri alınamaz" diyor.
+              final userViewModel = ctx.read<UserViewModel>();
+              final router = GoRouter.of(ctx);
+
               Navigator.pop(ctx);
+
+              vm.disconnect();
+              await userViewModel.setPartnerState(
+                isPartner: false,
+                partnerId: null,
+              );
+
+              // Partner modundan çıkıldı; kabuk artık partner ekranlarını
+              // göstermemeli.
+              router.goNamed(RouteNames.onboarding);
             },
             child: Text(
               context.tr('pv_disconnect_confirm'),

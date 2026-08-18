@@ -10,14 +10,39 @@ rules_version = '2';
 // Temel ilke: kullanıcı yalnızca kendi verisine yazar. Tek istisna
 // eşleştirme akışıdır (aşağıda).
 //
-// ⚠️ Eşleştirme modeli hakkında: uygulama partner bağlantısını, karşı tarafın
-// UID'sini QR kodla paylaşarak kuruyor. Yani UID pratikte bir "bearer token"
-// görevi görüyor: UID'yi bilen herkes kendini partner olarak bağlayabilir.
-// Aşağıdaki kurallar bu akışı çalışır tutarken hasarı sınırlar — bağlanan
+// ⚠️ BİLİNEN AÇIK — eşleştirme geri alınamıyor.
+//
+// Uygulama partner bağlantısını, karşı tarafın UID'sini QR kodla paylaşarak
+// kuruyor. UID pratikte bir "bearer token": UID'yi bilen herkes kendini
+// partner olarak bağlayabilir. Aşağıdaki kurallar hasarı sınırlar — bağlanan
 // taraf yalnızca `partnerId`/`hasPartner` alanlarına dokunabilir, log ve FCM
-// token'larına erişemez. Daha güçlü bir model isteniyorsa eşleştirme,
-// karşı tarafın onayladığı ayrı bir `pairingRequests` koleksiyonuna
-// taşınmalıdır.
+// token'larına erişemez.
+//
+// Sınırlayamadığı şey İPTAL. `isLinkedPartnerOf` istekte bulunanın KENDİ
+// dokümanındaki `partnerId` alanına bakıyor; o alanı da istekte bulunan
+// yazabiliyor (eşleştirme akışı buna dayanıyor). Sonuç:
+//
+//   1. Kullanıcı partnerinden ayrılır; `disconnectPartner` iki dokümandaki
+//      bağlantıyı temizler.
+//   2. Eski partner `users/{kendi}.partnerId` alanına eski UID'yi tekrar
+//      yazar — kural buna izin veriyor.
+//   3. `intimacy/{uid}` yeniden okunabilir hâle gelir.
+//
+// UID hiçbir zaman değişmediği (bkz. `UserViewModel.ensureMyId`) için eski
+// partnerin elindeki kod kalıcı olarak geçerli kalıyor. Yeni bir partner
+// bağlamak da eskisinin erişimini kaldırmıyor.
+//
+// Bunu kurallarla kapatmak mümkün değil; eşleştirme modelinin değişmesi
+// gerekiyor. Önerilen: QR'a UID yerine **döndürülebilir** bir eşleştirme
+// kodu koymak ve erişimi, yalnızca sahibinin yazabildiği bir
+// `users/{uid}.partners` listesine bağlamak:
+//
+//   allow read: if request.auth.uid in
+//                 get(/databases/$(database)/documents/users/$(uid)).data.partners;
+//
+// Bu, ayrılma anında erişimi gerçekten koparır ve karşı taraf kendini geri
+// ekleyemez. Karşılığı: eşleştirme sırasında sahibin onayı gerekir
+// (her iki taraf çevrimiçi ya da bir Cloud Function).
 
 service cloud.firestore {
   match /databases/{database}/documents {

@@ -589,5 +589,9 @@
   "insights_symptoms_basis": "D’après les {days} jours que tu as enregistrés",
   "insights_symptoms_empty": "Aucun symptôme enregistré pour le moment. Choisis un jour dans le calendrier et note comment tu te sens — tes symptômes les plus fréquents apparaîtront ici.",
   "insights_symptoms_count": "{percent} % · {days} jours",
-  "insights_symptoms_semantics": "{symptom} : {percent} pour cent des jours enregistrés, {days} jours"
+  "insights_symptoms_semantics": "{symptom} : {percent} pour cent des jours enregistrés, {days} jours",
+  "partner_scan_error_empty": "Impossible de lire le code QR, réessaie.",
+  "partner_scan_error_own_code": "C’est ton propre code. Scanne plutôt celui de ta partenaire.",
+  "partner_scan_error_already": "Tu es déjà connectée à cette partenaire.",
+  "partner_scan_error_malformed": "Ce n’est pas un code d’association. Scanne le code QR affiché dans l’app de ta partenaire."
 }

@@ -589,5 +589,9 @@
   "insights_symptoms_basis": "Kayıt girdiğin {days} güne göre",
   "insights_symptoms_empty": "Henüz belirti kaydın yok. Takvimden bir gün seçip belirti eklediğinde en sık yaşadıkların burada listelenir.",
   "insights_symptoms_count": "%{percent} · {days} gün",
-  "insights_symptoms_semantics": "{symptom}: kayıtlı günlerin yüzde {percent} kadarı, {days} gün"
+  "insights_symptoms_semantics": "{symptom}: kayıtlı günlerin yüzde {percent} kadarı, {days} gün",
+  "partner_scan_error_empty": "QR kodu okunamadı, tekrar deneyin.",
+  "partner_scan_error_own_code": "Bu senin kendi kodun. Partnerinin kodunu okutmalısın.",
+  "partner_scan_error_already": "Bu partnere zaten bağlısın.",
+  "partner_scan_error_malformed": "Bu bir eşleştirme kodu değil. Partnerinin uygulamadaki QR kodunu okutun."
 }

@@ -97,9 +97,10 @@ void main() {
       final points = InsightsService.cycleLengths(logs, limit: 3);
 
       expect(points.length, 3);
-      expect(points.last.startDate, DateTime(2026, 1, 1).add(
-        const Duration(days: 8 * 28),
-      ));
+      expect(
+        points.last.startDate,
+        DateTime(2026, 1, 1).add(const Duration(days: 8 * 28)),
+      );
     });
   });
 
