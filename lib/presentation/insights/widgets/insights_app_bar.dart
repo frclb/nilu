@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/navigation/route_names.dart';
 import '../../../design_system/app_palette.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
@@ -34,21 +36,41 @@ class InsightsAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: SizedBox(
           height: kToolbarHeight,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.insights, size: 22, color: theme.colorScheme.primary),
-              const SizedBox(width: 10),
-              Flexible(
-                child: Text(
-                  context.tr('insights_title'),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
+              const SizedBox(width: 56),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.insights,
+                      size: 22,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Text(
+                        context.tr('insights_title'),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Verine soru sorma girişi buradan: sorular zaten bu ekranın
+              // hesapladığı sayılarla cevaplanıyor.
+              IconButton(
+                onPressed: () => context.pushNamed(RouteNames.assistant),
+                tooltip: context.tr('assistant_title'),
+                icon: Icon(
+                  Icons.auto_awesome,
+                  color: theme.colorScheme.primary,
                 ),
               ),
             ],

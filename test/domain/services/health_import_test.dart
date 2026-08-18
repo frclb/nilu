@@ -21,7 +21,10 @@ void main() {
 
     test('ardışık günler tek dönem olur', () {
       final periods = HealthImport.toPeriods([
-        day(3, 1), day(3, 2), day(3, 3), day(3, 4),
+        day(3, 1),
+        day(3, 2),
+        day(3, 3),
+        day(3, 4),
       ], nextId: nextId);
 
       expect(periods, hasLength(1));
@@ -33,7 +36,10 @@ void main() {
       // Kullanıcı bir günü işaretlemeyi unutmuş olabilir; o boşluk yüzünden
       // tek dönemi ikiye bölmek ortalama döngü uzunluğunu bozar.
       final periods = HealthImport.toPeriods([
-        day(3, 1), day(3, 2), day(3, 4), day(3, 5),
+        day(3, 1),
+        day(3, 2),
+        day(3, 4),
+        day(3, 5),
       ], nextId: nextId);
 
       expect(periods, hasLength(1));
@@ -42,8 +48,10 @@ void main() {
 
     test('geniş boşluk ayrı dönem üretir', () {
       final periods = HealthImport.toPeriods([
-        day(3, 1), day(3, 2),
-        day(3, 29), day(3, 30),
+        day(3, 1),
+        day(3, 2),
+        day(3, 29),
+        day(3, 30),
       ], nextId: nextId);
 
       expect(periods, hasLength(2));
@@ -52,7 +60,10 @@ void main() {
 
     test('sırasız ve yinelenen günler düzeltilir', () {
       final periods = HealthImport.toPeriods([
-        day(3, 3), day(3, 1), day(3, 2), day(3, 2),
+        day(3, 3),
+        day(3, 1),
+        day(3, 2),
+        day(3, 2),
       ], nextId: nextId);
 
       expect(periods, hasLength(1));
@@ -62,9 +73,7 @@ void main() {
   });
 
   group('birleştirme', () {
-    final mevcut = [
-      period('a', DateTime(2026, 3, 1), DateTime(2026, 3, 5)),
-    ];
+    final mevcut = [period('a', DateTime(2026, 3, 1), DateTime(2026, 3, 5))];
 
     test('çakışmayan dönem eklenir', () {
       final gelen = [period('h0', DateTime(2026, 4, 1), DateTime(2026, 4, 4))];
@@ -99,10 +108,7 @@ void main() {
       ];
 
       final merged = HealthImport.merge(existing: mevcut, incoming: gelen);
-      expect(
-        merged.map((p) => p.startDate.month).toList(),
-        [1, 3, 5],
-      );
+      expect(merged.map((p) => p.startDate.month).toList(), [1, 3, 5]);
     });
 
     test('newOnes yalnızca eklenecekleri sayar', () {
@@ -117,9 +123,7 @@ void main() {
     });
 
     test('bitiş tarihi olmayan devam eden dönem de çakışma sayılır', () {
-      final devamEden = [
-        PeriodLog(id: 'a', startDate: DateTime(2026, 3, 1)),
-      ];
+      final devamEden = [PeriodLog(id: 'a', startDate: DateTime(2026, 3, 1))];
       final gelen = [period('h0', DateTime(2026, 3, 1), DateTime(2026, 3, 4))];
 
       expect(

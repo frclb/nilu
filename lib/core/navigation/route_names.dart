@@ -12,6 +12,7 @@ class RouteNames {
   static const String insights = 'insights';
   static const String appearance = 'appearance';
   static const String healthSync = 'health_sync';
+  static const String assistant = 'assistant';
   static const String healthLibrary = 'health_library';
   static const String premium = 'premium';
   static const String notificationSettings = 'notification_settings';
