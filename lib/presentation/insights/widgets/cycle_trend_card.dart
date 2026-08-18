@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_palette.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../localization/app_localizations.dart';
@@ -47,9 +48,7 @@ class CycleTrendCard extends StatelessWidget {
     final borderColor = isDark
         ? AppColors.surfaceDark
         : AppColors.borderGrayLight;
-    final textColor = isDark
-        ? const Color(0xFFF4F1F1)
-        : AppColors.textMainLight;
+    final textColor = isDark ? AppPalette.nightInk : AppColors.textMainLight;
     final subtitleColor = isDark
         ? AppColors.textMutedWarmDark
         : AppColors.textMutedLight;
@@ -197,7 +196,7 @@ class _ConsultationNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final amber = isDark ? const Color(0xFFFDBA74) : AppColors.moodOrangeText;
+    final amber = isDark ? AppPalette.clay400 : AppColors.moodOrangeText;
 
     return Container(
       padding: const EdgeInsets.all(12),

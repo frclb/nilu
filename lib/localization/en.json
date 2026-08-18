@@ -635,5 +635,8 @@
   "premium_active_desc": "Everything is unlocked. Thank you for your support.",
   "premium_manage": "Manage subscription",
   "premium_manage_hint": "You can manage your subscription in Settings → Apple Account → Subscriptions.",
-  "premium_retry": "Try again"
+  "premium_retry": "Try again",
+  "premium_banner_title": "Go Premium",
+  "premium_banner_desc": "Your full cycle history, symptom–phase analysis, export and custom themes.",
+  "premium_banner_cta": "See features"
 }

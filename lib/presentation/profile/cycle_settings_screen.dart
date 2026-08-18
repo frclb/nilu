@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_palette.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../data/repositories/cycle_settings_repository.dart';
@@ -124,7 +125,7 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                   decoration: BoxDecoration(
                     color: isDark
                         ? Colors.white.withAlpha(12)
-                        : const Color(0xFFFFF1F2),
+                        : AppPalette.rose50,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isDark

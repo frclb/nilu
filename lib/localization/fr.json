@@ -635,5 +635,8 @@
   "premium_active_desc": "Tout est débloqué. Merci pour ton soutien.",
   "premium_manage": "Gérer l’abonnement",
   "premium_manage_hint": "Tu peux gérer ton abonnement dans Réglages → Compte Apple → Abonnements.",
-  "premium_retry": "Réessayer"
+  "premium_retry": "Réessayer",
+  "premium_banner_title": "Passer à Premium",
+  "premium_banner_desc": "Tout ton historique de cycles, l’analyse symptôme–phase, l’export et les thèmes personnalisés.",
+  "premium_banner_cta": "Voir les fonctions"
 }

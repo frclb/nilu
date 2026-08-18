@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_palette.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
 
@@ -14,9 +15,7 @@ class RecipeContentSection extends StatelessWidget {
     final bgColor = isDark
         ? AppColors.backgroundDeepDark
         : AppColors.backgroundLight;
-    final textColor = isDark
-        ? const Color(0xFFF9F1F2)
-        : AppColors.textMainLight;
+    final textColor = isDark ? AppPalette.rose50 : AppColors.textMainLight;
     final mutedColor = isDark
         ? const Color(0xFFCFB6BD)
         : AppColors.textMutedLight;
@@ -126,11 +125,11 @@ class RecipeContentSection extends StatelessWidget {
                       child: _buildBenefitItem(
                         icon: Icons.monitor_heart,
                         iconBgColor: isDark
-                            ? const Color(0xFF6366F1).withAlpha(25)
+                            ? AppPalette.iris500.withAlpha(25)
                             : const Color(0xFFEEF2FF),
                         iconColor: isDark
                             ? const Color(0xFFA5B4FC)
-                            : const Color(0xFF6366F1),
+                            : AppPalette.iris500,
                         title: context.tr('recipe_magnesium'),
                         subtitle: context.tr('recipe_magnesium_desc'),
                         textColor: textColor,
@@ -142,11 +141,11 @@ class RecipeContentSection extends StatelessWidget {
                       child: _buildBenefitItem(
                         icon: Icons.water_drop,
                         iconBgColor: isDark
-                            ? const Color(0xFFF97316).withAlpha(25)
-                            : const Color(0xFFFFF7ED),
+                            ? AppPalette.clay600.withAlpha(25)
+                            : AppPalette.clay100,
                         iconColor: isDark
-                            ? const Color(0xFFFDBA74)
-                            : const Color(0xFFF97316),
+                            ? AppPalette.clay400
+                            : AppPalette.clay600,
                         title: context.tr('recipe_omega3'),
                         subtitle: context.tr('recipe_omega3_desc'),
                         textColor: textColor,

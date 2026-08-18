@@ -635,5 +635,8 @@
   "premium_active_desc": "Tüm özellikler açık. Desteğin için teşekkürler.",
   "premium_manage": "Aboneliği yönet",
   "premium_manage_hint": "Aboneliğini Ayarlar → Apple Kimliği → Abonelikler bölümünden yönetebilirsin.",
-  "premium_retry": "Tekrar dene"
+  "premium_retry": "Tekrar dene",
+  "premium_banner_title": "Premium'a Geç",
+  "premium_banner_desc": "Tüm döngü geçmişin, belirti–evre analizi, dışa aktarma ve özel temalar.",
+  "premium_banner_cta": "Özellikleri gör"
 }

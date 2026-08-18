@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_palette.dart';
 
 class SettingsItem {
   final String title;
@@ -46,7 +47,7 @@ class SettingsGroup extends StatelessWidget {
             color: isDark ? const Color(0xFF18181B) : Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isDark ? const Color(0xFF27272A) : Colors.grey[100]!,
+              color: isDark ? AppPalette.night700 : Colors.grey[100]!,
             ),
           ),
           child: Column(
@@ -114,9 +115,7 @@ class SettingsGroup extends StatelessWidget {
                     Divider(
                       height: 1,
                       thickness: 1,
-                      color: isDark
-                          ? const Color(0xFF27272A)
-                          : Colors.grey[50]!,
+                      color: isDark ? AppPalette.night700 : Colors.grey[50]!,
                       indent: 72,
                     ),
                 ],

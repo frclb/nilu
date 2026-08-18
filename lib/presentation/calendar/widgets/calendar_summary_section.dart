@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_palette.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/log_vocabulary.dart';
 import '../../../../localization/app_localizations.dart';
@@ -102,14 +103,14 @@ class CalendarSummarySection extends StatelessWidget {
                             LogVocabulary.flowKey(dailyLog.flowIntensity!),
                           ),
                           textColor: isDark
-                              ? const Color(0xFFFCE7F3)
+                              ? AppPalette.rose200
                               : theme.colorScheme.primary,
                           bgColor: isDark
                               ? AppColors.secondaryPinkDark
                               : AppColors.primaryLightTint,
                           borderColor: isDark
                               ? theme.colorScheme.primary.withAlpha(25)
-                              : const Color(0xFFFCE7F3),
+                              : AppPalette.rose200,
                         ),
                       if (hasMoods)
                         ...dailyLog.moods.map(
@@ -118,7 +119,7 @@ class CalendarSummarySection extends StatelessWidget {
                             iconColor: AppColors.moodOrangeIcon,
                             label: context.tr(LogVocabulary.moodKey(mood)),
                             textColor: isDark
-                                ? const Color(0xFFFDBA74)
+                                ? AppPalette.clay400
                                 : AppColors.moodOrangeText,
                             bgColor: isDark
                                 ? AppColors.moodOrangeText.withAlpha(51)

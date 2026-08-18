@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_palette.dart';
 import 'package:provider/provider.dart';
 import 'widgets/log_entry_app_bar.dart';
 import 'widgets/log_entry_header.dart';
@@ -122,7 +123,7 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
               ),
               decoration: BoxDecoration(
                 color: isDark
-                    ? const Color(0xFF2A2224).withAlpha(229)
+                    ? AppPalette.night800.withAlpha(229)
                     : Colors.white.withAlpha(204),
                 border: Border(
                   top: BorderSide(

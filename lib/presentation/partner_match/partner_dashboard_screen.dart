@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_palette.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -78,14 +79,12 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
         : const Color(0xFFD4717A);
     final textMainColor = isDark ? Colors.white : AppColors.textMainSlate;
     final textMutedColor = isDark
-        ? const Color(0xFFB3A2A5)
+        ? AppPalette.nightInkMuted
         : AppColors.textMutedSlate;
     final borderColor = isDark
         ? Colors.white.withAlpha(12)
         : AppColors.borderSlateLight;
-    final warmBg = isDark
-        ? const Color(0xFF2D1A1E)
-        : AppColors.primaryLightTint;
+    final warmBg = isDark ? AppPalette.night800 : AppColors.primaryLightTint;
 
     // Pulse animasyonu tetikle
     if (vm.hasNewUpdate) {
@@ -383,13 +382,13 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFF7ED),
+          color: AppPalette.clay100,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: const Color(0xFFFED7AA)),
         ),
         child: Row(
           children: [
-            const Icon(Icons.schedule, size: 16, color: Color(0xFFF97316)),
+            const Icon(Icons.schedule, size: 16, color: AppPalette.clay600),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -433,7 +432,7 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDark
-                ? [const Color(0xFF2D1A1E), const Color(0xFF321E24)]
+                ? [AppPalette.night800, const Color(0xFF321E24)]
                 : [AppColors.primaryLightTint, const Color(0xFFFCE7EA)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_palette.dart';
 import '../../../design_system/content_illustration.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
@@ -14,7 +15,7 @@ class YogaContentSection extends StatelessWidget {
     // ── Colour palette ──
     final textColor = isDark ? Colors.white : AppColors.textMainSlate;
     final mutedColor = isDark
-        ? const Color(0xFFB3A2A5)
+        ? AppPalette.nightInkMuted
         : AppColors.textMutedSlate;
     final cardColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
     final borderColor = isDark

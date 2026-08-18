@@ -53,12 +53,8 @@ class ProfileSettingsScreen extends StatelessWidget {
                   SettingsItem(
                     title: context.tr('profile_personal_info'),
                     icon: Icons.person_outline,
-                    iconColor: isDark
-                        ? const Color(0xFFF9A8D4)
-                        : AppColors.primaryLight,
-                    iconBgColor: isDark
-                        ? AppColors.primaryLight.withAlpha(127)
-                        : AppColors.primaryLight.withAlpha(25),
+                    iconColor: Theme.of(context).colorScheme.primary,
+                    iconBgColor: context.tokens.brandTint,
                     onTap: () {
                       context.pushNamed(RouteNames.personalInfo);
                     },
@@ -76,12 +72,8 @@ class ProfileSettingsScreen extends StatelessWidget {
                   SettingsItem(
                     title: context.tr('profile_cycle_settings'),
                     icon: Icons.water_drop_outlined,
-                    iconColor: isDark
-                        ? const Color(0xFFFB7185)
-                        : AppColors.accentRose,
-                    iconBgColor: isDark
-                        ? const Color(0xFF881337).withAlpha(76)
-                        : const Color(0xFFFFF1F2),
+                    iconColor: Theme.of(context).colorScheme.primary,
+                    iconBgColor: context.tokens.brandTint,
                     onTap: () {
                       context.pushNamed(RouteNames.cycleSettings);
                     },
@@ -91,12 +83,8 @@ class ProfileSettingsScreen extends StatelessWidget {
                     SettingsItem(
                       title: context.tr('profile_partner_settings'),
                       icon: Icons.favorite_border,
-                      iconColor: isDark
-                          ? const Color(0xFFC084FC)
-                          : const Color(0xFF9333EA),
-                      iconBgColor: isDark
-                          ? const Color(0xFF581C87).withAlpha(76)
-                          : const Color(0xFFFAF5FF),
+                      iconColor: Theme.of(context).colorScheme.primary,
+                      iconBgColor: context.tokens.brandTint,
                       onTap: () {
                         context.pushNamed(RouteNames.partnerShareSettings);
                       },
@@ -105,12 +93,8 @@ class ProfileSettingsScreen extends StatelessWidget {
                     SettingsItem(
                       title: context.tr('profile_partner_connect'),
                       icon: Icons.person_add_alt_1_outlined,
-                      iconColor: isDark
-                          ? const Color(0xFF60A5FA)
-                          : const Color(0xFF2563EB),
-                      iconBgColor: isDark
-                          ? const Color(0xFF1E3A8A).withAlpha(76)
-                          : const Color(0xFFEFF6FF),
+                      iconColor: Theme.of(context).colorScheme.primary,
+                      iconBgColor: context.tokens.brandTint,
                       onTap: () {
                         context.pushNamed(RouteNames.partner);
                       },
@@ -128,12 +112,8 @@ class ProfileSettingsScreen extends StatelessWidget {
                   SettingsItem(
                     title: context.tr('profile_notification_settings'),
                     icon: Icons.notifications_active_outlined,
-                    iconColor: isDark
-                        ? const Color(0xFFC084FC)
-                        : const Color(0xFF9333EA),
-                    iconBgColor: isDark
-                        ? const Color(0xFF581C87).withAlpha(76)
-                        : const Color(0xFFFAF5FF),
+                    iconColor: Theme.of(context).colorScheme.primary,
+                    iconBgColor: context.tokens.brandTint,
                     onTap: () {
                       context.pushNamed(RouteNames.partnerNotificationSettings);
                     },
@@ -150,12 +130,8 @@ class ProfileSettingsScreen extends StatelessWidget {
                 SettingsItem(
                   title: context.tr('profile_notifications'),
                   icon: Icons.notifications_none_outlined,
-                  iconColor: isDark
-                      ? const Color(0xFFFBBF24)
-                      : AppColors.accentAmber,
-                  iconBgColor: isDark
-                      ? const Color(0xFF78350F).withAlpha(76)
-                      : const Color(0xFFFFFBEB),
+                  iconColor: Theme.of(context).colorScheme.primary,
+                  iconBgColor: context.tokens.brandTint,
                   onTap: () {
                     context.pushNamed(RouteNames.notificationSettings);
                   },
@@ -172,12 +148,8 @@ class ProfileSettingsScreen extends StatelessWidget {
                 SettingsItem(
                   title: context.tr('profile_privacy_security'),
                   icon: Icons.lock_outline,
-                  iconColor: isDark
-                      ? const Color(0xFF2DD4BF)
-                      : const Color(0xFF0D9488),
-                  iconBgColor: isDark
-                      ? const Color(0xFF134E4A).withAlpha(76)
-                      : const Color(0xFFF0FDFA),
+                  iconColor: Theme.of(context).colorScheme.primary,
+                  iconBgColor: context.tokens.brandTint,
                   onTap: () {
                     context.pushNamed(RouteNames.privacySecurity);
                   },
@@ -193,12 +165,8 @@ class ProfileSettingsScreen extends StatelessWidget {
                 SettingsItem(
                   title: context.tr('privacy_policy_title'),
                   icon: Icons.description_outlined,
-                  iconColor: isDark
-                      ? const Color(0xFF93C5FD)
-                      : const Color(0xFF3B82F6),
-                  iconBgColor: isDark
-                      ? const Color(0xFF1E3A8A).withAlpha(76)
-                      : const Color(0xFFEFF6FF),
+                  iconColor: Theme.of(context).colorScheme.primary,
+                  iconBgColor: context.tokens.brandTint,
                   onTap: () {
                     context.pushNamed(RouteNames.privacyPolicy);
                   },
@@ -206,12 +174,8 @@ class ProfileSettingsScreen extends StatelessWidget {
                 SettingsItem(
                   title: context.tr('terms_of_service_title'),
                   icon: Icons.gavel_outlined,
-                  iconColor: isDark
-                      ? const Color(0xFFA78BFA)
-                      : const Color(0xFF7C3AED),
-                  iconBgColor: isDark
-                      ? const Color(0xFF4C1D95).withAlpha(76)
-                      : const Color(0xFFF5F3FF),
+                  iconColor: Theme.of(context).colorScheme.primary,
+                  iconBgColor: context.tokens.brandTint,
                   onTap: () {
                     context.pushNamed(RouteNames.termsOfService);
                   },
@@ -223,15 +187,11 @@ class ProfileSettingsScreen extends StatelessWidget {
             // Logout Button
             TextButton.icon(
               onPressed: () => _confirmAndSignOut(context),
-              icon: Icon(
-                Icons.logout,
-                size: 20,
-                color: isDark ? const Color(0xFFF87171) : Colors.grey[500],
-              ),
+              icon: Icon(Icons.logout, size: 20, color: context.tokens.danger),
               label: Text(
                 context.tr('profile_logout'),
                 style: TextStyle(
-                  color: isDark ? const Color(0xFFF87171) : Colors.grey[500],
+                  color: context.tokens.danger,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -242,7 +202,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                   vertical: 12,
                 ),
                 backgroundColor: isDark
-                    ? const Color(0xFF7F1D1D).withValues(alpha: 0.2)
+                    ? context.tokens.danger.withValues(alpha: 0.16)
                     : Colors.transparent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
@@ -275,7 +235,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                         ),
                       ),
                       backgroundColor: isDarkDialog
-                          ? const Color(0xFF2C2C2E)
+                          ? context.tokens.surfaceAlt
                           : Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -371,7 +331,7 @@ class ProfileSettingsScreen extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+        backgroundColor: context.tokens.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           dialogContext.tr('logout_confirm_title'),

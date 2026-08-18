@@ -635,5 +635,8 @@
   "premium_active_desc": "Todo está desbloqueado. Gracias por tu apoyo.",
   "premium_manage": "Gestionar suscripción",
   "premium_manage_hint": "Puedes gestionar tu suscripción en Ajustes → Cuenta de Apple → Suscripciones.",
-  "premium_retry": "Reintentar"
+  "premium_retry": "Reintentar",
+  "premium_banner_title": "Hazte Premium",
+  "premium_banner_desc": "Todo tu historial de ciclos, análisis síntoma–fase, exportación y temas personalizados.",
+  "premium_banner_cta": "Ver funciones"
 }

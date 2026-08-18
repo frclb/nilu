@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_palette.dart';
 import '../../design_system/content_illustration.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -32,15 +33,13 @@ class OnboardingSuccessScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final bgColor = isDark ? AppColors.backgroundDeepDark : Colors.white;
-    final textColor = isDark
-        ? const Color(0xFFF9F1F2)
-        : const Color(0xFF181114);
+    final textColor = isDark ? AppPalette.rose50 : const Color(0xFF181114);
     final textSecondaryColor = isDark ? Colors.grey[400]! : Colors.grey[600]!;
     final primaryColor =
         theme.colorScheme.primary; // Often #f04299 based on provided HTML
     final subtlePink = isDark
         ? Colors.white.withValues(alpha: 0.05)
-        : const Color(0xFFF9F1F2).withValues(alpha: 0.5);
+        : AppPalette.rose50.withValues(alpha: 0.5);
 
     return Scaffold(
       backgroundColor: bgColor,

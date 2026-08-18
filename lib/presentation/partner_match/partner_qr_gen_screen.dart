@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_palette.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -45,7 +46,7 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
     final primaryColor = theme.colorScheme.primary;
     final textMainColor = isDark ? Colors.white : AppColors.textMainSlate;
     final textMutedColor = isDark
-        ? const Color(0xFFB3A2A5)
+        ? AppPalette.nightInkMuted
         : AppColors.textMutedSlate;
 
     return Scaffold(

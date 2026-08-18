@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_palette.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../localization/app_localizations.dart';
@@ -51,9 +52,7 @@ class SymptomAnalysisCard extends StatelessWidget {
     final borderColor = isDark
         ? AppColors.surfaceDark
         : AppColors.borderGrayLight;
-    final textColor = isDark
-        ? const Color(0xFFF4F1F1)
-        : AppColors.textMainLight;
+    final textColor = isDark ? AppPalette.nightInk : AppColors.textMainLight;
     final subtitleColor = isDark
         ? AppColors.textMutedWarmDark
         : AppColors.textMutedLight;

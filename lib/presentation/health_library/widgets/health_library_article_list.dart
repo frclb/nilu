@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_palette.dart';
 import '../../../design_system/content_illustration.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
@@ -49,7 +50,7 @@ class HealthLibraryArticleList extends StatelessWidget {
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: isDark
-                      ? const Color(0xFF8A4F5B)
+                      ? AppPalette.plum500
                       : theme.colorScheme.primary,
                 ),
               ),
@@ -150,7 +151,7 @@ class HealthLibraryArticleList extends StatelessWidget {
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         color: isDark
-                            ? const Color(0xFF8A4F5B)
+                            ? AppPalette.plum500
                             : theme.colorScheme.primary,
                         letterSpacing: 0.5,
                       ),

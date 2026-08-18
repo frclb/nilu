@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../localization/app_localizations.dart';
 import '../../../../design_system/app_colors.dart';
 import '../../../../core/navigation/navigation_service.dart';
 import '../../../../core/navigation/route_names.dart';
@@ -61,8 +62,8 @@ class PremiumBanner extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Premium'a Geç",
+                          Text(
+                            context.tr('premium_banner_title'),
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -72,7 +73,11 @@ class PremiumBanner extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Daha derin analizler ve sınırsız partner desteği ile sağlığını yönet.",
+                            // Eski metin "sınırsız partner desteği" vaat
+                            // ediyordu; öyle bir kilit yok. Üstelik bu iki
+                            // satır hiç çevrilmemişti — Almanca cihazda da
+                            // Türkçe çıkıyordu.
+                            context.tr('premium_banner_desc'),
                             style: TextStyle(
                               color: Colors.white.withAlpha(204),
                               fontSize: 14,
@@ -106,17 +111,17 @@ class PremiumBanner extends StatelessWidget {
                       ),
                       elevation: 0,
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Tüm özelliklerin kilidini aç",
-                          style: TextStyle(
+                          context.tr('premium_banner_cta'),
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Icon(Icons.arrow_forward, size: 18),
                       ],
                     ),

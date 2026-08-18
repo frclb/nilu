@@ -635,5 +635,8 @@
   "premium_active_desc": "Alles ist freigeschaltet. Danke für deine Unterstützung.",
   "premium_manage": "Abo verwalten",
   "premium_manage_hint": "Du kannst dein Abo unter Einstellungen → Apple-Account → Abonnements verwalten.",
-  "premium_retry": "Erneut versuchen"
+  "premium_retry": "Erneut versuchen",
+  "premium_banner_title": "Premium holen",
+  "premium_banner_desc": "Deine gesamte Zyklushistorie, Symptom-Phasen-Analyse, Export und eigene Themes.",
+  "premium_banner_cta": "Funktionen ansehen"
 }

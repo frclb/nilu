@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_palette.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
 
@@ -38,7 +39,7 @@ class NotesSection extends StatelessWidget {
           Container(
             height: 120,
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF2A2224) : Colors.white,
+              color: isDark ? AppPalette.night800 : Colors.white,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isDark

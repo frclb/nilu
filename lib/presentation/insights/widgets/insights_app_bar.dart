@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_palette.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
 
@@ -20,9 +21,7 @@ class InsightsAppBar extends StatelessWidget implements PreferredSizeWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final surfaceColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
-    final textColor = isDark
-        ? const Color(0xFFF4F1F1)
-        : AppColors.textMainLight;
+    final textColor = isDark ? AppPalette.nightInk : AppColors.textMainLight;
     final borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
 
     return Container(

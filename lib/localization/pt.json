@@ -635,5 +635,8 @@
   "premium_active_desc": "Está tudo desbloqueado. Obrigado pelo teu apoio.",
   "premium_manage": "Gerir subscrição",
   "premium_manage_hint": "Podes gerir a tua subscrição em Definições → Conta Apple → Subscrições.",
-  "premium_retry": "Tentar novamente"
+  "premium_retry": "Tentar novamente",
+  "premium_banner_title": "Obter Premium",
+  "premium_banner_desc": "Todo o teu histórico de ciclos, análise sintoma–fase, exportação e temas personalizados.",
+  "premium_banner_cta": "Ver funcionalidades"
 }
