@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
+import '../../../design_system/phase_colors.dart';
 import 'package:provider/provider.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../core/navigation/navigation_service.dart';
@@ -15,6 +17,7 @@ class DailySuggestionCard extends StatelessWidget {
     final viewModel = context.watch<CalendarViewModel>();
     final phase = viewModel.cycleInfo.currentPhase;
     final suggestion = _getSuggestionForPhase(context, phase);
+    final phaseColor = phase.color(context.tokens);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
@@ -54,25 +57,25 @@ class DailySuggestionCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Faz renginde gradient banner
+                // Faz renginde gradient banner.
+                //
+                // Renk artık fazdan türetiliyor; öncesinde her öneri kendi
+                // sabit rengini taşıyordu (yumurtlama önerisi açık maviydi)
+                // ve kart paletin dışına düşüyordu.
                 Container(
-                  height: 80,
+                  height: 88,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        suggestion.color.withAlpha(76),
-                        suggestion.color.withAlpha(25),
+                        phaseColor.withAlpha(64),
+                        phaseColor.withAlpha(18),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                   ),
                   child: Center(
-                    child: Icon(
-                      suggestion.icon,
-                      size: 40,
-                      color: suggestion.color,
-                    ),
+                    child: Icon(suggestion.icon, size: 40, color: phaseColor),
                   ),
                 ),
                 Padding(
@@ -170,7 +173,6 @@ class DailySuggestionCard extends StatelessWidget {
           description: context.tr('suggestion_yin_yoga_desc'),
           duration: context.tr('duration_minutes', params: {'n': '15'}),
           icon: Icons.self_improvement,
-          color: const Color(0xFFE74C6F),
         );
       case CyclePhase.follicular:
         return _PhaseSuggestion(
@@ -178,7 +180,6 @@ class DailySuggestionCard extends StatelessWidget {
           description: context.tr('suggestion_energy_desc'),
           duration: context.tr('duration_minutes', params: {'n': '25'}),
           icon: Icons.fitness_center,
-          color: const Color(0xFF7BC67E),
         );
       case CyclePhase.ovulation:
         return _PhaseSuggestion(
@@ -186,7 +187,6 @@ class DailySuggestionCard extends StatelessWidget {
           description: context.tr('suggestion_hiit_desc'),
           duration: context.tr('duration_minutes', params: {'n': '30'}),
           icon: Icons.directions_run,
-          color: const Color(0xFF4FC3F7),
         );
       case CyclePhase.luteal:
         return _PhaseSuggestion(
@@ -194,7 +194,6 @@ class DailySuggestionCard extends StatelessWidget {
           description: context.tr('suggestion_meditation_desc'),
           duration: context.tr('duration_minutes', params: {'n': '10'}),
           icon: Icons.spa,
-          color: const Color(0xFFFFB74D),
         );
       case CyclePhase.unknown:
         return _PhaseSuggestion(
@@ -202,7 +201,6 @@ class DailySuggestionCard extends StatelessWidget {
           description: context.tr('suggestion_wellness_desc'),
           duration: context.tr('duration_minutes', params: {'n': '15'}),
           icon: Icons.favorite_border,
-          color: Colors.grey,
         );
     }
   }
@@ -213,13 +211,11 @@ class _PhaseSuggestion {
   final String description;
   final String duration;
   final IconData icon;
-  final Color color;
 
   _PhaseSuggestion({
     required this.title,
     required this.description,
     required this.duration,
     required this.icon,
-    required this.color,
   });
 }

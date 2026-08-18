@@ -1,165 +1,229 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'app_colors.dart';
+import 'app_palette.dart';
+import 'app_tokens.dart';
 
+/// Uygulama teması.
+///
+/// Renkler [AppTokens] üzerinden role göre okunur; burada yalnızca Flutter'ın
+/// kendi bileşenlerine o rolleri bağlıyoruz. Yeni renk değeri **buraya**
+/// yazılmaz, `AppPalette`'e eklenir.
 class AppTheme {
-  static ThemeData get lightTheme {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.light,
-      primaryColor: AppColors.primaryLight,
-      scaffoldBackgroundColor: AppColors.backgroundLight,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.backgroundLight,
-        elevation: 0,
-        centerTitle: true,
-        scrolledUnderElevation: 0,
-        iconTheme: IconThemeData(color: AppColors.textMainLight),
-        titleTextStyle: TextStyle(
-          color: AppColors.textMainLight,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
-      ),
-      textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme)
-          .apply(
-            bodyColor: AppColors.textMainLight,
-            displayColor: AppColors.textMainLight,
-          )
-          .copyWith(
-            labelLarge: GoogleFonts.inter(color: AppColors.textMutedLight),
-          ),
-      colorScheme: const ColorScheme.light(
-        primary: AppColors.primaryLight,
-        secondary: AppColors.secondaryPinkLight,
-        surface: Colors.white,
-        onSurface: AppColors.textMainLight,
-        onPrimary: Colors.white,
-        outline: Color(0xFFF3F4F6), // gray-100
-      ),
-      cardTheme: CardThemeData(
-        color: Colors.white,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Color(0xFFF3F4F6)),
-        ),
-      ),
-      dialogTheme: DialogThemeData(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        titleTextStyle: const TextStyle(
-          color: AppColors.textMainLight,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.primaryLight, width: 2),
-        ),
-      ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: Colors.white,
-        selectedItemColor: AppColors.primaryLight,
-        unselectedItemColor: AppColors.textMutedLight,
-      ),
-    );
-  }
+  const AppTheme._();
 
-  static ThemeData get darkTheme {
+  static ThemeData get lightTheme => _build(AppTokens.light, Brightness.light);
+  static ThemeData get darkTheme => _build(AppTokens.dark, Brightness.dark);
+
+  static ThemeData _build(AppTokens t, Brightness brightness) {
+    final isLight = brightness == Brightness.light;
+    final base = isLight ? ThemeData.light() : ThemeData.dark();
+
+    // Başlıklar Lora (serif), gövde Inter.
+    //
+    // Öncesinde her şey Inter'dı ve ekranlar birbirinden ayrışmıyordu.
+    // Başlıkta serif kullanmak sağlık uygulamasına klinik değil sakin bir
+    // ton veriyor; gövdede grotesk kalması okunurluğu koruyor.
+    //
+    // Önce Fraunces denendi ama o bir "wonky" tasarım serifi: breve'i çok
+    // küçük çiziyor ve 20px'te `ğ` ile `g` birbirinden ayrılmıyordu.
+    // Türkçe birincil dil olduğu için diakritikleri sağlam çizen Lora
+    // seçildi.
+    final body = GoogleFonts.interTextTheme(
+      base.textTheme,
+    ).apply(bodyColor: t.text, displayColor: t.text);
+
+    final display = GoogleFonts.frauncesTextTheme(
+      base.textTheme,
+    ).apply(bodyColor: t.text, displayColor: t.text);
+
+    final textTheme = body.copyWith(
+      displayLarge: display.displayLarge?.copyWith(
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.5,
+      ),
+      displayMedium: display.displayMedium?.copyWith(
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.4,
+      ),
+      displaySmall: display.displaySmall?.copyWith(fontWeight: FontWeight.w600),
+      headlineMedium: display.headlineMedium?.copyWith(
+        fontWeight: FontWeight.w600,
+      ),
+      titleLarge: body.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+      labelLarge: body.labelLarge?.copyWith(color: t.textMuted),
+      bodyMedium: body.bodyMedium?.copyWith(height: 1.5),
+    );
+
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: AppPalette.plum700,
+          brightness: brightness,
+        ).copyWith(
+          primary: isLight ? AppPalette.plum700 : AppPalette.plum300,
+          onPrimary: isLight ? Colors.white : AppPalette.night900,
+          secondary: t.brandTint,
+          onSecondary: t.text,
+          tertiary: t.accent,
+          surface: t.surface,
+          onSurface: t.text,
+          outline: t.border,
+          error: t.danger,
+        );
+
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
-      primaryColor: AppColors.primaryDark,
-      scaffoldBackgroundColor: AppColors.backgroundDark,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.backgroundDark,
+      brightness: brightness,
+      colorScheme: scheme,
+      scaffoldBackgroundColor: t.background,
+      textTheme: textTheme,
+      extensions: [t],
+
+      appBarTheme: AppBarTheme(
+        backgroundColor: t.background,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
         scrolledUnderElevation: 0,
-        iconTheme: IconThemeData(color: Colors.white),
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
-        systemOverlayStyle: SystemUiOverlayStyle.light,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: t.text),
+        titleTextStyle: textTheme.titleLarge?.copyWith(fontSize: 18),
+        systemOverlayStyle: isLight
+            ? SystemUiOverlayStyle.dark
+            : SystemUiOverlayStyle.light,
       ),
-      textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme)
-          .apply(
-            bodyColor: AppColors.textMainDark,
-            displayColor: AppColors.textMainDark,
-          )
-          .copyWith(
-            labelLarge: GoogleFonts.inter(color: AppColors.textMutedDark),
-          ),
-      colorScheme: const ColorScheme.dark(
-        primary: AppColors.primaryDark,
-        secondary: AppColors.secondaryPinkDark,
-        surface: AppColors.surfaceDark,
-        onSurface: AppColors.textMainDark,
-        onPrimary: AppColors.primaryLight,
-        outline: AppColors.borderDark,
-      ),
+
+      // Gölge yerine kenarlık: sıcak zeminde gölge kirli görünüyor,
+      // ince kenarlık kartları daha net ayırıyor.
       cardTheme: CardThemeData(
-        color: AppColors.surfaceDark,
+        color: t.surface,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.borderDark),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          side: BorderSide(color: t.border),
         ),
       ),
+
+      dividerTheme: DividerThemeData(color: t.border, thickness: 1, space: 1),
+
       dialogTheme: DialogThemeData(
-        backgroundColor: const Color(0xFF2C2C2E),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
+        backgroundColor: t.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+        ),
+        titleTextStyle: textTheme.titleLarge,
+        contentTextStyle: textTheme.bodyMedium?.copyWith(color: t.textMuted),
+      ),
+
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: t.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadius.xl),
+          ),
         ),
       ),
+
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceDark,
+        fillColor: t.surfaceAlt,
+        hintStyle: textTheme.bodyMedium?.copyWith(color: t.textFaint),
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.borderDark),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderSide: BorderSide(color: t.border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.borderDark),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderSide: BorderSide(color: t.border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.primaryDark, width: 2),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          borderSide: BorderSide(color: scheme.primary, width: 1.5),
         ),
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: AppColors.backgroundDark,
-        selectedItemColor: AppColors.primaryDark,
-        unselectedItemColor: AppColors.textMutedDark,
+
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: const Size.fromHeight(52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          textStyle: textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          minimumSize: const Size.fromHeight(52),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          textStyle: textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: scheme.primary,
+          minimumSize: const Size.fromHeight(52),
+          side: BorderSide(color: t.border),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          textStyle: textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(foregroundColor: scheme.primary),
+      ),
+
+      chipTheme: ChipThemeData(
+        backgroundColor: t.surfaceAlt,
+        side: BorderSide(color: t.border),
+        labelStyle: textTheme.bodyMedium,
+        shape: const StadiumBorder(),
+      ),
+
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? Colors.white : t.surface,
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (s) =>
+              s.contains(WidgetState.selected) ? scheme.primary : t.surfaceAlt,
+        ),
+      ),
+
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: isLight ? AppPalette.ink900 : AppPalette.night700,
+        contentTextStyle: textTheme.bodyMedium?.copyWith(
+          color: AppPalette.sand50,
+        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
+      ),
+
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: scheme.primary,
+        linearTrackColor: t.surfaceAlt,
       ),
     );
   }

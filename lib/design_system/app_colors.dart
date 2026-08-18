@@ -1,81 +1,84 @@
 import 'package:flutter/material.dart';
+import 'app_palette.dart';
 
+/// Eski renk adlarının yeni palete köprüsü.
+///
+/// Bu isimler otuza yakın ekran dosyasından okunuyor. Palet yenilenirken iki
+/// yol vardı: her dosyaya tek tek dokunmak, ya da isimleri yerinde bırakıp
+/// **değerlerini** yeni palete yönlendirmek. İkincisi seçildi — tek dosyayla
+/// tüm uygulama boyandı ve ekranlar aşamalı olarak `context.tokens`'a
+/// taşınabiliyor.
+///
+/// Yeni kod bunu **kullanmamalı**; rol tabanlı `AppTokens` kullanın:
+/// `context.tokens.surface`, `context.tokens.textMuted`…
+///
+/// Eskiden buradaki tonlar üç ayrı kaynaktan geliyordu — marka kırmızısı,
+/// Tailwind'in slate/gray ölçeği ve turuncu/mor/teal çip renkleri. Üçü
+/// birbirine ait değildi; ekranlar da hangisini kullanacağını dosya bazında
+/// seçiyordu. Hepsi tek bir sıcak paletle değiştirildi.
 class AppColors {
-  // Light Theme Colors
-  static const Color primaryLight = Color(0xFF551B26); // #551b26
-  static const Color backgroundLight = Color(0xFFF8F6F6); // #f8f6f6
-  static const Color secondaryPinkLight = Color(0xFFF9F1F2); // #f9f1f2
-  static const Color textMainLight = Color(0xFF161213); // #161213
-  static const Color textMutedLight = Color(0xFF816A6E); // #816a6e
+  const AppColors._();
 
-  // Dark Theme Colors
-  static const Color primaryDark = Color(
-    0xFFFBCFE8,
-  ); // pink-200 for dark primary text/icons
-  static const Color backgroundDark = Color(0xFF1E1416); // #1e1416
-  static const Color secondaryPinkDark = Color(0x33551B26); // primary/20
-  static const Color textMainDark = Color(0xFFFFFFFF); // white
-  static const Color textMutedDark = Color(0xFF9CA3AF); // gray-400
-  static const Color borderDark = Color(0xFF374151); // gray-700
-  static const Color surfaceDark = Color(0xFF1F2937); // gray-800
+  // ── Açık tema ──
+  static const Color primaryLight = AppPalette.plum700;
+  static const Color backgroundLight = AppPalette.sand50;
+  static const Color secondaryPinkLight = AppPalette.rose50;
+  static const Color textMainLight = AppPalette.ink900;
+  static const Color textMutedLight = AppPalette.ink600;
 
-  // Calendar & Flow Colors
-  static const Color primaryLightTint = Color(0xFFFDF2F4); // primary-light
-  static const Color flowHeavy = Color(0xFF8A2C3C);
-  static const Color flowMedium = Color(0xFFB5465A);
-  static const Color flowLight = Color(
-    0xFFD98A96,
-  ); // actually #d98a96 -> 0xFFD98A96
-  static const Color fertileLight = Color(0xFFFCECEE);
+  // ── Koyu tema ──
+  static const Color primaryDark = AppPalette.plum300;
+  static const Color backgroundDark = AppPalette.night900;
+  static const Color secondaryPinkDark = AppPalette.night700;
+  static const Color textMainDark = AppPalette.nightInk;
+  static const Color textMutedDark = AppPalette.nightInkMuted;
+  static const Color borderDark = AppPalette.night600;
+  static const Color surfaceDark = AppPalette.night800;
 
-  // Status Chip Colors
-  static const Color moodOrangeText = Color(0xFF9A3412); // orange-800
-  static const Color moodOrangeBg = Color(0xFFFFF7ED); // orange-50
-  static const Color moodOrangeIcon = Color(0xFFFB923C); // orange-400
+  // ── Takvim ve akış ──
+  static const Color primaryLightTint = AppPalette.rose50;
+  static const Color flowHeavy = AppPalette.plum700;
+  static const Color flowMedium = AppPalette.rose600;
+  static const Color flowLight = AppPalette.rose400;
+  static const Color fertileLight = AppPalette.rose200;
 
-  static const Color energyPurpleText = Color(0xFF6B21A8); // purple-800
-  static const Color energyPurpleBg = Color(0xFFFAF5FF); // purple-50
-  static const Color energyPurpleIcon = Color(0xFFC084FC); // purple-400
-
-  static const Color suggestionTealText = Color(0xFF0D9488); // teal-600
-  static const Color suggestionTealBg = Color(0xFFF0FDFA); // teal-50
-
-  // ─────────────────────────────────────────────────────────────
-  // Ekranlarda tekrar eden değerler.
+  // ── Çipler ──
   //
-  // Bu renkler daha önce onlarca dosyada satır içi hex olarak yazılıyordu;
-  // aynı rengin birden çok "sürümü" oluşmuştu (ör. 0xFF1E1415 / 0xFF1E1416).
-  // Yeni renk eklerken önce buraya bakın.
-  // ─────────────────────────────────────────────────────────────
+  // Turuncu/mor/teal Tailwind varsayılanlarıydı ve palete ait değillerdi.
+  // Ruh hâli kil, enerji mor (yumurtlamayla aynı aile), öneri yeşil oldu.
+  static const Color moodOrangeText = AppPalette.clay600;
+  static const Color moodOrangeBg = AppPalette.clay100;
+  static const Color moodOrangeIcon = AppPalette.clay400;
 
-  /// Alternatif açık tema zemini (bazı ayar ekranları).
-  static const Color backgroundLightAlt = Color(0xFFF6F6F8);
+  static const Color energyPurpleText = Color(0xFF5B4483);
+  static const Color energyPurpleBg = AppPalette.iris100;
+  static const Color energyPurpleIcon = AppPalette.iris500;
 
-  /// Lacivert tonlu koyu tema (profil/ayar ekranları).
-  static const Color backgroundNavyDark = Color(0xFF101622);
-  static const Color surfaceNavyDark = Color(0xFF1A2230);
+  static const Color suggestionTealText = AppPalette.success;
+  static const Color suggestionTealBg = Color(0xFFE6F2EF);
 
-  /// Sıcak tonlu koyu tema (partner/onboarding ekranları).
-  static const Color surfaceWarmDark = Color(0xFF2A1F20);
-  static const Color backgroundDeepDark = Color(0xFF1A0C13);
+  // ── Yüzeyler ──
+  static const Color backgroundLightAlt = AppPalette.sand100;
+  static const Color backgroundNavyDark = AppPalette.night900;
+  static const Color surfaceNavyDark = AppPalette.night800;
+  static const Color surfaceWarmDark = AppPalette.night800;
+  static const Color backgroundDeepDark = AppPalette.night900;
+  static const Color textMutedWarmDark = AppPalette.nightInkMuted;
+  static const Color primaryDeep = AppPalette.plum900;
 
-  /// Koyu temada silik metin (sıcak ton).
-  static const Color textMutedWarmDark = Color(0xFFD0C0C2);
+  // ── Metin ve kenarlık ──
+  //
+  // "Slate" adları Tailwind'den kalma; değerleri artık sıcak kum ölçeği.
+  static const Color textMainSlate = AppPalette.ink900;
+  static const Color textMutedSlate = AppPalette.ink600;
+  static const Color textMutedSlateDark = AppPalette.nightInkMuted;
+  static const Color borderSlateLight = AppPalette.sand200;
+  static const Color borderSlate = AppPalette.sand200;
+  static const Color borderSlateDark = AppPalette.night600;
+  static const Color borderGrayLight = AppPalette.sand200;
 
-  /// Marka kırmızısının koyu tonu (partner ekranları).
-  static const Color primaryDeep = Color(0xFF541C24);
-
-  // Slate ölçeği — metin ve kenarlıklar
-  static const Color textMainSlate = Color(0xFF0F172A); // slate-900
-  static const Color textMutedSlate = Color(0xFF64748B); // slate-500
-  static const Color textMutedSlateDark = Color(0xFF94A3B8); // slate-400
-  static const Color borderSlateLight = Color(0xFFF1F5F9); // slate-100
-  static const Color borderSlate = Color(0xFFE2E8F0); // slate-200
-  static const Color borderSlateDark = Color(0xFF334155); // slate-700
-  static const Color borderGrayLight = Color(0xFFF3F4F6); // gray-100
-
-  // Vurgu renkleri
-  static const Color accentAmber = Color(0xFFD97706); // amber-600
-  static const Color accentGreen = Color(0xFF10B981); // emerald-500
-  static const Color accentRose = Color(0xFFE11D48); // rose-600
+  // ── Durum ──
+  static const Color accentAmber = AppPalette.warning;
+  static const Color accentGreen = AppPalette.success;
+  static const Color accentRose = AppPalette.danger;
 }

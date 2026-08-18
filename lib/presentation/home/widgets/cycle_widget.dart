@@ -6,6 +6,8 @@ import '../../../core/navigation/route_names.dart';
 import '../../../domain/models/cycle_info.dart';
 import '../../calendar/view_models/calendar_view_model.dart';
 import '../../../design_system/app_colors.dart';
+import '../../../design_system/app_tokens.dart';
+import '../../../design_system/phase_colors.dart';
 
 class CycleWidget extends StatelessWidget {
   const CycleWidget({super.key});
@@ -75,7 +77,7 @@ class CycleWidget extends StatelessWidget {
                         ? AppColors.surfaceDark
                         : secondaryColor,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      _getPhaseColor(phase, primaryColor),
+                      phase.color(context.tokens),
                     ),
                     strokeCap: StrokeCap.round,
                   ),
@@ -228,49 +230,26 @@ class CycleWidget extends StatelessWidget {
     }
   }
 
-  Color _getPhaseColor(CyclePhase phase, Color primary) {
-    switch (phase) {
-      case CyclePhase.menstruation:
-        return const Color(0xFFE74C6F);
-      case CyclePhase.follicular:
-        return const Color(0xFF7BC67E);
-      case CyclePhase.ovulation:
-        return const Color(0xFF4FC3F7);
-      case CyclePhase.luteal:
-        return const Color(0xFFFFB74D);
-      case CyclePhase.unknown:
-        return primary;
-    }
-  }
-
   _FertilityInfo _getFertilityInfo(BuildContext context, CyclePhase phase) {
-    switch (phase) {
-      case CyclePhase.ovulation:
-        return _FertilityInfo(
-          color: Colors.red,
-          label: context.tr('home_very_high_fertility'),
-        );
-      case CyclePhase.follicular:
-        return _FertilityInfo(
-          color: Colors.orange,
-          label: context.tr('home_medium_fertility'),
-        );
-      case CyclePhase.luteal:
-        return _FertilityInfo(
-          color: Colors.green,
-          label: context.tr('home_low_fertility'),
-        );
-      case CyclePhase.menstruation:
-        return _FertilityInfo(
-          color: Colors.grey,
-          label: context.tr('home_low_fertility'),
-        );
-      case CyclePhase.unknown:
-        return _FertilityInfo(
-          color: Colors.grey,
-          label: context.tr('home_no_data_yet'),
-        );
-    }
+    final color = phase.fertilityColor(context.tokens);
+    return switch (phase) {
+      CyclePhase.ovulation => _FertilityInfo(
+        color: color,
+        label: context.tr('home_very_high_fertility'),
+      ),
+      CyclePhase.follicular => _FertilityInfo(
+        color: color,
+        label: context.tr('home_medium_fertility'),
+      ),
+      CyclePhase.luteal || CyclePhase.menstruation => _FertilityInfo(
+        color: color,
+        label: context.tr('home_low_fertility'),
+      ),
+      CyclePhase.unknown => _FertilityInfo(
+        color: color,
+        label: context.tr('home_no_data_yet'),
+      ),
+    };
   }
 }
 
