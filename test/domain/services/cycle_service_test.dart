@@ -6,6 +6,8 @@ PeriodLog startedOn(int day, {int month = 1}) =>
     PeriodLog(id: '$month-$day', startDate: DateTime(2026, month, day));
 
 void main() {
+  _plausibilityTests();
+
   final service = CycleService();
 
   group('calculateAverageCycleLength', () {
@@ -67,6 +69,72 @@ void main() {
         startedOn(5, month: 2),
       ];
       expect(service.getLastPeriodStart(logs), DateTime(2026, 3, 10));
+    });
+  });
+}
+
+/// Mantıksız aralıkların ortalamayı bozmaması.
+///
+/// Takvimde tek bir gün işaretlemek yeni bir dönem kaydı üretiyor. Kullanıcı
+/// bir düzeltme yapmak için reglinin bitiminden birkaç gün sonra bir gün
+/// işaretlediğinde, o birkaç günlük fark "döngü" sayılıp ortalamayı yere
+/// çekiyordu — doğurganlık penceresi de bir hafta kayıyordu.
+void _plausibilityTests() {
+  PeriodLog log(String id, int month, int day) =>
+      PeriodLog(id: id, startDate: DateTime(2026, month, day));
+
+  final service = CycleService();
+
+  group('mantıksız aralıklar', () {
+    test('çok kısa aralık ortalamaya katılmaz', () {
+      final duzenli = [
+        log('1', 5, 20),
+        log('2', 6, 22),
+        log('3', 7, 20),
+        log('4', 8, 17),
+      ];
+      final temizOrtalama = service.calculateAverageCycleLength(duzenli);
+
+      // Kullanıcı 20 Ağustos'ta tek bir gün daha işaretliyor (3 gün sonra).
+      final kirli = [...duzenli, log('5', 8, 20)];
+
+      expect(
+        service.calculateAverageCycleLength(kirli),
+        temizOrtalama,
+        reason: '3 günlük fark bir döngü değil',
+      );
+    });
+
+    test('takibe ara verilen uzun boşluk ortalamaya katılmaz', () {
+      final logs = [
+        log('1', 1, 1),
+        log('2', 1, 29), // 28
+        log('3', 7, 28), // ~180 — takip yok
+        log('4', 8, 25), // 28
+      ];
+
+      expect(service.calculateAverageCycleLength(logs), 28);
+    });
+
+    test('geçerli aralık kalmazsa varsayılana düşer', () {
+      final logs = [log('1', 8, 1), log('2', 8, 3)];
+
+      expect(
+        service.calculateAverageCycleLength(logs, defaultLength: 30),
+        30,
+        reason: 'uydurma bir ortalama üretmektense ayara düşmeli',
+      );
+    });
+
+    test('sınır değerler', () {
+      expect(
+        service.calculateAverageCycleLength([
+          log('1', 8, 1),
+          log('2', 8, 1 + CycleService.minPlausibleCycleDays),
+        ]),
+        CycleService.minPlausibleCycleDays,
+        reason: 'alt sınır dahil',
+      );
     });
   });
 }

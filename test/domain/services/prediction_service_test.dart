@@ -7,6 +7,8 @@ PeriodLog completed(String id, DateTime start, DateTime end) =>
     PeriodLog(id: id, startDate: start, endDate: end);
 
 void main() {
+  _chainTests();
+
   final service = PredictionService();
 
   group('veri yokken', () {
@@ -56,20 +58,34 @@ void main() {
       expect(info.fertileWindowEnd, DateTime(2026, 1, 16));
     });
 
-    test('3 ileri döngü tahmini üretir ve tarihler artan sıradadır', () {
+    test('ileri tahminler sonraki reglden başlar ve artan sıradadır', () {
+      // Bu test eskiden `hasLength(3)` ve "ilk tahmin sonraki reglden
+      // SONRA" diyordu. İkisi de kusuru sabitliyordu: zincir sonraki regli
+      // atlıyordu (o döngünün doğurganlık penceresi hiç üretilmiyordu) ve
+      // üç döngüden sonrası boş kalıyordu.
       final info = service.getCycleInfo(logs, userCycleLength: 28);
-      expect(info.futurePredictions, hasLength(3));
+      expect(
+        info.futurePredictions,
+        hasLength(PredictionService.forecastCycleCount),
+      );
 
       final starts = info.futurePredictions.map((p) => p.startDate).toList();
-      expect(starts[0].isAfter(info.predictedNextPeriod!), isTrue);
-      expect(starts[1].isAfter(starts[0]), isTrue);
-      expect(starts[2].isAfter(starts[1]), isTrue);
+      expect(starts.first, info.predictedNextPeriod);
+      for (var i = 0; i < starts.length - 1; i++) {
+        expect(starts[i + 1].isAfter(starts[i]), isTrue);
+      }
     });
 
-    test('her ileri tahminde de yumurtlama regl öncesi 14 gündür', () {
+    test('her ileri tahminde yumurtlama kendi döngüsünün içindedir', () {
+      // Eski hâli `startDate - ovulationDay == 14` bekliyordu, yani
+      // yumurtlamanın döngü başlangıcından ÖNCE olmasını. Doğrusu: o
+      // döngünün başlangıcından `uzunluk - 14` gün sonra.
       final info = service.getCycleInfo(logs, userCycleLength: 28);
       for (final p in info.futurePredictions) {
-        expect(p.startDate.difference(p.ovulationDay!).inDays, 14);
+        expect(
+          p.ovulationDay!.difference(p.startDate).inDays,
+          info.averageCycleLength - PredictionService.lutealPhaseDays,
+        );
       }
     });
   });
@@ -185,6 +201,117 @@ void main() {
 
     test('geçersiz gün unknown döner', () {
       expect(info.getPhaseForDay(0), CyclePhase.unknown);
+    });
+  });
+}
+
+/// Tahmin zincirinin tutarlılığı.
+///
+/// Kullanıcı takvimi değiştirdiğinde doğurganlık penceresinin kayması
+/// buradaki üç kusurdan geliyordu.
+void _chainTests() {
+  PeriodLog log(String id, int month, int day) =>
+      PeriodLog(id: id, startDate: DateTime(2026, month, day));
+
+  /// Ortalaması 30 gün olan gerçekçi bir geçmiş (33/28/28).
+  final gecmis = [
+    log('1', 5, 20),
+    log('2', 6, 22),
+    log('3', 7, 20),
+    log('4', 8, 17),
+  ];
+
+  group('tahmin zinciri', () {
+    test('regl aralıkları baştan sona aynı uzunlukta', () {
+      // Regresyon: mevcut döngü hesaplanan ortalamayı (30), gelecek döngüler
+      // ise kullanıcı ayarını (28) kullanıyordu. Kullanıcı takvimde önce 30
+      // günlük, sonra aniden 28 günlük aralıklar görüyordu.
+      final info = PredictionService().getCycleInfo(
+        gecmis,
+        userCycleLength: 28,
+      );
+
+      final baslangiclar = info.futurePredictions
+          .map((p) => p.startDate)
+          .toList();
+      expect(baslangiclar.first, info.predictedNextPeriod);
+
+      for (var i = 0; i < baslangiclar.length - 1; i++) {
+        expect(
+          baslangiclar[i + 1].difference(baslangiclar[i]).inDays,
+          info.averageCycleLength,
+          reason: '${i + 1}. ve ${i + 2}. tahmin arası',
+        );
+      }
+    });
+
+    test('her tahmin döngüsünün yumurtlaması kendi döngüsündedir', () {
+      // Regresyon: yumurtlama `başlangıç - 14` olarak hesaplanıyordu, yani
+      // bir önceki döngüye aitti. Kayıt içinde başlangıç ile yumurtlama
+      // birbirine uymuyordu.
+      final info = PredictionService().getCycleInfo(
+        gecmis,
+        userCycleLength: 28,
+      );
+
+      for (final p in info.futurePredictions) {
+        final gun = p.ovulationDay!.difference(p.startDate).inDays;
+        expect(
+          gun,
+          info.averageCycleLength - 14,
+          reason: '${p.startDate} döngüsünün yumurtlaması',
+        );
+        expect(gun, greaterThan(0), reason: 'yumurtlama döngü içinde olmalı');
+      }
+    });
+
+    test('tahmin edilen her reglin doğurganlık penceresi vardır', () {
+      // Regresyon: son tahmin döngüsünün yumurtlaması hiç üretilmiyordu.
+      final info = PredictionService().getCycleInfo(
+        gecmis,
+        userCycleLength: 28,
+      );
+
+      for (final p in info.futurePredictions) {
+        expect(p.ovulationDay, isNotNull, reason: '${p.startDate}');
+        expect(p.fertileStart, isNotNull, reason: '${p.startDate}');
+        expect(p.fertileEnd, isNotNull, reason: '${p.startDate}');
+      }
+    });
+
+    test('sonraki aylar için yeterli tahmin üretilir', () {
+      // Takvimde ileri sayfalanabiliyor; birkaç ay sonrası boş kalmamalı.
+      final info = PredictionService().getCycleInfo(
+        gecmis,
+        userCycleLength: 28,
+      );
+
+      final son = info.futurePredictions.last.startDate;
+      expect(
+        son.difference(info.lastPeriodStart!).inDays,
+        greaterThanOrEqualTo(330),
+        reason: 'en az bir yıl ileri tahmin',
+      );
+    });
+
+    test('araya karışan tek gün doğurganlığı kaydırmaz', () {
+      // Kullanıcının bildirdiği durum: takvimde bir gün işaretlemek
+      // doğurganlık penceresini bir hafta öteliyordu.
+      final temiz = PredictionService().getCycleInfo(
+        gecmis,
+        userCycleLength: 28,
+      );
+
+      final kirli = PredictionService().getCycleInfo([
+        ...gecmis,
+        log('5', 8, 20), // reglin bitiminden 3 gün sonra tek gün
+      ], userCycleLength: 28);
+
+      expect(kirli.averageCycleLength, temiz.averageCycleLength);
+      expect(
+        kirli.ovulationDay!.difference(kirli.lastPeriodStart!).inDays,
+        temiz.ovulationDay!.difference(temiz.lastPeriodStart!).inDays,
+      );
     });
   });
 }

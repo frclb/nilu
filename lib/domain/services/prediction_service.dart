@@ -4,7 +4,21 @@ import 'cycle_service.dart';
 
 /// Gelecek tahminlerini üreten servis.
 class PredictionService {
+  /// Kaç döngü ileri tahmin üretileceği.
+  ///
+  /// Takvimde ileri sayfalanabiliyor; üç döngü (~3 ay) sonrası boş kalıyordu.
+  /// On üç döngü bir yılı aşıyor.
+  static const int forecastCycleCount = 13;
+
+  /// Luteal faz uzunluğu. Yumurtlama, bir sonraki regl başlangıcından bu
+  /// kadar gün öncedir.
+  static const int lutealPhaseDays = 14;
+
   final CycleService _cycleService = CycleService();
+
+  /// [start] gününde başlayan, [cycleLength] gün süren döngünün yumurtlaması.
+  static DateTime _ovulationFor(DateTime start, int cycleLength) =>
+      start.add(Duration(days: cycleLength - lutealPhaseDays));
 
   /// Döngü bilgisini hesaplar.
   /// [userCycleLength] ve [userPeriodLength]: Kullanıcının ayarladığı değerler
@@ -60,20 +74,34 @@ class PredictionService {
 
     final nextPeriod = lastStart.add(Duration(days: effectiveCycleLength));
 
-    // Yumurtlama: Döngü uzunluğu - 14 gün
-    final ovulation = lastStart.add(Duration(days: effectiveCycleLength - 14));
+    // Yumurtlama luteal faza göre hesaplanır: bir sonraki reglden 14 gün önce,
+    // yani döngü başlangıcından `uzunluk - 14` gün sonra. Luteal faz kişiden
+    // kişiye pek değişmez, değişen foliküler fazdır.
+    final ovulation = _ovulationFor(lastStart, effectiveCycleLength);
 
     // Doğurganlık penceresi: Yumurtlama -5 gün → Yumurtlama +1 gün (tıbbi standart)
     final fertileStart = ovulation.subtract(const Duration(days: 5));
     final fertileEnd = ovulation.add(const Duration(days: 1));
 
-    // İleri 3 döngü tahmini — bunlar her zaman kullanıcı ayarlarını kullanır
-    // (gelecekteki döngüler settingsUpdatedAt'ten sonra olacak)
-    final futureCycleLength = userCycleLength;
+    // İleri döngü tahminleri.
+    //
+    // Üç kusur düzeltildi:
+    //
+    // 1. Uzunluk olarak `userCycleLength` kullanılıyordu, mevcut döngü ise
+    //    hesaplanan ortalamayı kullanıyordu. Kullanıcı takvimde önce 30
+    //    günlük, hemen ardından 28 günlük aralıklar görüyordu.
+    // 2. Yumurtlama `başlangıç - 14` idi; bu, o döngünün değil bir
+    //    öncekinin yumurtlamasıdır. Kayıt içinde başlangıç ve yumurtlama
+    //    birbirine uymuyordu ve zincirin son döngüsünün doğurganlık
+    //    penceresi hiç üretilmiyordu.
+    // 3. Zincir `nextPeriod`'dan **sonra** başlıyordu, dolayısıyla sonraki
+    //    reglin kendi doğurganlık penceresi listede yoktu.
     final futurePredictions = <PredictedCycle>[];
-    for (int i = 1; i <= 3; i++) {
-      final futureStart = nextPeriod.add(Duration(days: futureCycleLength * i));
-      final futureOvulation = futureStart.subtract(const Duration(days: 14));
+    for (int i = 1; i <= forecastCycleCount; i++) {
+      final futureStart = lastStart.add(
+        Duration(days: effectiveCycleLength * i),
+      );
+      final futureOvulation = _ovulationFor(futureStart, effectiveCycleLength);
       futurePredictions.add(
         PredictedCycle(
           startDate: futureStart,
