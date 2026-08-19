@@ -746,32 +746,9 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
                   color: textMutedColor,
                 ),
               ),
-              const SizedBox(height: 16),
-              GestureDetector(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(context.tr('article_coming_soon')),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      context.tr('read_more'),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: primaryColor,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(Icons.arrow_forward, size: 14, color: primaryColor),
-                  ],
-                ),
-              ),
+              // Burada bir "Devamını oku" bağlantısı vardı ama okunacak bir
+              // devamı yok — "yakında" uyarısı basıyordu. Kart açıklamanın
+              // tamamını zaten içeriyor.
             ],
           ),
         ),

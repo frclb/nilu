@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../design_system/app_palette.dart';
-import '../../../design_system/content_illustration.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
 
@@ -165,18 +164,11 @@ class YogaContentSection extends StatelessWidget {
             mutedColor: mutedColor,
             isDark: isDark,
           ),
-          const SizedBox(height: 32),
-
-          // ── Instructor ──
-          _sectionTitle(context.tr('yoga_instructor'), primaryColor, textColor),
-          const SizedBox(height: 16),
-          _buildInstructorCard(
-            context: context,
-            isDark: isDark,
-            primaryColor: primaryColor,
-            textColor: textColor,
-            mutedColor: mutedColor,
-          ),
+          // Burada bir "Eğitmen" bölümü vardı: fotoğraf, "Elif Yılmaz —
+          // Yoga Eğitmeni" ve bir "Profili Gör" bağlantısı. Böyle bir kişi
+          // yok, profil ekranı da yok — bağlantı "yakında" uyarısı basıyordu.
+          // Sağlık içeriğini var olmayan birine atfetmek, ölü bir düğmeden
+          // daha kötü.
           const SizedBox(height: 40),
         ],
       ),
@@ -532,88 +524,6 @@ class YogaContentSection extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Instructor Card ──
-  Widget _buildInstructorCard({
-    required BuildContext context,
-    required bool isDark,
-    required Color primaryColor,
-    required Color textColor,
-    required Color mutedColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          colors: [
-            primaryColor.withAlpha((isDark ? 0.20 : 0.08 * 255).toInt()),
-            Colors.transparent,
-          ],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        border: Border.all(color: primaryColor.withAlpha(25)),
-      ),
-      child: Row(
-        children: [
-          // Avatar
-          ClipOval(
-            child: SizedBox(
-              width: 48,
-              height: 48,
-              // Eğitmen fotoğrafı da geçici mockup adresindeydi.
-              child: ContentIllustration(
-                seed: 'yoga_instructor',
-                icon: Icons.self_improvement,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  context.tr('yoga_instructor_name'),
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  context.tr('yoga_instructor_role'),
-                  style: TextStyle(fontSize: 12, color: mutedColor),
-                ),
-              ],
-            ),
-          ),
-          // Profile button
-          GestureDetector(
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(context.tr('yoga_instructor_soon')),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-            child: Text(
-              context.tr('yoga_view_profile'),
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: primaryColor,
-              ),
             ),
           ),
         ],
