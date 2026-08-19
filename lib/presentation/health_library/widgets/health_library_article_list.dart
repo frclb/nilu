@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../article_screen.dart';
 import '../../../design_system/app_palette.dart';
 import '../../../design_system/content_illustration.dart';
 import '../../../../localization/app_localizations.dart';
@@ -96,14 +97,11 @@ class HealthLibraryArticleList extends StatelessWidget {
     bool isDark,
   ) {
     return GestureDetector(
-      onTap: () {
-        // Makale detay ekranı henüz yok. Buradan tarif ekranına gidiliyordu:
-        // "PMS için 5 besin"e dokunan kullanıcı somonlu kinoa tarifiyle
-        // karşılaşıyordu. Alakasız bir ekran açmaktansa dürüst mesaj.
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(context.tr('article_coming_soon'))),
-        );
-      },
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => ArticleScreen(article: article),
+        ),
+      ),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(

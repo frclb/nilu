@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../article_screen.dart';
 import '../../../design_system/app_palette.dart';
 import '../../../design_system/content_illustration.dart';
 import '../../../../localization/app_localizations.dart';
@@ -18,12 +19,11 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 8),
       child: GestureDetector(
-        onTap: () {
-          // Makale detay ekranı henüz yok — bkz. health_library_article_list.
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(context.tr('article_coming_soon'))),
-          );
-        },
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => ArticleScreen(article: article),
+          ),
+        ),
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
@@ -140,7 +140,9 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
                           Text(
                             context
                                 .tr('health_library_read_time')
-                                .replaceAll('{min}', '6'),
+                                // Sabit "6" yazıyordu: hangi makale öne
+                                // çıkarsa çıksın aynı süreyi gösteriyordu.
+                                .replaceAll('{min}', '${article.readMinutes}'),
                             style: TextStyle(
                               color: Colors.white.withAlpha(229),
                               fontSize: 12,

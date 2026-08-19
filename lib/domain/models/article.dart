@@ -18,6 +18,29 @@ enum ArticleCategory {
   };
 }
 
+/// Makale gövdesinde tek bir bölüm.
+class ArticleSection {
+  /// Ara başlık. Giriş paragrafında `null`.
+  final String? headingKey;
+
+  /// Bölüm metni. Satır sonları paragraf ayırır.
+  final String bodyKey;
+
+  const ArticleSection({this.headingKey, required this.bodyKey});
+}
+
+/// Makalenin dayandığı kaynak.
+///
+/// Sağlık iddialarının nereden geldiği okunabilir olmalı; kaynaksız metin
+/// kullanıcıdan güven istiyor ama karşılığını vermiyor. Etiket ve adres
+/// çevrilmez — kurum adları ve URL'ler her dilde aynı.
+class ArticleSource {
+  final String label;
+  final String url;
+
+  const ArticleSource({required this.label, required this.url});
+}
+
 /// Bir kütüphane makalesi.
 ///
 /// Başlık ve etiket dile bağlı olduğu için metin değil **anahtar** tutulur;
@@ -39,12 +62,24 @@ class Article {
   /// Öne çıkan makale kartında gösterilir.
   final bool isFeatured;
 
+  /// Makale gövdesi.
+  ///
+  /// Önceden yalnızca başlık vardı: kütüphane beş başlık listeliyor ama
+  /// dokununca "yakında" diyordu — alt menüdeki kök sekmelerden biri
+  /// tamamen boştu.
+  final List<ArticleSection> sections;
+
+  /// Metnin dayandığı kaynaklar. Makale sonunda listelenir.
+  final List<ArticleSource> sources;
+
   const Article({
     required this.titleKey,
     required this.tagKey,
     required this.category,
     required this.readMinutes,
     required this.icon,
+    required this.sections,
+    required this.sources,
     this.isFeatured = false,
   });
 }
@@ -62,9 +97,39 @@ class ArticleCatalog {
       titleKey: 'library_article_hormones',
       tagKey: 'library_cat_hormones',
       category: ArticleCategory.period,
-      readMinutes: 8,
+      readMinutes: 4,
       icon: Icons.spa_outlined,
       isFeatured: true,
+      sections: [
+        ArticleSection(bodyKey: 'article_hormones_intro'),
+        ArticleSection(
+          headingKey: 'article_hormones_h1',
+          bodyKey: 'article_hormones_b1',
+        ),
+        ArticleSection(
+          headingKey: 'article_hormones_h2',
+          bodyKey: 'article_hormones_b2',
+        ),
+        ArticleSection(
+          headingKey: 'article_hormones_h3',
+          bodyKey: 'article_hormones_b3',
+        ),
+        ArticleSection(
+          headingKey: 'article_hormones_h4',
+          bodyKey: 'article_hormones_b4',
+        ),
+      ],
+      sources: [
+        ArticleSource(
+          label: 'NHS — Periods',
+          url: 'https://www.nhs.uk/conditions/periods/',
+        ),
+        ArticleSource(
+          label: 'Office on Women\'s Health — Your menstrual cycle',
+          url:
+              'https://www.womenshealth.gov/menstrual-cycle/your-menstrual-cycle',
+        ),
+      ],
     ),
     Article(
       titleKey: 'library_article_pms',
@@ -72,27 +137,113 @@ class ArticleCatalog {
       category: ArticleCategory.nutrition,
       readMinutes: 4,
       icon: Icons.restaurant_menu,
+      sections: [
+        ArticleSection(bodyKey: 'article_pms_intro'),
+        ArticleSection(headingKey: 'article_pms_h1', bodyKey: 'article_pms_b1'),
+        ArticleSection(headingKey: 'article_pms_h2', bodyKey: 'article_pms_b2'),
+        ArticleSection(headingKey: 'article_pms_h3', bodyKey: 'article_pms_b3'),
+      ],
+      sources: [
+        ArticleSource(
+          label: 'Office on Women\'s Health — Premenstrual syndrome',
+          url:
+              'https://www.womenshealth.gov/menstrual-cycle/premenstrual-syndrome',
+        ),
+        ArticleSource(
+          label: 'NHS — PMS',
+          url: 'https://www.nhs.uk/conditions/pre-menstrual-syndrome/',
+        ),
+      ],
     ),
     Article(
       titleKey: 'library_article_partner',
       tagKey: 'library_cat_relationships',
       category: ArticleCategory.psychology,
-      readMinutes: 7,
+      readMinutes: 3,
       icon: Icons.favorite_outline,
+      sections: [
+        ArticleSection(bodyKey: 'article_partner_intro'),
+        ArticleSection(
+          headingKey: 'article_partner_h1',
+          bodyKey: 'article_partner_b1',
+        ),
+        ArticleSection(
+          headingKey: 'article_partner_h2',
+          bodyKey: 'article_partner_b2',
+        ),
+        ArticleSection(
+          headingKey: 'article_partner_h3',
+          bodyKey: 'article_partner_b3',
+        ),
+      ],
+      sources: [
+        ArticleSource(
+          label: 'Office on Women\'s Health — Premenstrual syndrome',
+          url:
+              'https://www.womenshealth.gov/menstrual-cycle/premenstrual-syndrome',
+        ),
+      ],
     ),
     Article(
       titleKey: 'library_article_mood',
       tagKey: 'library_cat_psychology',
       category: ArticleCategory.psychology,
-      readMinutes: 5,
+      readMinutes: 4,
       icon: Icons.psychology_outlined,
+      sections: [
+        ArticleSection(bodyKey: 'article_mood_intro'),
+        ArticleSection(
+          headingKey: 'article_mood_h1',
+          bodyKey: 'article_mood_b1',
+        ),
+        ArticleSection(
+          headingKey: 'article_mood_h2',
+          bodyKey: 'article_mood_b2',
+        ),
+        ArticleSection(
+          headingKey: 'article_mood_h3',
+          bodyKey: 'article_mood_b3',
+        ),
+      ],
+      sources: [
+        ArticleSource(
+          label: 'NHS — PMS',
+          url: 'https://www.nhs.uk/conditions/pre-menstrual-syndrome/',
+        ),
+        ArticleSource(
+          label: 'Office on Women\'s Health — Premenstrual syndrome',
+          url:
+              'https://www.womenshealth.gov/menstrual-cycle/premenstrual-syndrome',
+        ),
+      ],
     ),
     Article(
       titleKey: 'library_article_iron',
       tagKey: 'library_cat_health',
       category: ArticleCategory.nutrition,
-      readMinutes: 5,
+      readMinutes: 4,
       icon: Icons.local_dining_outlined,
+      sections: [
+        ArticleSection(bodyKey: 'article_iron_intro'),
+        ArticleSection(
+          headingKey: 'article_iron_h1',
+          bodyKey: 'article_iron_b1',
+        ),
+        ArticleSection(
+          headingKey: 'article_iron_h2',
+          bodyKey: 'article_iron_b2',
+        ),
+        ArticleSection(
+          headingKey: 'article_iron_h3',
+          bodyKey: 'article_iron_b3',
+        ),
+      ],
+      sources: [
+        ArticleSource(
+          label: 'NHS — Iron deficiency anaemia',
+          url: 'https://www.nhs.uk/conditions/iron-deficiency-anaemia/',
+        ),
+      ],
     ),
   ];
 
