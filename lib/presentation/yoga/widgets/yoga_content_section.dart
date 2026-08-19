@@ -96,19 +96,11 @@ class YogaContentSection extends StatelessWidget {
                   mutedColor: mutedColor,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildStatCard(
-                  icon: Icons.local_fire_department,
-                  value: '120',
-                  label: context.tr('yoga_stat_kcal'),
-                  cardColor: cardColor,
-                  borderColor: borderColor,
-                  primaryColor: primaryColor,
-                  textColor: textColor,
-                  mutedColor: mutedColor,
-                ),
-              ),
+              // Burada üçüncü bir kutu "120 kcal" yazıyordu. Sabit bir
+              // sayıydı: kalori kişinin kilosuna, hızına ve pozda ne kadar
+              // kaldığına göre değişir, uygulamanın bunların hiçbirini
+              // ölçecek verisi yok. Tahmini bir sayıyı ölçüm gibi göstermek
+              // yerine kutuyu kaldırdım.
             ],
           ),
           const SizedBox(height: 32),
