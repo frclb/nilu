@@ -739,5 +739,21 @@
   "home_phase_suppressed": "Doğum kontrolü",
   "phase_suppressed": "doğum kontrolü döneminde",
   "cycle_settings_contraception": "Hormonal doğum kontrolü kullanıyorum",
-  "cycle_settings_contraception_desc": "Hap, hormonal spiral, implant veya iğne. Açtığında yumurtlama ve doğurganlık tahmini gösterilmez — bu yöntemler çoğunlukla yumurtlamayı baskılar."
+  "cycle_settings_contraception_desc": "Hap, hormonal spiral, implant veya iğne. Açtığında yumurtlama ve doğurganlık tahmini gösterilmez — bu yöntemler çoğunlukla yumurtlamayı baskılar.",
+  "bleeding_check_title": "Kanamam yoğun mu?",
+  "bleeding_check_intro": "Kanamanın \"yoğun\" sayılıp sayılmadığı kişiden kişiye çok değişir. Aşağıdakiler NHS'in listelediği somut işaretler — sana uyanları işaretle.",
+  "bleeding_sign_frequent_changes": "Pedimi veya tamponumu 1–2 saatte bir değiştiriyorum",
+  "bleeding_sign_double_protection": "Aynı anda birden fazla ürün kullanıyorum (ped + tampon gibi)",
+  "bleeding_sign_longer_than_seven": "Kanamam 7 günden uzun sürüyor",
+  "bleeding_sign_large_clots": "Yaklaşık 2,5 cm'den büyük pıhtı geliyor",
+  "bleeding_sign_flooding": "Giysime veya yatağıma taşıyor",
+  "bleeding_sign_limits_life": "Kanama yüzünden günlük işlerimi bırakıyorum veya işe gidemiyorum",
+  "bleeding_sign_tiredness": "Yanında yorgunluk veya nefes darlığı oluyor",
+  "bleeding_check_result_title": "Bir hekime danışmanı öneririz",
+  "bleeding_check_result_body": "İşaretlediklerin yoğun kanama tanımına giriyor. Bu tek başına bir teşhis değil ama değerlendirilmeye değer — yoğun kanamanın tedavi edilebilir birçok nedeni var.",
+  "bleeding_check_iron_title": "Demir düzeyini de kontrol ettir",
+  "bleeding_check_iron_body": "Yoğun kanamaya yorgunluk eşlik ediyor. Yoğun regl, demir eksikliği anemisinin en yaygın nedenlerinden biri ve basit bir kan testiyle anlaşılır.",
+  "bleeding_check_none_title": "Henüz bir şey işaretlemedin",
+  "bleeding_check_none_body": "Sana uyan bir madde varsa işaretle. Hiçbiri uymuyorsa kanaman büyük olasılıkla olağan aralıkta.",
+  "profile_bleeding_check": "Kanama değerlendirmesi"
 }

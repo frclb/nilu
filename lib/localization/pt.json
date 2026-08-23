@@ -739,5 +739,21 @@
   "home_phase_suppressed": "Contraceção",
   "phase_suppressed": "sob contraceção",
   "cycle_settings_contraception": "Uso contraceção hormonal",
-  "cycle_settings_contraception_desc": "Pílula, DIU hormonal, implante ou injeção. Quando ativo, as estimativas de ovulação e fertilidade ficam ocultas — estes métodos costumam suprimir a ovulação."
+  "cycle_settings_contraception_desc": "Pílula, DIU hormonal, implante ou injeção. Quando ativo, as estimativas de ovulação e fertilidade ficam ocultas — estes métodos costumam suprimir a ovulação.",
+  "bleeding_check_title": "O meu sangramento é intenso?",
+  "bleeding_check_intro": "O que conta como \"intenso\" varia muito de pessoa para pessoa. Abaixo estão os sinais concretos que o NHS lista — assinala os que se aplicam a ti.",
+  "bleeding_sign_frequent_changes": "Mudo o penso ou o tampão a cada 1–2 horas",
+  "bleeding_sign_double_protection": "Uso mais do que um produto ao mesmo tempo (penso e tampão, por exemplo)",
+  "bleeding_sign_longer_than_seven": "O meu sangramento dura mais de 7 dias",
+  "bleeding_sign_large_clots": "Tenho coágulos maiores do que cerca de 2,5 cm",
+  "bleeding_sign_flooding": "Passa para a roupa ou para a cama",
+  "bleeding_sign_limits_life": "Deixo de fazer coisas ou falto ao trabalho por causa do sangramento",
+  "bleeding_sign_tiredness": "Vem acompanhado de cansaço ou falta de ar",
+  "bleeding_check_result_title": "Vale a pena consultar",
+  "bleeding_check_result_body": "O que assinalaste encaixa na descrição de sangramento intenso. Por si só não é um diagnóstico, mas vale a pena ser avaliado — o sangramento intenso tem muitas causas tratáveis.",
+  "bleeding_check_iron_title": "Pergunta também pelos teus níveis de ferro",
+  "bleeding_check_iron_body": "Sangramento intenso acompanhado de cansaço. Períodos intensos são uma das causas mais comuns de anemia por falta de ferro, e uma análise ao sangue simples deteta-o.",
+  "bleeding_check_none_title": "Ainda não assinalaste nada",
+  "bleeding_check_none_body": "Assinala o que se aplica a ti. Se nada se aplicar, o teu sangramento está muito provavelmente dentro do habitual.",
+  "profile_bleeding_check": "Avaliação do sangramento"
 }

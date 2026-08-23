@@ -739,5 +739,21 @@
   "home_phase_suppressed": "Contraception",
   "phase_suppressed": "while on contraception",
   "cycle_settings_contraception": "I use hormonal contraception",
-  "cycle_settings_contraception_desc": "Pill, hormonal IUD, implant or injection. When on, ovulation and fertility estimates are hidden — these methods usually suppress ovulation."
+  "cycle_settings_contraception_desc": "Pill, hormonal IUD, implant or injection. When on, ovulation and fertility estimates are hidden — these methods usually suppress ovulation.",
+  "bleeding_check_title": "Is my bleeding heavy?",
+  "bleeding_check_intro": "What counts as \"heavy\" varies a lot between people. Below are the concrete signs the NHS lists — tick the ones that apply to you.",
+  "bleeding_sign_frequent_changes": "I change my pad or tampon every 1–2 hours",
+  "bleeding_sign_double_protection": "I use more than one product at once (e.g. pad and tampon)",
+  "bleeding_sign_longer_than_seven": "My bleeding lasts longer than 7 days",
+  "bleeding_sign_large_clots": "I pass clots larger than about 2.5 cm",
+  "bleeding_sign_flooding": "It bleeds through onto my clothes or bedding",
+  "bleeding_sign_limits_life": "I skip activities or miss work because of the bleeding",
+  "bleeding_sign_tiredness": "It comes with tiredness or shortness of breath",
+  "bleeding_check_result_title": "Worth seeing a clinician",
+  "bleeding_check_result_body": "What you ticked fits the description of heavy bleeding. That is not a diagnosis on its own, but it is worth having looked at — heavy bleeding has many treatable causes.",
+  "bleeding_check_iron_title": "Ask about your iron levels too",
+  "bleeding_check_iron_body": "Heavy bleeding with tiredness alongside it. Heavy periods are one of the most common causes of iron deficiency anaemia, and a simple blood test shows it.",
+  "bleeding_check_none_title": "Nothing ticked yet",
+  "bleeding_check_none_body": "Tick anything that applies to you. If none of it does, your bleeding is most likely in the usual range.",
+  "profile_bleeding_check": "Bleeding check"
 }

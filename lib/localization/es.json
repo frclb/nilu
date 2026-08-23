@@ -739,5 +739,21 @@
   "home_phase_suppressed": "Anticoncepción",
   "phase_suppressed": "con anticoncepción",
   "cycle_settings_contraception": "Uso anticoncepción hormonal",
-  "cycle_settings_contraception_desc": "Píldora, DIU hormonal, implante o inyección. Al activarlo, se ocultan las estimaciones de ovulación y fertilidad: estos métodos suelen suprimir la ovulación."
+  "cycle_settings_contraception_desc": "Píldora, DIU hormonal, implante o inyección. Al activarlo, se ocultan las estimaciones de ovulación y fertilidad: estos métodos suelen suprimir la ovulación.",
+  "bleeding_check_title": "¿Mi sangrado es abundante?",
+  "bleeding_check_intro": "Lo que se considera \"abundante\" varía mucho de una persona a otra. Abajo están las señales concretas que enumera el NHS: marca las que te correspondan.",
+  "bleeding_sign_frequent_changes": "Cambio la compresa o el tampón cada 1–2 horas",
+  "bleeding_sign_double_protection": "Uso más de un producto a la vez (compresa y tampón, por ejemplo)",
+  "bleeding_sign_longer_than_seven": "Mi sangrado dura más de 7 días",
+  "bleeding_sign_large_clots": "Expulso coágulos de más de unos 2,5 cm",
+  "bleeding_sign_flooding": "Me traspasa la ropa o la cama",
+  "bleeding_sign_limits_life": "Dejo de hacer cosas o falto al trabajo por el sangrado",
+  "bleeding_sign_tiredness": "Va acompañado de cansancio o falta de aire",
+  "bleeding_check_result_title": "Conviene consultar",
+  "bleeding_check_result_body": "Lo que has marcado encaja con la descripción de sangrado abundante. Por sí solo no es un diagnóstico, pero merece que lo valoren: el sangrado abundante tiene muchas causas tratables.",
+  "bleeding_check_iron_title": "Pregunta también por tus niveles de hierro",
+  "bleeding_check_iron_body": "Sangrado abundante acompañado de cansancio. Las reglas abundantes son una de las causas más frecuentes de anemia por falta de hierro, y un análisis de sangre sencillo lo detecta.",
+  "bleeding_check_none_title": "Aún no has marcado nada",
+  "bleeding_check_none_body": "Marca lo que te corresponda. Si no te encaja nada, lo más probable es que tu sangrado esté en el rango habitual.",
+  "profile_bleeding_check": "Revisión del sangrado"
 }

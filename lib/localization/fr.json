@@ -739,5 +739,21 @@
   "home_phase_suppressed": "Contraception",
   "phase_suppressed": "sous contraception",
   "cycle_settings_contraception": "J'utilise une contraception hormonale",
-  "cycle_settings_contraception_desc": "Pilule, stérilet hormonal, implant ou injection. Une fois activé, les estimations d'ovulation et de fertilité sont masquées — ces méthodes suppriment généralement l'ovulation."
+  "cycle_settings_contraception_desc": "Pilule, stérilet hormonal, implant ou injection. Une fois activé, les estimations d'ovulation et de fertilité sont masquées — ces méthodes suppriment généralement l'ovulation.",
+  "bleeding_check_title": "Mes règles sont-elles abondantes ?",
+  "bleeding_check_intro": "Ce qui compte comme « abondant » varie beaucoup d'une personne à l'autre. Voici les signes concrets listés par le NHS — coche ceux qui te correspondent.",
+  "bleeding_sign_frequent_changes": "Je change de serviette ou de tampon toutes les 1 à 2 heures",
+  "bleeding_sign_double_protection": "J'utilise plusieurs protections en même temps (serviette et tampon par exemple)",
+  "bleeding_sign_longer_than_seven": "Mes saignements durent plus de 7 jours",
+  "bleeding_sign_large_clots": "J'ai des caillots de plus de 2,5 cm environ",
+  "bleeding_sign_flooding": "Ça traverse mes vêtements ou mes draps",
+  "bleeding_sign_limits_life": "Je renonce à des activités ou je manque le travail à cause des saignements",
+  "bleeding_sign_tiredness": "C'est accompagné de fatigue ou d'essoufflement",
+  "bleeding_check_result_title": "Une consultation est justifiée",
+  "bleeding_check_result_body": "Ce que tu as coché correspond à la description de règles abondantes. Ce n'est pas un diagnostic en soi, mais cela mérite d'être examiné — les règles abondantes ont de nombreuses causes traitables.",
+  "bleeding_check_iron_title": "Fais aussi vérifier ton fer",
+  "bleeding_check_iron_body": "Des saignements abondants accompagnés de fatigue. Les règles abondantes sont l'une des causes les plus fréquentes d'anémie par carence en fer, et une simple prise de sang le montre.",
+  "bleeding_check_none_title": "Rien de coché pour l'instant",
+  "bleeding_check_none_body": "Coche ce qui te correspond. Si rien ne s'applique, tes saignements sont très probablement dans la fourchette habituelle.",
+  "profile_bleeding_check": "Bilan des saignements"
 }

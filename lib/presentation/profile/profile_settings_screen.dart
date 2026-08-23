@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../health_check/heavy_bleeding_screen.dart';
 import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -77,6 +78,22 @@ class ProfileSettingsScreen extends StatelessWidget {
                     onTap: () {
                       context.pushNamed(RouteNames.cycleSettings);
                     },
+                  ),
+                  // Yoğun kanama kendini değerlendirme aracı.
+                  //
+                  // Uygulama akış yoğunluğunu zaten soruyordu ama "ağır"
+                  // herkes için farklı bir şey; NHS'in somut ölçütleri
+                  // karşılaştırılabilir bir zemin veriyor.
+                  SettingsItem(
+                    title: context.tr('profile_bleeding_check'),
+                    icon: Icons.monitor_heart_outlined,
+                    iconColor: Theme.of(context).colorScheme.primary,
+                    iconBgColor: context.tokens.brandTint,
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const HeavyBleedingScreen(),
+                      ),
+                    ),
                   ),
                   // Dynamic Partner Settings Item
                   if (context.watch<UserViewModel>().hasPartner)

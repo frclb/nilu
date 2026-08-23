@@ -739,5 +739,21 @@
   "home_phase_suppressed": "Verhütung",
   "phase_suppressed": "während der Verhütung",
   "cycle_settings_contraception": "Ich verhüte hormonell",
-  "cycle_settings_contraception_desc": "Pille, Hormonspirale, Implantat oder Spritze. Wenn aktiv, werden Eisprung- und Fruchtbarkeitsschätzungen ausgeblendet — diese Methoden unterdrücken meist den Eisprung."
+  "cycle_settings_contraception_desc": "Pille, Hormonspirale, Implantat oder Spritze. Wenn aktiv, werden Eisprung- und Fruchtbarkeitsschätzungen ausgeblendet — diese Methoden unterdrücken meist den Eisprung.",
+  "bleeding_check_title": "Ist meine Blutung stark?",
+  "bleeding_check_intro": "Was als \"stark\" gilt, ist von Mensch zu Mensch sehr verschieden. Unten stehen die konkreten Anzeichen, die der NHS nennt — hake an, was auf dich zutrifft.",
+  "bleeding_sign_frequent_changes": "Ich wechsle Binde oder Tampon alle 1–2 Stunden",
+  "bleeding_sign_double_protection": "Ich nutze mehrere Produkte gleichzeitig (z. B. Binde und Tampon)",
+  "bleeding_sign_longer_than_seven": "Meine Blutung dauert länger als 7 Tage",
+  "bleeding_sign_large_clots": "Ich habe Klumpen größer als etwa 2,5 cm",
+  "bleeding_sign_flooding": "Es blutet auf Kleidung oder Bettzeug durch",
+  "bleeding_sign_limits_life": "Ich lasse Aktivitäten aus oder fehle bei der Arbeit wegen der Blutung",
+  "bleeding_sign_tiredness": "Es kommt mit Müdigkeit oder Kurzatmigkeit",
+  "bleeding_check_result_title": "Ein Arztbesuch lohnt sich",
+  "bleeding_check_result_body": "Was du angehakt hast, passt zur Beschreibung starker Blutung. Das ist für sich genommen keine Diagnose, aber es lohnt sich abzuklären — starke Blutungen haben viele behandelbare Ursachen.",
+  "bleeding_check_iron_title": "Frag auch nach deinen Eisenwerten",
+  "bleeding_check_iron_body": "Starke Blutung zusammen mit Müdigkeit. Starke Perioden sind eine der häufigsten Ursachen für Eisenmangelanämie, und ein einfacher Bluttest zeigt sie.",
+  "bleeding_check_none_title": "Noch nichts angehakt",
+  "bleeding_check_none_body": "Hake an, was auf dich zutrifft. Wenn nichts davon passt, liegt deine Blutung höchstwahrscheinlich im üblichen Bereich.",
+  "profile_bleeding_check": "Blutungs-Check"
 }
