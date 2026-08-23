@@ -755,5 +755,13 @@
   "bleeding_check_iron_body": "Sangramento intenso acompanhado de cansaço. Períodos intensos são uma das causas mais comuns de anemia por falta de ferro, e uma análise ao sangue simples deteta-o.",
   "bleeding_check_none_title": "Ainda não assinalaste nada",
   "bleeding_check_none_body": "Assinala o que se aplica a ti. Se nada se aplicar, o teu sangramento está muito provavelmente dentro do habitual.",
-  "profile_bleeding_check": "Avaliação do sangramento"
+  "profile_bleeding_check": "Avaliação do sangramento",
+  "alert_section_title": "Algo em que reparar",
+  "alert_short_title": "Os teus ciclos são sempre mais curtos do que 24 dias",
+  "alert_short_body": "Todos os ciclos nos teus registos ficam abaixo de 24 dias. Pode haver muitas causas; vale a pena perguntar a um profissional.",
+  "alert_long_title": "Os teus ciclos são sempre mais longos do que 38 dias",
+  "alert_long_body": "Todos os ciclos nos teus registos ultrapassam os 38 dias. Períodos pouco frequentes ou irregulares merecem ser avaliados.",
+  "alert_variable_title": "A duração dos teus ciclos varia de forma notória",
+  "alert_variable_body": "Há mais de 8 dias entre o teu ciclo mais curto e o mais longo. O stress, o sono e as viagens explicam parte da variação; uma mudança repentina merece uma pergunta.",
+  "alert_disclaimer": "Isto não é um diagnóstico. A aplicação olha apenas para as datas que registaste."
 }

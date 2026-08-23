@@ -755,5 +755,13 @@
   "bleeding_check_iron_body": "Starke Blutung zusammen mit Müdigkeit. Starke Perioden sind eine der häufigsten Ursachen für Eisenmangelanämie, und ein einfacher Bluttest zeigt sie.",
   "bleeding_check_none_title": "Noch nichts angehakt",
   "bleeding_check_none_body": "Hake an, was auf dich zutrifft. Wenn nichts davon passt, liegt deine Blutung höchstwahrscheinlich im üblichen Bereich.",
-  "profile_bleeding_check": "Blutungs-Check"
+  "profile_bleeding_check": "Blutungs-Check",
+  "alert_section_title": "Etwas, das dir auffallen sollte",
+  "alert_short_title": "Deine Zyklen sind durchgehend kürzer als 24 Tage",
+  "alert_short_body": "Jeder Zyklus in deinen Einträgen liegt unter 24 Tagen. Dafür gibt es viele mögliche Gründe; frag am besten in der Praxis nach.",
+  "alert_long_title": "Deine Zyklen sind durchgehend länger als 38 Tage",
+  "alert_long_body": "Jeder Zyklus in deinen Einträgen liegt über 38 Tagen. Seltene oder unregelmäßige Perioden sollten abgeklärt werden.",
+  "alert_variable_title": "Deine Zykluslänge schwankt deutlich",
+  "alert_variable_body": "Zwischen deinem kürzesten und längsten Zyklus liegen mehr als 8 Tage. Stress, Schlaf und Reisen erklären einen Teil davon; bei einer plötzlichen Änderung lohnt sich eine Nachfrage.",
+  "alert_disclaimer": "Das ist keine Diagnose. Die App schaut nur auf die von dir eingetragenen Daten."
 }

@@ -755,5 +755,13 @@
   "bleeding_check_iron_body": "Sangrado abundante acompañado de cansancio. Las reglas abundantes son una de las causas más frecuentes de anemia por falta de hierro, y un análisis de sangre sencillo lo detecta.",
   "bleeding_check_none_title": "Aún no has marcado nada",
   "bleeding_check_none_body": "Marca lo que te corresponda. Si no te encaja nada, lo más probable es que tu sangrado esté en el rango habitual.",
-  "profile_bleeding_check": "Revisión del sangrado"
+  "profile_bleeding_check": "Revisión del sangrado",
+  "alert_section_title": "Algo en lo que fijarte",
+  "alert_short_title": "Tus ciclos duran siempre menos de 24 días",
+  "alert_short_body": "Todos los ciclos de tus registros están por debajo de 24 días. Puede haber muchas causas; conviene preguntarlo a un profesional.",
+  "alert_long_title": "Tus ciclos duran siempre más de 38 días",
+  "alert_long_body": "Todos los ciclos de tus registros superan los 38 días. Las reglas infrecuentes o irregulares merecen valoración.",
+  "alert_variable_title": "La duración de tus ciclos varía de forma notable",
+  "alert_variable_body": "Hay más de 8 días de diferencia entre tu ciclo más corto y el más largo. El estrés, el sueño y los viajes explican parte de la variación; un cambio repentino merece una consulta.",
+  "alert_disclaimer": "Esto no es un diagnóstico. La aplicación solo mira las fechas que has registrado."
 }

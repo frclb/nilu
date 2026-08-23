@@ -755,5 +755,13 @@
   "bleeding_check_iron_body": "Yoğun kanamaya yorgunluk eşlik ediyor. Yoğun regl, demir eksikliği anemisinin en yaygın nedenlerinden biri ve basit bir kan testiyle anlaşılır.",
   "bleeding_check_none_title": "Henüz bir şey işaretlemedin",
   "bleeding_check_none_body": "Sana uyan bir madde varsa işaretle. Hiçbiri uymuyorsa kanaman büyük olasılıkla olağan aralıkta.",
-  "profile_bleeding_check": "Kanama değerlendirmesi"
+  "profile_bleeding_check": "Kanama değerlendirmesi",
+  "alert_section_title": "Dikkat etmen gereken bir şey",
+  "alert_short_title": "Döngülerin sürekli 24 günden kısa",
+  "alert_short_body": "Kayıtlarındaki döngülerin hepsi 24 günün altında. Bunun birçok nedeni olabilir; bir hekime danışman iyi olur.",
+  "alert_long_title": "Döngülerin sürekli 38 günden uzun",
+  "alert_long_body": "Kayıtlarındaki döngülerin hepsi 38 günün üzerinde. Seyrek ya da düzensiz regl değerlendirilmeye değer bir bulgudur.",
+  "alert_variable_title": "Döngü uzunluğun belirgin biçimde oynuyor",
+  "alert_variable_body": "En kısa ve en uzun döngün arasında 8 günden fazla fark var. Stres, uyku ve seyahat bir miktar oynamayı açıklar; ani bir değişim varsa hekime sormaya değer.",
+  "alert_disclaimer": "Bu bir teşhis değil. Uygulama yalnızca senin kaydettiğin tarihlere bakıyor."
 }

@@ -755,5 +755,13 @@
   "bleeding_check_iron_body": "Heavy bleeding with tiredness alongside it. Heavy periods are one of the most common causes of iron deficiency anaemia, and a simple blood test shows it.",
   "bleeding_check_none_title": "Nothing ticked yet",
   "bleeding_check_none_body": "Tick anything that applies to you. If none of it does, your bleeding is most likely in the usual range.",
-  "profile_bleeding_check": "Bleeding check"
+  "profile_bleeding_check": "Bleeding check",
+  "alert_section_title": "Something worth noticing",
+  "alert_short_title": "Your cycles are consistently shorter than 24 days",
+  "alert_short_body": "Every cycle in your records is under 24 days. There are many possible reasons; it is worth asking a clinician.",
+  "alert_long_title": "Your cycles are consistently longer than 38 days",
+  "alert_long_body": "Every cycle in your records is over 38 days. Infrequent or irregular periods are worth having looked at.",
+  "alert_variable_title": "Your cycle length varies noticeably",
+  "alert_variable_body": "There are more than 8 days between your shortest and longest cycle. Stress, sleep and travel explain some variation; a sudden change is worth asking about.",
+  "alert_disclaimer": "This is not a diagnosis. The app only looks at the dates you logged."
 }

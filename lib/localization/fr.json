@@ -755,5 +755,13 @@
   "bleeding_check_iron_body": "Des saignements abondants accompagnés de fatigue. Les règles abondantes sont l'une des causes les plus fréquentes d'anémie par carence en fer, et une simple prise de sang le montre.",
   "bleeding_check_none_title": "Rien de coché pour l'instant",
   "bleeding_check_none_body": "Coche ce qui te correspond. Si rien ne s'applique, tes saignements sont très probablement dans la fourchette habituelle.",
-  "profile_bleeding_check": "Bilan des saignements"
+  "profile_bleeding_check": "Bilan des saignements",
+  "alert_section_title": "Quelque chose à remarquer",
+  "alert_short_title": "Tes cycles font systématiquement moins de 24 jours",
+  "alert_short_body": "Tous les cycles de tes relevés durent moins de 24 jours. Les causes possibles sont nombreuses ; il vaut mieux en parler à un professionnel.",
+  "alert_long_title": "Tes cycles font systématiquement plus de 38 jours",
+  "alert_long_body": "Tous les cycles de tes relevés dépassent 38 jours. Des règles rares ou irrégulières méritent d'être examinées.",
+  "alert_variable_title": "La durée de tes cycles varie nettement",
+  "alert_variable_body": "Plus de 8 jours séparent ton cycle le plus court du plus long. Le stress, le sommeil et les voyages expliquent une part de cette variation ; un changement brusque mérite une question.",
+  "alert_disclaimer": "Ce n'est pas un diagnostic. L'application ne regarde que les dates que tu as saisies."
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../design_system/app_colors.dart';
 import 'widgets/insights_app_bar.dart';
+import 'widgets/cycle_alert_card.dart';
 import 'widgets/cycle_trend_card.dart';
 import 'widgets/symptom_analysis_card.dart';
 
@@ -27,6 +28,8 @@ class InsightsScreen extends StatelessWidget {
         ),
         child: Column(
           children: const [
+            // Uyarı varsa en üstte; yoksa hiç çizilmiyor.
+            CycleAlertCard(),
             CycleTrendCard(),
             SizedBox(height: 24),
             SymptomAnalysisCard(),
