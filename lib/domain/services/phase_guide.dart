@@ -82,6 +82,15 @@ class PhaseGuide {
       activityMinutes: 10,
       activity: PhaseActivity.meditation,
     ),
+    CyclePhase.suppressed: PhaseGuidance(
+      titleKey: 'phase_title_suppressed',
+      bodyKey: 'phase_body_suppressed',
+      tipKey: 'phase_tip_suppressed',
+      activityTitleKey: 'suggestion_wellness_title',
+      activityDescKey: 'suggestion_wellness_desc',
+      activityMinutes: 15,
+      activity: PhaseActivity.gentle,
+    ),
     CyclePhase.unknown: PhaseGuidance(
       titleKey: 'phase_title_unknown',
       bodyKey: 'phase_body_unknown',

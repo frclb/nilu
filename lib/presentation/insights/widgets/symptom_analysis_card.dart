@@ -189,6 +189,7 @@ class SymptomAnalysisCard extends StatelessWidget {
     CyclePhase.follicular => 'phase_follicular',
     CyclePhase.ovulation => 'phase_ovulation',
     CyclePhase.luteal => 'phase_luteal',
+    CyclePhase.suppressed => 'phase_suppressed',
     CyclePhase.unknown => 'phase_unknown',
   };
 }

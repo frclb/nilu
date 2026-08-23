@@ -28,6 +28,10 @@ class CalendarViewModel extends ChangeNotifier {
   int _userCycleLength = 28;
   int _userPeriodLength = 5;
   DateTime? _settingsUpdatedAt;
+  bool _hormonalContraception = false;
+
+  /// Hormonal doğum kontrolü açıkken doğurganlık tahmini gösterilmez.
+  bool get hormonalContraception => _hormonalContraception;
 
   List<PeriodLog> get periodLogs => _periodLogs;
   List<DailyLog> get dailyLogs => _dailyLogs;
@@ -52,6 +56,7 @@ class CalendarViewModel extends ChangeNotifier {
       _userCycleLength = await _settingsRepo.getCycleLength();
       _userPeriodLength = await _settingsRepo.getPeriodLength();
       _settingsUpdatedAt = await _settingsRepo.getSettingsUpdatedAt();
+      _hormonalContraception = await _settingsRepo.getHormonalContraception();
 
       _recalculate();
     } catch (e) {
@@ -198,6 +203,7 @@ class CalendarViewModel extends ChangeNotifier {
       userCycleLength: _userCycleLength,
       userPeriodLength: _userPeriodLength,
       settingsUpdatedAt: _settingsUpdatedAt,
+      hormonalContraception: _hormonalContraception,
     );
     _publishWidget();
   }

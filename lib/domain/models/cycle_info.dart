@@ -4,6 +4,16 @@ enum CyclePhase {
   follicular, // Foliküler faz (regl sonrası → ovulasyon öncesi)
   ovulation, // Ovulasyon penceresi
   luteal, // Luteal faz (ovulasyon sonrası → sonraki regl)
+  /// Hormonal doğum kontrolü nedeniyle evre izlenmiyor.
+  ///
+  /// Kombine hap, hormonal spiral, implant ve iğne çoğunlukla yumurtlamayı
+  /// baskılar; hormon seviyelerini doğal döngü değil ilaç belirler. Bu
+  /// durumda foliküler/luteal ayrımı ve doğurganlık penceresi anlamını
+  /// yitirir. Uygulama bunları göstermeye devam etseydi kullanıcıya
+  /// olmayan bir yumurtlama günü ve yanlış bir doğurganlık penceresi
+  /// göstermiş olurdu.
+  suppressed,
+
   unknown, // Veri yok
 }
 
@@ -20,6 +30,12 @@ class CycleInfo {
   /// İleri döngü tahminleri (gelecek 3 döngü)
   final List<PredictedCycle> futurePredictions;
 
+  /// Doğurganlık tahmini üretiliyor mu?
+  ///
+  /// Hormonal doğum kontrolünde `false`: yumurtlama günü ve doğurganlık
+  /// penceresi hesaplanmaz, takvimde işaretlenmez.
+  final bool fertilityTracked;
+
   CycleInfo({
     this.averageCycleLength = 28,
     this.averagePeriodLength = 5,
@@ -29,6 +45,7 @@ class CycleInfo {
     this.fertileWindowEnd,
     this.ovulationDay,
     this.futurePredictions = const [],
+    this.fertilityTracked = true,
   });
 
   /// Bugünkü döngü gününü hesaplar.
@@ -82,6 +99,11 @@ class CycleInfo {
     if (cycleDay <= averagePeriodLength) {
       return CyclePhase.menstruation;
     }
+
+    // Hormonal doğum kontrolünde kanama dışındaki günler için evre
+    // belirtilmez: yumurtlama baskılandığı için foliküler/luteal ayrımı
+    // gerçeği yansıtmaz.
+    if (!fertilityTracked) return CyclePhase.suppressed;
 
     // Ovulasyon günü hesapla
     final ovulationDayNum = averageCycleLength - 14;
@@ -174,6 +196,7 @@ class CycleInfo {
   }
 
   bool isFertile(DateTime date) {
+    if (!fertilityTracked) return false;
     if (fertileWindowStart == null || fertileWindowEnd == null) return false;
     if (_isBetween(date, fertileWindowStart!, fertileWindowEnd!)) return true;
 

@@ -25,11 +25,16 @@ class PredictionService {
   /// (yeterli log verisi yoksa kullanılır).
   /// [settingsUpdatedAt]: Ayarların değiştirildiği tarih. Bu tarihten sonraki
   /// tahminlerde yeni değerler, öncekinde hesaplanan ortalamalar kullanılır.
+  /// [hormonalContraception] açıkken yumurtalık ve doğurganlık penceresi
+  /// **hiç hesaplanmaz**. Bunları ekranlarda tek tek gizlemek yerine burada
+  /// üretmemek daha güvenli: yeni bir ekran eklendiğinde de gizlemeyi
+  /// unutma riski kalmıyor.
   CycleInfo getCycleInfo(
     List<PeriodLog> logs, {
     int userCycleLength = 28,
     int userPeriodLength = 5,
     DateTime? settingsUpdatedAt,
+    bool hormonalContraception = false,
   }) {
     final avgLength = _cycleService.calculateAverageCycleLength(
       logs,
@@ -69,6 +74,7 @@ class PredictionService {
       return CycleInfo(
         averageCycleLength: effectiveCycleLength,
         averagePeriodLength: effectivePeriodLength,
+        fertilityTracked: !hormonalContraception,
       );
     }
 
@@ -77,11 +83,15 @@ class PredictionService {
     // Yumurtlama luteal faza göre hesaplanır: bir sonraki reglden 14 gün önce,
     // yani döngü başlangıcından `uzunluk - 14` gün sonra. Luteal faz kişiden
     // kişiye pek değişmez, değişen foliküler fazdır.
-    final ovulation = _ovulationFor(lastStart, effectiveCycleLength);
+    final tracksFertility = !hormonalContraception;
+
+    final ovulation = tracksFertility
+        ? _ovulationFor(lastStart, effectiveCycleLength)
+        : null;
 
     // Doğurganlık penceresi: Yumurtlama -5 gün → Yumurtlama +1 gün (tıbbi standart)
-    final fertileStart = ovulation.subtract(const Duration(days: 5));
-    final fertileEnd = ovulation.add(const Duration(days: 1));
+    final fertileStart = ovulation?.subtract(const Duration(days: 5));
+    final fertileEnd = ovulation?.add(const Duration(days: 1));
 
     // İleri döngü tahminleri.
     //
@@ -101,13 +111,15 @@ class PredictionService {
       final futureStart = lastStart.add(
         Duration(days: effectiveCycleLength * i),
       );
-      final futureOvulation = _ovulationFor(futureStart, effectiveCycleLength);
+      final futureOvulation = tracksFertility
+          ? _ovulationFor(futureStart, effectiveCycleLength)
+          : null;
       futurePredictions.add(
         PredictedCycle(
           startDate: futureStart,
           ovulationDay: futureOvulation,
-          fertileStart: futureOvulation.subtract(const Duration(days: 5)),
-          fertileEnd: futureOvulation.add(const Duration(days: 1)),
+          fertileStart: futureOvulation?.subtract(const Duration(days: 5)),
+          fertileEnd: futureOvulation?.add(const Duration(days: 1)),
         ),
       );
     }
@@ -121,6 +133,7 @@ class PredictionService {
       fertileWindowStart: fertileStart,
       fertileWindowEnd: fertileEnd,
       futurePredictions: futurePredictions,
+      fertilityTracked: tracksFertility,
     );
   }
 

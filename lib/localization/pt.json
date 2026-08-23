@@ -732,5 +732,12 @@
   "article_iron_b3": "Se tiveres estes sinais, consulta: a falta de ferro deteta-se com uma análise ao sangue simples, e vale a pena verificar se há algo além do sangramento por trás. Não comeces suplementos de ferro sem indicação médica — ferro de que não precisas pode ser prejudicial.",
   "article_sources": "Fontes",
   "article_disclaimer": "Isto é informação geral, não aconselhamento médico personalizado. Se algo te preocupa, fala com um profissional de saúde.",
-  "article_read_minutes": "{n} min de leitura"
+  "article_read_minutes": "{n} min de leitura",
+  "phase_title_suppressed": "Acompanhamento do ciclo",
+  "phase_body_suppressed": "As estimativas de ovulação e fertilidade estão ocultas porque usas contraceção hormonal. Estes métodos costumam suprimir a ovulação: os teus níveis hormonais são definidos pelo método, não por um ciclo natural.",
+  "phase_tip_suppressed": "Podes continuar a registar os dias de sangramento e os sintomas — se mudares de método ou notares algo irregular, esses registos dão-te algo concreto para mostrar.",
+  "home_phase_suppressed": "Contraceção",
+  "phase_suppressed": "sob contraceção",
+  "cycle_settings_contraception": "Uso contraceção hormonal",
+  "cycle_settings_contraception_desc": "Pílula, DIU hormonal, implante ou injeção. Quando ativo, as estimativas de ovulação e fertilidade ficam ocultas — estes métodos costumam suprimir a ovulação."
 }

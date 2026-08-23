@@ -732,5 +732,12 @@
   "article_iron_b3": "Bu belirtileri yaşıyorsan bir hekime danış: demir eksikliği basit bir kan testiyle anlaşılır ve kanamanın altında başka bir neden olup olmadığını değerlendirmek gerekir. Demir takviyesini hekim önerisi olmadan başlatma; gereksiz alınan demir zararlı olabilir.",
   "article_sources": "Kaynaklar",
   "article_disclaimer": "Bu içerik genel bilgilendirme amaçlıdır ve kişisel tıbbi tavsiye yerine geçmez. Endişen varsa bir sağlık uzmanına danış.",
-  "article_read_minutes": "{n} dk okuma"
+  "article_read_minutes": "{n} dk okuma",
+  "phase_title_suppressed": "Döngü Takibi",
+  "phase_body_suppressed": "Hormonal doğum kontrolü kullandığın için yumurtlama ve doğurganlık tahmini gösterilmiyor. Bu yöntemler çoğunlukla yumurtlamayı baskılar; hormon seviyelerini doğal döngü değil ilaç belirler.",
+  "phase_tip_suppressed": "Kanama günlerini ve belirtilerini kaydetmeye devam edebilirsin — yöntem değişirse ya da bir düzensizlik fark edersen bu kayıtlar hekimine gösterecek somut veri olur.",
+  "home_phase_suppressed": "Doğum kontrolü",
+  "phase_suppressed": "doğum kontrolü döneminde",
+  "cycle_settings_contraception": "Hormonal doğum kontrolü kullanıyorum",
+  "cycle_settings_contraception_desc": "Hap, hormonal spiral, implant veya iğne. Açtığında yumurtlama ve doğurganlık tahmini gösterilmez — bu yöntemler çoğunlukla yumurtlamayı baskılar."
 }

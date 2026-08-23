@@ -732,5 +732,12 @@
   "article_iron_b3": "Si tu as ces signes, consulte : une simple prise de sang met la carence en évidence, et il vaut la peine de vérifier qu'autre chose que les saignements n'est pas en cause. Ne commence pas de complément en fer sans avis médical — un fer dont tu n'as pas besoin peut être nocif.",
   "article_sources": "Sources",
   "article_disclaimer": "Ceci est une information générale, pas un avis médical personnel. Si quelque chose t'inquiète, parles-en à un professionnel de santé.",
-  "article_read_minutes": "{n} min de lecture"
+  "article_read_minutes": "{n} min de lecture",
+  "phase_title_suppressed": "Suivi du cycle",
+  "phase_body_suppressed": "Les estimations d'ovulation et de fertilité sont masquées parce que tu utilises une contraception hormonale. Ces méthodes suppriment généralement l'ovulation : ce sont elles, et non un cycle naturel, qui fixent tes taux hormonaux.",
+  "phase_tip_suppressed": "Tu peux continuer à noter les jours de saignement et les symptômes — en cas de changement de méthode ou d'irrégularité, ces relevés te donnent un élément concret à montrer.",
+  "home_phase_suppressed": "Contraception",
+  "phase_suppressed": "sous contraception",
+  "cycle_settings_contraception": "J'utilise une contraception hormonale",
+  "cycle_settings_contraception_desc": "Pilule, stérilet hormonal, implant ou injection. Une fois activé, les estimations d'ovulation et de fertilité sont masquées — ces méthodes suppriment généralement l'ovulation."
 }

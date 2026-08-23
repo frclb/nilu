@@ -9,6 +9,7 @@ class CycleSettingsRepository {
   static const String _cycleLengthKey = 'user_cycle_length';
   static const String _periodLengthKey = 'user_period_length';
   static const String _settingsUpdatedAtKey = 'settings_updated_at';
+  static const String _hormonalContraceptionKey = 'hormonal_contraception';
 
   static const int defaultCycleLength = 28;
   static const int defaultPeriodLength = 5;
@@ -57,6 +58,21 @@ class CycleSettingsRepository {
   /// Kayıtlı kanama süresini döndürür (varsayılan: 5).
   Future<int> getPeriodLength() async {
     return await _store.getInt(_periodLengthKey) ?? defaultPeriodLength;
+  }
+
+  /// Hormonal doğum kontrolü kullanılıyor mu?
+  ///
+  /// Açıkken yumurtlama ve doğurganlık penceresi tahmini üretilmez.
+  Future<bool> getHormonalContraception() async {
+    return await _store.getBool(_hormonalContraceptionKey) ?? false;
+  }
+
+  Future<void> setHormonalContraception(bool value) async {
+    await _store.setBool(_hormonalContraceptionKey, value);
+    await _store.setString(
+      _settingsUpdatedAtKey,
+      DateTime.now().toIso8601String(),
+    );
   }
 
   /// Ayarların en son değiştirildiği tarihi döndürür.

@@ -732,5 +732,12 @@
   "article_iron_b3": "If you have these signs, see a clinician: iron deficiency shows up on a simple blood test, and it is worth checking whether something other than bleeding is behind it. Do not start iron supplements without medical advice — iron you do not need can be harmful.",
   "article_sources": "Sources",
   "article_disclaimer": "This is general information, not personal medical advice. If something worries you, speak to a health professional.",
-  "article_read_minutes": "{n} min read"
+  "article_read_minutes": "{n} min read",
+  "phase_title_suppressed": "Cycle Tracking",
+  "phase_body_suppressed": "Ovulation and fertility estimates are hidden because you use hormonal contraception. These methods usually suppress ovulation, and your hormone levels are set by the medication rather than a natural cycle.",
+  "phase_tip_suppressed": "You can keep logging bleeding days and symptoms — if you change method or notice something irregular, those records give you something concrete to show a clinician.",
+  "home_phase_suppressed": "Contraception",
+  "phase_suppressed": "while on contraception",
+  "cycle_settings_contraception": "I use hormonal contraception",
+  "cycle_settings_contraception_desc": "Pill, hormonal IUD, implant or injection. When on, ovulation and fertility estimates are hidden — these methods usually suppress ovulation."
 }

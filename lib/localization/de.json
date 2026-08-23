@@ -732,5 +732,12 @@
   "article_iron_b3": "Wenn du diese Anzeichen hast, geh zur Ärztin oder zum Arzt: Eisenmangel zeigt sich in einem einfachen Bluttest, und es lohnt sich zu prüfen, ob etwas anderes als die Blutung dahintersteckt. Nimm kein Eisenpräparat ohne ärztlichen Rat — Eisen, das du nicht brauchst, kann schaden.",
   "article_sources": "Quellen",
   "article_disclaimer": "Das sind allgemeine Informationen, keine persönliche medizinische Beratung. Wenn dich etwas beunruhigt, sprich mit einer Fachperson.",
-  "article_read_minutes": "{n} Min. Lesezeit"
+  "article_read_minutes": "{n} Min. Lesezeit",
+  "phase_title_suppressed": "Zyklus-Tracking",
+  "phase_body_suppressed": "Eisprung- und Fruchtbarkeitsschätzungen werden ausgeblendet, weil du hormonell verhütest. Diese Methoden unterdrücken meist den Eisprung; deine Hormonspiegel bestimmt das Präparat, nicht ein natürlicher Zyklus.",
+  "phase_tip_suppressed": "Du kannst Blutungstage und Beschwerden weiter eintragen — wenn du die Methode wechselst oder etwas Unregelmäßiges bemerkst, hast du damit etwas Konkretes für die Praxis.",
+  "home_phase_suppressed": "Verhütung",
+  "phase_suppressed": "während der Verhütung",
+  "cycle_settings_contraception": "Ich verhüte hormonell",
+  "cycle_settings_contraception_desc": "Pille, Hormonspirale, Implantat oder Spritze. Wenn aktiv, werden Eisprung- und Fruchtbarkeitsschätzungen ausgeblendet — diese Methoden unterdrücken meist den Eisprung."
 }

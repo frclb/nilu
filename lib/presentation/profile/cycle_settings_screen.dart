@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import '../../design_system/app_palette.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
   final CycleSettingsRepository _settingsRepo = CycleSettingsRepository();
   int _cycleLength = 28;
   int _periodLength = 5;
+  bool _hormonalContraception = false;
   bool _isLoading = true;
 
   @override
@@ -29,9 +31,11 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
   Future<void> _loadSettings() async {
     final cycleLength = await _settingsRepo.getCycleLength();
     final periodLength = await _settingsRepo.getPeriodLength();
+    final contraception = await _settingsRepo.getHormonalContraception();
     setState(() {
       _cycleLength = cycleLength;
       _periodLength = periodLength;
+      _hormonalContraception = contraception;
       _isLoading = false;
     });
   }
@@ -42,6 +46,7 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
       cycleLength: _cycleLength,
       periodLength: _periodLength,
     );
+    await _settingsRepo.setHormonalContraception(_hormonalContraception);
 
     // CalendarViewModel'i yenile — yeni ayarlar yalnızca ileriye dönük uygulanır
     if (mounted) {
@@ -119,6 +124,49 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                   isDark: isDark,
                 ),
                 const SizedBox(height: 16),
+
+                // Hormonal doğum kontrolü.
+                //
+                // Bu yöntemler çoğunlukla yumurtlamayı baskılar. Bayrak
+                // açıkken tahmin katmanı yumurtlama ve doğurganlık penceresi
+                // **hiç üretmiyor**; öncesinde hap kullanan bir kullanıcıya
+                // da yumurtlama günü gösteriliyordu.
+                Container(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
+                  decoration: BoxDecoration(
+                    color: context.tokens.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: context.tokens.border),
+                  ),
+                  child: SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    value: _hormonalContraception,
+                    onChanged: (v) =>
+                        setState(() => _hormonalContraception = v),
+                    activeThumbColor: Theme.of(context).colorScheme.primary,
+                    title: Text(
+                      context.tr('cycle_settings_contraception'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: context.tokens.text,
+                      ),
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        context.tr('cycle_settings_contraception_desc'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          height: 1.5,
+                          color: context.tokens.textMuted,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
                 // Bilgi notu
                 Container(
                   padding: const EdgeInsets.all(12),

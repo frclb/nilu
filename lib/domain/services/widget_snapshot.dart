@@ -46,6 +46,7 @@ class WidgetSnapshot {
     CyclePhase.follicular => 'follicular',
     CyclePhase.ovulation => 'ovulation',
     CyclePhase.luteal => 'luteal',
+    CyclePhase.suppressed => 'suppressed',
     CyclePhase.unknown => 'unknown',
   };
 }

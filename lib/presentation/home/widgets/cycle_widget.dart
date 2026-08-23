@@ -27,7 +27,7 @@ class CycleWidget extends StatelessWidget {
 
     final phaseLabel = _getPhaseLabel(context, phase);
     final phaseIcon = _getPhaseIcon(phase);
-    final fertilityInfo = _getFertilityInfo(context, phase);
+    final fertilityInfo = _getFertilityInfo(context, phase, cycleInfo);
 
     return GestureDetector(
       onTap: () {
@@ -173,28 +173,30 @@ class CycleWidget extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: fertilityInfo.color,
-                  shape: BoxShape.circle,
+          if (fertilityInfo != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: fertilityInfo.color,
+                    shape: BoxShape.circle,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                fertilityInfo.label,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
+                const SizedBox(width: 6),
+                Text(
+                  fertilityInfo.label,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -210,6 +212,8 @@ class CycleWidget extends StatelessWidget {
         return context.tr('home_ovulation_phase');
       case CyclePhase.luteal:
         return context.tr('home_luteal_phase');
+      case CyclePhase.suppressed:
+        return context.tr('home_phase_suppressed');
       case CyclePhase.unknown:
         return context.tr('home_no_data_yet');
     }
@@ -225,12 +229,28 @@ class CycleWidget extends StatelessWidget {
         return Icons.sunny;
       case CyclePhase.luteal:
         return Icons.nights_stay;
+      case CyclePhase.suppressed:
+        return Icons.medication_outlined;
       case CyclePhase.unknown:
         return Icons.water_drop_outlined;
     }
   }
 
-  _FertilityInfo _getFertilityInfo(BuildContext context, CyclePhase phase) {
+  /// Doğurganlık göstergesi. Hormonal doğum kontrolünde `null`.
+  ///
+  /// Yumurtlama baskılanmışken "düşük/yüksek doğurganlık" demek uydurma bir
+  /// bilgi olurdu; satır tamamen gizleniyor.
+  ///
+  /// Karar evreye değil [CycleInfo.fertilityTracked]'e bakıyor: kanama
+  /// günlerinde evre hâlâ `menstruation` olduğu için evreye baksaydık hap
+  /// kullanan kullanıcıya regl günlerinde "düşük doğurganlık" yazmaya devam
+  /// ederdi.
+  _FertilityInfo? _getFertilityInfo(
+    BuildContext context,
+    CyclePhase phase,
+    CycleInfo cycleInfo,
+  ) {
+    if (!cycleInfo.fertilityTracked) return null;
     final color = phase.fertilityColor(context.tokens);
     return switch (phase) {
       CyclePhase.ovulation => _FertilityInfo(
@@ -241,10 +261,9 @@ class CycleWidget extends StatelessWidget {
         color: color,
         label: context.tr('home_medium_fertility'),
       ),
-      CyclePhase.luteal || CyclePhase.menstruation => _FertilityInfo(
-        color: color,
-        label: context.tr('home_low_fertility'),
-      ),
+      // `suppressed` yukarıda erken dönüyor; burada yalnızca tamlık için.
+      CyclePhase.suppressed || CyclePhase.luteal || CyclePhase.menstruation =>
+        _FertilityInfo(color: color, label: context.tr('home_low_fertility')),
       CyclePhase.unknown => _FertilityInfo(
         color: color,
         label: context.tr('home_no_data_yet'),

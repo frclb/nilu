@@ -17,6 +17,7 @@ extension CyclePhaseColors on CyclePhase {
     CyclePhase.follicular => t.phaseFollicular,
     CyclePhase.ovulation => t.ovulation,
     CyclePhase.luteal => t.phaseLuteal,
+    CyclePhase.suppressed => t.textMuted,
     CyclePhase.unknown => t.textFaint,
   };
 
@@ -31,6 +32,7 @@ extension CyclePhaseColors on CyclePhase {
     CyclePhase.follicular => t.ovulation.withAlpha(140),
     CyclePhase.luteal => t.textFaint,
     CyclePhase.menstruation => t.textFaint,
+    CyclePhase.suppressed => t.textFaint,
     CyclePhase.unknown => t.textFaint,
   };
 }

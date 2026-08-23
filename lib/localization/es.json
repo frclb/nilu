@@ -732,5 +732,12 @@
   "article_iron_b3": "Si tienes estas señales, consulta: la falta de hierro se detecta con un análisis de sangre sencillo, y conviene comprobar si hay algo distinto al sangrado detrás. No empieces suplementos de hierro sin indicación médica: el hierro que no necesitas puede ser perjudicial.",
   "article_sources": "Fuentes",
   "article_disclaimer": "Esto es información general, no consejo médico personal. Si algo te preocupa, habla con un profesional sanitario.",
-  "article_read_minutes": "{n} min de lectura"
+  "article_read_minutes": "{n} min de lectura",
+  "phase_title_suppressed": "Seguimiento del ciclo",
+  "phase_body_suppressed": "Las estimaciones de ovulación y fertilidad están ocultas porque usas anticoncepción hormonal. Estos métodos suelen suprimir la ovulación: tus niveles hormonales los marca el método, no un ciclo natural.",
+  "phase_tip_suppressed": "Puedes seguir registrando los días de sangrado y los síntomas: si cambias de método o notas algo irregular, esos registros te dan algo concreto que mostrar.",
+  "home_phase_suppressed": "Anticoncepción",
+  "phase_suppressed": "con anticoncepción",
+  "cycle_settings_contraception": "Uso anticoncepción hormonal",
+  "cycle_settings_contraception_desc": "Píldora, DIU hormonal, implante o inyección. Al activarlo, se ocultan las estimaciones de ovulación y fertilidad: estos métodos suelen suprimir la ovulación."
 }

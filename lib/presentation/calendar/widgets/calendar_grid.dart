@@ -216,16 +216,25 @@ class CalendarGrid extends StatelessWidget {
                   AppColors.flowLight,
                   context.tr('calendar_legend_predicted'),
                 ),
-                _buildLegendItem(
-                  context,
-                  isDark ? AppColors.secondaryPinkDark : AppColors.fertileLight,
-                  context.tr('calendar_legend_fertility'),
-                ),
-                _buildLegendItem(
-                  context,
-                  Colors.deepPurple.shade300,
-                  context.tr('calendar_legend_ovulation'),
-                ),
+                // Hormonal doğum kontrolünde takvimde doğurganlık ve
+                // yumurtlama işareti çizilmiyor; açıklama satırında da
+                // görünmemeli, yoksa var olmayan renkleri tarif ediyor.
+                if (context.select<CalendarViewModel, bool>(
+                  (v) => v.cycleInfo.fertilityTracked,
+                )) ...[
+                  _buildLegendItem(
+                    context,
+                    isDark
+                        ? AppColors.secondaryPinkDark
+                        : AppColors.fertileLight,
+                    context.tr('calendar_legend_fertility'),
+                  ),
+                  _buildLegendItem(
+                    context,
+                    context.tokens.ovulation,
+                    context.tr('calendar_legend_ovulation'),
+                  ),
+                ],
               ],
             ),
           ),
