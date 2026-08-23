@@ -763,5 +763,10 @@
   "alert_long_body": "Jeder Zyklus in deinen Einträgen liegt über 38 Tagen. Seltene oder unregelmäßige Perioden sollten abgeklärt werden.",
   "alert_variable_title": "Deine Zykluslänge schwankt deutlich",
   "alert_variable_body": "Zwischen deinem kürzesten und längsten Zyklus liegen mehr als 8 Tage. Stress, Schlaf und Reisen erklären einen Teil davon; bei einer plötzlichen Änderung lohnt sich eine Nachfrage.",
-  "alert_disclaimer": "Das ist keine Diagnose. Die App schaut nur auf die von dir eingetragenen Daten."
+  "alert_disclaimer": "Das ist keine Diagnose. Die App schaut nur auf die von dir eingetragenen Daten.",
+  "day_detail_pain": "Schmerzstärke",
+  "log_pain_mild": "Leicht",
+  "log_pain_moderate": "Mittel",
+  "log_pain_severe": "Stark",
+  "day_detail_pain_limited": "Die Schmerzen haben mich heute vom Alltag abgehalten"
 }

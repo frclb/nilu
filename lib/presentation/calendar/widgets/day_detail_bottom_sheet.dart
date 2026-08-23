@@ -78,6 +78,8 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
       flowIntensity: _currentLog.flowIntensity,
       moods: _currentLog.moods,
       sexualActivity: _currentLog.sexualActivity,
+      painLevel: _currentLog.painLevel,
+      painLimitedActivity: _currentLog.painLimitedActivity,
     );
     context.read<CalendarViewModel>().updateDailyLog(updatedLog);
   }
@@ -87,6 +89,11 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
     String? flowIntensity,
     List<String>? moods,
     String? sexualActivity,
+    // Ağrı seviyesi kaldırılabilmeli: `clearPain` olmadan `painLevel: null`
+    // "değiştirme" anlamına gelirdi ve seçim geri alınamazdı.
+    String? painLevel,
+    bool clearPain = false,
+    bool? painLimitedActivity,
   }) {
     setState(() {
       _currentLog = DailyLog(
@@ -96,6 +103,9 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
         flowIntensity: flowIntensity ?? _currentLog.flowIntensity,
         moods: moods ?? _currentLog.moods,
         sexualActivity: sexualActivity ?? _currentLog.sexualActivity,
+        painLevel: clearPain ? null : (painLevel ?? _currentLog.painLevel),
+        painLimitedActivity:
+            painLimitedActivity ?? _currentLog.painLimitedActivity,
       );
     });
     _save(); // Auto-save
@@ -181,18 +191,23 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                           ),
                         ),
                       ],
-                      const SizedBox(height: 4),
-                      Text(
-                        _getFertilityText(context, isFertile, isOvulation),
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: (isFertile || isOvulation)
-                              ? AppColors.moodOrangeText
-                              : theme.textTheme.bodySmall?.color,
-                          fontWeight: (isFertile || isOvulation)
-                              ? FontWeight.bold
-                              : FontWeight.normal,
+                      // Hormonal doğum kontrolünde doğurganlık satırı hiç
+                      // gösterilmiyor: yumurtlama baskılanmışken "düşük
+                      // doğurganlık" demek uydurma bir bilgi olurdu.
+                      if (viewModel.cycleInfo.fertilityTracked) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          _getFertilityText(context, isFertile, isOvulation),
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: (isFertile || isOvulation)
+                                ? AppColors.moodOrangeText
+                                : theme.textTheme.bodySmall?.color,
+                            fontWeight: (isFertile || isOvulation)
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -293,6 +308,57 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                       );
                     }).toList(),
                   ),
+
+                  const SizedBox(height: 24),
+
+                  // Ağrı şiddeti.
+                  //
+                  // Önceden ağrı yalnızca "kramp var/yok"tu; her ay bir gün
+                  // kramp giren kullanıcıyla her ay üç gün yatakta kalan
+                  // kullanıcı aynı görünüyordu.
+                  Text(
+                    context.tr('day_detail_pain'),
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: LogVocabulary.painLevels.map((code) {
+                      final isSelected = _currentLog.painLevel == code;
+                      return ChoiceChip(
+                        label: Text(
+                          context.tr(LogVocabulary.painLevelKey(code)),
+                        ),
+                        selected: isSelected,
+                        // Aynı seçeneğe tekrar dokunmak seçimi kaldırır.
+                        onSelected: (_) => _updateCurrentLog(
+                          painLevel: isSelected ? null : code,
+                          clearPain: isSelected,
+                        ),
+                        selectedColor: theme.colorScheme.primaryContainer,
+                      );
+                    }).toList(),
+                  ),
+
+                  // "Aktivitemi engelledi" — endometriozis için ayırt edici
+                  // olan, ağrının varlığı değil normal aktiviteyi durdurması.
+                  // Ağrı seçilmeden sormak anlamsız.
+                  if (_currentLog.painLevel != null) ...[
+                    const SizedBox(height: 4),
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      dense: true,
+                      value: _currentLog.painLimitedActivity,
+                      onChanged: (v) =>
+                          _updateCurrentLog(painLimitedActivity: v ?? false),
+                      title: Text(
+                        context.tr('day_detail_pain_limited'),
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ),
+                  ],
 
                   const SizedBox(height: 24),
 

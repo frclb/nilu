@@ -763,5 +763,10 @@
   "alert_long_body": "Todos os ciclos nos teus registos ultrapassam os 38 dias. Períodos pouco frequentes ou irregulares merecem ser avaliados.",
   "alert_variable_title": "A duração dos teus ciclos varia de forma notória",
   "alert_variable_body": "Há mais de 8 dias entre o teu ciclo mais curto e o mais longo. O stress, o sono e as viagens explicam parte da variação; uma mudança repentina merece uma pergunta.",
-  "alert_disclaimer": "Isto não é um diagnóstico. A aplicação olha apenas para as datas que registaste."
+  "alert_disclaimer": "Isto não é um diagnóstico. A aplicação olha apenas para as datas que registaste.",
+  "day_detail_pain": "Intensidade da dor",
+  "log_pain_mild": "Ligeira",
+  "log_pain_moderate": "Moderada",
+  "log_pain_severe": "Intensa",
+  "day_detail_pain_limited": "A dor impediu-me de fazer as atividades normais hoje"
 }

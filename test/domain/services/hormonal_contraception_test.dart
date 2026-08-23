@@ -72,6 +72,19 @@ void main() {
       }
     });
 
+    test('hiçbir gün yumurtlama günü işaretlenmez', () {
+      // `ovulationDay` null olduğu için doğal olarak false dönüyor; bu
+      // testin işi o davranışın sessizce bozulmasını engellemek.
+      final info = build(contraception: true);
+      for (var i = 0; i < 60; i++) {
+        expect(
+          info.isOvulationDay(start.add(Duration(days: i))),
+          isFalse,
+          reason: '${i + 1}. gün',
+        );
+      }
+    });
+
     test('regl günleri hâlâ regl olarak gösterilir', () {
       // Kanama takibi anlamını yitirmiyor; yalnızca doğurganlık yitiriyor.
       final info = build(contraception: true);

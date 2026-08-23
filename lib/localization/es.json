@@ -763,5 +763,10 @@
   "alert_long_body": "Todos los ciclos de tus registros superan los 38 días. Las reglas infrecuentes o irregulares merecen valoración.",
   "alert_variable_title": "La duración de tus ciclos varía de forma notable",
   "alert_variable_body": "Hay más de 8 días de diferencia entre tu ciclo más corto y el más largo. El estrés, el sueño y los viajes explican parte de la variación; un cambio repentino merece una consulta.",
-  "alert_disclaimer": "Esto no es un diagnóstico. La aplicación solo mira las fechas que has registrado."
+  "alert_disclaimer": "Esto no es un diagnóstico. La aplicación solo mira las fechas que has registrado.",
+  "day_detail_pain": "Intensidad del dolor",
+  "log_pain_mild": "Leve",
+  "log_pain_moderate": "Moderado",
+  "log_pain_severe": "Intenso",
+  "day_detail_pain_limited": "El dolor me impidió hacer mis actividades normales hoy"
 }

@@ -44,6 +44,11 @@ class LogVocabulary {
     'heavy',
   ];
 
+  /// Ağrı şiddeti. Sayısal bir ölçek yerine üç kademe: kullanıcıdan 0–10
+  /// arası bir sayı istemek kaydı zorlaştırıyor ve kişiden kişiye
+  /// karşılaştırılabilir olmuyor.
+  static const List<String> painLevels = ['mild', 'moderate', 'severe'];
+
   static const List<String> sexualActivities = [
     'none',
     'protected',
@@ -53,6 +58,8 @@ class LogVocabulary {
   // ─── Lokalizasyon anahtarları ───
 
   static String symptomKey(String code) => 'log_symptom_$code';
+
+  static String painLevelKey(String code) => 'log_pain_$code';
   static String moodKey(String code) => 'log_mood_$code';
   static String flowKey(String code) => 'log_flow_$code';
   static String sexualActivityKey(String code) => 'log_sex_$code';

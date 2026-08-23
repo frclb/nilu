@@ -763,5 +763,10 @@
   "alert_long_body": "Kayıtlarındaki döngülerin hepsi 38 günün üzerinde. Seyrek ya da düzensiz regl değerlendirilmeye değer bir bulgudur.",
   "alert_variable_title": "Döngü uzunluğun belirgin biçimde oynuyor",
   "alert_variable_body": "En kısa ve en uzun döngün arasında 8 günden fazla fark var. Stres, uyku ve seyahat bir miktar oynamayı açıklar; ani bir değişim varsa hekime sormaya değer.",
-  "alert_disclaimer": "Bu bir teşhis değil. Uygulama yalnızca senin kaydettiğin tarihlere bakıyor."
+  "alert_disclaimer": "Bu bir teşhis değil. Uygulama yalnızca senin kaydettiğin tarihlere bakıyor.",
+  "day_detail_pain": "Ağrı şiddeti",
+  "log_pain_mild": "Hafif",
+  "log_pain_moderate": "Orta",
+  "log_pain_severe": "Şiddetli",
+  "day_detail_pain_limited": "Ağrı bugün normal işlerimi engelledi"
 }

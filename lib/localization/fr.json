@@ -763,5 +763,10 @@
   "alert_long_body": "Tous les cycles de tes relevés dépassent 38 jours. Des règles rares ou irrégulières méritent d'être examinées.",
   "alert_variable_title": "La durée de tes cycles varie nettement",
   "alert_variable_body": "Plus de 8 jours séparent ton cycle le plus court du plus long. Le stress, le sommeil et les voyages expliquent une part de cette variation ; un changement brusque mérite une question.",
-  "alert_disclaimer": "Ce n'est pas un diagnostic. L'application ne regarde que les dates que tu as saisies."
+  "alert_disclaimer": "Ce n'est pas un diagnostic. L'application ne regarde que les dates que tu as saisies.",
+  "day_detail_pain": "Intensité de la douleur",
+  "log_pain_mild": "Légère",
+  "log_pain_moderate": "Modérée",
+  "log_pain_severe": "Forte",
+  "day_detail_pain_limited": "La douleur m'a empêchée de faire mes activités normales aujourd'hui"
 }

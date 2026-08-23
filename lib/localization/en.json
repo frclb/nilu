@@ -763,5 +763,10 @@
   "alert_long_body": "Every cycle in your records is over 38 days. Infrequent or irregular periods are worth having looked at.",
   "alert_variable_title": "Your cycle length varies noticeably",
   "alert_variable_body": "There are more than 8 days between your shortest and longest cycle. Stress, sleep and travel explain some variation; a sudden change is worth asking about.",
-  "alert_disclaimer": "This is not a diagnosis. The app only looks at the dates you logged."
+  "alert_disclaimer": "This is not a diagnosis. The app only looks at the dates you logged.",
+  "day_detail_pain": "Pain level",
+  "log_pain_mild": "Mild",
+  "log_pain_moderate": "Moderate",
+  "log_pain_severe": "Severe",
+  "day_detail_pain_limited": "The pain stopped me doing normal activities today"
 }
