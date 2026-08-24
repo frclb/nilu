@@ -768,5 +768,15 @@
   "log_pain_mild": "Leve",
   "log_pain_moderate": "Moderado",
   "log_pain_severe": "Intenso",
-  "day_detail_pain_limited": "El dolor me impidió hacer mis actividades normales hoy"
+  "day_detail_pain_limited": "El dolor me impidió hacer mis actividades normales hoy",
+  "export_section_clinical": "RESUMEN PARA LA CONSULTA",
+  "export_clinical_range": "Periodo registrado: {from} – {to}",
+  "export_clinical_cycles": "Ciclos observados: {n}",
+  "export_clinical_range_days": "Duración del ciclo: el más corto {min}, el más largo {max} días",
+  "export_clinical_period": "Duración del sangrado: media {avg}, máxima {max} días",
+  "export_clinical_heavy": "Días marcados como sangrado abundante: {n}",
+  "export_clinical_pain": "Días con dolor registrado: {total} (intenso: {severe})",
+  "export_clinical_limited": "Días en que el dolor impidió las actividades normales: {n}",
+  "export_clinical_symptoms": "Síntomas más frecuentes: {list}",
+  "export_pain_limited_short": "impidió las actividades normales"
 }

@@ -144,9 +144,15 @@ void main() {
         translate: _tr,
       );
 
+      // Yalnızca gün günlüğü bölümüne bakılıyor: muayene özeti en üstte
+      // kayıt aralığını (eskiden yeniye) yazıyor ve belgenin tamamında
+      // indeks karşılaştırması onu da sayardı.
+      final logSection = summary.substring(
+        summary.indexOf('export_section_logs'),
+      );
       expect(
-        summary.indexOf('2026-03-05'),
-        lessThan(summary.indexOf('2026-03-01')),
+        logSection.indexOf('2026-03-05'),
+        lessThan(logSection.indexOf('2026-03-01')),
       );
     });
 
@@ -173,6 +179,110 @@ void main() {
       );
 
       expect(summary, contains('ağrı kesici aldım'));
+    });
+  });
+
+  group('muayene özeti', () {
+    List<PeriodLog> cycles() => [
+      PeriodLog(
+        id: '1',
+        startDate: DateTime(2026, 1, 1),
+        endDate: DateTime(2026, 1, 5),
+      ),
+      PeriodLog(
+        id: '2',
+        startDate: DateTime(2026, 1, 29),
+        endDate: DateTime(2026, 2, 3),
+      ),
+      PeriodLog(
+        id: '3',
+        startDate: DateTime(2026, 2, 24),
+        endDate: DateTime(2026, 2, 28),
+      ),
+    ];
+
+    test('veri yokken özet bölümü hiç yazılmaz', () {
+      final out = DataExportService.buildSummary(
+        periodLogs: const [],
+        dailyLogs: const [],
+        generatedAt: DateTime(2026, 3, 1),
+        translate: _tr,
+      );
+      expect(out, isNot(contains('export_section_clinical')));
+    });
+
+    test('özet en başta, gün günlüğünden önce gelir', () {
+      // Hekim altmış satır günlük okumaz; toplu sayılar üstte olmalı.
+      final out = DataExportService.buildSummary(
+        periodLogs: cycles(),
+        dailyLogs: [
+          DailyLog(date: DateTime(2026, 1, 2), symptoms: const ['cramp']),
+        ],
+        generatedAt: DateTime(2026, 3, 1),
+        translate: _tr,
+      );
+      expect(
+        out.indexOf('export_section_clinical'),
+        lessThan(out.indexOf('export_section_logs')),
+      );
+    });
+
+    test('gözlenmiş döngü sayısı ve uçları yazılır', () {
+      final out = DataExportService.buildSummary(
+        periodLogs: cycles(),
+        dailyLogs: const [],
+        generatedAt: DateTime(2026, 3, 1),
+        translate: _tr,
+      );
+      expect(out, contains('export_clinical_cycles(n=2)'));
+      expect(out, contains('export_clinical_range_days(min=26,max=28)'));
+    });
+
+    test('ağrı sayıları yazılır', () {
+      final out = DataExportService.buildSummary(
+        periodLogs: cycles(),
+        dailyLogs: [
+          DailyLog(
+            date: DateTime(2026, 1, 2),
+            painLevel: 'severe',
+            painLimitedActivity: true,
+          ),
+          DailyLog(date: DateTime(2026, 1, 3), painLevel: 'mild'),
+        ],
+        generatedAt: DateTime(2026, 3, 1),
+        translate: _tr,
+      );
+      expect(out, contains('export_clinical_pain(total=2,severe=1)'));
+      expect(out, contains('export_clinical_limited(n=1)'));
+    });
+
+    test('ağrı kaydı yoksa ağrı satırı yazılmaz', () {
+      // Sıfır yazmak "ağrı yok" iddiası olur; kullanıcı sadece kaydetmemiş
+      // olabilir.
+      final out = DataExportService.buildSummary(
+        periodLogs: cycles(),
+        dailyLogs: const [],
+        generatedAt: DateTime(2026, 3, 1),
+        translate: _tr,
+      );
+      expect(out, isNot(contains('export_clinical_pain')));
+      expect(out, isNot(contains('export_clinical_limited')));
+    });
+
+    test('eşik dışı döngüde uyarı satırı görünür', () {
+      final short = [
+        PeriodLog(id: '1', startDate: DateTime(2026, 1, 1)),
+        PeriodLog(id: '2', startDate: DateTime(2026, 1, 21)),
+        PeriodLog(id: '3', startDate: DateTime(2026, 2, 10)),
+        PeriodLog(id: '4', startDate: DateTime(2026, 3, 1)),
+      ];
+      final out = DataExportService.buildSummary(
+        periodLogs: short,
+        dailyLogs: const [],
+        generatedAt: DateTime(2026, 3, 15),
+        translate: _tr,
+      );
+      expect(out, contains('alert_short_title'));
     });
   });
 }

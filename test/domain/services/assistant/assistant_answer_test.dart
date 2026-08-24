@@ -63,9 +63,12 @@ void main() {
     final periods = [period(6, 1), period(6, 29), period(7, 27)];
 
     test('sonraki regl gün sayısı ve tarih verir', () {
+      // Enjekte edilen tarih 18 Ağustos, tahmin 24 Ağustos → 6 gün.
+      // Bu sayı artık duvar saatine değil verilen [now]'a bağlı.
       final a = answer(AssistantIntent.nextPeriod, periods: periods);
       expect(a.key, 'assistant_next_period');
       expect(a.params['date'], '2026-08-24');
+      expect(a.params['days'], '6');
     });
 
     test('döngü uzunluğu ortalamayı ve son döngüyü verir', () {

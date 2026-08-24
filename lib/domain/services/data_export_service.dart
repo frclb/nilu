@@ -1,5 +1,7 @@
 import '../models/daily_log.dart';
 import '../models/period_log.dart';
+import 'clinical_summary.dart';
+import 'cycle_alert.dart';
 import 'insights_service.dart';
 
 /// Kullanıcının verisini taşınabilir biçimlere çevirir.
@@ -26,6 +28,10 @@ class DataExportService {
     final cycles = InsightsService.cycleLengths(periodLogs, limit: 12);
     final average = InsightsService.averageLength(cycles);
     final variation = InsightsService.variation(cycles);
+    final clinical = ClinicalSummary.build(
+      periodLogs: periodLogs,
+      dailyLogs: dailyLogs,
+    );
 
     final buffer = StringBuffer()
       ..writeln(translate('export_title'))
@@ -36,6 +42,66 @@ class DataExportService {
         ),
       )
       ..writeln();
+
+    // ── Muayene özeti ──
+    //
+    // En başta duruyor: altmış satırlık gün günlüğü muayenede kimsenin
+    // okuyacağı bir şey değil. Hekimin sorduğu şey toplu.
+    if (clinical.hasData) {
+      buffer.writeln(translate('export_section_clinical'));
+
+      void line(String key, Map<String, String> params) =>
+          buffer.writeln('  ${translate(key, params: params)}');
+
+      if (clinical.firstLoggedDay != null && clinical.lastLoggedDay != null) {
+        line('export_clinical_range', {
+          'from': _formatDate(clinical.firstLoggedDay!),
+          'to': _formatDate(clinical.lastLoggedDay!),
+        });
+      }
+      if (clinical.observedCycles > 0) {
+        line('export_clinical_cycles', {'n': '${clinical.observedCycles}'});
+      }
+      if (clinical.shortestCycleDays != null &&
+          clinical.longestCycleDays != null) {
+        line('export_clinical_range_days', {
+          'min': '${clinical.shortestCycleDays}',
+          'max': '${clinical.longestCycleDays}',
+        });
+      }
+      if (clinical.averagePeriodDays != null) {
+        line('export_clinical_period', {
+          'avg': '${clinical.averagePeriodDays}',
+          'max': '${clinical.longestPeriodDays}',
+        });
+      }
+      if (clinical.heavyFlowDays > 0) {
+        line('export_clinical_heavy', {'n': '${clinical.heavyFlowDays}'});
+      }
+      if (clinical.painDays > 0) {
+        line('export_clinical_pain', {
+          'total': '${clinical.painDays}',
+          'severe': '${clinical.severePainDays}',
+        });
+      }
+      if (clinical.painLimitedDays > 0) {
+        line('export_clinical_limited', {'n': '${clinical.painLimitedDays}'});
+      }
+      if (clinical.topSymptoms.isNotEmpty) {
+        final names = clinical.topSymptoms
+            .map(
+              (f) =>
+                  '${translate('log_symptom_${f.code}')} '
+                  '(${f.dayCount})',
+            )
+            .join(', ');
+        line('export_clinical_symptoms', {'list': names});
+      }
+      for (final alert in clinical.alerts) {
+        buffer.writeln('  ! ${translate(CycleAlertService.titleKey(alert))}');
+      }
+      buffer.writeln();
+    }
 
     // ── Döngü özeti ──
     buffer.writeln(translate('export_section_cycles'));
@@ -73,19 +139,29 @@ class DataExportService {
         buffer.writeln('  ${_formatDate(log.date)}');
         if (log.flowIntensity != null) {
           buffer.writeln(
-            '    ${translate('log_flow_title')}: '
+            '    ${translate('log_flow_intensity')}: '
             '${translate('log_flow_${log.flowIntensity}')}',
           );
         }
         if (log.symptoms.isNotEmpty) {
           buffer.writeln(
-            '    ${translate('log_symptoms_title')}: '
+            '    ${translate('log_symptoms')}: '
             '${log.symptoms.map((s) => translate('log_symptom_$s')).join(', ')}',
+          );
+        }
+        final pain = log.painLevel;
+        if (pain != null) {
+          final limited = log.painLimitedActivity
+              ? ' — ${translate('export_pain_limited_short')}'
+              : '';
+          buffer.writeln(
+            '    ${translate('day_detail_pain')}: '
+            '${translate('log_pain_$pain')}$limited',
           );
         }
         if (log.moods.isNotEmpty) {
           buffer.writeln(
-            '    ${translate('log_mood_title')}: '
+            '    ${translate('log_mood')}: '
             '${log.moods.map((m) => translate('log_mood_$m')).join(', ')}',
           );
         }

@@ -768,5 +768,15 @@
   "log_pain_mild": "Leicht",
   "log_pain_moderate": "Mittel",
   "log_pain_severe": "Stark",
-  "day_detail_pain_limited": "Die Schmerzen haben mich heute vom Alltag abgehalten"
+  "day_detail_pain_limited": "Die Schmerzen haben mich heute vom Alltag abgehalten",
+  "export_section_clinical": "BEFUND-ZUSAMMENFASSUNG",
+  "export_clinical_range": "Erfasster Zeitraum: {from} – {to}",
+  "export_clinical_cycles": "Beobachtete Zyklen: {n}",
+  "export_clinical_range_days": "Zykluslänge: kürzester {min}, längster {max} Tage",
+  "export_clinical_period": "Blutungsdauer: durchschnittlich {avg}, längste {max} Tage",
+  "export_clinical_heavy": "Tage mit starker Blutung markiert: {n}",
+  "export_clinical_pain": "Tage mit erfassten Schmerzen: {total} (stark: {severe})",
+  "export_clinical_limited": "Tage, an denen Schmerzen den Alltag verhinderten: {n}",
+  "export_clinical_symptoms": "Häufigste Beschwerden: {list}",
+  "export_pain_limited_short": "verhinderte den Alltag"
 }

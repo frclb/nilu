@@ -66,7 +66,14 @@ class AssistantAnswerBuilder {
       return const AssistantAnswer('assistant_no_data', needsData: true);
     }
 
-    final days = info.daysUntilNextPeriod ?? 0;
+    // `info.daysUntilNextPeriod` içeride `DateTime.now()` okuyor; burada
+    // kullanılsaydı çağıranın verdiği [now] sessizce yok sayılırdı. Testte
+    // sabit bir tarih enjekte edilmesine rağmen cevap duvar saatine göre
+    // değişiyordu.
+    final today = DateTime(now.year, now.month, now.day);
+    final target = DateTime(next.year, next.month, next.day);
+    final days = target.difference(today).inDays.clamp(0, 1 << 31);
+
     return AssistantAnswer(
       days == 0 ? 'assistant_next_period_today' : 'assistant_next_period',
       params: {'days': '$days', 'date': _format(next)},

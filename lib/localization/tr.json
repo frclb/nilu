@@ -768,5 +768,15 @@
   "log_pain_mild": "Hafif",
   "log_pain_moderate": "Orta",
   "log_pain_severe": "Şiddetli",
-  "day_detail_pain_limited": "Ağrı bugün normal işlerimi engelledi"
+  "day_detail_pain_limited": "Ağrı bugün normal işlerimi engelledi",
+  "export_section_clinical": "MUAYENE ÖZETİ",
+  "export_clinical_range": "Kayıt aralığı: {from} – {to}",
+  "export_clinical_cycles": "Gözlenmiş döngü sayısı: {n}",
+  "export_clinical_range_days": "Döngü uzunluğu: en kısa {min}, en uzun {max} gün",
+  "export_clinical_period": "Kanama süresi: ortalama {avg}, en uzun {max} gün",
+  "export_clinical_heavy": "Yoğun akış işaretlenen gün: {n}",
+  "export_clinical_pain": "Ağrı kaydedilen gün: {total} (şiddetli: {severe})",
+  "export_clinical_limited": "Ağrının olağan etkinlikleri engellediği gün: {n}",
+  "export_clinical_symptoms": "En sık belirtiler: {list}",
+  "export_pain_limited_short": "olağan işleri engelledi"
 }

@@ -768,5 +768,15 @@
   "log_pain_mild": "Légère",
   "log_pain_moderate": "Modérée",
   "log_pain_severe": "Forte",
-  "day_detail_pain_limited": "La douleur m'a empêchée de faire mes activités normales aujourd'hui"
+  "day_detail_pain_limited": "La douleur m'a empêchée de faire mes activités normales aujourd'hui",
+  "export_section_clinical": "SYNTHÈSE POUR LA CONSULTATION",
+  "export_clinical_range": "Période saisie : {from} – {to}",
+  "export_clinical_cycles": "Cycles observés : {n}",
+  "export_clinical_range_days": "Durée des cycles : plus court {min}, plus long {max} jours",
+  "export_clinical_period": "Durée des saignements : moyenne {avg}, plus longue {max} jours",
+  "export_clinical_heavy": "Jours marqués saignements abondants : {n}",
+  "export_clinical_pain": "Jours avec douleur notée : {total} (fortes : {severe})",
+  "export_clinical_limited": "Jours où la douleur a empêché les activités normales : {n}",
+  "export_clinical_symptoms": "Symptômes les plus fréquents : {list}",
+  "export_pain_limited_short": "a empêché les activités normales"
 }

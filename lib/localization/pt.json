@@ -768,5 +768,15 @@
   "log_pain_mild": "Ligeira",
   "log_pain_moderate": "Moderada",
   "log_pain_severe": "Intensa",
-  "day_detail_pain_limited": "A dor impediu-me de fazer as atividades normais hoje"
+  "day_detail_pain_limited": "A dor impediu-me de fazer as atividades normais hoje",
+  "export_section_clinical": "RESUMO PARA A CONSULTA",
+  "export_clinical_range": "Período registado: {from} – {to}",
+  "export_clinical_cycles": "Ciclos observados: {n}",
+  "export_clinical_range_days": "Duração do ciclo: mais curto {min}, mais longo {max} dias",
+  "export_clinical_period": "Duração do sangramento: média {avg}, mais longa {max} dias",
+  "export_clinical_heavy": "Dias marcados como sangramento intenso: {n}",
+  "export_clinical_pain": "Dias com dor registada: {total} (intensa: {severe})",
+  "export_clinical_limited": "Dias em que a dor impediu as atividades normais: {n}",
+  "export_clinical_symptoms": "Sintomas mais frequentes: {list}",
+  "export_pain_limited_short": "impediu as atividades normais"
 }
