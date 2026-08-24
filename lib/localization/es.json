@@ -778,5 +778,9 @@
   "export_clinical_pain": "Días con dolor registrado: {total} (intenso: {severe})",
   "export_clinical_limited": "Días en que el dolor impidió las actividades normales: {n}",
   "export_clinical_symptoms": "Síntomas más frecuentes: {list}",
-  "export_pain_limited_short": "impidió las actividades normales"
+  "export_pain_limited_short": "impidió las actividades normales",
+  "partner_qr_gen_rotate": "Renovar código",
+  "partner_qr_gen_rotate_hint": "Al renovarlo, los códigos QR que compartiste antes dejan de funcionar.",
+  "partner_qr_gen_rotated": "Código renovado. Los códigos QR anteriores ya no funcionan.",
+  "partner_scan_error_unknown": "Este código ya no es válido. Pídele a tu pareja uno nuevo."
 }

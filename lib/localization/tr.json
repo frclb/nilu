@@ -778,5 +778,9 @@
   "export_clinical_pain": "Ağrı kaydedilen gün: {total} (şiddetli: {severe})",
   "export_clinical_limited": "Ağrının olağan etkinlikleri engellediği gün: {n}",
   "export_clinical_symptoms": "En sık belirtiler: {list}",
-  "export_pain_limited_short": "olağan işleri engelledi"
+  "export_pain_limited_short": "olağan işleri engelledi",
+  "partner_qr_gen_rotate": "Kodu yenile",
+  "partner_qr_gen_rotate_hint": "Yenilediğinde daha önce paylaştığın QR kodları çalışmaz.",
+  "partner_qr_gen_rotated": "Kod yenilendi. Eski QR kodları artık geçersiz.",
+  "partner_scan_error_unknown": "Bu kod artık geçerli değil. Partnerinden yeni bir kod istemen gerekiyor."
 }

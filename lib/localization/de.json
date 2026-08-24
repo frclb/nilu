@@ -778,5 +778,9 @@
   "export_clinical_pain": "Tage mit erfassten Schmerzen: {total} (stark: {severe})",
   "export_clinical_limited": "Tage, an denen Schmerzen den Alltag verhinderten: {n}",
   "export_clinical_symptoms": "Häufigste Beschwerden: {list}",
-  "export_pain_limited_short": "verhinderte den Alltag"
+  "export_pain_limited_short": "verhinderte den Alltag",
+  "partner_qr_gen_rotate": "Code erneuern",
+  "partner_qr_gen_rotate_hint": "Beim Erneuern funktionieren zuvor geteilte QR-Codes nicht mehr.",
+  "partner_qr_gen_rotated": "Code erneuert. Ältere QR-Codes funktionieren nicht mehr.",
+  "partner_scan_error_unknown": "Dieser Code ist nicht mehr gültig. Bitte deinen Partner um einen neuen."
 }

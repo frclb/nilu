@@ -102,39 +102,119 @@ class FirestoreDataSource {
     return _firestore.collection('intimacy').doc(partnerUid).snapshots();
   }
 
-  Future<void> savePartnerConnection(String uid, String partnerId) async {
+  // ── Eşleştirme ──
+  //
+  // Erişim `users/{uid}.partners` listesine bağlı ve o listeye yalnızca
+  // sahibi yazıyor. Önceki modelde her iki taraf da karşısının dokümanına
+  // yazıyordu; bu yüzden ayrılan taraf kendini geri ekleyebiliyor ve erişim
+  // gerçekten iptal edilemiyordu (bkz. firestore.rules).
+
+  /// Kullanıcının eşleştirme kodunu yayımlar.
+  ///
+  /// Kod QR'da paylaşılan şey; onu bilen sahibin UID'sini çözebilir. Eski kod
+  /// varsa siliniyor — kodu yenilemek daha önce paylaşılmış bütün QR'ları
+  /// geçersiz kılmalı.
+  Future<void> publishPairingToken(
+    String uid,
+    String token, {
+    String? previousToken,
+  }) async {
     if (!_available) return;
     try {
-      // Connect me to partner
-      await _firestore.collection('users').doc(uid).set({
-        'partnerId': partnerId,
-        'hasPartner': true,
-      }, SetOptions(merge: true));
-
-      // Connect partner to me
-      await _firestore.collection('users').doc(partnerId).set({
-        'partnerId': uid,
-        'hasPartner': true,
-      }, SetOptions(merge: true));
+      if (previousToken != null && previousToken != token) {
+        await _firestore
+            .collection('pairingTokens')
+            .doc(previousToken)
+            .delete();
+      }
+      await _firestore.collection('pairingTokens').doc(token).set({
+        'ownerUid': uid,
+      });
     } catch (e) {
-      debugPrint("Error saving partner connection: $e");
+      debugPrint('Error publishing pairing token: $e');
     }
   }
 
-  Future<void> disconnectPartner(String uid, String partnerId) async {
+  /// Kodu iptal eder. Bundan sonra o QR hiçbir işe yaramaz.
+  Future<void> revokePairingToken(String token) async {
     if (!_available) return;
     try {
-      await _firestore.collection('users').doc(uid).update({
-        'partnerId': FieldValue.delete(),
-        'hasPartner': false,
-      });
-
-      await _firestore.collection('users').doc(partnerId).update({
-        'partnerId': FieldValue.delete(),
-        'hasPartner': false,
-      });
+      await _firestore.collection('pairingTokens').doc(token).delete();
     } catch (e) {
-      debugPrint("Error disconnecting partner: $e");
+      debugPrint('Error revoking pairing token: $e');
+    }
+  }
+
+  /// Kodun sahibinin UID'sini çözer. Kod geçersizse `null`.
+  Future<String?> resolvePairingToken(String token) async {
+    if (!_available) return null;
+    try {
+      final doc = await _firestore.collection('pairingTokens').doc(token).get();
+      if (!doc.exists) return null;
+      return doc.data()?['ownerUid'] as String?;
+    } catch (e) {
+      debugPrint('Error resolving pairing token: $e');
+      return null;
+    }
+  }
+
+  /// Kodu okuyan taraf eşleştirme isteği bırakır.
+  ///
+  /// İstek tek başına erişim vermiyor; sahip onaylayana kadar hiçbir şey
+  /// okunamaz.
+  Future<void> requestPairing(String token, String requesterUid) async {
+    if (!_available) return;
+    try {
+      await _firestore
+          .collection('pairingTokens')
+          .doc(token)
+          .collection('requests')
+          .doc(requesterUid)
+          .set({'requestedAt': FieldValue.serverTimestamp()});
+    } catch (e) {
+      debugPrint('Error requesting pairing: $e');
+    }
+  }
+
+  /// Sahibin kendi eşleştirme isteklerini dinlemesi.
+  Stream<QuerySnapshot<Map<String, dynamic>>> watchPairingRequests(
+    String token,
+  ) {
+    if (!_available) {
+      return const Stream<QuerySnapshot<Map<String, dynamic>>>.empty();
+    }
+    return _firestore
+        .collection('pairingTokens')
+        .doc(token)
+        .collection('requests')
+        .snapshots();
+  }
+
+  /// Sahip erişimi verir: partneri **kendi** listesine ekler.
+  Future<void> approvePartner(String uid, String partnerUid) async {
+    if (!_available) return;
+    try {
+      await _firestore.collection('users').doc(uid).set({
+        'partners': FieldValue.arrayUnion([partnerUid]),
+        'hasPartner': true,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Error approving partner: $e');
+    }
+  }
+
+  /// Sahip erişimi geri alır.
+  ///
+  /// Karşı taraf kendini geri ekleyemez: liste sahibin dokümanında ve
+  /// kurallar yalnızca sahibin yazmasına izin veriyor. Asıl düzeltme bu.
+  Future<void> removePartner(String uid, String partnerUid) async {
+    if (!_available) return;
+    try {
+      await _firestore.collection('users').doc(uid).set({
+        'partners': FieldValue.arrayRemove([partnerUid]),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Error removing partner: $e');
     }
   }
 
@@ -146,13 +226,21 @@ class FirestoreDataSource {
   /// yakınlık verisini okumaya devam ediyordu; ve hem App Store hem Play
   /// Store, hesap silmenin sunucudaki veriyi de silmesini şart koşuyor.
   ///
-  /// Partner bağlantısı önce kesilir: doküman silinse bile karşı tarafın
-  /// profilinde asılı kalan `partnerId` temizlenmiş olur.
-  Future<void> deleteUserData(String uid, {String? partnerId}) async {
+  /// Partner erişimi önce geri alınır: doküman silinse bile karşı tarafta
+  /// asılı kalan bir izin bırakılmaz. Eşleştirme kodu da iptal edilir, aksi
+  /// hâlde hesap silindikten sonra paylaşılmış QR ortada kalırdı.
+  Future<void> deleteUserData(
+    String uid, {
+    String? partnerId,
+    String? pairingToken,
+  }) async {
     if (!_available) return;
     try {
       if (partnerId != null && partnerId.isNotEmpty) {
-        await disconnectPartner(uid, partnerId);
+        await removePartner(uid, partnerId);
+      }
+      if (pairingToken != null && pairingToken.isNotEmpty) {
+        await revokePairingToken(pairingToken);
       }
 
       // Alt koleksiyon dokümanı silmekle gitmiyor; logları tek tek sil.

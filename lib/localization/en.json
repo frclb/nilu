@@ -778,5 +778,9 @@
   "export_clinical_pain": "Days with pain logged: {total} (severe: {severe})",
   "export_clinical_limited": "Days pain stopped normal activities: {n}",
   "export_clinical_symptoms": "Most frequent symptoms: {list}",
-  "export_pain_limited_short": "stopped normal activities"
+  "export_pain_limited_short": "stopped normal activities",
+  "partner_qr_gen_rotate": "Refresh code",
+  "partner_qr_gen_rotate_hint": "Refreshing stops any QR code you shared earlier from working.",
+  "partner_qr_gen_rotated": "Code refreshed. Older QR codes no longer work.",
+  "partner_scan_error_unknown": "This code is no longer valid. Ask your partner for a new one."
 }

@@ -3,46 +3,42 @@ rules_version = '2';
 // RCApp — Cloud Firestore güvenlik kuralları
 //
 // Veri modeli (lib/data/datasources/remote/firestore_datasource.dart):
-//   users/{uid}                -> profil, partnerId, hasPartner, fcmTokens
-//   users/{uid}/logs/{dateStr} -> günlük sağlık logları (HASSAS)
-//   intimacy/{uid}             -> yakınlık durumu (HASSAS)
+//   users/{uid}                  -> profil, partners, fcmTokens
+//   users/{uid}/logs/{dateStr}   -> günlük sağlık logları (HASSAS)
+//   intimacy/{uid}               -> yakınlık durumu (HASSAS)
+//   pairingTokens/{token}        -> eşleştirme kodu → sahip UID
 //
-// Temel ilke: kullanıcı yalnızca kendi verisine yazar. Tek istisna
-// eşleştirme akışıdır (aşağıda).
+// Temel ilke: kullanıcı yalnızca kendi verisine yazar. Erişim verme yetkisi
+// yalnızca verinin sahibinde.
 //
-// ⚠️ BİLİNEN AÇIK — eşleştirme geri alınamıyor.
+// ── Eşleştirme modeli ──
 //
-// Uygulama partner bağlantısını, karşı tarafın UID'sini QR kodla paylaşarak
-// kuruyor. UID pratikte bir "bearer token": UID'yi bilen herkes kendini
-// partner olarak bağlayabilir. Aşağıdaki kurallar hasarı sınırlar — bağlanan
-// taraf yalnızca `partnerId`/`hasPartner` alanlarına dokunabilir, log ve FCM
-// token'larına erişemez.
+// Önceki model UID'yi QR ile paylaşıyordu ve **iptal edilemiyordu**. UID
+// pratikte kalıcı bir bearer token'dı: `isLinkedPartnerOf` istekte bulunanın
+// kendi dokümanındaki `partnerId` alanına bakıyor, o alanı da istekte
+// bulunan yazabiliyordu. Sonuç:
 //
-// Sınırlayamadığı şey İPTAL. `isLinkedPartnerOf` istekte bulunanın KENDİ
-// dokümanındaki `partnerId` alanına bakıyor; o alanı da istekte bulunan
-// yazabiliyor (eşleştirme akışı buna dayanıyor). Sonuç:
+//   1. Kullanıcı partnerinden ayrılır, bağlantı iki tarafta da temizlenir.
+//   2. Eski partner `users/{kendi}.partnerId` alanına eski UID'yi yeniden
+//      yazar — kural buna izin veriyordu.
+//   3. Erişim geri gelir. UID hiç değişmediği için elindeki kod kalıcı
+//      olarak geçerliydi; yeni bir partner bağlamak da eskisini atmıyordu.
 //
-//   1. Kullanıcı partnerinden ayrılır; `disconnectPartner` iki dokümandaki
-//      bağlantıyı temizler.
-//   2. Eski partner `users/{kendi}.partnerId` alanına eski UID'yi tekrar
-//      yazar — kural buna izin veriyor.
-//   3. `intimacy/{uid}` yeniden okunabilir hâle gelir.
+// Şimdi erişim `users/{uid}.partners` listesine bağlı ve o listeye
+// **yalnızca sahibi** yazabiliyor. Ayrılma anında sahip listeden çıkarır ve
+// karşı taraf kendini geri ekleyemez.
 //
-// UID hiçbir zaman değişmediği (bkz. `UserViewModel.ensureMyId`) için eski
-// partnerin elindeki kod kalıcı olarak geçerli kalıyor. Yeni bir partner
-// bağlamak da eskisinin erişimini kaldırmıyor.
+// QR'da UID değil döndürülebilir bir kod var (bkz. `PairingToken`). Kod
+// yenilendiğinde daha önce paylaşılmış bütün QR'lar geçersiz olur.
 //
-// Bunu kurallarla kapatmak mümkün değil; eşleştirme modelinin değişmesi
-// gerekiyor. Önerilen: QR'a UID yerine **döndürülebilir** bir eşleştirme
-// kodu koymak ve erişimi, yalnızca sahibinin yazabildiği bir
-// `users/{uid}.partners` listesine bağlamak:
+// Eşleştirme akışı:
+//   1. Sahip bir kod üretir; `pairingTokens/{token}` sahibin UID'sini tutar.
+//   2. Karşı taraf kodu okur, `pairingTokens/{token}/requests/{kendiUid}`
+//      altına bir istek yazar.
+//   3. Sahip isteği görür ve onaylarsa kendi `partners` listesine ekler.
 //
-//   allow read: if request.auth.uid in
-//                 get(/databases/$(database)/documents/users/$(uid)).data.partners;
-//
-// Bu, ayrılma anında erişimi gerçekten koparır ve karşı taraf kendini geri
-// ekleyemez. Karşılığı: eşleştirme sırasında sahibin onayı gerekir
-// (her iki taraf çevrimiçi ya da bir Cloud Function).
+// Üçüncü adım sahibin onayını gerektiriyor — bedeli bu. Karşılığında erişim
+// gerçekten geri alınabiliyor.
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -55,24 +51,17 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == uid;
     }
 
-    // İstek sahibinin kendi profilinde kayıtlı partneri {uid} mi?
-    function isLinkedPartnerOf(uid) {
+    // İstekte bulunan, {uid}'nin **kendi yazdığı** partner listesinde mi?
+    //
+    // Kritik fark: bakılan liste veri sahibinin dokümanında ve o dokümana
+    // yalnızca sahibi yazabiliyor. İstekte bulunan kendini bu listeye
+    // ekleyemez.
+    function isApprovedPartnerOf(uid) {
       return isSignedIn()
-        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
-        && get(/databases/$(database)/documents/users/$(request.auth.uid))
-             .data.partnerId == uid;
-    }
-
-    // Bu yazma işlemi YALNIZCA eşleştirme alanlarına mı dokunuyor?
-    function touchesOnlyPairingFields() {
-      return request.resource.data.diff(resource.data)
-               .affectedKeys()
-               .hasOnly(['partnerId', 'hasPartner']);
-    }
-
-    // Doküman ilk kez oluşturuluyorsa yalnız bu alanlarla oluşturulabilir.
-    function createsOnlyPairingFields() {
-      return request.resource.data.keys().hasOnly(['partnerId', 'hasPartner']);
+        && exists(/databases/$(database)/documents/users/$(uid))
+        && request.auth.uid in
+             get(/databases/$(database)/documents/users/$(uid))
+               .data.get('partners', []);
     }
 
     match /users/{uid} {
@@ -80,14 +69,9 @@ service cloud.firestore {
       // (dolayısıyla fcmTokens'a) erişemez.
       allow read: if isOwner(uid);
 
-      allow create: if isOwner(uid)
-                    || (isSignedIn() && createsOnlyPairingFields());
-
-      allow update: if isOwner(uid)
-                    || (isSignedIn() && touchesOnlyPairingFields());
-
-      // Profil silme yalnızca sahibine ait.
-      allow delete: if isOwner(uid);
+      // Eşleştirme artık başka birinin dokümanına yazmayı gerektirmiyor;
+      // herkes yalnızca kendi dokümanına yazar.
+      allow create, update, delete: if isOwner(uid);
 
       // Günlük sağlık logları hiçbir koşulda paylaşılmaz.
       match /logs/{dateStr} {
@@ -96,9 +80,36 @@ service cloud.firestore {
     }
 
     match /intimacy/{uid} {
-      // Sahibi her zaman; bağlı partner yalnızca okuyabilir.
-      allow read: if isOwner(uid) || isLinkedPartnerOf(uid);
+      // Sahibi her zaman; onaylı partner yalnızca okuyabilir.
+      allow read: if isOwner(uid) || isApprovedPartnerOf(uid);
       allow write: if isOwner(uid);
+    }
+
+    match /pairingTokens/{token} {
+      // Kodun kendisi sırdır: kodu bilen sahibin UID'sini çözebilir.
+      // Kodu bilmeyen bu dokümanın adını da bilemez, listeleme kapalı.
+      allow get: if isSignedIn();
+      allow list: if false;
+
+      // Kodu yalnızca sahibi oluşturur ve siler. Silmek kodu iptal eder.
+      allow create: if isSignedIn()
+                    && request.resource.data.ownerUid == request.auth.uid;
+      allow delete: if isSignedIn()
+                    && resource.data.ownerUid == request.auth.uid;
+      allow update: if false;
+
+      // Eşleştirme isteği. Karşı taraf yalnızca kendi adına istek yazabilir.
+      match /requests/{requesterUid} {
+        allow create: if isOwner(requesterUid);
+
+        // Sahip istekleri okur ve işi bitince siler; istekte bulunan da
+        // kendi isteğini geri çekebilir.
+        allow read, delete: if isOwner(requesterUid)
+                           || (isSignedIn()
+                               && get(/databases/$(database)/documents/pairingTokens/$(token))
+                                    .data.ownerUid == request.auth.uid);
+        allow update: if false;
+      }
     }
 
     // Tanımlanmamış her yol kapalıdır.

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../data/datasources/remote/firestore_datasource.dart';
+import '../../domain/services/pairing_token.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -66,6 +68,7 @@ class PartnerScanScreen extends StatefulWidget {
 class _PartnerScanScreenState extends State<PartnerScanScreen> {
   // We use MobileScannerController to pause/start parsing barcodes
   final MobileScannerController _scannerController = MobileScannerController();
+  final FirestoreDataSource _remote = FirestoreDataSource();
   bool _isProcessing = false;
 
   @override
@@ -84,27 +87,42 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
 
     // Eskiden okunan **her** QR doğrudan partnerId olarak kaydediliyordu:
     // afişteki bir bağlantı ya da kişinin kendi kodu da dahil.
-    final userViewModel = context.read<UserViewModel>();
-    final status = PartnerCode.validate(
-      raw,
-      myId: userViewModel.myId,
-      currentPartnerId: userViewModel.partnerId,
-    );
-
-    if (!status.isValid) {
+    //
+    // Artık iki aşama var. QR'daki şey UID değil döndürülebilir bir kod;
+    // kime ait olduğu ancak sunucuda çözülüyor. Biçim kontrolü önce
+    // yapılıyor ki geçersiz her kare için ağa gidilmesin.
+    final format = PartnerCode.validateFormat(raw);
+    if (!format.isValid) {
       // Kamera açık kalsın: kullanıcı doğru kodu okutmayı sürdürebilsin.
-      _showScanError(status);
+      _showScanError(format);
       return;
     }
 
     setState(() {
       _isProcessing = true;
     });
-
-    // Pause scanner while showing dialog
     _scannerController.stop();
 
-    _showConfirmationDialog(raw!.trim());
+    final userViewModel = context.read<UserViewModel>();
+    final token = PairingToken.normalize(raw!);
+    final ownerUid = await _remote.resolvePairingToken(token);
+    if (!mounted) return;
+
+    final status = PartnerCode.validateOwner(
+      ownerUid,
+      myId: userViewModel.myId,
+      currentPartnerId: userViewModel.partnerId,
+    );
+
+    if (!status.isValid) {
+      setState(() => _isProcessing = false);
+      await _scannerController.start();
+      if (!mounted) return;
+      _showScanError(status);
+      return;
+    }
+
+    _showConfirmationDialog(ownerUid!);
   }
 
   /// Geçersiz kodu bildirir ve taramaya devam eder.

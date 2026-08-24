@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../data/repositories/pairing_repository.dart';
+import '../../domain/services/pairing_token.dart';
 import '../../design_system/app_palette.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -16,22 +18,46 @@ class PartnerQrGenScreen extends StatefulWidget {
 }
 
 class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
-  String? _myId;
+  final PairingRepository _pairing = PairingRepository();
+
+  /// QR'da paylaşılan eşleştirme kodu.
+  ///
+  /// Burada eskiden kullanıcının UID'si duruyordu. UID hiç değişmediği için
+  /// paylaşılan QR kalıcı olarak geçerli kalıyordu: ayrılmak erişimi
+  /// koparmıyor, eski partner elindeki kodla geri bağlanabiliyordu. Kod artık
+  /// döndürülebilir.
+  String? _token;
+  bool _rotating = false;
 
   @override
   void initState() {
     super.initState();
-    _ensureMyId();
+    _load();
   }
 
-  Future<void> _ensureMyId() async {
+  Future<void> _load() async {
     // Kimlik üretimi tek bir yerde: UserViewModel.ensureMyId().
     // Firebase varsa anonim UID, yoksa yerel UUID döner.
     final id = await context.read<UserViewModel>().ensureMyId();
+    final token = await _pairing.currentToken(id);
+    if (!mounted) return;
+    setState(() => _token = token);
+  }
+
+  /// Kodu yeniler. Daha önce paylaşılmış bütün QR'lar geçersiz olur.
+  Future<void> _rotate() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final rotated = context.tr('partner_qr_gen_rotated');
+
+    setState(() => _rotating = true);
+    final id = await context.read<UserViewModel>().ensureMyId();
+    final token = await _pairing.rotate(id);
     if (!mounted) return;
     setState(() {
-      _myId = id;
+      _token = token;
+      _rotating = false;
     });
+    messenger.showSnackBar(SnackBar(content: Text(rotated)));
   }
 
   @override
@@ -69,7 +95,7 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
           ),
         ),
       ),
-      body: _myId == null
+      body: _token == null
           ? Center(child: CircularProgressIndicator(color: primaryColor))
           : SingleChildScrollView(
               padding: const EdgeInsets.symmetric(
@@ -156,7 +182,7 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
                         child: Column(
                           children: [
                             QrImageView(
-                              data: _myId!,
+                              data: _token!,
                               version: QrVersions.auto,
                               size: 200.0,
                               backgroundColor: Colors.transparent,
@@ -182,15 +208,15 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
                                     : Colors.grey.shade100,
                                 borderRadius: BorderRadius.circular(12),
                               ),
+                              // Kodun tamamı gösteriliyor: kamera
+                              // çalışmadığında elle yazılabilmeli. Kısaltılmış
+                              // bir parça hiçbir işe yaramıyordu.
                               child: Text(
-                                _myId!.substring(
-                                  0,
-                                  8,
-                                ), // Show short slice just as reference
+                                PairingToken.forDisplay(_token!),
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  letterSpacing: 2.0,
+                                  letterSpacing: 1.5,
                                   color: textMutedColor,
                                 ),
                               ),
@@ -201,12 +227,40 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 24),
+
+                  // Kodu yenile.
+                  //
+                  // Ayrılırken erişimi kesmek listeden çıkarmakla oluyor ama
+                  // eski QR ortada kalıyor. Bunu yenilemek onu da geçersiz
+                  // kılar — kullanıcının kontrolünde olması gereken bir şey.
+                  TextButton.icon(
+                    onPressed: _rotating ? null : _rotate,
+                    icon: _rotating
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.autorenew, size: 18),
+                    label: Text(context.tr('partner_qr_gen_rotate')),
+                    style: TextButton.styleFrom(foregroundColor: primaryColor),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Text(
+                      context.tr('partner_qr_gen_rotate_hint'),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 12, color: textMutedColor),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
 
                   // Share Button Alternative
                   OutlinedButton.icon(
                     onPressed: () async {
-                      await Clipboard.setData(ClipboardData(text: _myId!));
+                      await Clipboard.setData(ClipboardData(text: _token!));
                       if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(

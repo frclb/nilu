@@ -1,130 +1,116 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:period_tracker/domain/services/pairing_token.dart';
 import 'package:period_tracker/domain/services/partner_code.dart';
 
 void main() {
-  const myId = 'aBcD1234efGH5678ijKL9012mnOP'; // Firebase UID biçimi
-  const partnerId = '9f8e7d6c-5b4a-3210-fedc-ba9876543210'; // UUID biçimi
+  // Geçerli biçimde bir eşleştirme kodu.
+  final token = PairingToken.generate();
+  const myId = 'aBcDeFgHiJkLmNoPqRsTuVwXyZ12';
+  const otherId = 'zZyYxXwWvVuUtTsSrRqQpPoOnN34';
 
-  group('geçerli kod', () {
-    test('başka birinin UID\'i kabul edilir', () {
+  group('biçim doğrulaması', () {
+    test('geçerli kod kabul edilir', () {
+      expect(PartnerCode.validateFormat(token), PartnerCodeStatus.valid);
+    });
+
+    test('baştaki ve sondaki boşluk yok sayılır', () {
+      expect(PartnerCode.validateFormat('  $token  '), PartnerCodeStatus.valid);
+    });
+
+    test('gösterim biçimi (dörtlü gruplar) da kabul edilir', () {
+      // Kamera çalışmadığında kullanıcı kodu elle yazabilmeli.
       expect(
-        PartnerCode.validate(partnerId, myId: myId),
+        PartnerCode.validateFormat(PairingToken.forDisplay(token)),
         PartnerCodeStatus.valid,
       );
     });
 
-    test('baştaki ve sondaki boşluk kırpılır', () {
-      expect(
-        PartnerCode.validate('  $partnerId  ', myId: myId),
-        PartnerCodeStatus.valid,
-      );
+    test('boş kod reddedilir', () {
+      expect(PartnerCode.validateFormat(null), PartnerCodeStatus.empty);
+      expect(PartnerCode.validateFormat('   '), PartnerCodeStatus.empty);
     });
 
-    test('kimlik henüz üretilmemişse yine de bağlanılabilir', () {
-      // Partner uygulamayı ilk kez açıp doğrudan taramaya gidebiliyor.
-      expect(
-        PartnerCode.validate(partnerId, myId: null),
-        PartnerCodeStatus.valid,
-      );
+    test('eşleştirme kodu olmayan içerik reddedilir', () {
+      // Afişteki bir bağlantıyı okutmak kullanıcıyı var olmayan bir
+      // "partnere" bağlıyordu.
+      for (final junk in [
+        'https://example.com',
+        'WIFI:S:Cafe;T:WPA;P:1234;;',
+        'merhaba',
+        '12345',
+      ]) {
+        expect(
+          PartnerCode.validateFormat(junk),
+          PartnerCodeStatus.malformed,
+          reason: junk,
+        );
+      }
+    });
+
+    test('UID biçimi artık geçerli bir kod değil', () {
+      // Eski modelde QR'da UID vardı; kalıcı olduğu için iptal edilemiyordu.
+      expect(PartnerCode.validateFormat(myId), PartnerCodeStatus.malformed);
     });
   });
 
-  group('reddedilen kodlar', () {
+  group('sahip doğrulaması', () {
+    test('başka bir kullanıcının kodu geçerli', () {
+      expect(
+        PartnerCode.validateOwner(otherId, myId: myId),
+        PartnerCodeStatus.valid,
+      );
+    });
+
     test('kendi kodu reddedilir', () {
-      // Kişi kendi partneri olamaz; olursa uygulama partner moduna geçip
-      // kendi takip ekranlarını kaybediyordu.
-      expect(PartnerCode.validate(myId, myId: myId), PartnerCodeStatus.ownCode);
+      expect(
+        PartnerCode.validateOwner(myId, myId: myId),
+        PartnerCodeStatus.ownCode,
+      );
     });
 
     test('zaten bağlı olunan partner reddedilir', () {
       expect(
-        PartnerCode.validate(
-          partnerId,
+        PartnerCode.validateOwner(
+          otherId,
           myId: myId,
-          currentPartnerId: partnerId,
+          currentPartnerId: otherId,
         ),
         PartnerCodeStatus.alreadyConnected,
       );
     });
 
-    test('boş içerik reddedilir', () {
-      for (final code in [null, '', '   ']) {
-        expect(
-          PartnerCode.validate(code, myId: myId),
-          PartnerCodeStatus.empty,
-          reason: 'girdi: ${code == null ? 'null' : '"$code"'}',
-        );
-      }
-    });
-
-    test('eşleştirme kodu olmayan QR içerikleri reddedilir', () {
-      // Tarayıcı eskiden bunların hepsini partnerId olarak kaydediyordu.
-      const notCodes = [
-        'https://example.com/kampanya',
-        'WIFI:S:EvAgi;T:WPA;P:parola123;;',
-        'BEGIN:VCARD\nFN:Ayse\nEND:VCARD',
-        'merhaba dünya',
-        '12345',
-      ];
-
-      for (final code in notCodes) {
-        expect(
-          PartnerCode.validate(code, myId: myId),
-          PartnerCodeStatus.malformed,
-          reason: code,
-        );
-      }
-    });
-
-    test('sınır uzunlukları', () {
-      final tooShort = 'a' * (PartnerCode.minLength - 1);
-      final tooLong = 'a' * (PartnerCode.maxLength + 1);
-      final shortest = 'a' * PartnerCode.minLength;
-
+    test('çözülemeyen kod reddedilir', () {
+      // Sahip kodu yenilediyse ya da hesabını sildiyse kod çözülmez.
+      // İptalin gerçekten çalıştığının işareti bu durumun oluşabilmesi.
       expect(
-        PartnerCode.validate(tooShort, myId: myId),
-        PartnerCodeStatus.malformed,
+        PartnerCode.validateOwner(null, myId: myId),
+        PartnerCodeStatus.unknownCode,
       );
       expect(
-        PartnerCode.validate(tooLong, myId: myId),
-        PartnerCodeStatus.malformed,
+        PartnerCode.validateOwner('', myId: myId),
+        PartnerCodeStatus.unknownCode,
       );
+    });
+
+    test('kimliğimiz yoksa yine bağlanılabilir', () {
+      // Firebase kapalıysa yerel UUID henüz üretilmemiş olabilir.
       expect(
-        PartnerCode.validate(shortest, myId: myId),
+        PartnerCode.validateOwner(otherId, myId: null),
         PartnerCodeStatus.valid,
       );
     });
   });
 
-  group('yeni partnere geçiş', () {
-    test('ayrıldıktan sonra farklı bir kod kabul edilir', () {
-      const yeniPartner = 'ZZZZ1234efGH5678ijKL9012mnOP';
-
-      // Ayrılmadan önce: eski partnere tekrar bağlanma engellenir.
-      expect(
-        PartnerCode.validate(
-          partnerId,
-          myId: myId,
-          currentPartnerId: partnerId,
-        ),
-        PartnerCodeStatus.alreadyConnected,
-      );
-
-      // Ayrıldıktan sonra (currentPartnerId temizlenmiş): yeni kod serbest.
-      expect(
-        PartnerCode.validate(yeniPartner, myId: myId, currentPartnerId: null),
-        PartnerCodeStatus.valid,
-      );
-    });
-  });
-
-  test('her durumun bir mesaj anahtarı var, geçerli olanın yok', () {
-    for (final status in PartnerCodeStatus.values) {
-      if (status.isValid) {
-        expect(status.messageKey, isNull);
-      } else {
-        expect(status.messageKey, isNotNull, reason: status.name);
+  group('hata mesajları', () {
+    test('her geçersiz durumun bir mesaj anahtarı var', () {
+      for (final status in PartnerCodeStatus.values) {
+        if (status.isValid) {
+          expect(status.messageKey, isNull);
+        } else {
+          expect(status.messageKey, isNotNull, reason: '$status');
+          expect(status.messageKey, isNotEmpty, reason: '$status');
+        }
       }
-    }
+    });
   });
 }

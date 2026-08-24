@@ -165,17 +165,21 @@ class UserViewModel extends ChangeNotifier {
       await prefs.setString('partnerId', partnerId);
       hasPartnerNow = true;
 
-      // Eğer kendi UID'miz varsa Firestore'da da bağlantıyı kur
+      // Erişimi kendi dokümanımızdaki listeye yazıyoruz. Önceden karşı
+      // tarafın dokümanına da yazılıyordu; iptal edilemeyen eşleştirmenin
+      // sebebi buydu (bkz. firestore.rules).
       if (_myId != null) {
-        await _firestoreDS.savePartnerConnection(_myId!, partnerId);
+        await _firestoreDS.approvePartner(_myId!, partnerId);
       }
     } else {
       await prefs.remove('partnerId');
       hasPartnerNow = false;
 
-      // Eğer kendi UID'miz varsa ve eski bir partnerId varsa Firestore'da bağlantıyı kes
+      // Erişimi kendi listemizden çıkarıyoruz. Karşı taraf kendini geri
+      // ekleyemiyor: liste bizim dokümanımızda ve kurallar yalnızca sahibin
+      // yazmasına izin veriyor.
       if (_myId != null && _partnerId != null) {
-        await _firestoreDS.disconnectPartner(_myId!, _partnerId!);
+        await _firestoreDS.removePartner(_myId!, _partnerId!);
       }
     }
     await prefs.setBool('hasPartner', hasPartnerNow);
