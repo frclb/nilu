@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../domain/view_models/user_view_model.dart';
 import '../calendar/view_models/calendar_view_model.dart';
 import 'widgets/home_header.dart';
-import 'widgets/cycle_widget.dart';
+import 'widgets/cycle_masthead.dart';
 import 'widgets/daily_suggestion_card.dart';
 import 'widgets/two_column_widgets.dart';
 import 'widgets/intimacy_section.dart';
@@ -30,7 +30,7 @@ class HomeScreen extends StatelessWidget {
                   ), // padding for FAB
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      const CycleWidget(),
+                      const CycleMasthead(),
                       const DailySuggestionCard(),
                       const TwoColumnWidgets(),
                       if (!context.watch<UserViewModel>().isPartner)
