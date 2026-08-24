@@ -54,7 +54,7 @@ class CycleMasthead extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -68,60 +68,45 @@ class CycleMasthead extends StatelessWidget {
                         color: t.textMuted,
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 6),
 
                     // Cevap şekle kodlanmıyor, cümleyle söyleniyor.
                     //
-                    // Halkanın içindeki "5" bir saniyede okunmuyordu: sayının döngü
-                    // günü olduğunu bilmek gerekiyor. Kullanıcının sorduğu soru ise
-                    // genelde "kaçıncı gündeyim" değil, "ne zaman başlayacak".
-                    Text(
-                      context.tr(_headlineLabelKey(phase)).toUpperCase(),
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontSize: 11,
-                        letterSpacing: 2.4,
-                        fontWeight: FontWeight.w600,
-                        color: t.textMuted,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-
-                    Text(
-                      _headline(context, phase, day, daysUntil),
-                      style: theme.textTheme.displayLarge?.copyWith(
-                        fontSize: 46,
-                        height: 1.1,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -1.2,
-                      ),
-                    ),
-
-                    // Bu satır yalnızca başlık gelecek reglden bahsederken anlamlı.
-                    // Regl sürerken "5. gün" altında bir tarih göstermek, o günün o
-                    // tarihte olduğunu ima ediyordu. Sıradaki regl zaten aşağıdaki
-                    // ajandada duruyor.
-                    if (phase != CyclePhase.menstruation &&
-                        info.predictedNextPeriod != null) ...[
-                      const SizedBox(height: 6),
-                      Text(
-                        context.tr(
-                          'home_expected_on',
-                          params: {
-                            'date': _formatDate(
-                              context,
-                              info.predictedNextPeriod!,
+                    // Halkanın içindeki çıplak bir sayı ("5") bir saniyede
+                    // okunmuyor: onun döngü günü olduğunu bilmek gerekiyor.
+                    // Merkezde duran şey bir sayı değil, cümle.
+                    CycleRing(
+                      info: info,
+                      currentDay: day ?? 0,
+                      center: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            context.tr(_headlineLabelKey(phase)).toUpperCase(),
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              fontSize: 10,
+                              letterSpacing: 2.2,
+                              fontWeight: FontWeight.w600,
+                              color: t.textMuted,
                             ),
-                          },
-                        ),
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          fontSize: 14,
-                          color: t.textMuted,
-                        ),
+                          ),
+                          const SizedBox(height: 4),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              _headline(context, phase, day, daysUntil),
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.displayLarge?.copyWith(
+                                fontSize: 34,
+                                height: 1.1,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: -0.8,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-
-                    const SizedBox(height: 18),
-                    CycleRing(info: info, currentDay: day ?? 0),
+                    ),
                   ],
                 ),
               ),
@@ -133,9 +118,22 @@ class CycleMasthead extends StatelessWidget {
                   color: t.surfaceAlt,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 14),
+                      Text(
+                        context.tr('home_agenda_title').toUpperCase(),
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontSize: 10,
+                          letterSpacing: 2,
+                          fontWeight: FontWeight.w600,
+                          color: t.textMuted,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
                       for (var i = 0; i < agenda.length; i++)
                         _AgendaRow(entry: agenda[i], divided: i > 0),
+                      const SizedBox(height: 6),
                     ],
                   ),
                 ),
@@ -204,10 +202,21 @@ class _AgendaRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
+            // Renk noktası satırı halkayla eşliyor: aynı olay ekranda iki
+            // yerde aynı renkte görünsün.
+            Container(
+              width: 7,
+              height: 7,
+              margin: const EdgeInsets.only(right: 11),
+              decoration: BoxDecoration(
+                color: _entryColor(entry.kind, t),
+                shape: BoxShape.circle,
+              ),
+            ),
             // Tam ay adı için yer bırakılıyor: dar sütunda "28 Ağustos"
             // ikiye bölünüyordu.
             SizedBox(
-              width: 104,
+              width: 96,
               child: Text(
                 _formatDate(context, entry.date),
                 maxLines: 1,
@@ -240,3 +249,10 @@ class _AgendaRow extends StatelessWidget {
     );
   }
 }
+
+/// Ajanda satırındaki renk noktası — halkadaki evre renkleriyle aynı.
+Color _entryColor(AgendaKind kind, AppTokens t) => switch (kind) {
+  AgendaKind.periodStart => t.flow,
+  AgendaKind.fertileStart => t.ovulation,
+  AgendaKind.ovulation => t.ovulation,
+};

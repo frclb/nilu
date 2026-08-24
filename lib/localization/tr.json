@@ -802,5 +802,6 @@
   "agenda_fertile_start": "Doğurgan dönem başlıyor",
   "agenda_ovulation": "Yumurtlama",
   "agenda_days_away": "{n} gün",
-  "home_ring_cycle_length": "{n} günlük\ndöngü"
+  "home_ring_cycle_length": "{n} günlük\ndöngü",
+  "home_agenda_title": "Sırada"
 }

@@ -802,5 +802,6 @@
   "agenda_fertile_start": "Fertile window opens",
   "agenda_ovulation": "Ovulation",
   "agenda_days_away": "{n} days",
-  "home_ring_cycle_length": "{n}-day\ncycle"
+  "home_ring_cycle_length": "{n}-day\ncycle",
+  "home_agenda_title": "Up next"
 }

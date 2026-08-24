@@ -16,10 +16,22 @@ import '../../../localization/app_localizations.dart';
 /// şeklini gösteriyor — evrelerin nerede başlayıp bittiğini ve bugünün o yay
 /// üzerindeki yerini.
 class CycleRing extends StatelessWidget {
-  const CycleRing({super.key, required this.info, required this.currentDay});
+  const CycleRing({
+    super.key,
+    required this.info,
+    required this.currentDay,
+    required this.center,
+  });
 
   final CycleInfo info;
   final int currentDay;
+
+  /// Halkanın ortasında duran içerik.
+  ///
+  /// Başlık ve halka önce ayrı bloklardı; ikisi ayrı ayrı dikkat çekiyor ve
+  /// aradaki boşluk kartı seyrek gösteriyordu. Tek bir odak nesnesi olarak
+  /// daha derli toplu duruyor.
+  final Widget center;
 
   @override
   Widget build(BuildContext context) {
@@ -34,30 +46,56 @@ class CycleRing extends StatelessWidget {
       for (var day = 1; day <= length; day++) info.getPhaseForDay(day).color(t),
     ];
 
+    final phaseColor = info.currentPhase.color(t);
+
     return Center(
       child: SizedBox(
-        width: 196,
-        height: 196,
+        width: 232,
+        height: 232,
         child: Stack(
           alignment: Alignment.center,
           children: [
+            // Evre renginde çok hafif bir hâle: halka düz zeminde yüzer gibi
+            // duruyordu, bu onu yere oturtuyor.
+            Container(
+              width: 190,
+              height: 190,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [phaseColor.withAlpha(20), phaseColor.withAlpha(0)],
+                ),
+              ),
+            ),
             CustomPaint(
-              size: const Size.square(196),
+              size: const Size.square(232),
               painter: _RingPainter(
                 colors: colors,
                 currentDay: currentDay,
-                marker: t.text,
+                track: t.border,
+                marker: t.surface,
               ),
             ),
-            // Merkezde döngünün uzunluğu: halkanın neyi temsil ettiğini
-            // söyleyen tek bilgi, ekranda başka yerde yok.
-            Text(
-              context.tr('home_ring_cycle_length', params: {'n': '$length'}),
-              textAlign: TextAlign.center,
-              style: theme.textTheme.labelLarge?.copyWith(
-                fontSize: 12,
-                height: 1.4,
-                color: t.textMuted,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 34),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  center,
+                  const SizedBox(height: 6),
+                  Text(
+                    context.tr(
+                      'home_ring_cycle_length',
+                      params: {'n': '$length'},
+                    ),
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontSize: 11,
+                      height: 1.35,
+                      color: t.textMuted,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -71,11 +109,18 @@ class _RingPainter extends CustomPainter {
   _RingPainter({
     required this.colors,
     required this.currentDay,
+    required this.track,
     required this.marker,
   });
 
   final List<Color> colors;
   final int currentDay;
+
+  /// Parçaların altındaki ince iz: halka soluk günlerde de tam bir daire
+  /// olarak okunsun.
+  final Color track;
+
+  /// Bugün işaretinin iç rengi.
   final Color marker;
 
   int get length => colors.length;
@@ -84,15 +129,27 @@ class _RingPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (length <= 0) return;
 
-    const stroke = 14.0;
+    const stroke = 11.0;
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = (math.min(size.width, size.height) - stroke) / 2 - 6;
+    final radius = (math.min(size.width, size.height) - stroke) / 2 - 10;
     final rect = Rect.fromCircle(center: center, radius: radius);
 
+    // Altta tam bir halka izi.
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()
+        ..color = track
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1,
+    );
+
     final sweep = 2 * math.pi / length;
-    // Parçalar arasında ince boşluk: günler sayılabilsin, tek bir halka gibi
-    // görünmesin.
-    final gap = sweep * 0.14;
+    // Parçalar arasında boşluk: günler sayılabilsin, tek bir dolu halka gibi
+    // görünmesin. Yuvarlak uçlar boşluğun bir kısmını yiyor; dar bırakınca
+    // gelecek günler bitişip geçmiş günler ayrık kalıyordu — aynı halkada iki
+    // farklı görüntü.
+    final gap = sweep * 0.42;
 
     for (var day = 1; day <= length; day++) {
       final isToday = day == currentDay;
@@ -100,24 +157,27 @@ class _RingPainter extends CustomPainter {
       final color = colors[day - 1];
 
       final paint = Paint()
-        ..color = isPast ? color.withAlpha(90) : color
+        ..color = isPast ? color.withAlpha(80) : color
         ..style = PaintingStyle.stroke
-        ..strokeWidth = isToday ? stroke + 5 : stroke
-        ..strokeCap = StrokeCap.butt;
+        ..strokeWidth = stroke
+        // Yuvarlak uç: kesik uçlar halkayı bir barkod gibi gösteriyordu.
+        ..strokeCap = StrokeCap.round;
 
       // Saat 12'den başla.
       final start = -math.pi / 2 + (day - 1) * sweep + gap / 2;
       canvas.drawArc(rect, start, sweep - gap, false, paint);
 
       if (isToday) {
-        // Bugünün dışına küçük bir işaret: hangi parçanın bugün olduğu
-        // kalınlık farkından bağımsız olarak da okunsun.
+        // Bugün halkanın üstünde duran dolu bir nokta. Önceden parçayı
+        // kalınlaştırıyordum; kalınlık içe ve dışa birden büyüyüp halkanın
+        // temiz kenarlarını bozuyordu.
         final mid = start + (sweep - gap) / 2;
-        final dotAt = Offset(
-          center.dx + (radius + stroke / 2 + 8) * math.cos(mid),
-          center.dy + (radius + stroke / 2 + 8) * math.sin(mid),
+        final at = Offset(
+          center.dx + radius * math.cos(mid),
+          center.dy + radius * math.sin(mid),
         );
-        canvas.drawCircle(dotAt, 3, Paint()..color = marker);
+        canvas.drawCircle(at, stroke * 0.95, Paint()..color = color);
+        canvas.drawCircle(at, stroke * 0.42, Paint()..color = marker);
       }
     }
   }
@@ -125,6 +185,7 @@ class _RingPainter extends CustomPainter {
   @override
   bool shouldRepaint(_RingPainter old) =>
       old.currentDay != currentDay ||
+      old.track != track ||
       old.marker != marker ||
       !listEquals(old.colors, colors);
 }

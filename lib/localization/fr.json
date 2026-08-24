@@ -802,5 +802,6 @@
   "agenda_fertile_start": "Début de la fenêtre fertile",
   "agenda_ovulation": "Ovulation",
   "agenda_days_away": "{n} jours",
-  "home_ring_cycle_length": "cycle de\n{n} jours"
+  "home_ring_cycle_length": "cycle de\n{n} jours",
+  "home_agenda_title": "À venir"
 }
