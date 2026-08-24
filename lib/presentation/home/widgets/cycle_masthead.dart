@@ -30,6 +30,7 @@ class CycleMasthead extends StatelessWidget {
     final day = info.currentCycleDay;
     final phase = info.currentPhase;
     final daysUntil = info.daysUntilNextPeriod;
+    final daysLate = info.daysLateAt(now);
 
     final agenda = CycleAgenda.upcoming(info, now: now);
 
@@ -82,7 +83,9 @@ class CycleMasthead extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            context.tr(_headlineLabelKey(phase)).toUpperCase(),
+                            context
+                                .tr(_headlineLabelKey(phase, daysLate))
+                                .toUpperCase(),
                             style: theme.textTheme.labelLarge?.copyWith(
                               fontSize: 10,
                               letterSpacing: 2.2,
@@ -94,7 +97,13 @@ class CycleMasthead extends StatelessWidget {
                           FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
-                              _headline(context, phase, day, daysUntil),
+                              _headline(
+                                context,
+                                phase,
+                                day,
+                                daysUntil,
+                                daysLate,
+                              ),
                               textAlign: TextAlign.center,
                               style: theme.textTheme.displayLarge?.copyWith(
                                 fontSize: 34,
@@ -146,12 +155,14 @@ class CycleMasthead extends StatelessWidget {
 }
 
 /// Başlık etiketi: durum kelimesi.
-String _headlineLabelKey(CyclePhase phase) => switch (phase) {
-  CyclePhase.menstruation => 'home_label_period',
-  CyclePhase.suppressed => 'home_label_cycle',
-  CyclePhase.unknown => 'home_label_cycle',
-  _ => 'home_label_next_period',
-};
+String _headlineLabelKey(CyclePhase phase, int daysLate) {
+  if (phase == CyclePhase.menstruation) return 'home_label_period';
+  if (daysLate > 0) return 'home_label_period';
+  if (phase == CyclePhase.suppressed || phase == CyclePhase.unknown) {
+    return 'home_label_cycle';
+  }
+  return 'home_label_next_period';
+}
 
 /// Başlık cümlesi.
 String _headline(
@@ -159,10 +170,16 @@ String _headline(
   CyclePhase phase,
   int? day,
   int? daysUntil,
+  int daysLate,
 ) {
   if (day == null) return context.tr('home_headline_no_data');
   if (phase == CyclePhase.menstruation) {
     return context.tr('home_headline_period_day', params: {'n': '$day'});
+  }
+  // Gecikme kendi cümlesini hak ediyor. `daysUntil` sıfırın altına inmediği
+  // için gecikmenin her gününde "bugün başlıyor" yazıyordu.
+  if (daysLate > 0) {
+    return context.tr('home_headline_late', params: {'n': '$daysLate'});
   }
   if (daysUntil == null) {
     return context.tr('home_headline_cycle_day', params: {'n': '$day'});

@@ -122,12 +122,15 @@ class CalendarViewModel extends ChangeNotifier {
   }
 
   /// Bir günü regl günü olarak işaretler veya kaldırır. Başarılıysa true döner.
-  Future<bool> togglePeriodDay(DateTime date) async {
-    final today = DateTime(
-      DateTime.now().year,
-      DateTime.now().month,
-      DateTime.now().day,
-    );
+  Future<bool> togglePeriodDay(DateTime rawDate) async {
+    // Saat bilgisi burada temizleniyor. "Bugünü işaretle" diyen bir çağrı
+    // `DateTime.now()` geçirdiğinde tarih gece yarısından sonra olduğu için
+    // aşağıdaki gelecek-günü koruması devreye giriyor ve işlem sessizce
+    // reddediliyordu. İşlem zaten gün hassasiyetinde; normalleştirmenin yeri
+    // çağıran taraf değil burası.
+    final date = DateTime(rawDate.year, rawDate.month, rawDate.day);
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     final currentlyIsPeriod = isPeriodDay(date);
 
     // Gelecek bir tarihe yeni regl girişi yapılamaz (kayıt silmeye izin ver)

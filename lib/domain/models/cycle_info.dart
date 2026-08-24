@@ -77,6 +77,23 @@ class CycleInfo {
     return diff < 0 ? 0 : diff;
   }
 
+  /// Regl tahmin edilen günü kaç gün geçti.
+  ///
+  /// Gecikme yoksa 0. [daysUntilNextPeriod] sıfırın altına inmiyor; tek başına
+  /// bakıldığında gecikmenin ilk günü ile onuncu günü aynı görünüyordu ve
+  /// ekranda her ikisinde de "bugün başlıyor" yazıyordu.
+  int daysLateAt(DateTime now) {
+    final predicted = predictedNextPeriod;
+    if (predicted == null) return 0;
+    final today = DateTime(now.year, now.month, now.day);
+    final due = DateTime(predicted.year, predicted.month, predicted.day);
+    final diff = today.difference(due).inDays;
+    return diff > 0 ? diff : 0;
+  }
+
+  /// Bugün itibarıyla gecikme.
+  int get daysLate => daysLateAt(DateTime.now());
+
   /// Döngü ilerlemesini 0.0-1.0 arasında döndürür.
   double get cycleProgress {
     final day = currentCycleDay;

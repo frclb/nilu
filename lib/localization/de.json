@@ -803,5 +803,9 @@
   "agenda_ovulation": "Eisprung",
   "agenda_days_away": "{n} Tage",
   "home_ring_cycle_length": "{n}-Tage-\nZyklus",
-  "home_agenda_title": "Als Nächstes"
+  "home_agenda_title": "Als Nächstes",
+  "home_headline_late": "{n} Tage überfällig",
+  "home_period_start": "Meine Periode hat begonnen",
+  "home_period_end": "Meine Periode ist vorbei",
+  "home_period_toggle_failed": "Dieser Tag konnte nicht markiert werden."
 }

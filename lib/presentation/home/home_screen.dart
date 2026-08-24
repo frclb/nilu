@@ -4,6 +4,7 @@ import '../../domain/view_models/user_view_model.dart';
 import '../calendar/view_models/calendar_view_model.dart';
 import 'widgets/home_header.dart';
 import 'widgets/cycle_masthead.dart';
+import 'widgets/period_toggle_button.dart';
 import 'widgets/daily_suggestion_card.dart';
 import 'widgets/two_column_widgets.dart';
 import 'widgets/intimacy_section.dart';
@@ -31,6 +32,7 @@ class HomeScreen extends StatelessWidget {
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       const CycleMasthead(),
+                      PeriodToggleButton(),
                       const DailySuggestionCard(),
                       const TwoColumnWidgets(),
                       if (!context.watch<UserViewModel>().isPartner)

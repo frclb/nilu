@@ -37,13 +37,21 @@ class CycleRing extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
     final theme = Theme.of(context);
-    final length = info.averageCycleLength;
+    final expected = info.averageCycleLength;
+
+    // Regl gecikirse döngü tahmin edilen uzunluğu aşıyor. Halka yalnızca
+    // beklenen uzunlukta çizilseydi bugüne denk gelen parça olmaz, işaret
+    // kaybolur ve bütün günler "geçmiş" sayılıp halka tamamen solardı.
+    // Halka bugüne kadar uzuyor; beklenenin ötesindeki günler nötr renkte,
+    // böylece gecikme halkanın kendisinden okunuyor.
+    final length = math.max(expected, currentDay);
 
     // Renkler boyayıcıya girmeden hesaplanıyor: bir kapanış geçirilseydi
     // `shouldRepaint` onu karşılaştıramaz ve evre renkleri değişip gün sayısı
     // aynı kaldığında halka yeniden çizilmezdi.
     final colors = [
-      for (var day = 1; day <= length; day++) info.getPhaseForDay(day).color(t),
+      for (var day = 1; day <= length; day++)
+        if (day > expected) t.textFaint else info.getPhaseForDay(day).color(t),
     ];
 
     final phaseColor = info.currentPhase.color(t);
@@ -73,7 +81,7 @@ class CycleRing extends StatelessWidget {
                 colors: colors,
                 currentDay: currentDay,
                 track: t.border,
-                marker: t.surface,
+                core: t.surface,
               ),
             ),
             Padding(
@@ -86,7 +94,7 @@ class CycleRing extends StatelessWidget {
                   Text(
                     context.tr(
                       'home_ring_cycle_length',
-                      params: {'n': '$length'},
+                      params: {'n': '$expected'},
                     ),
                     textAlign: TextAlign.center,
                     style: theme.textTheme.labelLarge?.copyWith(
@@ -110,7 +118,7 @@ class _RingPainter extends CustomPainter {
     required this.colors,
     required this.currentDay,
     required this.track,
-    required this.marker,
+    required this.core,
   });
 
   final List<Color> colors;
@@ -120,8 +128,8 @@ class _RingPainter extends CustomPainter {
   /// olarak okunsun.
   final Color track;
 
-  /// Bugün işaretinin iç rengi.
-  final Color marker;
+  /// Papatyaların göbek rengi — kartın yüzeyiyle aynı.
+  final Color core;
 
   int get length => colors.length;
 
@@ -129,12 +137,10 @@ class _RingPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (length <= 0) return;
 
-    const stroke = 11.0;
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = (math.min(size.width, size.height) - stroke) / 2 - 10;
-    final rect = Rect.fromCircle(center: center, radius: radius);
+    final radius = math.min(size.width, size.height) / 2 - 18;
 
-    // Altta tam bir halka izi.
+    // Çiçeklerin dizildiği ince iz.
     canvas.drawCircle(
       center,
       radius,
@@ -145,47 +151,82 @@ class _RingPainter extends CustomPainter {
     );
 
     final sweep = 2 * math.pi / length;
-    // Parçalar arasında boşluk: günler sayılabilsin, tek bir dolu halka gibi
-    // görünmesin. Yuvarlak uçlar boşluğun bir kısmını yiyor; dar bırakınca
-    // gelecek günler bitişip geçmiş günler ayrık kalıyordu — aynı halkada iki
-    // farklı görüntü.
-    final gap = sweep * 0.42;
+
+    // Her gün bir papatya. Boyut, iki komşu çiçek değmeyecek şekilde
+    // yaydan türetiliyor: döngü uzadıkça çiçekler küçülüyor.
+    final slot = 2 * math.pi * radius / length;
+    final petalSize = math.min(slot * 0.92, 22.0);
 
     for (var day = 1; day <= length; day++) {
       final isToday = day == currentDay;
       final isPast = day < currentDay;
       final color = colors[day - 1];
 
-      final paint = Paint()
-        ..color = isPast ? color.withAlpha(80) : color
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = stroke
-        // Yuvarlak uç: kesik uçlar halkayı bir barkod gibi gösteriyordu.
-        ..strokeCap = StrokeCap.round;
-
       // Saat 12'den başla.
-      final start = -math.pi / 2 + (day - 1) * sweep + gap / 2;
-      canvas.drawArc(rect, start, sweep - gap, false, paint);
+      final angle = -math.pi / 2 + (day - 1) * sweep + sweep / 2;
+      final at = Offset(
+        center.dx + radius * math.cos(angle),
+        center.dy + radius * math.sin(angle),
+      );
 
-      if (isToday) {
-        // Bugün halkanın üstünde duran dolu bir nokta. Önceden parçayı
-        // kalınlaştırıyordum; kalınlık içe ve dışa birden büyüyüp halkanın
-        // temiz kenarlarını bozuyordu.
-        final mid = start + (sweep - gap) / 2;
-        final at = Offset(
-          center.dx + radius * math.cos(mid),
-          center.dy + radius * math.sin(mid),
-        );
-        canvas.drawCircle(at, stroke * 0.95, Paint()..color = color);
-        canvas.drawCircle(at, stroke * 0.42, Paint()..color = marker);
-      }
+      _drawDaisy(
+        canvas,
+        at: at,
+        size: isToday ? petalSize * 1.45 : petalSize,
+        // Geçmiş günler soluk: bakış bugüne ve önündeki yola gitsin.
+        petal: isPast ? color.withAlpha(80) : color,
+        // Papatyanın göbeği kartın yüzey rengi. Sarı bir göbek palete yeni
+        // bir renk sokardı; boşluk bırakmak çiçeği yine papatya gibi okutuyor.
+        core: isPast ? core.withAlpha(150) : core,
+        // Bugünün çiçeği hem büyük hem tam açık; ayrıca dışına işaret
+        // koymaya gerek kalmıyor.
+        petals: 8,
+      );
     }
+  }
+
+  /// Tek bir papatya çizer.
+  ///
+  /// Taç yaprakları merkez çevresinde döndürülmüş elipsler. Yaprak sayısı
+  /// tekil çiçeği tanınır kılacak kadar çok, küçük boyutta lekeye dönüşmeyecek
+  /// kadar az.
+  void _drawDaisy(
+    Canvas canvas, {
+    required Offset at,
+    required double size,
+    required Color petal,
+    required Color core,
+    required int petals,
+  }) {
+    final paint = Paint()
+      ..color = petal
+      ..isAntiAlias = true;
+    final petalLength = size * 0.52;
+    final petalWidth = size * 0.30;
+
+    canvas.save();
+    canvas.translate(at.dx, at.dy);
+    for (var i = 0; i < petals; i++) {
+      canvas.save();
+      canvas.rotate(2 * math.pi * i / petals);
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(0, -petalLength * 0.52),
+          width: petalWidth,
+          height: petalLength,
+        ),
+        paint,
+      );
+      canvas.restore();
+    }
+    canvas.drawCircle(Offset.zero, size * 0.17, Paint()..color = core);
+    canvas.restore();
   }
 
   @override
   bool shouldRepaint(_RingPainter old) =>
       old.currentDay != currentDay ||
       old.track != track ||
-      old.marker != marker ||
+      old.core != core ||
       !listEquals(old.colors, colors);
 }

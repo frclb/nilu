@@ -803,5 +803,9 @@
   "agenda_ovulation": "Yumurtlama",
   "agenda_days_away": "{n} gün",
   "home_ring_cycle_length": "{n} günlük\ndöngü",
-  "home_agenda_title": "Sırada"
+  "home_agenda_title": "Sırada",
+  "home_headline_late": "{n} gün gecikti",
+  "home_period_start": "Reglim başladı",
+  "home_period_end": "Reglim bitti",
+  "home_period_toggle_failed": "Bu gün işaretlenemedi."
 }

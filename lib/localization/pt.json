@@ -803,5 +803,9 @@
   "agenda_ovulation": "Ovulação",
   "agenda_days_away": "{n} dias",
   "home_ring_cycle_length": "ciclo de\n{n} dias",
-  "home_agenda_title": "A seguir"
+  "home_agenda_title": "A seguir",
+  "home_headline_late": "{n} dias de atraso",
+  "home_period_start": "O meu período começou",
+  "home_period_end": "O meu período terminou",
+  "home_period_toggle_failed": "Não foi possível marcar este dia."
 }
