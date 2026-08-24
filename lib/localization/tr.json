@@ -801,6 +801,5 @@
   "agenda_period_start": "Regl bekleniyor",
   "agenda_fertile_start": "Doğurgan dönem başlıyor",
   "agenda_ovulation": "Yumurtlama",
-  "agenda_days_away": "{n} gün",
-  "month_names_short": "Oca,Şub,Mar,Nis,May,Haz,Tem,Ağu,Eyl,Eki,Kas,Ara"
+  "agenda_days_away": "{n} gün"
 }

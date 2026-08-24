@@ -801,6 +801,5 @@
   "agenda_period_start": "Período previsto",
   "agenda_fertile_start": "Início da janela fértil",
   "agenda_ovulation": "Ovulação",
-  "agenda_days_away": "{n} dias",
-  "month_names_short": "jan,fev,mar,abr,mai,jun,jul,ago,set,out,nov,dez"
+  "agenda_days_away": "{n} dias"
 }

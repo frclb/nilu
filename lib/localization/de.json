@@ -801,6 +801,5 @@
   "agenda_period_start": "Periode erwartet",
   "agenda_fertile_start": "Fruchtbares Fenster beginnt",
   "agenda_ovulation": "Eisprung",
-  "agenda_days_away": "{n} Tage",
-  "month_names_short": "Jan,Feb,Mär,Apr,Mai,Jun,Jul,Aug,Sep,Okt,Nov,Dez"
+  "agenda_days_away": "{n} Tage"
 }

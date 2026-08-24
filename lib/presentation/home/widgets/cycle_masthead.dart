@@ -5,6 +5,7 @@ import '../../../core/navigation/navigation_service.dart';
 import '../../../core/navigation/route_names.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../localization/app_localizations.dart';
+import '../../../localization/date_names.dart';
 import '../../calendar/view_models/calendar_view_model.dart';
 import '../../../domain/models/cycle_info.dart';
 import '../../../domain/services/cycle_agenda.dart';
@@ -24,6 +25,7 @@ class CycleMasthead extends StatelessWidget {
     final t = context.tokens;
     final theme = Theme.of(context);
     final info = context.watch<CalendarViewModel>().cycleInfo;
+    final now = DateTime.now();
 
     final day = info.currentCycleDay;
     final phase = info.currentPhase;
@@ -37,6 +39,18 @@ class CycleMasthead extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Bugünün tarihi. Ajandadaki satırlar "4 gün", "23 gün" diyor;
+            // bunların neye göre sayıldığı ekranda yazılı olmalı.
+            Text(
+              '${now.day} ${context.monthName(now.month)} '
+              '${now.year} · ${context.weekdayName(now.weekday)}',
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontSize: 13,
+                color: t.textMuted,
+              ),
+            ),
+            const SizedBox(height: 14),
+
             // Cevap şekle kodlanmıyor, cümleyle söyleniyor.
             //
             // Halkanın içindeki "5" bir saniyede okunmuyordu: sayının döngü
@@ -88,7 +102,7 @@ class CycleMasthead extends StatelessWidget {
             CycleBand(info: info, currentDay: day ?? 0),
             const SizedBox(height: 22),
 
-            for (final entry in CycleAgenda.upcoming(info, now: DateTime.now()))
+            for (final entry in CycleAgenda.upcoming(info, now: now))
               _AgendaRow(entry: entry),
           ],
         ),
@@ -123,11 +137,13 @@ String _headline(
   return context.tr('home_headline_days_left', params: {'n': '$daysUntil'});
 }
 
-String _formatDate(BuildContext context, DateTime date) {
-  final months = context.tr('month_names_short').split(',');
-  final name = months.length >= date.month ? months[date.month - 1].trim() : '';
-  return '${date.day} $name';
-}
+/// Ajanda satırındaki kısa tarih.
+///
+/// Ay adları için ayrı bir liste tutmuyoruz: uygulamada zaten
+/// `context.monthName` var ve takvim de onu kullanıyor. İki ayrı listenin
+/// zamanla birbirinden ayrılması kaçınılmazdı.
+String _formatDate(BuildContext context, DateTime date) =>
+    '${date.day} ${context.monthName(date.month)}';
 
 /// Ajandadaki tek satır: tarih, olay, kalan gün.
 class _AgendaRow extends StatelessWidget {
@@ -149,10 +165,14 @@ class _AgendaRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 11),
         child: Row(
           children: [
+            // Tam ay adı için yer bırakılıyor: dar sütunda "28 Ağustos"
+            // ikiye bölünüyordu.
             SizedBox(
-              width: 62,
+              width: 104,
               child: Text(
                 _formatDate(context, entry.date),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.labelLarge?.copyWith(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
