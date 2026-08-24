@@ -788,5 +788,19 @@
   "partner_requests_hint": "Personne ne voit ton cycle tant que tu n'as pas accepté. Refuse ce que tu n'attendais pas.",
   "partner_request_approve": "Accepter",
   "partner_request_reject": "Refuser",
-  "partner_request_approved": "Accepté. Ton partenaire voit maintenant ce que tu partages."
+  "partner_request_approved": "Accepté. Ton partenaire voit maintenant ce que tu partages.",
+  "home_label_period": "Règles",
+  "home_label_next_period": "Prochaines règles",
+  "home_label_cycle": "Cycle",
+  "home_headline_period_day": "Jour {n}",
+  "home_headline_days_left": "dans {n} jours",
+  "home_headline_period_today": "Commencent aujourd'hui",
+  "home_headline_cycle_day": "Jour de cycle {n}",
+  "home_headline_no_data": "Pas encore de données",
+  "home_expected_on": "Prévues le {date}",
+  "agenda_period_start": "Règles prévues",
+  "agenda_fertile_start": "Début de la fenêtre fertile",
+  "agenda_ovulation": "Ovulation",
+  "agenda_days_away": "{n} jours",
+  "month_names_short": "janv,févr,mars,avr,mai,juin,juil,août,sept,oct,nov,déc"
 }

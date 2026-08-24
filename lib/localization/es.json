@@ -788,5 +788,19 @@
   "partner_requests_hint": "Nadie ve tu ciclo hasta que lo apruebes. Rechaza lo que no esperabas.",
   "partner_request_approve": "Aprobar",
   "partner_request_reject": "Rechazar",
-  "partner_request_approved": "Aprobado. Tu pareja ya puede ver lo que compartes."
+  "partner_request_approved": "Aprobado. Tu pareja ya puede ver lo que compartes.",
+  "home_label_period": "Regla",
+  "home_label_next_period": "Próxima regla",
+  "home_label_cycle": "Ciclo",
+  "home_headline_period_day": "Día {n}",
+  "home_headline_days_left": "en {n} días",
+  "home_headline_period_today": "Empieza hoy",
+  "home_headline_cycle_day": "Día del ciclo {n}",
+  "home_headline_no_data": "Aún no hay datos",
+  "home_expected_on": "Prevista el {date}",
+  "agenda_period_start": "Regla prevista",
+  "agenda_fertile_start": "Empieza la ventana fértil",
+  "agenda_ovulation": "Ovulación",
+  "agenda_days_away": "{n} días",
+  "month_names_short": "ene,feb,mar,abr,may,jun,jul,ago,sep,oct,nov,dic"
 }

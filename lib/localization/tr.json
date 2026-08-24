@@ -788,5 +788,19 @@
   "partner_requests_hint": "Onaylayana kadar kimse döngü bilgilerini göremez. İstemediğin bir isteği reddet.",
   "partner_request_approve": "Onayla",
   "partner_request_reject": "Reddet",
-  "partner_request_approved": "Onaylandı. Partnerin artık paylaştığın bilgileri görebilir."
+  "partner_request_approved": "Onaylandı. Partnerin artık paylaştığın bilgileri görebilir.",
+  "home_label_period": "Regl",
+  "home_label_next_period": "Regl'e",
+  "home_label_cycle": "Döngü",
+  "home_headline_period_day": "{n}. gün",
+  "home_headline_days_left": "{n} gün var",
+  "home_headline_period_today": "Bugün başlıyor",
+  "home_headline_cycle_day": "Döngü günü {n}",
+  "home_headline_no_data": "Henüz kayıt yok",
+  "home_expected_on": "{date} tarihinde bekleniyor",
+  "agenda_period_start": "Regl bekleniyor",
+  "agenda_fertile_start": "Doğurgan dönem başlıyor",
+  "agenda_ovulation": "Yumurtlama",
+  "agenda_days_away": "{n} gün",
+  "month_names_short": "Oca,Şub,Mar,Nis,May,Haz,Tem,Ağu,Eyl,Eki,Kas,Ara"
 }

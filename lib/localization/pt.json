@@ -788,5 +788,19 @@
   "partner_requests_hint": "Ninguém vê o teu ciclo até aprovares. Rejeita o que não estavas à espera.",
   "partner_request_approve": "Aprovar",
   "partner_request_reject": "Rejeitar",
-  "partner_request_approved": "Aprovado. O teu par já vê o que partilhas."
+  "partner_request_approved": "Aprovado. O teu par já vê o que partilhas.",
+  "home_label_period": "Período",
+  "home_label_next_period": "Próximo período",
+  "home_label_cycle": "Ciclo",
+  "home_headline_period_day": "Dia {n}",
+  "home_headline_days_left": "daqui a {n} dias",
+  "home_headline_period_today": "Começa hoje",
+  "home_headline_cycle_day": "Dia do ciclo {n}",
+  "home_headline_no_data": "Ainda sem dados",
+  "home_expected_on": "Previsto para {date}",
+  "agenda_period_start": "Período previsto",
+  "agenda_fertile_start": "Início da janela fértil",
+  "agenda_ovulation": "Ovulação",
+  "agenda_days_away": "{n} dias",
+  "month_names_short": "jan,fev,mar,abr,mai,jun,jul,ago,set,out,nov,dez"
 }
