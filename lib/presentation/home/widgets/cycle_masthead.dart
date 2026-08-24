@@ -9,7 +9,7 @@ import '../../../localization/date_names.dart';
 import '../../calendar/view_models/calendar_view_model.dart';
 import '../../../domain/models/cycle_info.dart';
 import '../../../domain/services/cycle_agenda.dart';
-import 'cycle_band.dart';
+import 'cycle_ring.dart';
 
 /// Ana ekranın üst bloğu.
 ///
@@ -121,7 +121,7 @@ class CycleMasthead extends StatelessWidget {
                     ],
 
                     const SizedBox(height: 18),
-                    CycleBand(info: info, currentDay: day ?? 0),
+                    CycleRing(info: info, currentDay: day ?? 0),
                   ],
                 ),
               ),

@@ -801,5 +801,6 @@
   "agenda_period_start": "Periode erwartet",
   "agenda_fertile_start": "Fruchtbares Fenster beginnt",
   "agenda_ovulation": "Eisprung",
-  "agenda_days_away": "{n} Tage"
+  "agenda_days_away": "{n} Tage",
+  "home_ring_cycle_length": "{n}-Tage-\nZyklus"
 }

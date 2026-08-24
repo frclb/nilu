@@ -801,5 +801,6 @@
   "agenda_period_start": "Período previsto",
   "agenda_fertile_start": "Início da janela fértil",
   "agenda_ovulation": "Ovulação",
-  "agenda_days_away": "{n} dias"
+  "agenda_days_away": "{n} dias",
+  "home_ring_cycle_length": "ciclo de\n{n} dias"
 }
