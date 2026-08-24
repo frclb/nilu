@@ -190,6 +190,24 @@ class FirestoreDataSource {
         .snapshots();
   }
 
+  /// İşlenen isteği siler.
+  ///
+  /// Onaylandıktan ya da reddedildikten sonra istek listede kalmamalı; aksi
+  /// hâlde sahip aynı isteği her açılışta yeniden görür.
+  Future<void> clearPairingRequest(String token, String requesterUid) async {
+    if (!_available) return;
+    try {
+      await _firestore
+          .collection('pairingTokens')
+          .doc(token)
+          .collection('requests')
+          .doc(requesterUid)
+          .delete();
+    } catch (e) {
+      debugPrint('Error clearing pairing request: $e');
+    }
+  }
+
   /// Sahip erişimi verir: partneri **kendi** listesine ekler.
   Future<void> approvePartner(String uid, String partnerUid) async {
     if (!_available) return;

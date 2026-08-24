@@ -69,6 +69,9 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
   // We use MobileScannerController to pause/start parsing barcodes
   final MobileScannerController _scannerController = MobileScannerController();
   final FirestoreDataSource _remote = FirestoreDataSource();
+
+  /// Okunan eşleştirme kodu. İstek bu koda bırakılıyor.
+  String? _scannedToken;
   bool _isProcessing = false;
 
   @override
@@ -122,6 +125,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
       return;
     }
 
+    _scannedToken = token;
     _showConfirmationDialog(ownerUid!);
   }
 
@@ -277,11 +281,18 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
       ),
     );
 
-    // Update state
     final userViewModel = context.read<UserViewModel>();
-    await userViewModel.setPartnerState(isPartner: true, partnerId: code);
+    final messenger = ScaffoldMessenger.of(context);
+    final requested = context.tr('partner_scan_requested');
 
-    // Mark onboarding as complete
+    // Kodu okumak tek başına erişim vermiyor: sahip onaylayana kadar hiçbir
+    // şey okunamaz. Önceki modelde okuyan taraf kendini doğrudan bağlıyordu —
+    // erişimi verenin sahip olmaması, iptalin çalışmamasının da sebebiydi.
+    final myId = await userViewModel.ensureMyId();
+    await _remote.requestPairing(_scannedToken!, myId);
+
+    // Yerel taraf partner moduna geçiyor; veriyi ancak onay sonrası görecek.
+    await userViewModel.setPartnerState(isPartner: true, partnerId: code);
     await userViewModel.completeOnboarding();
 
     if (mounted) {
@@ -290,7 +301,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
       // pop sheet
       Navigator.pop(context);
 
-      // Navigate Home (where Partner Dashboard will be shown if isPartner is true)
+      messenger.showSnackBar(SnackBar(content: Text(requested)));
       context.goNamed(RouteNames.home);
     }
   }

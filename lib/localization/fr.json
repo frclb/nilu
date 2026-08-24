@@ -782,5 +782,11 @@
   "partner_qr_gen_rotate": "Renouveler le code",
   "partner_qr_gen_rotate_hint": "En renouvelant, les QR codes déjà partagés cessent de fonctionner.",
   "partner_qr_gen_rotated": "Code renouvelé. Les anciens QR codes ne fonctionnent plus.",
-  "partner_scan_error_unknown": "Ce code n'est plus valide. Demande un nouveau code à ton partenaire."
+  "partner_scan_error_unknown": "Ce code n'est plus valide. Demande un nouveau code à ton partenaire.",
+  "partner_scan_requested": "Demande envoyée. Tu verras le cycle une fois qu’elle aura accepté.",
+  "partner_requests_title": "Demandes de liaison en attente",
+  "partner_requests_hint": "Personne ne voit ton cycle tant que tu n'as pas accepté. Refuse ce que tu n'attendais pas.",
+  "partner_request_approve": "Accepter",
+  "partner_request_reject": "Refuser",
+  "partner_request_approved": "Accepté. Ton partenaire voit maintenant ce que tu partages."
 }

@@ -782,5 +782,11 @@
   "partner_qr_gen_rotate": "Code erneuern",
   "partner_qr_gen_rotate_hint": "Beim Erneuern funktionieren zuvor geteilte QR-Codes nicht mehr.",
   "partner_qr_gen_rotated": "Code erneuert. Ältere QR-Codes funktionieren nicht mehr.",
-  "partner_scan_error_unknown": "Dieser Code ist nicht mehr gültig. Bitte deinen Partner um einen neuen."
+  "partner_scan_error_unknown": "Dieser Code ist nicht mehr gültig. Bitte deinen Partner um einen neuen.",
+  "partner_scan_requested": "Anfrage gesendet. Du siehst den Zyklus, sobald sie zustimmt.",
+  "partner_requests_title": "Offene Kopplungsanfragen",
+  "partner_requests_hint": "Niemand sieht deinen Zyklus, bevor du zustimmst. Lehne ab, was du nicht erwartet hast.",
+  "partner_request_approve": "Zustimmen",
+  "partner_request_reject": "Ablehnen",
+  "partner_request_approved": "Zugestimmt. Dein Partner sieht jetzt, was du teilst."
 }

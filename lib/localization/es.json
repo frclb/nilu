@@ -782,5 +782,11 @@
   "partner_qr_gen_rotate": "Renovar código",
   "partner_qr_gen_rotate_hint": "Al renovarlo, los códigos QR que compartiste antes dejan de funcionar.",
   "partner_qr_gen_rotated": "Código renovado. Los códigos QR anteriores ya no funcionan.",
-  "partner_scan_error_unknown": "Este código ya no es válido. Pídele a tu pareja uno nuevo."
+  "partner_scan_error_unknown": "Este código ya no es válido. Pídele a tu pareja uno nuevo.",
+  "partner_scan_requested": "Solicitud enviada. Verás el ciclo cuando lo apruebe.",
+  "partner_requests_title": "Solicitudes de vinculación pendientes",
+  "partner_requests_hint": "Nadie ve tu ciclo hasta que lo apruebes. Rechaza lo que no esperabas.",
+  "partner_request_approve": "Aprobar",
+  "partner_request_reject": "Rechazar",
+  "partner_request_approved": "Aprobado. Tu pareja ya puede ver lo que compartes."
 }

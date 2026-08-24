@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/pairing_requests_section.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/navigation/route_names.dart';
 import '../../../design_system/app_colors.dart';
@@ -47,6 +48,12 @@ class PartnerMatchScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: const [
                   PartnerMatchHero(),
+
+                  // Bekleyen istekler en üstte: erişimi vermek sahibin
+                  // kararı ve bekleyen bir istek varsa ilk görülmesi
+                  // gereken şey o.
+                  PairingRequestsSection(),
+
                   SizedBox(height: 32),
                   SharedInfoSection(),
                   SizedBox(height: 32),

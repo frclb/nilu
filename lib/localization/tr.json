@@ -782,5 +782,11 @@
   "partner_qr_gen_rotate": "Kodu yenile",
   "partner_qr_gen_rotate_hint": "Yenilediğinde daha önce paylaştığın QR kodları çalışmaz.",
   "partner_qr_gen_rotated": "Kod yenilendi. Eski QR kodları artık geçersiz.",
-  "partner_scan_error_unknown": "Bu kod artık geçerli değil. Partnerinden yeni bir kod istemen gerekiyor."
+  "partner_scan_error_unknown": "Bu kod artık geçerli değil. Partnerinden yeni bir kod istemen gerekiyor.",
+  "partner_scan_requested": "İstek gönderildi. Partnerin onayladığında döngü bilgilerini görebileceksin.",
+  "partner_requests_title": "Bekleyen eşleşme istekleri",
+  "partner_requests_hint": "Onaylayana kadar kimse döngü bilgilerini göremez. İstemediğin bir isteği reddet.",
+  "partner_request_approve": "Onayla",
+  "partner_request_reject": "Reddet",
+  "partner_request_approved": "Onaylandı. Partnerin artık paylaştığın bilgileri görebilir."
 }

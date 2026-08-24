@@ -782,5 +782,11 @@
   "partner_qr_gen_rotate": "Refresh code",
   "partner_qr_gen_rotate_hint": "Refreshing stops any QR code you shared earlier from working.",
   "partner_qr_gen_rotated": "Code refreshed. Older QR codes no longer work.",
-  "partner_scan_error_unknown": "This code is no longer valid. Ask your partner for a new one."
+  "partner_scan_error_unknown": "This code is no longer valid. Ask your partner for a new one.",
+  "partner_scan_requested": "Request sent. You will see their cycle once they approve.",
+  "partner_requests_title": "Pending pairing requests",
+  "partner_requests_hint": "Nobody sees your cycle until you approve. Reject anything you did not expect.",
+  "partner_request_approve": "Approve",
+  "partner_request_reject": "Reject",
+  "partner_request_approved": "Approved. Your partner can now see what you share."
 }
