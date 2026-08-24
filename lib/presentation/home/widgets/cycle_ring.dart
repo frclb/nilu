@@ -155,7 +155,18 @@ class _RingPainter extends CustomPainter {
     // Her gün bir papatya. Boyut, iki komşu çiçek değmeyecek şekilde
     // yaydan türetiliyor: döngü uzadıkça çiçekler küçülüyor.
     final slot = 2 * math.pi * radius / length;
-    final petalSize = math.min(slot * 0.92, 22.0);
+
+    // Taban boyut, bugünün büyütülmüş çiçeğine yer kalacak şekilde
+    // hesaplanıyor. İki komşu merkez arası `slot` kadar; bugünün yarıçapı ile
+    // komşusunun yarıçapının toplamı bunun altında kalmalı.
+    //
+    //   base/2 * todayScale + base/2 <= slot * clearance
+    //
+    // Önceden taban `slot * 0.92` ve büyütme 1.45'ti; toplam yarıçap slot'u
+    // aşıyor ve bugünün çiçeği iki komşusuna değiyordu.
+    const todayScale = 1.28;
+    const clearance = 0.94;
+    final petalSize = math.min(slot * 2 * clearance / (todayScale + 1), 20.0);
 
     for (var day = 1; day <= length; day++) {
       final isToday = day == currentDay;
@@ -164,15 +175,29 @@ class _RingPainter extends CustomPainter {
 
       // Saat 12'den başla.
       final angle = -math.pi / 2 + (day - 1) * sweep + sweep / 2;
+
+      // Bugünün çiçeği bir tık dışarıda duruyor. Açısal aralık sabit
+      // olduğundan dışa çıkmak komşularla arayı açıyor; ayrıca çelengin
+      // üzerinde hafifçe kabarmış gibi görünüyor.
+      final r = isToday ? radius + petalSize * 0.22 : radius;
       final at = Offset(
-        center.dx + radius * math.cos(angle),
-        center.dy + radius * math.sin(angle),
+        center.dx + r * math.cos(angle),
+        center.dy + r * math.sin(angle),
       );
+
+      if (isToday) {
+        // Yumuşak bir hâle: bugünü büyütmeye fazla yüklenmeden ayırıyor.
+        canvas.drawCircle(
+          at,
+          petalSize * 0.95,
+          Paint()..color = color.withAlpha(38),
+        );
+      }
 
       _drawDaisy(
         canvas,
         at: at,
-        size: isToday ? petalSize * 1.45 : petalSize,
+        size: isToday ? petalSize * todayScale : petalSize,
         // Geçmiş günler soluk: bakış bugüne ve önündeki yola gitsin.
         petal: isPast ? color.withAlpha(80) : color,
         // Papatyanın göbeği kartın yüzey rengi. Sarı bir göbek palete yeni
