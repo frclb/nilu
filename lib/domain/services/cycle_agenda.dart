@@ -49,11 +49,17 @@ class CycleAgenda {
     final today = DateTime(now.year, now.month, now.day);
     final entries = <AgendaEntry>[];
 
+    // Aynı olay iki kaynaktan gelebiliyor: `predictedNextPeriod` çoğu zaman
+    // `futurePredictions`'ın ilkiyle aynı tarih. Tekilleştirilmeseydi ajandada
+    // "16 Eylül · Regl bekleniyor" iki kez yazıyordu.
+    final seen = <String>{};
+
     void add(AgendaKind kind, DateTime? date) {
       if (date == null) return;
       final clean = DateTime(date.year, date.month, date.day);
       final days = clean.difference(today).inDays;
       if (days <= 0) return;
+      if (!seen.add('${kind.name}@${clean.toIso8601String()}')) return;
       entries.add(AgendaEntry(kind: kind, date: clean, daysAway: days));
     }
 

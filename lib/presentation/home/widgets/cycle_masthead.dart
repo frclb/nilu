@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/navigation/navigation_service.dart';
 import '../../../core/navigation/route_names.dart';
 import '../../../design_system/app_tokens.dart';
+import '../../../design_system/phase_colors.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../localization/date_names.dart';
 import '../../calendar/view_models/calendar_view_model.dart';
@@ -45,9 +46,22 @@ class CycleMasthead extends StatelessWidget {
           decoration: BoxDecoration(
             color: t.surface,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: t.border),
+            // Kenarlık `t.border` idi: beyaz yüzeye karşı 1.35:1, yani
+            // pratikte görünmüyordu. Kart zeminden ayrışmıyordu.
+            border: Border.all(color: t.textFaint.withAlpha(120)),
             boxShadow: [
-              BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 4),
+              // Tek katman %2 opaklıktaydı — hiçbir şey yapmıyordu. İki
+              // katman: yere değdiği yerde keskin, yukarıda yayvan.
+              BoxShadow(
+                color: Colors.black.withAlpha(12),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+              BoxShadow(
+                color: Colors.black.withAlpha(26),
+                blurRadius: 22,
+                offset: const Offset(0, 10),
+              ),
             ],
           ),
           clipBehavior: Clip.antiAlias,
@@ -65,8 +79,9 @@ class CycleMasthead extends StatelessWidget {
                       '${now.day} ${context.monthName(now.month)} '
                       '${now.year} · ${context.weekdayName(now.weekday)}',
                       style: theme.textTheme.labelLarge?.copyWith(
-                        fontSize: 13,
-                        color: t.textMuted,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: t.text,
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -87,10 +102,12 @@ class CycleMasthead extends StatelessWidget {
                                 .tr(_headlineLabelKey(phase, daysLate))
                                 .toUpperCase(),
                             style: theme.textTheme.labelLarge?.copyWith(
-                              fontSize: 10,
+                              fontSize: 11,
                               letterSpacing: 2.2,
-                              fontWeight: FontWeight.w600,
-                              color: t.textMuted,
+                              fontWeight: FontWeight.w700,
+                              // Etiket gri değil evre renginde: çelenkteki
+                              // renkle aynı şeyi söylüyor.
+                              color: phase.color(t),
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -124,7 +141,14 @@ class CycleMasthead extends StatelessWidget {
               if (agenda.isNotEmpty)
                 Container(
                   width: double.infinity,
-                  color: t.surfaceAlt,
+                  decoration: BoxDecoration(
+                    color: t.surfaceAlt,
+                    // Bant rengi kart yüzeyine karşı 1.17:1; tek başına iki
+                    // bölümü ayırmaya yetmiyordu. Keskin bir çizgi ayırıyor.
+                    border: Border(
+                      top: BorderSide(color: t.textFaint.withAlpha(110)),
+                    ),
+                  ),
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -222,9 +246,9 @@ class _AgendaRow extends StatelessWidget {
             // Renk noktası satırı halkayla eşliyor: aynı olay ekranda iki
             // yerde aynı renkte görünsün.
             Container(
-              width: 7,
-              height: 7,
-              margin: const EdgeInsets.only(right: 11),
+              width: 8,
+              height: 8,
+              margin: const EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
                 color: _entryColor(entry.kind, t),
                 shape: BoxShape.circle,
@@ -239,15 +263,19 @@ class _AgendaRow extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.labelLarge?.copyWith(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: t.text,
                 ),
               ),
             ),
             Expanded(
               child: Text(
                 context.tr(entry.labelKey),
-                style: theme.textTheme.labelLarge?.copyWith(fontSize: 13),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontSize: 14,
+                  color: t.text,
+                ),
               ),
             ),
             Text(
@@ -256,7 +284,7 @@ class _AgendaRow extends StatelessWidget {
                 params: {'n': '${entry.daysAway}'},
               ),
               style: theme.textTheme.labelLarge?.copyWith(
-                fontSize: 13,
+                fontSize: 14,
                 color: t.textMuted,
               ),
             ),

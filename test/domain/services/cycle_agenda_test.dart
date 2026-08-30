@@ -94,6 +94,21 @@ void main() {
       expect(list.last.date, DateTime(2026, 10, 18));
     });
 
+    test('aynı tarihli olay iki kez listelenmez', () {
+      // `predictedNextPeriod` çoğu zaman `futurePredictions`'ın ilkiyle aynı
+      // tarih; ekranda "Regl bekleniyor" iki kez yazıyordu.
+      final list = CycleAgenda.upcoming(
+        info(
+          next: DateTime(2026, 9, 20),
+          future: [PredictedCycle(startDate: DateTime(2026, 9, 20))],
+        ),
+        now: now,
+        limit: 5,
+      );
+      expect(list.length, 1);
+      expect(list.single.kind, AgendaKind.periodStart);
+    });
+
     test('sınır kadar olay döner', () {
       final list = CycleAgenda.upcoming(
         info(
