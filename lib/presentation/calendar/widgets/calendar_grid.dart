@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../localization/date_names.dart';
@@ -59,186 +60,185 @@ class CalendarGrid extends StatelessWidget {
 
     final currentMonthName = context.monthName(month);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.backgroundDark : Colors.white,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(5),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
-      child: Column(
-        children: [
-          // Ay Navigasyonu
-          Padding(
-            padding: const EdgeInsets.only(top: 12, bottom: 8, left: 4),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: () => viewModel.previousMonth(),
-                  icon: const Icon(Icons.chevron_left),
-                  color: theme.textTheme.labelLarge?.color,
-                  tooltip: context.tr('calendar_previous_month'),
-                ),
-                Expanded(
-                  child: Text(
-                    context.tr(
-                      'calendar_month_year',
-                      params: {
-                        'month': currentMonthName,
-                        'year': year.toString(),
-                      },
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.displayLarge?.copyWith(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => viewModel.nextMonth(),
-                  icon: const Icon(Icons.chevron_right),
-                  color: theme.textTheme.labelLarge?.color,
-                  tooltip: context.tr('calendar_next_month'),
-                ),
-              ],
-            ),
-          ),
-
-          // "Bugüne dön" — yalnızca başka bir aya gidildiğinde görünür.
-          // Aksi halde kullanıcı ok düğmesine ay sayısı kadar basmak zorunda.
-          if (!viewModel.isViewingCurrentMonth)
+    // Izgara ekranın iki kenarına yapışık, yalnızca altı yuvarlak bir paneldi
+    // ve gölgesi %2 opaklıktaydı — ana ekrandaki kartlarla aynı dili
+    // konuşmuyordu. Artık paylaşılan kart bileşeni kullanılıyor.
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+      child: AppCard(
+        // Regl aralığı çubuğu satırın iki ucuna kadar uzuyor; dar boşlukta
+        // kartın yuvarlak köşesinde kesiliyordu.
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 14),
+        child: Column(
+          children: [
+            // Ay Navigasyonu
             Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: TextButton.icon(
-                onPressed: viewModel.goToToday,
-                icon: const Icon(Icons.today, size: 16),
-                label: Text(context.tr('calendar_jump_today')),
-                style: TextButton.styleFrom(
-                  minimumSize: const Size(0, 40),
-                  foregroundColor: theme.colorScheme.primary,
-                  textStyle: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
+              padding: const EdgeInsets.only(top: 12, bottom: 8, left: 4),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () => viewModel.previousMonth(),
+                    icon: const Icon(Icons.chevron_left),
+                    color: theme.textTheme.labelLarge?.color,
+                    tooltip: context.tr('calendar_previous_month'),
                   ),
-                ),
+                  Expanded(
+                    child: Text(
+                      context.tr(
+                        'calendar_month_year',
+                        params: {
+                          'month': currentMonthName,
+                          'year': year.toString(),
+                        },
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.displayLarge?.copyWith(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => viewModel.nextMonth(),
+                    icon: const Icon(Icons.chevron_right),
+                    color: theme.textTheme.labelLarge?.color,
+                    tooltip: context.tr('calendar_next_month'),
+                  ),
+                ],
               ),
             ),
 
-          // Haftanın Günleri Başlığı.
-          // Sabit 48px genişlik yerine eşit paylaşım: dar ekranlarda
-          // (7 × 48 = 336px) satır taşıyordu.
-          Row(
-            children: daysOfWeek.map((day) {
-              return Expanded(
-                child: Text(
-                  day.toUpperCase(),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                    color: theme.colorScheme.primary.withAlpha(178),
+            // "Bugüne dön" — yalnızca başka bir aya gidildiğinde görünür.
+            // Aksi halde kullanıcı ok düğmesine ay sayısı kadar basmak zorunda.
+            if (!viewModel.isViewingCurrentMonth)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: TextButton.icon(
+                  onPressed: viewModel.goToToday,
+                  icon: const Icon(Icons.today, size: 16),
+                  label: Text(context.tr('calendar_jump_today')),
+                  style: TextButton.styleFrom(
+                    minimumSize: const Size(0, 40),
+                    foregroundColor: theme.colorScheme.primary,
+                    textStyle: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 8),
+              ),
 
-          // Takvim Izgarası
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: totalItems,
-            // Hücre içeriği 47px (36 daire + 3 boşluk + 8 nokta). 0.85 oranı
-            // hücreyi 62px yapıyor, boşa giden 15px × 6 satır yüzünden eylem
-            // düğmeleri ekranın altında kalıyordu.
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-              mainAxisSpacing: 2,
-              crossAxisSpacing: 0,
-              childAspectRatio: 1.0,
+            // Haftanın Günleri Başlığı.
+            // Sabit 48px genişlik yerine eşit paylaşım: dar ekranlarda
+            // (7 × 48 = 336px) satır taşıyordu.
+            Row(
+              children: daysOfWeek.map((day) {
+                return Expanded(
+                  child: Text(
+                    day.toUpperCase(),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                      color: theme.colorScheme.primary.withAlpha(178),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
-            itemBuilder: (context, index) {
-              final DateTime date;
-              bool isFaded = false;
+            const SizedBox(height: 8),
 
-              if (index < previousMonthFill) {
-                isFaded = true;
-                date = firstDayOfMonth.subtract(
-                  Duration(days: previousMonthFill - index),
-                );
-              } else if (index < previousMonthFill + daysInMonth) {
-                date = DateTime(year, month, index - previousMonthFill + 1);
-              } else {
-                isFaded = true;
-                date = DateTime(year, month, daysInMonth).add(
-                  Duration(days: index - (previousMonthFill + daysInMonth) + 1),
-                );
-              }
+            // Takvim Izgarası
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: totalItems,
+              // Hücre içeriği 47px (36 daire + 3 boşluk + 8 nokta). 0.85 oranı
+              // hücreyi 62px yapıyor, boşa giden 15px × 6 satır yüzünden eylem
+              // düğmeleri ekranın altında kalıyordu.
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 7,
+                mainAxisSpacing: 2,
+                crossAxisSpacing: 0,
+                childAspectRatio: 1.0,
+              ),
+              itemBuilder: (context, index) {
+                final DateTime date;
+                bool isFaded = false;
 
-              return _DayTile(date: date, isFaded: isFaded);
-            },
-          ),
+                if (index < previousMonthFill) {
+                  isFaded = true;
+                  date = firstDayOfMonth.subtract(
+                    Duration(days: previousMonthFill - index),
+                  );
+                } else if (index < previousMonthFill + daysInMonth) {
+                  date = DateTime(year, month, index - previousMonthFill + 1);
+                } else {
+                  isFaded = true;
+                  date = DateTime(year, month, daysInMonth).add(
+                    Duration(
+                      days: index - (previousMonthFill + daysInMonth) + 1,
+                    ),
+                  );
+                }
 
-          const SizedBox(height: 12),
+                return _DayTile(date: date, isFaded: isFaded);
+              },
+            ),
 
-          // Açıklamalar (Legend)
-          //
-          // Sabit bir Row idi; dört etiket tek satıra sığmak zorundaydı.
-          // Uzun çevirilerde (ör. Almanca "Fruchtbares Fenster") taşıyordu.
-          // Wrap ile gerektiğinde alt satıra iniyor.
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 14,
-              runSpacing: 8,
-              children: [
-                _buildLegendItem(
-                  context,
-                  AppColors.flowMedium,
-                  context.tr('calendar_legend_period'),
-                ),
-                _buildLegendItem(
-                  context,
-                  AppColors.flowLight,
-                  context.tr('calendar_legend_predicted'),
-                ),
-                // Hormonal doğum kontrolünde takvimde doğurganlık ve
-                // yumurtlama işareti çizilmiyor; açıklama satırında da
-                // görünmemeli, yoksa var olmayan renkleri tarif ediyor.
-                if (context.select<CalendarViewModel, bool>(
-                  (v) => v.cycleInfo.fertilityTracked,
-                )) ...[
+            const SizedBox(height: 12),
+
+            // Açıklamalar (Legend)
+            //
+            // Sabit bir Row idi; dört etiket tek satıra sığmak zorundaydı.
+            // Uzun çevirilerde (ör. Almanca "Fruchtbares Fenster") taşıyordu.
+            // Wrap ile gerektiğinde alt satıra iniyor.
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 14,
+                runSpacing: 8,
+                children: [
                   _buildLegendItem(
                     context,
-                    isDark
-                        ? AppColors.secondaryPinkDark
-                        : AppColors.fertileLight,
-                    context.tr('calendar_legend_fertility'),
+                    AppColors.flowMedium,
+                    context.tr('calendar_legend_period'),
                   ),
                   _buildLegendItem(
                     context,
-                    context.tokens.ovulation,
-                    context.tr('calendar_legend_ovulation'),
+                    AppColors.flowLight,
+                    context.tr('calendar_legend_predicted'),
                   ),
+                  // Hormonal doğum kontrolünde takvimde doğurganlık ve
+                  // yumurtlama işareti çizilmiyor; açıklama satırında da
+                  // görünmemeli, yoksa var olmayan renkleri tarif ediyor.
+                  if (context.select<CalendarViewModel, bool>(
+                    (v) => v.cycleInfo.fertilityTracked,
+                  )) ...[
+                    _buildLegendItem(
+                      context,
+                      isDark
+                          ? AppColors.secondaryPinkDark
+                          : AppColors.fertileLight,
+                      context.tr('calendar_legend_fertility'),
+                    ),
+                    _buildLegendItem(
+                      context,
+                      context.tokens.ovulation,
+                      context.tr('calendar_legend_ovulation'),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
