@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/navigation/navigation_service.dart';
 import '../../../core/navigation/route_names.dart';
+import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../design_system/phase_colors.dart';
 import '../../../localization/app_localizations.dart';
@@ -36,147 +37,95 @@ class CycleMasthead extends StatelessWidget {
 
     final agenda = CycleAgenda.upcoming(info, now: now);
 
-    return GestureDetector(
-      onTap: () => NavigationService().push(RouteNames.calendar),
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-        // Uygulamanın geri kalanı yuvarlak kartlarla kurulu; başlık çıplak
-        // durunca altındaki kartlarla aynı dili konuşmuyordu.
-        child: Container(
-          decoration: BoxDecoration(
-            color: t.surface,
-            borderRadius: BorderRadius.circular(24),
-            // Kenarlık `t.border` idi: beyaz yüzeye karşı 1.35:1, yani
-            // pratikte görünmüyordu. Kart zeminden ayrışmıyordu.
-            border: Border.all(color: t.textFaint.withAlpha(120)),
-            boxShadow: [
-              // Tek katman %2 opaklıktaydı — hiçbir şey yapmıyordu. İki
-              // katman: yere değdiği yerde keskin, yukarıda yayvan.
-              BoxShadow(
-                color: Colors.black.withAlpha(12),
-                blurRadius: 2,
-                offset: const Offset(0, 1),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+      // Kart görünümü paylaşılan bileşenden: yarıçap, kenarlık ve gölge
+      // tek yerde tanımlı olsun ki ekranlar arasında derinlik tutarlı olsun.
+      child: AppSectionedCard(
+        onTap: () => NavigationService().push(RouteNames.calendar),
+        header: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Bugünün tarihi. Ajandadaki satırlar "4 gün", "23 gün" diyor;
+            // bunların neye göre sayıldığı ekranda yazılı olmalı.
+            Text(
+              '${now.day} ${context.monthName(now.month)} '
+              '${now.year} · ${context.weekdayName(now.weekday)}',
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: t.text,
               ),
-              BoxShadow(
-                color: Colors.black.withAlpha(26),
-                blurRadius: 22,
-                offset: const Offset(0, 10),
+            ),
+            const SizedBox(height: 6),
+
+            // Cevap şekle kodlanmıyor, cümleyle söyleniyor.
+            //
+            // Halkanın içindeki çıplak bir sayı ("5") bir saniyede
+            // okunmuyor: onun döngü günü olduğunu bilmek gerekiyor.
+            // Merkezde duran şey bir sayı değil, cümle.
+            CycleRing(
+              data: CycleRingData.from(
+                info: info,
+                currentDay: day ?? 0,
+                tokens: t,
               ),
-            ],
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Bugünün tarihi. Ajandadaki satırlar "4 gün", "23 gün" diyor;
-                    // bunların neye göre sayıldığı ekranda yazılı olmalı.
-                    Text(
-                      '${now.day} ${context.monthName(now.month)} '
-                      '${now.year} · ${context.weekdayName(now.weekday)}',
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontSize: 14,
+              center: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    context
+                        .tr(_headlineLabelKey(phase, daysLate))
+                        .toUpperCase(),
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontSize: 11,
+                      letterSpacing: 2.2,
+                      fontWeight: FontWeight.w700,
+                      // Etiket gri değil evre renginde: çelenkteki
+                      // renkle aynı şeyi söylüyor.
+                      color: phase.color(t),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      _headline(context, phase, day, daysUntil, daysLate),
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.displayLarge?.copyWith(
+                        fontSize: 34,
+                        height: 1.1,
                         fontWeight: FontWeight.w600,
-                        color: t.text,
+                        letterSpacing: -0.8,
                       ),
                     ),
-                    const SizedBox(height: 6),
-
-                    // Cevap şekle kodlanmıyor, cümleyle söyleniyor.
-                    //
-                    // Halkanın içindeki çıplak bir sayı ("5") bir saniyede
-                    // okunmuyor: onun döngü günü olduğunu bilmek gerekiyor.
-                    // Merkezde duran şey bir sayı değil, cümle.
-                    CycleRing(
-                      data: CycleRingData.from(
-                        info: info,
-                        currentDay: day ?? 0,
-                        tokens: t,
-                      ),
-                      center: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            context
-                                .tr(_headlineLabelKey(phase, daysLate))
-                                .toUpperCase(),
-                            style: theme.textTheme.labelLarge?.copyWith(
-                              fontSize: 11,
-                              letterSpacing: 2.2,
-                              fontWeight: FontWeight.w700,
-                              // Etiket gri değil evre renginde: çelenkteki
-                              // renkle aynı şeyi söylüyor.
-                              color: phase.color(t),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              _headline(
-                                context,
-                                phase,
-                                day,
-                                daysUntil,
-                                daysLate,
-                              ),
-                              textAlign: TextAlign.center,
-                              style: theme.textTheme.displayLarge?.copyWith(
-                                fontSize: 34,
-                                height: 1.1,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: -0.8,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-
-              // Ajanda kartın ikinci bölümü: aynı yüzeyde ama ayrı okunuyor.
-              if (agenda.isNotEmpty)
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: t.surfaceAlt,
-                    // Bant rengi kart yüzeyine karşı 1.17:1; tek başına iki
-                    // bölümü ayırmaya yetmiyordu. Keskin bir çizgi ayırıyor.
-                    border: Border(
-                      top: BorderSide(color: t.textFaint.withAlpha(110)),
+            ),
+          ],
+        ),
+        footer: agenda.isEmpty
+            ? null
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 14),
+                  Text(
+                    context.tr('home_agenda_title').toUpperCase(),
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontSize: 10,
+                      letterSpacing: 2,
+                      fontWeight: FontWeight.w600,
+                      color: t.textMuted,
                     ),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 14),
-                      Text(
-                        context.tr('home_agenda_title').toUpperCase(),
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          fontSize: 10,
-                          letterSpacing: 2,
-                          fontWeight: FontWeight.w600,
-                          color: t.textMuted,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      for (var i = 0; i < agenda.length; i++)
-                        _AgendaRow(entry: agenda[i], divided: i > 0),
-                      const SizedBox(height: 6),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        ),
+                  const SizedBox(height: 4),
+                  for (var i = 0; i < agenda.length; i++)
+                    _AgendaRow(entry: agenda[i], divided: i > 0),
+                  const SizedBox(height: 6),
+                ],
+              ),
       ),
     );
   }
