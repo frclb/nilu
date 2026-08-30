@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_card.dart';
 import '../article_screen.dart';
 import '../../../design_system/app_palette.dart';
 import '../../../design_system/content_illustration.dart';
@@ -102,24 +103,11 @@ class HealthLibraryArticleList extends StatelessWidget {
           builder: (_) => ArticleScreen(article: article),
         ),
       ),
-      child: Container(
+      // Kart görünümü paylaşılan bileşenden; koyu temada gölge tamamen
+      // kapalıydı ve açık temada kenarlık şeffaftı — kart iki temada iki ayrı
+      // şey gibi duruyordu.
+      child: AppCard(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceWarmDark : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: isDark
-              ? []
-              : [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(7),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-          border: isDark
-              ? Border.all(color: Colors.white.withAlpha(12))
-              : Border.all(color: Colors.transparent),
-        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

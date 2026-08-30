@@ -7,6 +7,7 @@ import '../../../design_system/app_colors.dart';
 import '../../../domain/models/cycle_info.dart';
 import '../../../domain/models/log_vocabulary.dart';
 import '../../../core/navigation/route_names.dart';
+import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../domain/services/insights_service.dart';
 import '../../../domain/services/premium_gate.dart';
@@ -48,29 +49,13 @@ class SymptomAnalysisCard extends StatelessWidget {
             periodLength: viewModel.cycleInfo.averagePeriodLength,
           );
 
-    final cardBgColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
-    final borderColor = isDark
-        ? AppColors.surfaceDark
-        : AppColors.borderGrayLight;
     final textColor = isDark ? AppPalette.nightInk : AppColors.textMainLight;
     final subtitleColor = isDark
         ? AppColors.textMutedWarmDark
         : AppColors.textMutedLight;
 
-    return Container(
+    return AppCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardBgColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(5),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -138,14 +123,14 @@ class SymptomAnalysisCard extends StatelessWidget {
           // olmayan bir şeyi satmayalım.
           if (!canSeePhase && frequencies.isNotEmpty) ...[
             const SizedBox(height: 20),
-            Divider(color: borderColor, height: 1),
+            Divider(color: AppCard.dividerColor(context.tokens), height: 1),
             const SizedBox(height: 16),
             _PhaseLocked(),
           ],
 
           if (dominant != null) ...[
             const SizedBox(height: 20),
-            Divider(color: borderColor, height: 1),
+            Divider(color: AppCard.dividerColor(context.tokens), height: 1),
             const SizedBox(height: 16),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,

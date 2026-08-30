@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_card.dart';
+import '../../../design_system/app_tokens.dart';
 import '../article_screen.dart';
 import '../../../design_system/app_palette.dart';
 import '../../../design_system/content_illustration.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 import '../../../domain/models/article.dart';
 
 class HealthLibraryFeaturedArticle extends StatelessWidget {
@@ -24,23 +25,11 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
             builder: (_) => ArticleScreen(article: article),
           ),
         ),
+        // Koyu temada gölge kapalı, açık temada kenarlık yoktu — kart iki
+        // temada iki ayrı şey gibi duruyordu. Artık ikisi de paylaşılan
+        // bileşenden.
         child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            color: isDark ? AppColors.surfaceWarmDark : Colors.white,
-            boxShadow: isDark
-                ? []
-                : [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(10),
-                      blurRadius: 30,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-            border: isDark
-                ? Border.all(color: Colors.white.withAlpha(12))
-                : null,
-          ),
+          decoration: AppCard.decoration(context.tokens),
           clipBehavior: Clip.antiAlias,
           child: AspectRatio(
             aspectRatio: 16 / 9,
