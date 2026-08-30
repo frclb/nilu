@@ -20,7 +20,6 @@ class CalendarGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final viewModel = context.watch<CalendarViewModel>();
 
     if (viewModel.isLoading) {
@@ -221,11 +220,13 @@ class CalendarGrid extends StatelessWidget {
                   if (context.select<CalendarViewModel, bool>(
                     (v) => v.cycleInfo.fertilityTracked,
                   )) ...[
+                    // Koyu temada `secondaryPinkDark` kullanılıyordu: zemine
+                    // çok yakın bir ton, nokta görünmüyordu. Üstelik hücrenin
+                    // gerçekte boyadığı renk bu değil — açıklama ile takvim
+                    // farklı şeyler söylüyordu.
                     _buildLegendItem(
                       context,
-                      isDark
-                          ? AppColors.secondaryPinkDark
-                          : AppColors.fertileLight,
+                      AppColors.fertileLight,
                       context.tr('calendar_legend_fertility'),
                     ),
                     _buildLegendItem(
@@ -513,7 +514,8 @@ class _DayTile extends StatelessWidget {
       return AppColors.flowLight.withAlpha(isDark ? 20 : 35);
     } else if (isFertile) {
       return isDark
-          ? AppColors.fertileLight.withAlpha(15)
+          // Koyu temada %6 opaklıktaydı; doğurgan günler hiç görünmüyordu.
+          ? AppColors.fertileLight.withAlpha(45)
           : AppColors.fertileLight.withAlpha(30);
     }
     return Colors.transparent;
