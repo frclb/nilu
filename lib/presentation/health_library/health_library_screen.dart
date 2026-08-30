@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/ad_banner.dart';
 import '../../design_system/app_colors.dart';
 import '../../domain/models/article.dart';
 import '../../localization/app_localizations.dart';
@@ -78,6 +79,11 @@ class _HealthLibraryScreenState extends State<HealthLibraryScreen> {
                   : results,
               emptyQuery: _query,
             ),
+
+            // Reklam yalnızca burada ve içerik ekranlarında. Takvim, kayıt ve
+            // analiz ekranlarında yok: kullanıcının semptom girdiği yerde
+            // reklam göstermek hem rahatsız edici hem bağlam olarak yanlış.
+            const AdBanner(),
           ],
         ),
       ),

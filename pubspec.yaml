@@ -62,6 +62,7 @@ dependencies:
   health: ^13.3.2
   home_widget: ^0.9.3
   url_launcher: ^6.3.2
+  google_mobile_ads: ^9.1.0
 
 
 dev_dependencies:

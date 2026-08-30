@@ -7,6 +7,7 @@ import 'design_system/app_theme.dart';
 import 'localization/app_localizations.dart';
 import 'core/navigation/app_router.dart';
 import 'domain/view_models/theme_view_model.dart';
+import 'data/datasources/ads_datasource.dart';
 import 'presentation/lock/app_lock_gate.dart';
 import 'presentation/reminders/reminder_sync.dart';
 import 'presentation/calendar/view_models/calendar_view_model.dart';
@@ -43,6 +44,9 @@ void main() async {
 
   // RevenueCat Init
   await SubscriptionService.init();
+
+  // Reklam SDK'sı. Kişiselleştirme kapalı; bkz. AdsDatasource.
+  await AdsDatasource.init();
 
   // UserViewModel'ı önceden oluştur (router'a ihtiyaç duyduğu için)
   final userViewModel = UserViewModel();

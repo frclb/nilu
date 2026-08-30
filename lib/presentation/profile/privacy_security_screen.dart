@@ -191,8 +191,56 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                           context.tr('privacy_encryption_notice'),
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDark ? Colors.grey[300] : Colors.grey[700],
+                            color: context.tokens.textMuted,
                           ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Reklam bildirimi. Ücretsiz sürümde reklam gösteriliyorsa
+                // kullanıcı bunu gizlilik ekranında görmeli — hem de ne
+                // toplanmadığıyla birlikte.
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: context.tokens.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: context.tokens.border),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.campaign_outlined,
+                        size: 18,
+                        color: context.tokens.textMuted,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              context.tr('privacy_ads_title'),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: context.tokens.text,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              context.tr('privacy_ads_notice'),
+                              style: TextStyle(
+                                fontSize: 12,
+                                height: 1.5,
+                                color: context.tokens.textMuted,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],

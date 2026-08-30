@@ -110,7 +110,7 @@
   "onboarding_skip": "Passer",
   "onboarding_success_title": "Tout est prêt !",
   "onboarding_success_desc": "Ton cycle est configuré. Tu peux commencer à suivre ta santé.",
-  "onboarding_success_privacy": "Tes données restent uniquement sur ton appareil.",
+  "onboarding_success_privacy": "Tes données de santé sont stockées chiffrées sur ton appareil.",
   "onboarding_success_cta": "Commencer à explorer",
   "health_library_title": "Bibliothèque santé",
   "health_library_search": "Rechercher un article, un symptôme ou un sujet…",
@@ -807,5 +807,9 @@
   "home_headline_late": "{n} jours de retard",
   "home_period_start": "Mes règles ont commencé",
   "home_period_end": "Mes règles sont finies",
-  "home_period_toggle_failed": "Ce jour n'a pas pu être marqué."
+  "home_period_toggle_failed": "Ce jour n'a pas pu être marqué.",
+  "privacy_ads_notice": "La version gratuite affiche des publicités. Elles ne sont pas personnalisées : tes données de santé ne servent jamais à la publicité et tu n'es pas ciblée. Premium est sans publicité.",
+  "privacy_ads_title": "Publicités",
+  "premium_feature_noads_title": "Sans publicité",
+  "premium_feature_noads_desc": "Supprime les bannières de la version gratuite."
 }

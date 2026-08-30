@@ -74,4 +74,14 @@ void main() {
       );
     });
   });
+
+  group('reklam', () {
+    test('ücretsiz kullanıcıya gösterilir', () {
+      expect(PremiumGate.showsAds(isPremium: false), isTrue);
+    });
+
+    test('premium kullanıcıya gösterilmez', () {
+      expect(PremiumGate.showsAds(isPremium: true), isFalse);
+    });
+  });
 }

@@ -110,7 +110,7 @@
   "onboarding_skip": "Überspringen",
   "onboarding_success_title": "Alles bereit!",
   "onboarding_success_desc": "Dein Zyklus wurde erfolgreich eingerichtet. Du kannst jetzt mit dem Tracking beginnen.",
-  "onboarding_success_privacy": "Deine Daten bleiben ausschließlich auf deinem Gerät.",
+  "onboarding_success_privacy": "Deine Gesundheitsdaten werden verschlüsselt auf deinem Gerät gespeichert.",
   "onboarding_success_cta": "Los geht's",
   "health_library_title": "Gesundheitsbibliothek",
   "health_library_search": "Artikel, Symptome oder Themen suchen …",
@@ -807,5 +807,9 @@
   "home_headline_late": "{n} Tage überfällig",
   "home_period_start": "Meine Periode hat begonnen",
   "home_period_end": "Meine Periode ist vorbei",
-  "home_period_toggle_failed": "Dieser Tag konnte nicht markiert werden."
+  "home_period_toggle_failed": "Dieser Tag konnte nicht markiert werden.",
+  "privacy_ads_notice": "Die kostenlose Version zeigt Werbung. Sie ist nicht personalisiert: Deine Gesundheitsdaten werden nie für Werbung genutzt, und du wirst nicht gezielt angesprochen. Premium ist werbefrei.",
+  "privacy_ads_title": "Werbung",
+  "premium_feature_noads_title": "Ohne Werbung",
+  "premium_feature_noads_desc": "Entfernt die Banner der kostenlosen Version."
 }

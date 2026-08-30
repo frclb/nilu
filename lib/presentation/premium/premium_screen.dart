@@ -449,6 +449,11 @@ class _FeatureList extends StatelessWidget {
         'premium_feature_themes_title',
         'premium_feature_themes_desc',
       ),
+      (
+        Icons.block_outlined,
+        'premium_feature_noads_title',
+        'premium_feature_noads_desc',
+      ),
     ];
 
     return Column(

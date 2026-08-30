@@ -110,7 +110,7 @@
   "onboarding_skip": "Atla",
   "onboarding_success_title": "Her Şey Hazır!",
   "onboarding_success_desc": "Döngünüz başarıyla ayarlandı. Şimdi sağlığınızı takip etmeye başlayabilirsiniz.",
-  "onboarding_success_privacy": "Verileriniz güvende, yalnızca sizin cihazınızda saklanır.",
+  "onboarding_success_privacy": "Sağlık verilerin cihazında şifreli olarak saklanır.",
   "onboarding_success_cta": "Keşfetmeye Başla",
   "health_library_title": "Sağlık Kütüphanesi",
   "health_library_search": "Makale, semptom veya konu ara...",
@@ -807,5 +807,9 @@
   "home_headline_late": "{n} gün gecikti",
   "home_period_start": "Reglim başladı",
   "home_period_end": "Reglim bitti",
-  "home_period_toggle_failed": "Bu gün işaretlenemedi."
+  "home_period_toggle_failed": "Bu gün işaretlenemedi.",
+  "privacy_ads_notice": "Ücretsiz sürümde reklam gösterilir. Reklamlar kişiselleştirilmez: sağlık verilerin reklam için kullanılmaz, sana özel hedefleme yapılmaz. Premium'da reklam yoktur.",
+  "privacy_ads_title": "Reklamlar",
+  "premium_feature_noads_title": "Reklamsız kullanım",
+  "premium_feature_noads_desc": "Ücretsiz sürümdeki banner reklamlar kaldırılır."
 }

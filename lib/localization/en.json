@@ -110,7 +110,7 @@
   "onboarding_skip": "Skip",
   "onboarding_success_title": "You're All Set!",
   "onboarding_success_desc": "Your cycle has been set up successfully. You can now start tracking your health.",
-  "onboarding_success_privacy": "Your data is kept on your device only.",
+  "onboarding_success_privacy": "Your health data is stored encrypted on your device.",
   "onboarding_success_cta": "Start Exploring",
   "health_library_title": "Health Library",
   "health_library_search": "Search articles, symptoms, or topics...",
@@ -807,5 +807,9 @@
   "home_headline_late": "{n} days late",
   "home_period_start": "My period started",
   "home_period_end": "My period ended",
-  "home_period_toggle_failed": "This day could not be marked."
+  "home_period_toggle_failed": "This day could not be marked.",
+  "privacy_ads_notice": "The free version shows ads. They are not personalised: your health data is never used for advertising and you are not targeted. Premium has no ads.",
+  "privacy_ads_title": "Ads",
+  "premium_feature_noads_title": "No ads",
+  "premium_feature_noads_desc": "Removes the banner ads shown in the free version."
 }

@@ -110,7 +110,7 @@
   "onboarding_skip": "Pular",
   "onboarding_success_title": "Tudo pronto!",
   "onboarding_success_desc": "Seu ciclo foi configurado com sucesso. Você já pode começar a cuidar da sua saúde.",
-  "onboarding_success_privacy": "Seus dados ficam apenas no seu dispositivo.",
+  "onboarding_success_privacy": "Os teus dados de saúde são guardados encriptados no teu dispositivo.",
   "onboarding_success_cta": "Começar a explorar",
   "health_library_title": "Biblioteca de saúde",
   "health_library_search": "Busque artigos, sintomas ou temas…",
@@ -807,5 +807,9 @@
   "home_headline_late": "{n} dias de atraso",
   "home_period_start": "O meu período começou",
   "home_period_end": "O meu período terminou",
-  "home_period_toggle_failed": "Não foi possível marcar este dia."
+  "home_period_toggle_failed": "Não foi possível marcar este dia.",
+  "privacy_ads_notice": "A versão gratuita mostra anúncios. Não são personalizados: os teus dados de saúde nunca são usados para publicidade e não és segmentada. O Premium não tem anúncios.",
+  "privacy_ads_title": "Anúncios",
+  "premium_feature_noads_title": "Sem anúncios",
+  "premium_feature_noads_desc": "Remove os banners da versão gratuita."
 }

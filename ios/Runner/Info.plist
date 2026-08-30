@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -12,6 +14,15 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>tr</string>
+		<string>en</string>
+		<string>de</string>
+		<string>es</string>
+		<string>fr</string>
+		<string>pt</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>Period Tracker</string>
 	<key>CFBundlePackageType</key>
@@ -22,8 +33,28 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to scan your partner's QR code for pairing.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Uygulama kilidi açıkken sağlık verilerinize yalnızca siz erişebilesiniz diye Face ID kullanılır.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Regl, uyku ve nabız verilerini Sağlık uygulamasından okuyup döngü tahminlerini iyileştirmek için kullanılır.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Bu uygulamada işaretlediğin regl günleri, izin verirsen Sağlık uygulamasına da yazılır.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs photo library access to let you pick a QR code image.</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -36,42 +67,6 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-	</array>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>NSHealthShareUsageDescription</key>
-	<string>Regl, uyku ve nabız verilerini Sağlık uygulamasından okuyup döngü tahminlerini iyileştirmek için kullanılır.</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>Bu uygulamada işaretlediğin regl günleri, izin verirsen Sağlık uygulamasına da yazılır.</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>Uygulama kilidi açıkken sağlık verilerinize yalnızca siz erişebilesiniz diye Face ID kullanılır.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>This app needs camera access to scan your partner's QR code for pairing.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app needs photo library access to let you pick a QR code image.</string>
-	<!-- Uygulama yalnızca Apple'ın kendi sağladığı şifrelemeyi kullanır
-	     (Keychain + HTTPS). Bu, ihracat kısıtlaması muafiyeti kapsamındadır;
-	     kendi şifreleme algoritmanızı eklerseniz bunu true yapıp App Store
-	     Connect'te ihracat uyum belgesi doldurmanız gerekir. -->
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<!-- App Store'da listelenecek diller. Altısı da tam çevrilidir
-	     (562/562 anahtar); `dart run tool/check_localization.dart` doğrular.
-	     Yeni bir dil eklemeden önce çevirisini tamamlayın. -->
-	<key>CFBundleLocalizations</key>
-	<array>
-		<string>tr</string>
-		<string>en</string>
-		<string>de</string>
-		<string>es</string>
-		<string>fr</string>
-		<string>pt</string>
-	</array>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>remote-notification</string>
 	</array>
 </dict>
 </plist>

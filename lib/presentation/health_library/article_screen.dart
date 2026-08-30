@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/ad_banner.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../design_system/app_tokens.dart';
@@ -134,6 +135,8 @@ class ArticleScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                const SizedBox(height: 8),
+                const AdBanner(),
               ]),
             ),
           ),

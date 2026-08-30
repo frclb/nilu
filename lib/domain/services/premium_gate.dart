@@ -30,6 +30,14 @@ class PremiumGate {
   /// Belirtilerin döngü evresine göre kırılımı.
   static bool canSeePhaseBreakdown({required bool isPremium}) => isPremium;
 
+  /// Reklam gösterilsin mi?
+  ///
+  /// Ücretsiz katman reklamla, ödeyen kullanıcı reklamsız. Reklamlar
+  /// kişiselleştirilmiyor (`nonPersonalizedAds`): reklam kimliği kullanılmıyor,
+  /// izleme izni istenmiyor. Bir regl uygulamasında davranış verisiyle hedefli
+  /// reklam, uygulamanın kullanıcıya verdiği gizlilik sözüyle çelişirdi.
+  static bool showsAds({required bool isPremium}) => !isPremium;
+
   /// Veriyi dosya olarak dışa aktarma.
   ///
   /// Not: "Hesabımı Sil" ve verinin kendisi her zaman kullanıcınındır;
