@@ -112,7 +112,7 @@ class _MoodSectionState extends State<MoodSection> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withAlpha(12),
+                            color: Colors.black.withAlpha(26),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),

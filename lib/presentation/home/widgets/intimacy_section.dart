@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_card.dart';
+import '../../../design_system/app_tokens.dart';
 import 'package:provider/provider.dart';
 import '../../../domain/view_models/intimacy_view_model.dart';
 import '../../../localization/app_localizations.dart';
@@ -77,20 +79,11 @@ class _ShareControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final error = _errorMessage(context);
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.white.withAlpha(10) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withAlpha(15)
-              : theme.colorScheme.outline,
-        ),
-      ),
+      decoration: AppCard.decoration(context.tokens),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -239,13 +232,7 @@ class _MiniDesireCard extends StatelessWidget {
                 ? theme.colorScheme.primary.withAlpha(60)
                 : theme.colorScheme.outline,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(6),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          boxShadow: AppCard.shadow(),
         ),
         child: Stack(
           clipBehavior: Clip.none,
@@ -450,13 +437,7 @@ class _MiniAffectionCard extends StatelessWidget {
                 ? theme.colorScheme.primary.withAlpha(60)
                 : theme.colorScheme.outline,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(6),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          boxShadow: AppCard.shadow(),
         ),
         child: Stack(
           clipBehavior: Clip.none,

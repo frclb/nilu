@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_card.dart';
 import '../../../design_system/app_palette.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/log_vocabulary.dart';
@@ -47,18 +48,7 @@ class CalendarSummarySection extends StatelessWidget {
           // Summary Card
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.surfaceDark : Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: isDark
-                    ? AppColors.borderDark.withAlpha(127)
-                    : AppColors.borderSlateLight,
-              ),
-              boxShadow: [
-                BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 4),
-              ],
-            ),
+            decoration: AppCard.decoration(context.tokens),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

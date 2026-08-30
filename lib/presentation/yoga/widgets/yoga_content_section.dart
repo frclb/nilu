@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../design_system/app_palette.dart';
 import '../../../localization/app_localizations.dart';
@@ -217,13 +218,7 @@ class YogaContentSection extends StatelessWidget {
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(7),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: AppCard.shadow(),
       ),
       child: Column(
         children: [
@@ -295,13 +290,7 @@ class YogaContentSection extends StatelessWidget {
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(7),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: AppCard.shadow(),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -439,13 +428,7 @@ class YogaContentSection extends StatelessWidget {
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(7),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: AppCard.shadow(),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

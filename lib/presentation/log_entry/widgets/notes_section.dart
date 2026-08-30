@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_card.dart';
 import '../../../design_system/app_palette.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
@@ -46,13 +47,7 @@ class NotesSection extends StatelessWidget {
                     ? AppColors.borderSlateDark
                     : AppColors.borderSlate,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(5),
-                  blurRadius: 4,
-                  offset: const Offset(0, 1),
-                ),
-              ],
+              boxShadow: AppCard.shadow(),
             ),
             padding: const EdgeInsets.all(16),
             child: TextField(

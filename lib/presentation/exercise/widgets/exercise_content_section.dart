@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
@@ -196,28 +197,13 @@ class ExerciseContentSection extends StatelessWidget {
     bool isDark,
     ThemeData theme,
   ) {
-    final itemBgNode = context.tokens.surface;
-    final itemBorder = isDark
-        ? AppColors.surfaceDark
-        : AppColors.borderGrayLight;
     final iconBg = context.tokens.brandTint;
     final titleColor = isDark ? Colors.white : AppColors.textMainSlate;
     final descColor = isDark ? Colors.grey.shade400 : Colors.grey.shade500;
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: itemBgNode,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: itemBorder),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(5),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
+      decoration: AppCard.decoration(context.tokens),
       child: Row(
         children: [
           Container(

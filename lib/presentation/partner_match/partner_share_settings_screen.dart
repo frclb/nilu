@@ -256,7 +256,7 @@ class _PartnerShareSettingsScreenState
                 ? []
                 : [
                     BoxShadow(
-                      color: Colors.black.withAlpha(5),
+                      color: Colors.black.withAlpha(26),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),

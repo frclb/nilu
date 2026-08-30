@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_card.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
 
@@ -42,9 +43,7 @@ class PartnerMatchHero extends StatelessWidget {
                     ? Colors.black.withAlpha(51)
                     : Colors.white.withAlpha(102),
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withAlpha(5), blurRadius: 10),
-                ],
+                boxShadow: AppCard.shadow(),
               ),
               child: Icon(
                 Icons.diversity_1, // close enough equivalent

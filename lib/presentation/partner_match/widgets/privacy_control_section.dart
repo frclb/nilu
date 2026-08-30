@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_card.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../design_system/app_colors.dart';
 
@@ -19,10 +21,6 @@ class _PrivacyControlSectionState extends State<PrivacyControlSection> {
     final isDark = theme.brightness == Brightness.dark;
 
     final headerColor = isDark ? Colors.white : AppColors.textMainSlate;
-    final itemBgNode = isDark ? Colors.white.withAlpha(12) : Colors.white;
-    final itemBorder = isDark
-        ? Colors.white.withAlpha(25)
-        : Colors.grey.shade100;
     final dividerColor = isDark
         ? Colors.white.withAlpha(25)
         : Colors.grey.shade100;
@@ -41,18 +39,7 @@ class _PrivacyControlSectionState extends State<PrivacyControlSection> {
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: itemBgNode,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: itemBorder),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(5),
-                blurRadius: 4,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
+          decoration: AppCard.decoration(context.tokens),
           child: Column(
             children: [
               // Master Toggle

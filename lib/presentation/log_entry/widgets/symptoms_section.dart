@@ -110,7 +110,7 @@ class _SymptomsSectionState extends State<SymptomsSection> {
                         ? null
                         : [
                             BoxShadow(
-                              color: Colors.black.withAlpha(5),
+                              color: Colors.black.withAlpha(26),
                               blurRadius: 2,
                               offset: const Offset(0, 1),
                             ),

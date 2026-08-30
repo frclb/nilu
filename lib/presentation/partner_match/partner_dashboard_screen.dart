@@ -615,7 +615,7 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
                     ? []
                     : [
                         BoxShadow(
-                          color: Colors.black.withAlpha(6),
+                          color: Colors.black.withAlpha(26),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),

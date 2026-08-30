@@ -277,7 +277,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                   ? []
                   : [
                       BoxShadow(
-                        color: Colors.black.withAlpha(12),
+                        color: Colors.black.withAlpha(26),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),

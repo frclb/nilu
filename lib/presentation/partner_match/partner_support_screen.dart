@@ -289,7 +289,7 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
             ? []
             : [
                 BoxShadow(
-                  color: Colors.black.withAlpha(10),
+                  color: Colors.black.withAlpha(26),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -462,7 +462,7 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
               ? []
               : [
                   BoxShadow(
-                    color: Colors.black.withAlpha(10),
+                    color: Colors.black.withAlpha(26),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -623,7 +623,7 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
             ? []
             : [
                 BoxShadow(
-                  color: Colors.black.withAlpha(10),
+                  color: Colors.black.withAlpha(26),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
