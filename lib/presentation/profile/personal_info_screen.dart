@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../design_system/app_colors.dart';
@@ -202,11 +203,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: isDark
-                    ? Colors.blueGrey[800]!.withAlpha(127)
-                    : Colors.grey[200]!,
-              ),
+              borderSide: BorderSide(color: context.tokens.border),
             ),
           ),
         ),
@@ -242,11 +239,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
             decoration: BoxDecoration(
               color: isDark ? AppColors.surfaceNavyDark : Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isDark
-                    ? Colors.blueGrey[800]!.withAlpha(127)
-                    : Colors.grey[200]!,
-              ),
+              border: Border.all(color: context.tokens.border),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

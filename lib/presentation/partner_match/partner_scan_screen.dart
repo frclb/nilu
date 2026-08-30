@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import '../../data/datasources/remote/firestore_datasource.dart';
 import '../../domain/services/pairing_token.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -149,7 +150,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     messenger.showSnackBar(
       SnackBar(
         content: Text(context.tr(status.messageKey!)),
-        backgroundColor: Colors.red.shade400,
+        backgroundColor: context.tokens.danger,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 3),
       ),
@@ -187,12 +188,12 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.green.withAlpha(38),
+                    color: context.tokens.success.withAlpha(38),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.check_circle_outline,
-                    color: Colors.green,
+                    color: context.tokens.success,
                     size: 48,
                   ),
                 ),

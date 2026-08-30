@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import 'package:provider/provider.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../localization/app_localizations.dart';
@@ -225,7 +226,7 @@ class CalendarDayHeader extends StatelessWidget {
               : context.tr('calendar_future_date_error'),
         ),
         backgroundColor: !success
-            ? Colors.red.shade400
+            ? context.tokens.danger
             : wasPeriod
             ? Colors.grey.shade700
             : AppColors.flowMedium,

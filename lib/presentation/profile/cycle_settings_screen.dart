@@ -241,11 +241,7 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceNavyDark : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark
-              ? Colors.blueGrey[800]!.withAlpha(127)
-              : Colors.grey[200]!,
-        ),
+        border: Border.all(color: context.tokens.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,7 +273,7 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
             min: min,
             max: max,
             activeColor: Theme.of(context).colorScheme.primary,
-            inactiveColor: isDark ? Colors.blueGrey[800] : Colors.grey[300],
+            inactiveColor: context.tokens.border,
             onChanged: onChanged,
           ),
         ],

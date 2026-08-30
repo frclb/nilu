@@ -11,6 +11,17 @@ import 'app_tokens.dart';
 /// kendi bileşenlerine o rolleri bağlıyoruz. Yeni renk değeri **buraya**
 /// yazılmaz, `AppPalette`'e eklenir.
 class AppTheme {
+  /// Diyalog eylem düğmesi biçimi.
+  ///
+  /// Tema, sayfa düzeyindeki çağrılara tam genişlik veriyor
+  /// (`minimumSize: Size.fromHeight(52)` — genişlik sonsuz). Diyalog içinde bu
+  /// düğmeyi kendi satırına itiyor ve "İptal" ile onay eylemi alt alta
+  /// diziliyordu.
+  static ButtonStyle dialogAction() => FilledButton.styleFrom(
+    minimumSize: const Size(0, 44),
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+  );
+
   const AppTheme._();
 
   static ThemeData light(AppFlavor flavor) => _build(flavor, Brightness.light);

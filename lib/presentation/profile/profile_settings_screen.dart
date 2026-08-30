@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_theme.dart';
 import '../health_check/heavy_bleeding_screen.dart';
 import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
@@ -213,11 +214,13 @@ class ProfileSettingsScreen extends StatelessWidget {
             // Logout Button
             TextButton.icon(
               onPressed: () => _confirmAndSignOut(context),
-              icon: Icon(Icons.logout, size: 20, color: context.tokens.danger),
+              // Kırmızıydı. Çıkış yıkıcı bir işlem değil — oturum kapanıyor,
+              // kayıtlı veri cihazda kalıyor. Kırmızı, hesap silmeye ait.
+              icon: Icon(Icons.logout, size: 20, color: context.tokens.text),
               label: Text(
                 context.tr('profile_logout'),
                 style: TextStyle(
-                  color: context.tokens.danger,
+                  color: context.tokens.text,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -227,9 +230,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                   horizontal: 24,
                   vertical: 12,
                 ),
-                backgroundColor: isDark
-                    ? context.tokens.danger.withValues(alpha: 0.16)
-                    : Colors.transparent,
+                backgroundColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
@@ -242,49 +243,25 @@ class ProfileSettingsScreen extends StatelessWidget {
               onPressed: () async {
                 final bool? confirm = await showDialog<bool>(
                   context: context,
+                  // Biçimler `dialogTheme`'den; burada elle beyaz/siyah ve
+                  // gri tonlar yazılıydı ve temayı takip etmiyorlardı.
                   builder: (BuildContext context) {
-                    final isDarkDialog =
-                        Theme.of(context).brightness == Brightness.dark;
                     return AlertDialog(
-                      title: Text(
-                        context.tr('clear_cache_title'),
-                        style: TextStyle(
-                          color: isDarkDialog ? Colors.white : Colors.black,
-                        ),
-                      ),
-                      content: Text(
-                        context.tr('clear_cache_desc'),
-                        style: TextStyle(
-                          color: isDarkDialog
-                              ? Colors.grey[300]
-                              : Colors.grey[700],
-                        ),
-                      ),
-                      backgroundColor: isDarkDialog
-                          ? context.tokens.surfaceAlt
-                          : Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                      title: Text(context.tr('clear_cache_title')),
+                      content: Text(context.tr('clear_cache_desc')),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(false),
-                          child: Text(
-                            context.tr('cancel'),
-                            style: TextStyle(
-                              color: isDarkDialog
-                                  ? Colors.grey[400]
-                                  : Colors.grey[600],
-                            ),
-                          ),
+                          child: Text(context.tr('cancel')),
                         ),
                         ElevatedButton(
                           onPressed: () => Navigator.of(context).pop(true),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                          style: AppTheme.dialogAction().copyWith(
+                            backgroundColor: WidgetStatePropertyAll(
+                              context.tokens.danger,
+                            ),
+                            foregroundColor: const WidgetStatePropertyAll(
+                              Colors.white,
                             ),
                           ),
                           child: Text(context.tr('delete')),
@@ -308,12 +285,14 @@ class ProfileSettingsScreen extends StatelessWidget {
               icon: Icon(
                 Icons.cleaning_services_outlined,
                 size: 20,
-                color: isDark ? Colors.blue[300] : Colors.blue[600],
+                // Yumurtlama rengindeydi; önbellek temizlemenin döngüyle
+                // ilgisi yok ve mor buraya anlam yüklüyordu.
+                color: context.tokens.textMuted,
               ),
               label: Text(
                 context.tr('profile_clear_cache'),
                 style: TextStyle(
-                  color: isDark ? Colors.blue[300] : Colors.blue[600],
+                  color: context.tokens.textMuted,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -323,9 +302,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                   horizontal: 24,
                   vertical: 12,
                 ),
-                backgroundColor: isDark
-                    ? Colors.blue[900]!.withValues(alpha: 0.2)
-                    : Colors.blue[50],
+                backgroundColor: context.tokens.surfaceAlt,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
@@ -336,7 +313,7 @@ class ProfileSettingsScreen extends StatelessWidget {
             // Version Info
             Text(
               "v1.0.0",
-              style: TextStyle(color: Colors.grey[400], fontSize: 12),
+              style: TextStyle(color: context.tokens.textFaint, fontSize: 12),
             ),
             const SizedBox(height: 32),
           ],
@@ -352,38 +329,26 @@ class ProfileSettingsScreen extends StatelessWidget {
   /// uygulama yeniden açıldığında doğruca ana ekrana dönülüyor, hatta durum
   /// her değiştiğinde kullanıcı ana ekrana geri sıçrıyordu.
   Future<void> _confirmAndSignOut(BuildContext context) async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: context.tokens.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          dialogContext.tr('logout_confirm_title'),
-          style: TextStyle(
-            color: isDark ? Colors.white : Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          dialogContext.tr('logout_confirm_desc'),
-          style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[700]),
-        ),
+        // Başlık ve gövde biçimleri `dialogTheme`'den geliyor; burada elle
+        // beyaz/siyah ve gri tonlar yazılıydı, tema değişse de sabit
+        // kalıyorlardı.
+        title: Text(dialogContext.tr('logout_confirm_title')),
+        content: Text(dialogContext.tr('logout_confirm_desc')),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
             child: Text(dialogContext.tr('cancel')),
           ),
-          ElevatedButton(
+          // Ham `Colors.red` idi. Çıkış yıkıcı bir işlem değil — metnin
+          // kendisi "kayıtlı sağlık verileriniz cihazda kalır" diyor. Kırmızı
+          // burada olduğundan ağır bir uyarı veriyordu; hesap silmeye
+          // saklandı.
+          FilledButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
+            style: AppTheme.dialogAction(),
             child: Text(dialogContext.tr('profile_logout')),
           ),
         ],

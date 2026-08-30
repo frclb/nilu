@@ -791,7 +791,6 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(context.tr('pv_disconnect_title')),
         content: Text(context.tr('pv_disconnect_desc')),
         actions: [
@@ -822,9 +821,14 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
               // göstermemeli.
               router.goNamed(RouteNames.onboarding);
             },
+            // Bağlantıyı kesmek geri alınamaz; iki eylem aynı görünüyordu ve
+            // hangisinin yıkıcı olduğu okunmuyordu.
             child: Text(
               context.tr('pv_disconnect_confirm'),
-              style: TextStyle(color: primaryColor),
+              style: TextStyle(
+                color: context.tokens.danger,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],

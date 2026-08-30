@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/repositories/notification_settings_repository.dart';
 import '../../domain/models/notification_settings.dart';
@@ -342,8 +343,6 @@ class _PartnerNotificationSettingsScreenState
     required Color? textMutedColor,
     required Color bgColor,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -388,9 +387,7 @@ class _PartnerNotificationSettingsScreenState
                 activeThumbColor: Colors.white,
                 activeTrackColor: primaryColor,
                 inactiveThumbColor: Colors.white,
-                inactiveTrackColor: isDark
-                    ? Colors.blueGrey[700]
-                    : Colors.grey[300],
+                inactiveTrackColor: context.tokens.border,
                 trackOutlineColor: WidgetStateProperty.resolveWith<Color?>(
                   (states) => Colors.transparent,
                 ),

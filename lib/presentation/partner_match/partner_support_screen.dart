@@ -252,7 +252,7 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
             context: context,
             isDark: isDark,
             icon: Icons.water_drop,
-            iconColor: Colors.blue,
+            iconColor: context.tokens.ovulation,
             title: context.tr('partner_support_water_need'),
             // Kişiye özel değil, genel günlük su tüketimi önerisi.
             value: context.tr('partner_support_water_value'),

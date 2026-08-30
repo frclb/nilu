@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import '../../design_system/app_theme.dart';
+import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -126,11 +128,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                   decoration: BoxDecoration(
                     color: isDark ? AppColors.surfaceNavyDark : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark
-                          ? Colors.blueGrey[800]!.withAlpha(127)
-                          : Colors.grey[200]!,
-                    ),
+                    border: Border.all(color: context.tokens.border),
                   ),
                   child: Column(
                     children: [
@@ -178,18 +176,14 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                   decoration: BoxDecoration(
                     color: isDark ? AppColors.surfaceNavyDark : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark
-                          ? Colors.blueGrey[800]!.withAlpha(127)
-                          : Colors.grey[200]!,
-                    ),
+                    border: Border.all(color: context.tokens.border),
                   ),
                   child: Row(
                     children: [
                       Icon(
                         Icons.lock_outline,
                         size: 18,
-                        color: Colors.green[600],
+                        color: context.tokens.success,
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -236,13 +230,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     return Container(
       decoration: BoxDecoration(
         border: hasBorder
-            ? Border(
-                bottom: BorderSide(
-                  color: isDark
-                      ? Colors.blueGrey[800]!.withAlpha(127)
-                      : Colors.grey[200]!,
-                ),
-              )
+            ? Border(bottom: BorderSide(color: context.tokens.border))
             : null,
       ),
       child: SwitchListTile(
@@ -271,7 +259,9 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
         activeThumbColor: AppColors.accentAmber,
         activeTrackColor: AppColors.accentAmber.withAlpha(127),
         inactiveThumbColor: Colors.white,
-        inactiveTrackColor: isDark ? Colors.blueGrey[700] : Colors.grey[300],
+        inactiveTrackColor: isDark
+            ? context.tokens.surfaceAlt
+            : Colors.grey[300],
       ),
     );
   }
@@ -283,19 +273,13 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     bool isDark, {
     bool isDestructive = false,
   }) {
-    final color = isDestructive
-        ? Colors.red[400]
-        : (isDark ? Colors.white : Colors.black87);
+    final color = isDestructive ? context.tokens.danger : context.tokens.text;
 
     return Container(
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceNavyDark : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark
-              ? Colors.blueGrey[800]!.withAlpha(127)
-              : Colors.grey[200]!,
-        ),
+        border: Border.all(color: context.tokens.border),
       ),
       child: ListTile(
         leading: Icon(icon, size: 20, color: color),
@@ -323,15 +307,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? AppColors.surfaceNavyDark : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          context.tr('privacy_export'),
-          style: TextStyle(
-            color: isDark ? Colors.white : Colors.black87,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text(context.tr('privacy_export')),
         content: Text(
           context.tr('privacy_export_desc'),
           style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[700]),
@@ -443,25 +419,19 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? AppColors.surfaceNavyDark : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        // Kırmızı burada yerinde — işlem gerçekten geri alınamaz. Ama ham
+        // `Colors.red` değil paletin uyarı rengi kullanılıyor.
         title: Text(
           context.tr('privacy_delete_account'),
-          style: TextStyle(color: Colors.red[400], fontWeight: FontWeight.bold),
+          style: Theme.of(
+            context,
+          ).dialogTheme.titleTextStyle?.copyWith(color: context.tokens.danger),
         ),
-        content: Text(
-          context.tr('privacy_delete_desc'),
-          style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[700]),
-        ),
+        content: Text(context.tr('privacy_delete_desc')),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              context.tr('cancel'),
-              style: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
-              ),
-            ),
+            child: Text(context.tr('cancel')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -480,12 +450,9 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               messenger.showSnackBar(SnackBar(content: Text(doneMessage)));
               router.goNamed(RouteNames.onboarding);
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+            style: AppTheme.dialogAction().copyWith(
+              backgroundColor: WidgetStatePropertyAll(context.tokens.danger),
+              foregroundColor: const WidgetStatePropertyAll(Colors.white),
             ),
             child: Text(context.tr('privacy_delete_confirm')),
           ),

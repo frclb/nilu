@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/navigation/route_names.dart';
 import '../../localization/app_localizations.dart';
@@ -101,7 +102,7 @@ class PartnerImportantDaysScreen extends StatelessWidget {
                 dateBgColor: isDark
                     ? primaryColor.withValues(alpha: 0.3)
                     : primaryColor.withValues(alpha: 0.1),
-                dateTextColor: isDark ? Colors.red[300]! : primaryColor,
+                dateTextColor: context.tokens.danger,
                 relativeTimeText: context.tr('partner_important_days_est_2'),
                 tipText: context.tr('partner_important_days_tip_1'),
                 bgColor: eventBgColor,
@@ -114,8 +115,8 @@ class PartnerImportantDaysScreen extends StatelessWidget {
               _buildEventItem(
                 context: context,
                 icon: Icons.auto_awesome_outlined, // Sparkles approximation
-                iconBgColor: Colors.orange.withValues(alpha: 0.2),
-                iconColor: isDark ? Colors.orange[400]! : Colors.orange[600]!,
+                iconBgColor: context.tokens.warning.withAlpha(51),
+                iconColor: context.tokens.warning,
                 title: context.tr('partner_important_days_fertility'),
                 dateText: "17 Eyl",
                 dateBgColor: isDark
@@ -134,8 +135,8 @@ class PartnerImportantDaysScreen extends StatelessWidget {
               _buildEventItem(
                 context: context,
                 icon: Icons.favorite_border, // Heart approximation
-                iconBgColor: Colors.blue.withValues(alpha: 0.2),
-                iconColor: isDark ? Colors.blue[400]! : Colors.blue[600]!,
+                iconBgColor: context.tokens.ovulation.withAlpha(51),
+                iconColor: context.tokens.ovulation,
                 title: context.tr('partner_important_days_ovulation'),
                 dateText: "22 Eyl",
                 dateBgColor: isDark
@@ -166,8 +167,7 @@ class PartnerImportantDaysScreen extends StatelessWidget {
     Color textMainColor,
     Color textMutedColor,
   ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? Colors.red[400] : primaryColor;
+    final iconColor = context.tokens.danger;
 
     return Container(
       padding: const EdgeInsets.all(16),

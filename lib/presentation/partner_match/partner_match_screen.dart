@@ -93,9 +93,6 @@ class PartnerMatchScreen extends StatelessWidget {
                     backgroundColor: theme.colorScheme.primary,
                     foregroundColor: Colors.white,
                     minimumSize: const Size(double.infinity, 56),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
                     elevation: 8,
                     shadowColor: theme.colorScheme.primary.withAlpha(76),
                   ),
@@ -119,9 +116,6 @@ class PartnerMatchScreen extends StatelessWidget {
                       color: theme.colorScheme.primary.withAlpha(127),
                     ),
                     minimumSize: const Size(double.infinity, 56),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
                   ),
                   icon: const Icon(Icons.qr_code_scanner, size: 20),
                   label: Text(
@@ -163,8 +157,6 @@ class PartnerMatchScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: isDark ? AppColors.surfaceWarmDark : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           context.tr('partner_match_how_it_works'),
           style: TextStyle(
