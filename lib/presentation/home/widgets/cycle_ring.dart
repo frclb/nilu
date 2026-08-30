@@ -6,14 +6,14 @@ import '../../../design_system/app_tokens.dart';
 import '../../../localization/app_localizations.dart';
 import 'cycle_ring_data.dart';
 
-/// Döngüyü papatya çelengi olarak çizer ve düzen değiştiğinde canlandırır.
+/// Döngüyü papatya çelengi olarak çizer ve düzen değiştiğinde yeniler.
 ///
 /// Döngü tahmin edildiği kadar sürmeyebilir: erken biterse çiçek sayısı azalır,
-/// gecikirse artar. Yeni düzene sıçrayarak geçmek çelengi bozuk gösteriyordu;
-/// çiçekler artık yeni yerlerine dönerek gidiyor, fazlalar açılıyor, eksikler
-/// soluyor.
+/// gecikirse artar. Yeni düzene sıçrayarak geçmek çelengi bozuk gösteriyordu.
 ///
-/// Canlandırma yalnızca bu alanı kapsıyor — ekranın geri kalanı sabit kalıyor.
+/// Yenileme iki evre: eski çelenk sırayla kapanıyor, sonra yenisi 1. günden
+/// itibaren sırayla açılıyor. Canlandırma yalnızca bu alanı kapsıyor —
+/// kartın geri kalanı ve ekranın diğer bölümleri sabit.
 class CycleRing extends StatefulWidget {
   const CycleRing({super.key, required this.data, required this.center});
 
@@ -33,20 +33,21 @@ class _CycleRingState extends State<CycleRing>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
-  /// Geçişin başladığı düzen.
+  /// Kapanacak olan düzen.
   late CycleRingData _from;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 950),
+      duration: const Duration(milliseconds: 1700),
       vsync: this,
     );
 
-    // Uygulama açıldığında döngü çoktan uzamışsa, geçiş tahmin edilen
-    // çelenkten başlayıp bugüne kadar uzuyor. Kullanıcı "regl hâlâ sürüyor"
-    // bilgisini bir sıçrama olarak değil, çelengin büyümesi olarak görüyor.
+    // Uygulama açıldığında döngü çoktan uzamışsa çelenk yenileniyor: önce
+    // tahmin edilen düzen kapanıyor, sonra bugüne kadar uzayan düzen açılıyor.
+    // Kullanıcı "regl hâlâ sürüyor" bilgisini bir sıçrama olarak değil,
+    // çelengin yeniden kurulması olarak görüyor.
     final target = widget.data;
     final start = target.clampedToExpected();
     if (start != target) {
@@ -63,30 +64,11 @@ class _CycleRingState extends State<CycleRing>
     super.didUpdateWidget(old);
     if (old.data == widget.data) return;
 
-    // Geçiş ortasında yeni bir değişiklik gelirse, o anki ara durumdan devam
-    // etmek gerekiyor; yoksa çiçekler geri sıçrayıp yeniden yola çıkıyor.
-    _from = _lerpData(_from, old.data, _controller.value);
+    // Önceki yenileme sürüyorsa onu bitmiş sayıp yeniden başlıyoruz. Yarım
+    // kalmış bir çelengin üzerine ikinci bir sıra başlatmak, henüz açılmamış
+    // çiçekleri kapanıyor gösteriyordu.
+    _from = old.data;
     _controller.forward(from: 0);
-  }
-
-  /// İki düzen arasındaki ara durumu üretir.
-  CycleRingData _lerpData(CycleRingData a, CycleRingData b, double t) {
-    if (t <= 0) return a;
-    if (t >= 1) return b;
-    final count = math.max(a.length, b.length);
-    return CycleRingData(
-      colors: [
-        for (var i = 0; i < count; i++)
-          Color.lerp(
-                i < a.length ? a.colors[i] : b.colors[i],
-                i < b.length ? b.colors[i] : a.colors[i],
-                t,
-              ) ??
-              b.colors[math.min(i, b.length - 1)],
-      ],
-      todayIndex: t < 0.5 ? a.todayIndex : b.todayIndex,
-      expected: b.expected,
-    );
   }
 
   @override
@@ -106,19 +88,17 @@ class _CycleRingState extends State<CycleRing>
         height: 232,
         child: AnimatedBuilder(
           animation: _controller,
-          builder: (context, child) {
-            return CustomPaint(
-              size: const Size.square(232),
-              painter: _WreathPainter(
-                from: _from,
-                to: widget.data,
-                progress: _controller.value,
-                track: t.border,
-                core: t.surface,
-              ),
-              child: child,
-            );
-          },
+          builder: (context, child) => CustomPaint(
+            size: const Size.square(232),
+            painter: _WreathPainter(
+              from: _from,
+              to: widget.data,
+              progress: _controller.value,
+              track: t.border,
+              core: t.surface,
+            ),
+            child: child,
+          ),
           child: Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 34),
@@ -168,33 +148,44 @@ class _WreathPainter extends CustomPainter {
   /// Papatyaların göbek rengi — kartın yüzeyiyle aynı.
   final Color core;
 
-  /// Bir çiçeğin kendi ilerlemesi.
-  ///
-  /// Hepsi aynı anda hareket ederse çelenk tek parça gibi dönüyor. Bugünden
-  /// uzaklaştıkça küçük bir gecikme ekleniyor: değişim bugünden başlayıp
-  /// halka boyunca dalga hâlinde yayılıyor.
-  double _localProgress(int index, int count) {
-    final anchor = to.todayIndex ?? from.todayIndex ?? 0;
-    var distance = (index - anchor).abs();
-    if (count > 0) {
-      distance = math.min(distance, count - distance);
-    }
-    final delay = count <= 1 ? 0.0 : (distance / count) * 0.55;
-    final span = 1 - delay;
-    if (span <= 0) return 1;
-    final local = ((progress - delay) / span).clamp(0.0, 1.0);
+  // Zaman çizelgesi. Aradeğerleme yerine kapan-aç ayrımı tercih edildi:
+  // döngü uzunluğu değiştiğinde çiçekler yer değiştirirken hangisinin hangisi
+  // olduğu okunmuyordu. Kapanıp yeniden açılmak değişimi açıkça anlatıyor.
+  //
+  //   0.00 - 0.46   kapanma  (1. günden sona doğru)
+  //   0.46 - 0.54   çelenk boş
+  //   0.54 - 1.00   açılma   (1. günden sona doğru)
+  static const double _outStagger = 0.30;
+  static const double _outSpan = 0.16;
+  static const double _inStart = 0.54;
+  static const double _inStagger = 0.34;
+  static const double _inSpan = 0.12;
+
+  /// Sıradaki çiçeğin gecikmesi. Tek çiçekli halkada bölme yapılmıyor.
+  double _offset(int index, int count, double stagger) =>
+      count <= 1 ? 0 : (index / (count - 1)) * stagger;
+
+  /// Eski çelenkteki bir çiçeğin ölçeği: 1'den 0'a.
+  double _outScale(int index, int count) {
+    final begin = _offset(index, count, _outStagger);
+    final local = ((progress - begin) / _outSpan).clamp(0.0, 1.0);
+    return 1 - Curves.easeInCubic.transform(local);
+  }
+
+  /// Yeni çelenkteki bir çiçeğin ölçeği: 0'dan 1'e.
+  double _inScale(int index, int count) {
+    final begin = _inStart + _offset(index, count, _inStagger);
+    final local = ((progress - begin) / _inSpan).clamp(0.0, 1.0);
     return Curves.easeOutCubic.transform(local);
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    final count = math.max(from.length, to.length);
-    if (count <= 0) return;
-
     final center = Offset(size.width / 2, size.height / 2);
     final radius = math.min(size.width, size.height) / 2 - 18;
 
-    // Çiçeklerin dizildiği ince iz.
+    // Çiçeklerin dizildiği ince iz. Çelenk boşken alanın ne olduğunu gösteren
+    // tek şey bu, o yüzden her zaman çiziliyor.
     canvas.drawCircle(
       center,
       radius,
@@ -204,6 +195,38 @@ class _WreathPainter extends CustomPainter {
         ..strokeWidth = 1,
     );
 
+    // Kapanan eski çelenk.
+    _paintWreath(
+      canvas,
+      center: center,
+      radius: radius,
+      data: from,
+      scaleOf: (i) => _outScale(i, from.length),
+      spinOf: (i) => (1 - _outScale(i, from.length)) * 0.5,
+    );
+
+    // Açılan yeni çelenk.
+    _paintWreath(
+      canvas,
+      center: center,
+      radius: radius,
+      data: to,
+      scaleOf: (i) => _inScale(i, to.length),
+      // Açılırken yerine dönüyor: çiçek "açılıyor" gibi okunuyor.
+      spinOf: (i) => (1 - _inScale(i, to.length)) * -0.6,
+    );
+  }
+
+  void _paintWreath(
+    Canvas canvas, {
+    required Offset center,
+    required double radius,
+    required CycleRingData data,
+    required double Function(int) scaleOf,
+    required double Function(int) spinOf,
+  }) {
+    if (data.length <= 0) return;
+
     // Taban boyut, bugünün büyütülmüş çiçeğine yer kalacak şekilde
     // hesaplanıyor. İki komşu merkez arası `slot` kadar; bugünün yarıçapı ile
     // komşusunun yarıçapının toplamı bunun altında kalmalı:
@@ -211,38 +234,17 @@ class _WreathPainter extends CustomPainter {
     //   base/2 * todayScale + base/2 <= slot * clearance
     const todayScale = 1.28;
     const clearance = 0.94;
+    final slot = 2 * math.pi * radius / data.length;
+    final base = math.min(slot * 2 * clearance / (todayScale + 1), 20.0);
 
-    double sizeFor(int length) {
-      if (length <= 0) return 0;
-      final slot = 2 * math.pi * radius / length;
-      return math.min(slot * 2 * clearance / (todayScale + 1), 20.0);
-    }
+    for (var i = 0; i < data.length; i++) {
+      final scale = scaleOf(i);
+      if (scale <= 0.01) continue;
 
-    final sizeFrom = sizeFor(from.length);
-    final sizeTo = sizeFor(to.length);
-
-    for (var i = 0; i < count; i++) {
-      final local = _localProgress(i, count);
-
-      final inFrom = i < from.length;
-      final inTo = i < to.length;
+      final isToday = i == data.todayIndex;
 
       // Saat 12'den başla; çiçek dilimin ortasında dursun.
-      double angleFor(int length) =>
-          -math.pi / 2 + (i + 0.5) * (2 * math.pi / length);
-
-      final angle = _lerp(
-        inFrom ? angleFor(from.length) : angleFor(to.length),
-        inTo ? angleFor(to.length) : angleFor(from.length),
-        local,
-      );
-
-      // Düzene yeni katılan çiçek açılıyor, çıkan soluyor.
-      final presence = _lerp(inFrom ? 1 : 0, inTo ? 1 : 0, local);
-      if (presence <= 0.01) continue;
-
-      final base = _lerp(sizeFrom, sizeTo, local) * presence;
-      final isToday = i == (local < 0.5 ? from.todayIndex : to.todayIndex);
+      final angle = -math.pi / 2 + (i + 0.5) * (2 * math.pi / data.length);
 
       // Bugünün çiçeği bir tık dışarıda: açısal aralık sabit olduğundan dışa
       // çıkmak komşularla arayı açıyor ve çelengin üzerinde kabarmış gibi
@@ -253,33 +255,29 @@ class _WreathPainter extends CustomPainter {
         center.dy + r * math.sin(angle),
       );
 
-      final color = Color.lerp(
-        inFrom ? from.colors[i] : to.colors[i],
-        inTo ? to.colors[i] : from.colors[i],
-        local,
-      )!;
+      final color = data.colors[i];
 
       if (isToday) {
         // Yumuşak bir hâle: bugünü büyütmeye fazla yüklenmeden ayırıyor.
+        // Çiçekle birlikte büyüyüp küçülüyor.
         canvas.drawCircle(
           at,
-          base * 0.95,
-          Paint()..color = color.withAlpha(38),
+          base * 0.95 * scale,
+          Paint()..color = color.withAlpha((38 * scale).round()),
         );
       }
 
       _drawDaisy(
         canvas,
         at: at,
-        size: isToday ? base * todayScale : base,
+        size: base * (isToday ? todayScale : 1) * scale,
         petal: color,
         core: core,
         petals: 8,
+        spin: spinOf(i),
       );
     }
   }
-
-  double _lerp(double a, double b, double t) => a + (b - a) * t;
 
   /// Tek bir papatya çizer.
   ///
@@ -293,6 +291,7 @@ class _WreathPainter extends CustomPainter {
     required Color petal,
     required Color core,
     required int petals,
+    required double spin,
   }) {
     final paint = Paint()
       ..color = petal
@@ -302,6 +301,7 @@ class _WreathPainter extends CustomPainter {
 
     canvas.save();
     canvas.translate(at.dx, at.dy);
+    canvas.rotate(spin);
     for (var i = 0; i < petals; i++) {
       canvas.save();
       canvas.rotate(2 * math.pi * i / petals);
