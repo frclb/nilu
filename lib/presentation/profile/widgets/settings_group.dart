@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../design_system/app_palette.dart';
 
@@ -43,14 +44,11 @@ class SettingsGroup extends StatelessWidget {
             ),
           ),
         ),
+        // Kenarlık açık temada `Colors.grey[100]` idi — beyaz yüzeye karşı
+        // görünmüyordu ve grup zeminden ayrışmıyordu. Gölge de yoktu.
         Container(
-          decoration: BoxDecoration(
-            color: context.tokens.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isDark ? AppPalette.night700 : Colors.grey[100]!,
-            ),
-          ),
+          decoration: AppCard.decoration(context.tokens),
+          clipBehavior: Clip.antiAlias,
           child: Column(
             children: items.asMap().entries.map((entry) {
               final index = entry.key;
