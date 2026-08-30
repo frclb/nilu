@@ -1,100 +1,136 @@
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../design_system/app_tokens.dart';
-import '../../../design_system/phase_colors.dart';
-import '../../../domain/models/cycle_info.dart';
 import '../../../localization/app_localizations.dart';
+import 'cycle_ring_data.dart';
 
-/// Döngüyü halka olarak çizer: her gün bir yay parçası.
+/// Döngüyü papatya çelengi olarak çizer ve düzen değiştiğinde canlandırır.
 ///
-/// Halkanın içinde gün sayısı **yok**. Bu kategorideki uygulamalarda merkezdeki
-/// sayı tek başına duruyor ve okumak için onun bir döngü günü olduğunu bilmek
-/// gerekiyor. Burada cevabı üstteki cümle veriyor; halka yalnızca döngünün
-/// şeklini gösteriyor — evrelerin nerede başlayıp bittiğini ve bugünün o yay
-/// üzerindeki yerini.
-class CycleRing extends StatelessWidget {
-  const CycleRing({
-    super.key,
-    required this.info,
-    required this.currentDay,
-    required this.center,
-  });
+/// Döngü tahmin edildiği kadar sürmeyebilir: erken biterse çiçek sayısı azalır,
+/// gecikirse artar. Yeni düzene sıçrayarak geçmek çelengi bozuk gösteriyordu;
+/// çiçekler artık yeni yerlerine dönerek gidiyor, fazlalar açılıyor, eksikler
+/// soluyor.
+///
+/// Canlandırma yalnızca bu alanı kapsıyor — ekranın geri kalanı sabit kalıyor.
+class CycleRing extends StatefulWidget {
+  const CycleRing({super.key, required this.data, required this.center});
 
-  final CycleInfo info;
-  final int currentDay;
+  final CycleRingData data;
 
   /// Halkanın ortasında duran içerik.
   ///
   /// Başlık ve halka önce ayrı bloklardı; ikisi ayrı ayrı dikkat çekiyor ve
-  /// aradaki boşluk kartı seyrek gösteriyordu. Tek bir odak nesnesi olarak
-  /// daha derli toplu duruyor.
+  /// aradaki boşluk kartı seyrek gösteriyordu.
   final Widget center;
+
+  @override
+  State<CycleRing> createState() => _CycleRingState();
+}
+
+class _CycleRingState extends State<CycleRing>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  /// Geçişin başladığı düzen.
+  late CycleRingData _from;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 950),
+      vsync: this,
+    );
+
+    // Uygulama açıldığında döngü çoktan uzamışsa, geçiş tahmin edilen
+    // çelenkten başlayıp bugüne kadar uzuyor. Kullanıcı "regl hâlâ sürüyor"
+    // bilgisini bir sıçrama olarak değil, çelengin büyümesi olarak görüyor.
+    final target = widget.data;
+    final start = target.clampedToExpected();
+    if (start != target) {
+      _from = start;
+      _controller.forward(from: 0);
+    } else {
+      _from = target;
+      _controller.value = 1;
+    }
+  }
+
+  @override
+  void didUpdateWidget(CycleRing old) {
+    super.didUpdateWidget(old);
+    if (old.data == widget.data) return;
+
+    // Geçiş ortasında yeni bir değişiklik gelirse, o anki ara durumdan devam
+    // etmek gerekiyor; yoksa çiçekler geri sıçrayıp yeniden yola çıkıyor.
+    _from = _lerpData(_from, old.data, _controller.value);
+    _controller.forward(from: 0);
+  }
+
+  /// İki düzen arasındaki ara durumu üretir.
+  CycleRingData _lerpData(CycleRingData a, CycleRingData b, double t) {
+    if (t <= 0) return a;
+    if (t >= 1) return b;
+    final count = math.max(a.length, b.length);
+    return CycleRingData(
+      colors: [
+        for (var i = 0; i < count; i++)
+          Color.lerp(
+                i < a.length ? a.colors[i] : b.colors[i],
+                i < b.length ? b.colors[i] : a.colors[i],
+                t,
+              ) ??
+              b.colors[math.min(i, b.length - 1)],
+      ],
+      todayIndex: t < 0.5 ? a.todayIndex : b.todayIndex,
+      expected: b.expected,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
     final theme = Theme.of(context);
-    final expected = info.averageCycleLength;
-
-    // Regl gecikirse döngü tahmin edilen uzunluğu aşıyor. Halka yalnızca
-    // beklenen uzunlukta çizilseydi bugüne denk gelen parça olmaz, işaret
-    // kaybolur ve bütün günler "geçmiş" sayılıp halka tamamen solardı.
-    // Halka bugüne kadar uzuyor; beklenenin ötesindeki günler nötr renkte,
-    // böylece gecikme halkanın kendisinden okunuyor.
-    final length = math.max(expected, currentDay);
-
-    // Renkler boyayıcıya girmeden hesaplanıyor: bir kapanış geçirilseydi
-    // `shouldRepaint` onu karşılaştıramaz ve evre renkleri değişip gün sayısı
-    // aynı kaldığında halka yeniden çizilmezdi.
-    final colors = [
-      for (var day = 1; day <= length; day++)
-        if (day > expected) t.textFaint else info.getPhaseForDay(day).color(t),
-    ];
-
-    final phaseColor = info.currentPhase.color(t);
 
     return Center(
       child: SizedBox(
         width: 232,
         height: 232,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Evre renginde çok hafif bir hâle: halka düz zeminde yüzer gibi
-            // duruyordu, bu onu yere oturtuyor.
-            Container(
-              width: 190,
-              height: 190,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [phaseColor.withAlpha(20), phaseColor.withAlpha(0)],
-                ),
-              ),
-            ),
-            CustomPaint(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return CustomPaint(
               size: const Size.square(232),
-              painter: _RingPainter(
-                colors: colors,
-                currentDay: currentDay,
+              painter: _WreathPainter(
+                from: _from,
+                to: widget.data,
+                progress: _controller.value,
                 track: t.border,
                 core: t.surface,
               ),
-            ),
-            Padding(
+              child: child,
+            );
+          },
+          child: Center(
+            child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 34),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  center,
+                  widget.center,
                   const SizedBox(height: 6),
                   Text(
                     context.tr(
                       'home_ring_cycle_length',
-                      params: {'n': '$expected'},
+                      params: {'n': '${widget.data.expected}'},
                     ),
                     textAlign: TextAlign.center,
                     style: theme.textTheme.labelLarge?.copyWith(
@@ -106,36 +142,54 @@ class CycleRing extends StatelessWidget {
                 ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _RingPainter extends CustomPainter {
-  _RingPainter({
-    required this.colors,
-    required this.currentDay,
+class _WreathPainter extends CustomPainter {
+  _WreathPainter({
+    required this.from,
+    required this.to,
+    required this.progress,
     required this.track,
     required this.core,
   });
 
-  final List<Color> colors;
-  final int currentDay;
+  final CycleRingData from;
+  final CycleRingData to;
+  final double progress;
 
-  /// Parçaların altındaki ince iz: halka soluk günlerde de tam bir daire
-  /// olarak okunsun.
+  /// Çiçeklerin dizildiği ince iz.
   final Color track;
 
   /// Papatyaların göbek rengi — kartın yüzeyiyle aynı.
   final Color core;
 
-  int get length => colors.length;
+  /// Bir çiçeğin kendi ilerlemesi.
+  ///
+  /// Hepsi aynı anda hareket ederse çelenk tek parça gibi dönüyor. Bugünden
+  /// uzaklaştıkça küçük bir gecikme ekleniyor: değişim bugünden başlayıp
+  /// halka boyunca dalga hâlinde yayılıyor.
+  double _localProgress(int index, int count) {
+    final anchor = to.todayIndex ?? from.todayIndex ?? 0;
+    var distance = (index - anchor).abs();
+    if (count > 0) {
+      distance = math.min(distance, count - distance);
+    }
+    final delay = count <= 1 ? 0.0 : (distance / count) * 0.55;
+    final span = 1 - delay;
+    if (span <= 0) return 1;
+    final local = ((progress - delay) / span).clamp(0.0, 1.0);
+    return Curves.easeOutCubic.transform(local);
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (length <= 0) return;
+    final count = math.max(from.length, to.length);
+    if (count <= 0) return;
 
     final center = Offset(size.width / 2, size.height / 2);
     final radius = math.min(size.width, size.height) / 2 - 18;
@@ -150,46 +204,66 @@ class _RingPainter extends CustomPainter {
         ..strokeWidth = 1,
     );
 
-    final sweep = 2 * math.pi / length;
-
-    // Her gün bir papatya. Boyut, iki komşu çiçek değmeyecek şekilde
-    // yaydan türetiliyor: döngü uzadıkça çiçekler küçülüyor.
-    final slot = 2 * math.pi * radius / length;
-
     // Taban boyut, bugünün büyütülmüş çiçeğine yer kalacak şekilde
     // hesaplanıyor. İki komşu merkez arası `slot` kadar; bugünün yarıçapı ile
-    // komşusunun yarıçapının toplamı bunun altında kalmalı.
+    // komşusunun yarıçapının toplamı bunun altında kalmalı:
     //
     //   base/2 * todayScale + base/2 <= slot * clearance
-    //
-    // Önceden taban `slot * 0.92` ve büyütme 1.45'ti; toplam yarıçap slot'u
-    // aşıyor ve bugünün çiçeği iki komşusuna değiyordu.
     const todayScale = 1.28;
     const clearance = 0.94;
-    final petalSize = math.min(slot * 2 * clearance / (todayScale + 1), 20.0);
 
-    for (var day = 1; day <= length; day++) {
-      final isToday = day == currentDay;
-      final isPast = day < currentDay;
-      final color = colors[day - 1];
+    double sizeFor(int length) {
+      if (length <= 0) return 0;
+      final slot = 2 * math.pi * radius / length;
+      return math.min(slot * 2 * clearance / (todayScale + 1), 20.0);
+    }
 
-      // Saat 12'den başla.
-      final angle = -math.pi / 2 + (day - 1) * sweep + sweep / 2;
+    final sizeFrom = sizeFor(from.length);
+    final sizeTo = sizeFor(to.length);
 
-      // Bugünün çiçeği bir tık dışarıda duruyor. Açısal aralık sabit
-      // olduğundan dışa çıkmak komşularla arayı açıyor; ayrıca çelengin
-      // üzerinde hafifçe kabarmış gibi görünüyor.
-      final r = isToday ? radius + petalSize * 0.22 : radius;
+    for (var i = 0; i < count; i++) {
+      final local = _localProgress(i, count);
+
+      final inFrom = i < from.length;
+      final inTo = i < to.length;
+
+      // Saat 12'den başla; çiçek dilimin ortasında dursun.
+      double angleFor(int length) =>
+          -math.pi / 2 + (i + 0.5) * (2 * math.pi / length);
+
+      final angle = _lerp(
+        inFrom ? angleFor(from.length) : angleFor(to.length),
+        inTo ? angleFor(to.length) : angleFor(from.length),
+        local,
+      );
+
+      // Düzene yeni katılan çiçek açılıyor, çıkan soluyor.
+      final presence = _lerp(inFrom ? 1 : 0, inTo ? 1 : 0, local);
+      if (presence <= 0.01) continue;
+
+      final base = _lerp(sizeFrom, sizeTo, local) * presence;
+      final isToday = i == (local < 0.5 ? from.todayIndex : to.todayIndex);
+
+      // Bugünün çiçeği bir tık dışarıda: açısal aralık sabit olduğundan dışa
+      // çıkmak komşularla arayı açıyor ve çelengin üzerinde kabarmış gibi
+      // görünüyor.
+      final r = isToday ? radius + base * 0.22 : radius;
       final at = Offset(
         center.dx + r * math.cos(angle),
         center.dy + r * math.sin(angle),
       );
 
+      final color = Color.lerp(
+        inFrom ? from.colors[i] : to.colors[i],
+        inTo ? to.colors[i] : from.colors[i],
+        local,
+      )!;
+
       if (isToday) {
         // Yumuşak bir hâle: bugünü büyütmeye fazla yüklenmeden ayırıyor.
         canvas.drawCircle(
           at,
-          petalSize * 0.95,
+          base * 0.95,
           Paint()..color = color.withAlpha(38),
         );
       }
@@ -197,18 +271,15 @@ class _RingPainter extends CustomPainter {
       _drawDaisy(
         canvas,
         at: at,
-        size: isToday ? petalSize * todayScale : petalSize,
-        // Geçmiş günler soluk: bakış bugüne ve önündeki yola gitsin.
-        petal: isPast ? color.withAlpha(80) : color,
-        // Papatyanın göbeği kartın yüzey rengi. Sarı bir göbek palete yeni
-        // bir renk sokardı; boşluk bırakmak çiçeği yine papatya gibi okutuyor.
-        core: isPast ? core.withAlpha(150) : core,
-        // Bugünün çiçeği hem büyük hem tam açık; ayrıca dışına işaret
-        // koymaya gerek kalmıyor.
+        size: isToday ? base * todayScale : base,
+        petal: color,
+        core: core,
         petals: 8,
       );
     }
   }
+
+  double _lerp(double a, double b, double t) => a + (b - a) * t;
 
   /// Tek bir papatya çizer.
   ///
@@ -249,9 +320,10 @@ class _RingPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_RingPainter old) =>
-      old.currentDay != currentDay ||
+  bool shouldRepaint(_WreathPainter old) =>
+      old.progress != progress ||
+      old.from != from ||
+      old.to != to ||
       old.track != track ||
-      old.core != core ||
-      !listEquals(old.colors, colors);
+      old.core != core;
 }

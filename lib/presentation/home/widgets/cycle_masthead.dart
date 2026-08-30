@@ -11,6 +11,7 @@ import '../../calendar/view_models/calendar_view_model.dart';
 import '../../../domain/models/cycle_info.dart';
 import '../../../domain/services/cycle_agenda.dart';
 import 'cycle_ring.dart';
+import 'cycle_ring_data.dart';
 
 /// Ana ekranın üst bloğu.
 ///
@@ -92,8 +93,11 @@ class CycleMasthead extends StatelessWidget {
                     // okunmuyor: onun döngü günü olduğunu bilmek gerekiyor.
                     // Merkezde duran şey bir sayı değil, cümle.
                     CycleRing(
-                      info: info,
-                      currentDay: day ?? 0,
+                      data: CycleRingData.from(
+                        info: info,
+                        currentDay: day ?? 0,
+                        tokens: t,
+                      ),
                       center: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
