@@ -806,6 +806,7 @@
   "home_agenda_title": "À venir",
   "home_headline_late": "{n} jours de retard",
   "home_period_start": "Mes règles ont commencé",
+  "home_period_started": "Début des règles enregistré",
   "home_period_end": "Mes règles sont finies",
   "home_period_ended_today": "Tes règles se sont terminées aujourd'hui",
   "home_period_undo": "Annuler",

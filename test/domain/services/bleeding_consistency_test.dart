@@ -183,6 +183,65 @@ void main() {
     });
   });
 
+  group('yanlışlıkla "Reglim başladı"', () {
+    /// Ana ekranın geri alma eylemi: bugünü kayıttan tamamen çıkarır.
+    List<PeriodLog> undoStart(List<PeriodLog> logs) =>
+        periods.toggleDay(logs, dayAt(0), today: dayAt(0));
+
+    test('hiç kayıt yokken geri alma başlangıç öncesine döner', () {
+      final started = periods.startPeriod([], dayAt(0));
+      expect(started, hasLength(1));
+
+      expect(undoStart(started), isEmpty);
+    });
+
+    test('dün biten dönem yeniden açıldıysa eski bitiş tarihi geri gelir', () {
+      // "Başladı" burada yeni bir dönem açmıyor, dünkü dönemi yeniden
+      // açıyor. Geri alma da kaydı silmek yerine bitişi geri koymalı.
+      final original = [
+        PeriodLog(id: 'a', startDate: dayAt(3), endDate: dayAt(1)),
+      ];
+
+      final started = periods.startPeriod(original, dayAt(0));
+      expect(started.single.isOngoing, isTrue);
+
+      final undone = undoStart(started);
+      expect(undone, hasLength(1));
+      expect(undone.single.startDate, dayAt(3));
+      expect(undone.single.endDate, dayAt(1));
+      expect(bleedingToday(undone), isFalse);
+    });
+
+    test('ilgisiz eski kayıtlara dokunulmaz', () {
+      final original = [
+        PeriodLog(id: 'a', startDate: dayAt(35), endDate: dayAt(31)),
+      ];
+
+      final undone = undoStart(periods.startPeriod(original, dayAt(0)));
+
+      expect(undone, hasLength(1));
+      expect(undone.single.startDate, dayAt(35));
+      expect(undone.single.endDate, dayAt(31));
+    });
+
+    test('geri almadan sonra başlık da başlangıç öncesine döner', () {
+      final original = [
+        PeriodLog(id: 'a', startDate: dayAt(30), endDate: dayAt(26)),
+      ];
+
+      final started = periods.startPeriod(original, dayAt(0));
+      expect(
+        service.getCycleInfo(started, userPeriodLength: 5).currentPhase,
+        CyclePhase.menstruation,
+      );
+
+      final undone = undoStart(started);
+      final info = service.getCycleInfo(undone, userPeriodLength: 5);
+      expect(info.currentCycleDay, 31);
+      expect(info.currentPhase, isNot(CyclePhase.menstruation));
+    });
+  });
+
   group('takvim kaydı ile beklentiyi ayırır', () {
     test('devam eden dönemin bugünden sonrası kayıt değil beklentidir', () {
       final log = PeriodLog(id: 'a', startDate: dayAt(1), endDate: null);

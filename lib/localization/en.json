@@ -806,6 +806,7 @@
   "home_agenda_title": "Up next",
   "home_headline_late": "{n} days late",
   "home_period_start": "My period started",
+  "home_period_started": "Period start saved",
   "home_period_end": "My period ended",
   "home_period_ended_today": "Your period ended today",
   "home_period_undo": "Undo",

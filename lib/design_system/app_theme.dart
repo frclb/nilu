@@ -231,6 +231,10 @@ class AppTheme {
         contentTextStyle: textTheme.bodyMedium?.copyWith(
           color: AppPalette.sand50,
         ),
+        // Varsayılan eylem rengi `inversePrimary`; koyu snackbar zemininde
+        // metinden ayırt edilemiyordu. plum300 her iki zeminde de 6.4:1
+        // üzerinde kontrast veriyor.
+        actionTextColor: AppPalette.plum300,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),

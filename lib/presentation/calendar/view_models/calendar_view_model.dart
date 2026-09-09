@@ -185,6 +185,21 @@ class CalendarViewModel extends ChangeNotifier {
     return true;
   }
 
+  /// "Reglim başladı"yı geri alır: bugünü kayıttan tamamen çıkarır.
+  ///
+  /// Yanlışlıkla basıldığında ekranda duran "Reglim bitti" bir çıkış yolu
+  /// değil — o, bugünü işaretli bırakıp dönemi kapatır. Geri alma, başlatma
+  /// öncesine dönmeli: yeni açılan kayıt siliniyor, yeniden açılmış bir kayıt
+  /// varsa eski bitiş tarihine dönüyor.
+  Future<bool> undoPeriodStart() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    if (!isPeriodDay(today)) return false;
+    _periodLogs = _periodService.toggleDay(_periodLogs, today, today: today);
+    await _persistPeriods();
+    return true;
+  }
+
   /// "Geri al" — bugün kapatılan dönemi yeniden açar.
   Future<bool> reopenPeriodToday() async {
     final now = DateTime.now();

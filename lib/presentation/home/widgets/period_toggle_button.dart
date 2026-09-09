@@ -25,9 +25,15 @@ class PeriodToggleButton extends StatefulWidget {
 class _PeriodToggleButtonState extends State<PeriodToggleButton> {
   bool _busy = false;
 
-  Future<void> _run(Future<bool> Function() action) async {
+  /// [undo] verilirse, iş bittiğinde geri alma sunan bir bildirim gösterilir.
+  Future<void> _run(
+    Future<bool> Function() action, {
+    String? confirmation,
+    VoidCallback? undo,
+  }) async {
     final messenger = ScaffoldMessenger.of(context);
     final failed = context.tr('home_period_toggle_failed');
+    final undoLabel = context.tr('home_period_undo');
 
     setState(() => _busy = true);
     final ok = await action();
@@ -36,7 +42,21 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
 
     if (!ok) {
       messenger.showSnackBar(SnackBar(content: Text(failed)));
+      return;
     }
+
+    if (confirmation == null || undo == null) return;
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(confirmation),
+          // Varsayılan dört saniye, yanlış dokunuşu fark edip geri almak için
+          // kısa kalıyor.
+          duration: const Duration(seconds: 6),
+          action: SnackBarAction(label: undoLabel, onPressed: undo),
+        ),
+      );
   }
 
   @override
@@ -51,8 +71,16 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
       child: SizedBox(
         height: 52,
         child: switch (action) {
+          // Başlatma yanlışlıkla da yapılabilir. Ekranda kalan "Reglim bitti"
+          // bir çıkış yolu değil — o, bugünü işaretli bırakıp dönemi kapatır.
           PeriodAction.start => FilledButton.icon(
-            onPressed: _busy ? null : () => _run(viewModel.startPeriodToday),
+            onPressed: _busy
+                ? null
+                : () => _run(
+                    viewModel.startPeriodToday,
+                    confirmation: context.tr('home_period_started'),
+                    undo: () => viewModel.undoPeriodStart(),
+                  ),
             icon: const Icon(Icons.water_drop_outlined, size: 20),
             label: Text(context.tr('home_period_start')),
             style: FilledButton.styleFrom(

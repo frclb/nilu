@@ -806,6 +806,7 @@
   "home_agenda_title": "Als Nächstes",
   "home_headline_late": "{n} Tage überfällig",
   "home_period_start": "Meine Periode hat begonnen",
+  "home_period_started": "Periodenbeginn gespeichert",
   "home_period_end": "Meine Periode ist vorbei",
   "home_period_ended_today": "Deine Periode endete heute",
   "home_period_undo": "Rückgängig",
