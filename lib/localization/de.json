@@ -807,6 +807,8 @@
   "home_headline_late": "{n} Tage überfällig",
   "home_period_start": "Meine Periode hat begonnen",
   "home_period_end": "Meine Periode ist vorbei",
+  "home_period_ended_today": "Deine Periode endete heute",
+  "home_period_undo": "Rückgängig",
   "home_period_toggle_failed": "Dieser Tag konnte nicht markiert werden.",
   "privacy_ads_notice": "Die kostenlose Version zeigt Werbung. Sie ist nicht personalisiert: Deine Gesundheitsdaten werden nie für Werbung genutzt, und du wirst nicht gezielt angesprochen. Premium ist werbefrei.",
   "privacy_ads_title": "Werbung",

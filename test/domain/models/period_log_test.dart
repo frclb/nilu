@@ -24,45 +24,135 @@ void main() {
     });
   });
 
-  group('PeriodLog.contains — tamamlanmış dönem', () {
+  group('PeriodLog.containsRecorded — tamamlanmış dönem', () {
     final l = log('1', DateTime(2026, 3, 10), DateTime(2026, 3, 14));
 
     test('sınırlar dahildir', () {
-      expect(l.contains(DateTime(2026, 3, 10)), isTrue);
-      expect(l.contains(DateTime(2026, 3, 14)), isTrue);
+      expect(l.containsRecorded(DateTime(2026, 3, 10)), isTrue);
+      expect(l.containsRecorded(DateTime(2026, 3, 14)), isTrue);
     });
 
     test('aralık dışı günler hariçtir', () {
-      expect(l.contains(DateTime(2026, 3, 9)), isFalse);
-      expect(l.contains(DateTime(2026, 3, 15)), isFalse);
+      expect(l.containsRecorded(DateTime(2026, 3, 9)), isFalse);
+      expect(l.containsRecorded(DateTime(2026, 3, 15)), isFalse);
     });
 
     test('günün saati sonucu değiştirmez', () {
-      expect(l.contains(DateTime(2026, 3, 14, 23, 59)), isTrue);
+      expect(l.containsRecorded(DateTime(2026, 3, 14, 23, 59)), isTrue);
+    });
+
+    test('bugün kayıt aralığını etkilemez', () {
+      expect(
+        l.containsRecorded(DateTime(2026, 3, 14), today: DateTime(2026, 3, 11)),
+        isTrue,
+      );
     });
   });
 
-  group('PeriodLog.contains — devam eden dönem', () {
+  group('PeriodLog.containsRecorded — devam eden dönem', () {
     final l = log('1', DateTime(2026, 3, 10));
+    final today = DateTime(2026, 3, 12);
 
-    test('varsayılan projeksiyon 5 gündür', () {
-      expect(l.contains(DateTime(2026, 3, 14)), isTrue);
-      expect(l.contains(DateTime(2026, 3, 15)), isFalse);
+    test('kayıt bugüne kadar uzanır', () {
+      expect(l.containsRecorded(DateTime(2026, 3, 10), today: today), isTrue);
+      expect(l.containsRecorded(DateTime(2026, 3, 12), today: today), isTrue);
     });
 
-    test('kullanıcının regl süresi ayarı projeksiyonu belirler', () {
-      // Regresyon: bu değer eskiden 5'e sabitlenmişti ve kullanıcı ayarı
-      // yoksayılıyordu.
-      expect(l.contains(DateTime(2026, 3, 16), ongoingLength: 7), isTrue);
-      expect(l.contains(DateTime(2026, 3, 17), ongoingLength: 7), isFalse);
+    test('bugünden sonrası kayıt değildir', () {
+      // Regresyon: burada kullanıcının regl süresi kadar ileri bir projeksiyon
+      // vardı ve takvim o günleri gerçek kayıtmış gibi koyu boyuyordu.
+      expect(l.containsRecorded(DateTime(2026, 3, 13), today: today), isFalse);
+      expect(l.containsRecorded(DateTime(2026, 3, 14), today: today), isFalse);
+    });
 
-      expect(l.contains(DateTime(2026, 3, 12), ongoingLength: 3), isTrue);
-      expect(l.contains(DateTime(2026, 3, 13), ongoingLength: 3), isFalse);
+    test('başlangıçtan önceki günler hariçtir', () {
+      expect(l.containsRecorded(DateTime(2026, 3, 9), today: today), isFalse);
+    });
+
+    test('recordedLength bugüne kadar geçen günü sayar', () {
+      expect(l.recordedLength(today: today), 3);
+      expect(l.recordedLength(today: DateTime(2026, 3, 10)), 1);
+    });
+  });
+
+  group('PeriodLog.isExpectedContinuation', () {
+    final ongoing = log('1', DateTime(2026, 3, 10));
+    final today = DateTime(2026, 3, 12);
+
+    test('bugünden sonraki beklenen günler', () {
+      expect(
+        ongoing.isExpectedContinuation(
+          DateTime(2026, 3, 13),
+          today: today,
+          expectedLength: 5,
+        ),
+        isTrue,
+      );
+      expect(
+        ongoing.isExpectedContinuation(
+          DateTime(2026, 3, 14),
+          today: today,
+          expectedLength: 5,
+        ),
+        isTrue,
+      );
+    });
+
+    test('beklenen uzunluğun ötesi beklenti de değildir', () {
+      expect(
+        ongoing.isExpectedContinuation(
+          DateTime(2026, 3, 15),
+          today: today,
+          expectedLength: 5,
+        ),
+        isFalse,
+      );
+    });
+
+    test('kullanıcının regl süresi ayarı beklentiyi belirler', () {
+      expect(
+        ongoing.isExpectedContinuation(
+          DateTime(2026, 3, 16),
+          today: today,
+          expectedLength: 7,
+        ),
+        isTrue,
+      );
+      expect(
+        ongoing.isExpectedContinuation(
+          DateTime(2026, 3, 17),
+          today: today,
+          expectedLength: 7,
+        ),
+        isFalse,
+      );
+    });
+
+    test('kayıtlı günler beklenti sayılmaz', () {
+      expect(
+        ongoing.isExpectedContinuation(DateTime(2026, 3, 12), today: today),
+        isFalse,
+      );
+    });
+
+    test('tamamlanmış dönemin beklenen devamı yoktur', () {
+      final closed = log('1', DateTime(2026, 3, 10), DateTime(2026, 3, 11));
+      expect(
+        closed.isExpectedContinuation(DateTime(2026, 3, 12), today: today),
+        isFalse,
+      );
     });
 
     test('geçersiz uzunluk en az 1 güne çekilir', () {
-      expect(l.contains(DateTime(2026, 3, 10), ongoingLength: 0), isTrue);
-      expect(l.contains(DateTime(2026, 3, 11), ongoingLength: 0), isFalse);
+      final startedToday = log('1', DateTime(2026, 3, 12));
+      expect(
+        startedToday.isExpectedContinuation(
+          DateTime(2026, 3, 13),
+          today: today,
+          expectedLength: 0,
+        ),
+        isFalse,
+      );
     });
   });
 

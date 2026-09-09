@@ -32,7 +32,7 @@ class CalendarDayHeader extends StatelessWidget {
       isPeriod: isPeriod,
       isOvulation: viewModel.cycleInfo.isOvulationDay(selectedDate),
       isFertile: viewModel.cycleInfo.isFertile(selectedDate),
-      isPredicted: viewModel.cycleInfo.isPredictedPeriod(selectedDate),
+      isPredicted: viewModel.isPredictedPeriodDay(selectedDate),
     );
 
     final dateStr =

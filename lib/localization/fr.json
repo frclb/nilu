@@ -807,6 +807,8 @@
   "home_headline_late": "{n} jours de retard",
   "home_period_start": "Mes règles ont commencé",
   "home_period_end": "Mes règles sont finies",
+  "home_period_ended_today": "Tes règles se sont terminées aujourd'hui",
+  "home_period_undo": "Annuler",
   "home_period_toggle_failed": "Ce jour n'a pas pu être marqué.",
   "privacy_ads_notice": "La version gratuite affiche des publicités. Elles ne sont pas personnalisées : tes données de santé ne servent jamais à la publicité et tu n'es pas ciblée. Premium est sans publicité.",
   "privacy_ads_title": "Publicités",

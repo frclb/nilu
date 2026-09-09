@@ -807,6 +807,8 @@
   "home_headline_late": "{n} dias de atraso",
   "home_period_start": "O meu período começou",
   "home_period_end": "O meu período terminou",
+  "home_period_ended_today": "A tua menstruação terminou hoje",
+  "home_period_undo": "Anular",
   "home_period_toggle_failed": "Não foi possível marcar este dia.",
   "privacy_ads_notice": "A versão gratuita mostra anúncios. Não são personalizados: os teus dados de saúde nunca são usados para publicidade e não és segmentada. O Premium não tem anúncios.",
   "privacy_ads_title": "Anúncios",

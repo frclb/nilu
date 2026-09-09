@@ -88,32 +88,102 @@ void main() {
   });
 
   group('toggleDay — devam eden dönem', () {
-    test('projeksiyon uzunluğu kullanıcı ayarına uyar', () {
-      // 10 Nisan'da başlayan, bitmemiş bir dönem.
-      // 7 günlük ayarla 16 Nisan hâlâ dönemin içindedir; 5 günlük ayarla değil.
-      final ongoing = [block('a', 10, null)];
-
-      final withSevenDaySetting = service.toggleDay(
-        ongoing,
-        d(16),
-        ongoingLength: 7,
+    // Devam eden bir dönemin kaydı bugüne kadar uzanır; bugünden sonrası
+    // veri değil beklenti. Testler bugünü açıkça geçiyor.
+    test('ortadaki günü kaldırınca dönem bölünür, devam ediyor kalır', () {
+      final result = service.toggleDay(
+        [block('a', 10, null)],
+        d(12),
+        today: d(16),
       );
-      // Dönemin içindeydi → kaldırma yolu çalışır. Devam eden kayıtta o günden
-      // sonrası veri değil projeksiyon olduğu için kayıt bölünmez, bir önceki
-      // günde kapanır; bölmek yarın başlayan hayalet bir dönem bırakıyordu.
-      expect(spans(withSevenDaySetting), [
-        [10, 15],
+      expect(spans(result), [
+        [10, 11],
+        [13, null],
       ]);
+    });
 
-      final withFiveDaySetting = service.toggleDay(
+    test('bugünü kaldırmak dönemi dün kapatır', () {
+      final result = service.toggleDay(
         [block('a', 10, null)],
         d(16),
-        ongoingLength: 5,
+        today: d(16),
       );
-      // Dönemin dışındaydı → yeni bağımsız gün eklenir.
-      expect(spans(withFiveDaySetting), [
-        [10, null],
-        [16, 16],
+      expect(spans(result), [
+        [10, 15],
+      ]);
+    });
+
+    test('ilk günü kaldırmak dönemi bir gün ileri kaydırır', () {
+      final result = service.toggleDay(
+        [block('a', 10, null)],
+        d(10),
+        today: d(16),
+      );
+      expect(spans(result), [
+        [11, null],
+      ]);
+    });
+  });
+
+  group('startPeriod', () {
+    test('bugünden itibaren devam eden bir dönem açar', () {
+      expect(spans(service.startPeriod([], d(16))), [
+        [16, null],
+      ]);
+    });
+
+    test('bugün zaten kayıtlıysa hiçbir şey değişmez', () {
+      final logs = [block('a', 14, 18)];
+      expect(spans(service.startPeriod(logs, d(16))), [
+        [14, 18],
+      ]);
+    });
+
+    test('devam eden bir dönem varken ikinci dönem açılmaz', () {
+      // Devam eden kayıt tanımı gereği bugünü kapsar.
+      expect(spans(service.startPeriod([block('a', 12, null)], d(16))), [
+        [12, null],
+      ]);
+    });
+
+    test('dün biten dönemi yeniden açar, ikinci dönem yaratmaz', () {
+      // Aynı kanamayı iki ayrı döngü gibi göstermek, ortalama döngü
+      // uzunluğunu da bozardı.
+      expect(spans(service.startPeriod([block('a', 12, 15)], d(16))), [
+        [12, null],
+      ]);
+    });
+  });
+
+  group('endPeriod', () {
+    test('dönemi bugünde kapatır ve bugünü kayıtta bırakır', () {
+      final result = service.endPeriod([block('a', 12, null)], d(16));
+      expect(spans(result), [
+        [12, 16],
+      ]);
+      expect(
+        result.single.containsRecorded(d(16), today: d(16)),
+        isTrue,
+        reason: 'son kanama günü kayıtta kalmalı',
+      );
+    });
+
+    test('bugünün ötesine uzanan kaydı bugüne kırpar', () {
+      // Onboarding'in ürettiği kayıt tipik olarak bugünün ötesine uzanıyor.
+      expect(spans(service.endPeriod([block('a', 14, 18)], d(16))), [
+        [14, 16],
+      ]);
+    });
+
+    test('bugün kayıtlı değilse ama dün kayıtlıysa bugüne uzatıp kapatır', () {
+      expect(spans(service.endPeriod([block('a', 12, 15)], d(16))), [
+        [12, 16],
+      ]);
+    });
+
+    test('ilgisiz bir kayıt varken hiçbir şey değişmez', () {
+      expect(spans(service.endPeriod([block('a', 2, 6)], d(16))), [
+        [2, 6],
       ]);
     });
   });

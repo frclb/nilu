@@ -46,9 +46,11 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
 
     await viewModel.updateDailyLog(log);
 
-    // Eğer akış yoğunluğu varsa regl günü olarak da işaretle
+    // Akış yoğunluğu girildiyse kanama var demektir: dönemi başlat. Tek
+    // günlük kapalı bir kayıt açsaydık ertesi gün ana ekran yine "Reglim
+    // başladı" derdi.
     if (_flowIntensity != null && !viewModel.isPeriodDay(today)) {
-      await viewModel.togglePeriodDay(today);
+      await viewModel.startPeriodToday();
     }
 
     if (mounted) {

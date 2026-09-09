@@ -282,7 +282,7 @@ class _DayTile extends StatelessWidget {
       (v) => v.isPeriodDay(date),
     );
     final isPredicted = context.select<CalendarViewModel, bool>(
-      (v) => v.cycleInfo.isPredictedPeriod(date),
+      (v) => v.isPredictedPeriodDay(date),
     );
     final isFertile = context.select<CalendarViewModel, bool>(
       (v) => v.cycleInfo.isFertile(date),
@@ -318,16 +318,13 @@ class _DayTile extends StatelessWidget {
         isPredicted &&
         !isPeriod &&
         context.select<CalendarViewModel, bool>(
-          (v) => v.cycleInfo.isPredictedPeriod(
-            date.subtract(const Duration(days: 1)),
-          ),
+          (v) => v.isPredictedPeriodDay(date.subtract(const Duration(days: 1))),
         );
     final hasPredictedAfter =
         isPredicted &&
         !isPeriod &&
         context.select<CalendarViewModel, bool>(
-          (v) =>
-              v.cycleInfo.isPredictedPeriod(date.add(const Duration(days: 1))),
+          (v) => v.isPredictedPeriodDay(date.add(const Duration(days: 1))),
         );
 
     final theme = Theme.of(context);

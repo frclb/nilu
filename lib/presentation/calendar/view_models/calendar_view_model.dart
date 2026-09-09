@@ -138,16 +138,73 @@ class CalendarViewModel extends ChangeNotifier {
       return false;
     }
 
-    _periodLogs = _periodService.toggleDay(
-      _periodLogs,
-      date,
-      ongoingLength: _userPeriodLength,
-      today: today,
-    );
+    _periodLogs = _periodService.toggleDay(_periodLogs, date, today: today);
+    await _persistPeriods();
+    return true;
+  }
+
+  /// Takvimin "tahmin" olarak boyadığı gün.
+  ///
+  /// İki kaynak var: sonraki döngünün tahmini, bir de devam eden dönemin
+  /// bugünden sonraki beklenen günleri.
+  bool isPredictedPeriodDay(DateTime date) =>
+      _cycleInfo.isPredictedPeriod(date) || isExpectedPeriodDay(date);
+
+  /// Ana ekrandaki düğmenin bugün için sunduğu eylem.
+  PeriodAction get periodActionToday {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    for (final log in _periodLogs) {
+      if (!log.containsRecorded(today, today: today)) continue;
+      // Dönem bugünde kapatılmışsa yapacak bir şey kalmadı; geri alma dışında.
+      final end = log.endDate;
+      final closedToday =
+          end != null &&
+          DateTime(end.year, end.month, end.day).isAtSameMomentAs(today);
+      return closedToday ? PeriodAction.endedToday : PeriodAction.end;
+    }
+    return PeriodAction.start;
+  }
+
+  /// "Reglim başladı" — bugünden itibaren devam eden bir dönem açar.
+  Future<bool> startPeriodToday() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    _periodLogs = _periodService.startPeriod(_periodLogs, today);
+    await _persistPeriods();
+    return true;
+  }
+
+  /// "Reglim bitti" — dönemi bugünde kapatır; bugün kayıtta kalır.
+  Future<bool> endPeriodToday() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    _periodLogs = _periodService.endPeriod(_periodLogs, today);
+    await _persistPeriods();
+    return true;
+  }
+
+  /// "Geri al" — bugün kapatılan dönemi yeniden açar.
+  Future<bool> reopenPeriodToday() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    for (final log in _periodLogs) {
+      final end = log.endDate;
+      if (end != null &&
+          DateTime(end.year, end.month, end.day).isAtSameMomentAs(today)) {
+        log.endDate = null;
+        break;
+      }
+    }
+    await _persistPeriods();
+    return true;
+  }
+
+  Future<void> _persistPeriods() async {
     _recalculate();
     await _repository.savePeriodLogs(_periodLogs);
     notifyListeners();
-    return true;
   }
 
   /// Günlük detayı (semptom/not) günceller.
@@ -216,8 +273,30 @@ class CalendarViewModel extends ChangeNotifier {
   /// Belirli bir günün regl olup olmadığını kontrol eder.
   /// Devam eden dönemler kullanıcının ayarladığı regl süresi kadar projekte edilir.
   bool isPeriodDay(DateTime date) {
+    return _periodLogs.any((log) => log.containsRecorded(date));
+  }
+
+  /// Devam eden dönemin bugünden sonraki beklenen günü mü?
+  ///
+  /// Takvim bunu tahmin olarak boyuyor. Kayıtlı günlerle aynı koyulukta
+  /// gösterseydik kullanıcının yaşamadığı bir kanamayı yaşanmış gibi
+  /// gösterirdik.
+  bool isExpectedPeriodDay(DateTime date) {
     return _periodLogs.any(
-      (log) => log.contains(date, ongoingLength: _userPeriodLength),
+      (log) =>
+          log.isExpectedContinuation(date, expectedLength: _userPeriodLength),
     );
   }
+}
+
+/// Ana ekrandaki düğmenin gösterdiği eylem.
+enum PeriodAction {
+  /// Bugün kanama kaydı yok.
+  start,
+
+  /// Dönem devam ediyor; bitirilebilir.
+  end,
+
+  /// Dönem bugün kapatıldı. Geriye yalnızca geri almak kalıyor.
+  endedToday,
 }

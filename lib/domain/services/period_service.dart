@@ -2,55 +2,70 @@ import '../models/period_log.dart';
 
 /// Regl günlerini yöneten ve logları blok (başlangıç/bitiş) olarak tutan servis.
 class PeriodService {
-  /// Yeni bir regl dönemi başlatır.
-  /// Eğer zaten devam eden bir dönem varsa, onu bugünden bir önceki gün olarak kapatır.
-  List<PeriodLog> startPeriod(List<PeriodLog> logs, DateTime startDate) {
-    final cleanStart = DateTime(startDate.year, startDate.month, startDate.day);
+  /// "Reglim başladı": [date] gününden itibaren devam eden bir dönem açar.
+  ///
+  /// Dönem **bitişsiz** kaydediliyor. Kapalı tek günlük bir kayıt açsaydık
+  /// ertesi gün düğme yine "Reglim başladı" derdi; kullanıcı kanaması
+  /// sürerken her sabah "başladı" demek zorunda kalıyordu.
+  List<PeriodLog> startPeriod(List<PeriodLog> logs, DateTime date) {
+    final cleanDate = DateTime(date.year, date.month, date.day);
     final newList = List<PeriodLog>.from(logs);
 
-    // Devam eden bir döngü var mı kontrol et ve kapat
-    for (var log in newList) {
-      if (log.isOngoing) {
-        // Eğer aynı gün başlatılmaya çalışılıyorsa hiçbir şey yapma
-        if (DateTime(
-          log.startDate.year,
-          log.startDate.month,
-          log.startDate.day,
-        ).isAtSameMomentAs(cleanStart)) {
-          return newList;
-        }
-        // Devam eden döngüyü, yeni başlayanın bir gün öncesinden kapat
-        log.endDate = cleanStart.subtract(const Duration(days: 1));
+    // Bugün zaten kayıtlıysa yapacak bir şey yok.
+    if (newList.any((l) => l.containsRecorded(cleanDate, today: cleanDate))) {
+      return newList;
+    }
+
+    // Dün biten bir dönem varsa aslında bitmemiş: kaydı yeniden açıyoruz.
+    // Yeni bir dönem açmak, aynı kanamayı iki döngü gibi gösterirdi.
+    final yesterday = cleanDate.subtract(const Duration(days: 1));
+    for (final log in newList) {
+      final end = log.endDate;
+      if (end != null &&
+          DateTime(end.year, end.month, end.day).isAtSameMomentAs(yesterday)) {
+        log.endDate = null;
+        return newList;
       }
     }
 
-    // Yeni log oluştur
-    final newLog = PeriodLog(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      startDate: cleanStart,
-      endDate: null, // Devam ediyor
+    // Açık kalmış bir dönemi burada kapatmak gerekmiyor: devam eden bir kayıt
+    // tanımı gereği bugünü kapsar, o durumda da bu metoda hiç gelinmez.
+    newList.add(
+      PeriodLog(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        startDate: cleanDate,
+        endDate: null,
+      ),
     );
-    newList.add(newLog);
-
     newList.sort((a, b) => a.startDate.compareTo(b.startDate));
     return newList;
   }
 
-  /// Devam eden veya belirli bir regl dönemini sonlandırır.
-  List<PeriodLog> endPeriod(List<PeriodLog> logs, String id, DateTime endDate) {
-    final cleanEnd = DateTime(endDate.year, endDate.month, endDate.day);
+  /// "Reglim bitti": dönemi [date] gününde kapatır.
+  ///
+  /// [date] kaydın **içinde kalır**. Önceden bu eylem günü kaydın dışına
+  /// çıkarıyordu; kullanıcı son kanama gününü işaretleyemiyordu.
+  ///
+  /// Dönem bugünün ötesine uzanıyorsa (onboarding'in ürettiği kayıt tipik
+  /// olarak uzanıyor) bugüne kırpılır.
+  List<PeriodLog> endPeriod(List<PeriodLog> logs, DateTime date) {
+    final cleanDate = DateTime(date.year, date.month, date.day);
     final newList = List<PeriodLog>.from(logs);
 
-    final index = newList.indexWhere((log) => log.id == id);
-    if (index != -1) {
-      // Bitiş tarihi, başlangıç tarihinden önce olamaz
-      final logStart = newList[index].startDate;
-      final cleanStart = DateTime(logStart.year, logStart.month, logStart.day);
+    for (final log in newList) {
+      if (log.containsRecorded(cleanDate, today: cleanDate)) {
+        log.endDate = cleanDate;
+        return newList;
+      }
+    }
 
-      if (cleanEnd.isBefore(cleanStart)) {
-        newList[index].endDate = cleanStart;
-      } else {
-        newList[index].endDate = cleanEnd;
+    // Bugün kayıtlı değil ama dün kayıtlıysa kanama bugün de sürdü demektir;
+    // dönemi bugüne uzatıp kapatıyoruz.
+    final yesterday = cleanDate.subtract(const Duration(days: 1));
+    for (final log in newList) {
+      if (log.containsRecorded(yesterday, today: cleanDate)) {
+        log.endDate = cleanDate;
+        return newList;
       }
     }
 
@@ -66,15 +81,14 @@ class PeriodService {
 
   /// Bir günü regl günü olarak işaretler veya kaldırır.
   ///
-  /// [ongoingLength]: devam eden bir dönemin kaç gün olarak varsayılacağı —
-  /// kullanıcının ayarladığı regl süresi geçilmelidir.
+  /// Takvimde tek bir güne dokunmanın karşılığı. Ana ekrandaki düğme bunu
+  /// kullanmıyor; onun eylemleri [startPeriod] ve [endPeriod].
   ///
   /// [today]: bugünün tarihi. Gelecekte **başlayan** bir dönem üretilmesini
   /// engellemek için gerekiyor; kullanıcı yaşamadığı bir kanamayı kaydedemez.
   List<PeriodLog> toggleDay(
     List<PeriodLog> logs,
     DateTime date, {
-    int ongoingLength = PeriodLog.defaultOngoingLength,
     DateTime? today,
   }) {
     final cleanDate = DateTime(date.year, date.month, date.day);
@@ -82,46 +96,26 @@ class PeriodService {
     final cleanToday = DateTime(reference.year, reference.month, reference.day);
     final newList = List<PeriodLog>.from(logs);
 
-    // Check if the day is already in any period
-    int foundIndex = -1;
-    for (int i = 0; i < newList.length; i++) {
-      if (newList[i].contains(cleanDate, ongoingLength: ongoingLength)) {
-        foundIndex = i;
-        break;
-      }
-    }
+    final foundIndex = newList.indexWhere(
+      (l) => l.containsRecorded(cleanDate, today: cleanToday),
+    );
 
     if (foundIndex != -1) {
-      // It is already a period day. We need to remove it.
-      // 1. If it's a 1-day period, just delete the period
       final log = newList[foundIndex];
-      final logStart = DateTime(
-        log.startDate.year,
-        log.startDate.month,
-        log.startDate.day,
-      );
-      final logEnd = log.endDate != null
-          ? DateTime(log.endDate!.year, log.endDate!.month, log.endDate!.day)
-          : null;
+      final logStart = log.firstDay;
+      final logEnd = log.lastRecordedDay(today: cleanToday);
 
       if (logStart.isAtSameMomentAs(cleanDate) &&
-          (logEnd == null || logEnd.isAtSameMomentAs(cleanDate))) {
+          logEnd.isAtSameMomentAs(cleanDate)) {
+        // Tek günlük dönem: kaydı sil.
         newList.removeAt(foundIndex);
       } else if (logStart.isAtSameMomentAs(cleanDate)) {
-        // Remove from the beginning
-        newList[foundIndex].startDate = cleanDate.add(const Duration(days: 1));
-      } else if (logEnd != null && logEnd.isAtSameMomentAs(cleanDate)) {
-        // Remove from the end
-        newList[foundIndex].endDate = cleanDate.subtract(
-          const Duration(days: 1),
-        );
-      } else if (logEnd == null) {
-        // Devam eden kayıt: bu günden sonrası veri değil, projeksiyon.
-        // Bölmek, yarın başlayan devam eden bir dönem yaratıyordu; kaydı
-        // bir önceki günde kapatmak yeterli.
-        newList[foundIndex].endDate = cleanDate.subtract(
-          const Duration(days: 1),
-        );
+        // Baştan kırp; dönem devam ediyorsa devam eder.
+        log.startDate = cleanDate.add(const Duration(days: 1));
+      } else if (logEnd.isAtSameMomentAs(cleanDate)) {
+        // Sondan kırp. Devam eden bir dönemde son kayıtlı gün bugündür;
+        // bugünü kaldırmak dönemi dün kapatır.
+        log.endDate = cleanDate.subtract(const Duration(days: 1));
       } else {
         // Ortadaki bir gün siliniyor: dönem ikiye ayrılır.
         final secondStart = cleanDate.add(const Duration(days: 1));
@@ -135,13 +129,10 @@ class PeriodService {
           ),
         );
 
-        // İkinci parça gelecekte başlıyorsa atılıyor. Ana ekrandaki "Reglim
-        // bitti" düğmesi tam buraya düşüyordu: kayıt bugünün ötesine
-        // uzandığı için dönem ikiye bölünüyor, ikinci parça yarın
-        // başlıyordu. `lastPeriodStart` geleceğe kayınca döngü günü null
-        // oluyor, başlık ile çelenk boşalıyordu — düğme işe yaramıyor gibi
-        // görünüyordu. Gelecekte başlayan bir dönem zaten kullanıcının
-        // yaşamadığı bir şey.
+        // İkinci parça gelecekte başlıyorsa atılıyor. Kayıt bugünün ötesine
+        // uzandığında (onboarding'inki uzanıyor) bölme, yarın başlayan bir
+        // dönem bırakıyordu; `lastPeriodStart` geleceğe kayınca döngü günü
+        // null oluyor, ana ekranın başlığı ile çelengi boşalıyordu.
         if (!secondStart.isAfter(cleanToday)) {
           newList.add(
             PeriodLog(
@@ -153,44 +144,30 @@ class PeriodService {
         }
       }
     } else {
-      // It is not a period day. We need to add it.
-      // Find if there are adjacent periods
+      // Regl günü değil: ekle. Komşu dönemler varsa onlarla birleştir.
       final nextDay = cleanDate.add(const Duration(days: 1));
       final prevDay = cleanDate.subtract(const Duration(days: 1));
 
       PeriodLog? prevPeriod;
       PeriodLog? nextPeriod;
 
-      for (var log in newList) {
-        if (log.endDate != null &&
-            DateTime(
-              log.endDate!.year,
-              log.endDate!.month,
-              log.endDate!.day,
-            ).isAtSameMomentAs(prevDay)) {
+      for (final log in newList) {
+        if (log.lastRecordedDay(today: cleanToday).isAtSameMomentAs(prevDay)) {
           prevPeriod = log;
         }
-        if (DateTime(
-          log.startDate.year,
-          log.startDate.month,
-          log.startDate.day,
-        ).isAtSameMomentAs(nextDay)) {
+        if (log.firstDay.isAtSameMomentAs(nextDay)) {
           nextPeriod = log;
         }
       }
 
       if (prevPeriod != null && nextPeriod != null) {
-        // Merge two periods
         prevPeriod.endDate = nextPeriod.endDate;
         newList.remove(nextPeriod);
       } else if (prevPeriod != null) {
-        // Merge to prev period
         prevPeriod.endDate = cleanDate;
       } else if (nextPeriod != null) {
-        // Merge to next period
         nextPeriod.startDate = cleanDate;
       } else {
-        // Standalone 1-day period
         newList.add(
           PeriodLog(
             id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -201,7 +178,6 @@ class PeriodService {
       }
     }
 
-    // Clean up and sort
     newList.sort((a, b) => a.startDate.compareTo(b.startDate));
     return newList;
   }

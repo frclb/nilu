@@ -189,7 +189,9 @@ class DataExportService {
   }) {
     final periodDays = <String>{};
     for (final log in periodLogs) {
-      final end = log.endDate ?? log.startDate;
+      // Devam eden dönemin kaydı bugüne kadar uzanır; `endDate ?? startDate`
+      // yalnızca ilk günü dışa aktarıyordu.
+      final end = log.lastRecordedDay();
       for (
         var day = _dateOnly(log.startDate);
         !day.isAfter(_dateOnly(end));

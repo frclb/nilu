@@ -807,6 +807,8 @@
   "home_headline_late": "{n} días de retraso",
   "home_period_start": "Me ha venido la regla",
   "home_period_end": "Se me ha ido la regla",
+  "home_period_ended_today": "Tu regla terminó hoy",
+  "home_period_undo": "Deshacer",
   "home_period_toggle_failed": "No se ha podido marcar este día.",
   "privacy_ads_notice": "La versión gratuita muestra anuncios. No están personalizados: tus datos de salud nunca se usan con fines publicitarios y no se te segmenta. Premium no tiene anuncios.",
   "privacy_ads_title": "Anuncios",

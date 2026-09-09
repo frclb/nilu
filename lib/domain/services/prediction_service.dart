@@ -35,6 +35,7 @@ class PredictionService {
     int userPeriodLength = 5,
     DateTime? settingsUpdatedAt,
     bool hormonalContraception = false,
+    DateTime? today,
   }) {
     final avgLength = _cycleService.calculateAverageCycleLength(
       logs,
@@ -82,11 +83,7 @@ class PredictionService {
     // ortalama gelecek tahminleri için, bu ise "bugün kanama var mı"
     // sorusu için. İkisini karıştırdığımızda takvimde regl kısaltılınca
     // başlık ile düğme farklı şey söylüyordu.
-    final currentPeriodLength = _loggedLengthOf(
-      logs,
-      lastStart,
-      ongoingLength: userPeriodLength,
-    );
+    final currentPeriodLength = _loggedLengthOf(logs, lastStart, today: today);
 
     final nextPeriod = lastStart.add(Duration(days: effectiveCycleLength));
 
@@ -156,13 +153,13 @@ class PredictionService {
   /// [defaultLength] yeterli veri olmadığında kullanılacak değer.
   /// [start] tarihinde başlayan kaydın kanama uzunluğu.
   ///
-  /// `PeriodLog.contains` ile birebir aynı sayıyı verir: bitmiş kayıtta gerçek
-  /// uzunluk, devam eden kayıtta kullanıcının ayarladığı regl süresi. Aynı
-  /// sayıyı vermezse ekranın iki yarısı yine ayrışır.
+  /// `PeriodLog.containsRecorded` ile birebir aynı sayıyı verir: bitmiş
+  /// kayıtta gerçek uzunluk, devam eden kayıtta bugüne kadar geçen gün
+  /// sayısı. Aynı sayıyı vermezse ekranın iki yarısı yine ayrışır.
   int? _loggedLengthOf(
     List<PeriodLog> logs,
     DateTime start, {
-    required int ongoingLength,
+    DateTime? today,
   }) {
     final cleanStart = DateTime(start.year, start.month, start.day);
     for (final log in logs) {
@@ -172,7 +169,7 @@ class PredictionService {
         log.startDate.day,
       );
       if (logStart.isAtSameMomentAs(cleanStart)) {
-        return log.completedLength ?? (ongoingLength < 1 ? 1 : ongoingLength);
+        return log.recordedLength(today: today);
       }
     }
     return null;
