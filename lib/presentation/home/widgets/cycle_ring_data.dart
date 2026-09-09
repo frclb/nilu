@@ -68,7 +68,7 @@ class CycleRingData {
     // Beklenen uzunluğun ötesi nötr: gecikme çelengin kendisinden okunuyor.
     final base = day > expected
         ? tokens.textFaint
-        : info.getPhaseForDay(day).color(tokens);
+        : info.phaseForCurrentCycleDay(day).color(tokens);
 
     // Geçmiş günler soluk: bakış bugüne ve önündeki yola gitsin.
     return day < currentDay ? base.withAlpha(80) : base;

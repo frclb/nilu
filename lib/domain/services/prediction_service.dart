@@ -78,6 +78,16 @@ class PredictionService {
       );
     }
 
+    // Bu döngüde kanamanın kayıtlı uzunluğu. Ortalamadan ayrı tutuluyor:
+    // ortalama gelecek tahminleri için, bu ise "bugün kanama var mı"
+    // sorusu için. İkisini karıştırdığımızda takvimde regl kısaltılınca
+    // başlık ile düğme farklı şey söylüyordu.
+    final currentPeriodLength = _loggedLengthOf(
+      logs,
+      lastStart,
+      ongoingLength: userPeriodLength,
+    );
+
     final nextPeriod = lastStart.add(Duration(days: effectiveCycleLength));
 
     // Yumurtlama luteal faza göre hesaplanır: bir sonraki reglden 14 gün önce,
@@ -133,6 +143,7 @@ class PredictionService {
       fertileWindowStart: fertileStart,
       fertileWindowEnd: fertileEnd,
       futurePredictions: futurePredictions,
+      currentPeriodLength: currentPeriodLength,
       fertilityTracked: tracksFertility,
     );
   }
@@ -143,6 +154,30 @@ class PredictionService {
   /// uzunluğu henüz bilinmediğinden, onu sabit bir değerle hesaba katmak
   /// ortalamayı kullanıcının gerçek verisinden saptırır.
   /// [defaultLength] yeterli veri olmadığında kullanılacak değer.
+  /// [start] tarihinde başlayan kaydın kanama uzunluğu.
+  ///
+  /// `PeriodLog.contains` ile birebir aynı sayıyı verir: bitmiş kayıtta gerçek
+  /// uzunluk, devam eden kayıtta kullanıcının ayarladığı regl süresi. Aynı
+  /// sayıyı vermezse ekranın iki yarısı yine ayrışır.
+  int? _loggedLengthOf(
+    List<PeriodLog> logs,
+    DateTime start, {
+    required int ongoingLength,
+  }) {
+    final cleanStart = DateTime(start.year, start.month, start.day);
+    for (final log in logs) {
+      final logStart = DateTime(
+        log.startDate.year,
+        log.startDate.month,
+        log.startDate.day,
+      );
+      if (logStart.isAtSameMomentAs(cleanStart)) {
+        return log.completedLength ?? (ongoingLength < 1 ? 1 : ongoingLength);
+      }
+    }
+    return null;
+  }
+
   int _calculateAveragePeriodLength(
     List<PeriodLog> logs, {
     int defaultLength = 5,

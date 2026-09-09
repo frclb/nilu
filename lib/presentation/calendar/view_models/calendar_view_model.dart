@@ -142,6 +142,7 @@ class CalendarViewModel extends ChangeNotifier {
       _periodLogs,
       date,
       ongoingLength: _userPeriodLength,
+      today: today,
     );
     _recalculate();
     await _repository.savePeriodLogs(_periodLogs);
@@ -187,9 +188,10 @@ class CalendarViewModel extends ChangeNotifier {
   /// Takvimde başka bir güne dokunulduğunda içerik o güne göre değişsin diye;
   /// öncesinde her gün için bugünün evresi gösteriliyordu.
   CyclePhase phaseForDate(DateTime date) {
-    final day = getCycleDayForDate(date);
-    if (day == null) return CyclePhase.unknown;
-    return _cycleInfo.getPhaseForDay(day);
+    return _cycleInfo.phaseForDate(
+      date,
+      loggedStart: _periodService.getLastPeriodStartBefore(_periodLogs, date),
+    );
   }
 
   /// Ana ekran widget'ını günceller.

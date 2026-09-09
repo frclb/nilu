@@ -98,8 +98,12 @@ void main() {
         d(16),
         ongoingLength: 7,
       );
-      // Dönemin içindeydi → kaldırma yolu çalışır (bölme).
-      expect(withSevenDaySetting.length, greaterThan(1));
+      // Dönemin içindeydi → kaldırma yolu çalışır. Devam eden kayıtta o günden
+      // sonrası veri değil projeksiyon olduğu için kayıt bölünmez, bir önceki
+      // günde kapanır; bölmek yarın başlayan hayalet bir dönem bırakıyordu.
+      expect(spans(withSevenDaySetting), [
+        [10, 15],
+      ]);
 
       final withFiveDaySetting = service.toggleDay(
         [block('a', 10, null)],

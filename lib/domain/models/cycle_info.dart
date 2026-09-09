@@ -36,6 +36,20 @@ class CycleInfo {
   /// penceresi hesaplanmaz, takvimde işaretlenmez.
   final bool fertilityTracked;
 
+  /// Bu döngüde kanamanın **kayıtlı** uzunluğu; kayıt yoksa null.
+  ///
+  /// [averagePeriodLength] geçmişin ortalamasıdır ve gelecek tahminleri için
+  /// doğru sayıdır — ama bugün kanama olup olmadığını söylemez. Kullanıcı
+  /// takvimde reglini kısaltınca ekran kendi kendini yalanlıyordu: başlık
+  /// ortalamaya bakıp "REGL / 3. gün" derken düğme kayda bakıp "Reglim
+  /// başladı" diyordu. Basılınca da yalnızca düğme değişiyor, başlık
+  /// kımıldamıyordu; düğme işlevsiz görünüyordu.
+  ///
+  /// Bu alan `PeriodLog.contains`in kullandığı uzunluğun aynısıdır: bitmiş
+  /// kayıtta gerçek uzunluk, devam eden kayıtta kullanıcının ayarladığı regl
+  /// süresi.
+  final int? currentPeriodLength;
+
   CycleInfo({
     this.averageCycleLength = 28,
     this.averagePeriodLength = 5,
@@ -46,6 +60,7 @@ class CycleInfo {
     this.ovulationDay,
     this.futurePredictions = const [],
     this.fertilityTracked = true,
+    this.currentPeriodLength,
   });
 
   /// Bugünkü döngü gününü hesaplar.
@@ -105,15 +120,28 @@ class CycleInfo {
   CyclePhase get currentPhase {
     final day = currentCycleDay;
     if (day == null) return CyclePhase.unknown;
-    return getPhaseForDay(day);
+    return phaseForCurrentCycleDay(day);
   }
 
+  /// Mevcut döngünün belirli bir günü için fazı belirler.
+  ///
+  /// Kanama uzunluğu olarak ortalamayı değil kaydı kullanır; ana ekranın
+  /// başlığı ile "Reglim başladı / bitti" düğmesi böylece aynı veriden
+  /// besleniyor.
+  CyclePhase phaseForCurrentCycleDay(int cycleDay) =>
+      getPhaseForDay(cycleDay, periodLength: currentPeriodLength);
+
   /// Belirli bir döngü günü için fazı belirler.
-  CyclePhase getPhaseForDay(int cycleDay) {
+  ///
+  /// [periodLength] verilmezse geçmişin ortalaması kullanılır — tahmin edilen
+  /// döngüler için doğru olan budur, çünkü onların kaydı henüz yok.
+  CyclePhase getPhaseForDay(int cycleDay, {int? periodLength}) {
     if (cycleDay < 1) return CyclePhase.unknown;
 
-    // Menstrüasyon fazı (1 → averagePeriodLength)
-    if (cycleDay <= averagePeriodLength) {
+    final bleedingLength = periodLength ?? averagePeriodLength;
+
+    // Menstrüasyon fazı (1 → kanama uzunluğu)
+    if (cycleDay <= bleedingLength) {
       return CyclePhase.menstruation;
     }
 
@@ -131,7 +159,7 @@ class CycleInfo {
     }
 
     // Foliküler faz (regl sonrası → ovulasyon penceresi öncesi)
-    if (cycleDay > averagePeriodLength && cycleDay < ovulationDayNum - 2) {
+    if (cycleDay > bleedingLength && cycleDay < ovulationDayNum - 2) {
       return CyclePhase.follicular;
     }
 
@@ -153,9 +181,15 @@ class CycleInfo {
     DateTime? loggedStart,
     DateTime? now,
   }) {
-    final day = cycleDayForDate(date, loggedStart: loggedStart, now: now);
-    if (day == null) return CyclePhase.unknown;
-    return getPhaseForDay(day);
+    final anchored = _anchor(date, loggedStart: loggedStart, now: now);
+    if (anchored == null) return CyclePhase.unknown;
+
+    // Yalnızca içinde bulunduğumuz döngünün kaydı var; geçmiş ve gelecek
+    // döngüler için ortalamaya düşülüyor.
+    return getPhaseForDay(
+      anchored.day,
+      periodLength: anchored.isCurrentCycle ? currentPeriodLength : null,
+    );
   }
 
   /// Belirli bir tarihin, ait olduğu döngüdeki kaçıncı gün olduğunu döndürür.
@@ -168,6 +202,13 @@ class CycleInfo {
   /// kullanıcının doğrulamadığı bir şeyi — reglin başladığını — iddia ederdi.
   /// Gecikmede 30. günde kalması doğru davranış.
   int? cycleDayForDate(DateTime date, {DateTime? loggedStart, DateTime? now}) {
+    return _anchor(date, loggedStart: loggedStart, now: now)?.day;
+  }
+
+  /// [date] hangi döngü başlangıcına dayanıyor ve o başlangıç bugünkü döngünün
+  /// başlangıcı mı — [cycleDayForDate] ile [phaseForDate] aynı çapayı
+  /// kullansın diye tek yerde hesaplanıyor.
+  _AnchoredDay? _anchor(DateTime date, {DateTime? loggedStart, DateTime? now}) {
     final target = DateTime(date.year, date.month, date.day);
     final reference = now ?? DateTime.now();
     final today = DateTime(reference.year, reference.month, reference.day);
@@ -191,7 +232,15 @@ class CycleInfo {
     }
     if (anchor == null) return null;
 
-    return target.difference(anchor).inDays + 1;
+    final start = lastPeriodStart;
+    final isCurrent =
+        start != null &&
+        anchor.isAtSameMomentAs(DateTime(start.year, start.month, start.day));
+
+    return _AnchoredDay(
+      day: target.difference(anchor).inDays + 1,
+      isCurrentCycle: isCurrent,
+    );
   }
 
   bool isPredictedPeriod(DateTime date) {
@@ -285,4 +334,13 @@ class PredictedCycle {
     this.fertileEnd,
     this.ovulationDay,
   });
+}
+
+/// Bir tarihin çapalandığı döngü günü ve bu çapanın bugünkü döngüye ait olup
+/// olmadığı.
+class _AnchoredDay {
+  final int day;
+  final bool isCurrentCycle;
+
+  const _AnchoredDay({required this.day, required this.isCurrentCycle});
 }

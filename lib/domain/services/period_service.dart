@@ -68,12 +68,18 @@ class PeriodService {
   ///
   /// [ongoingLength]: devam eden bir dönemin kaç gün olarak varsayılacağı —
   /// kullanıcının ayarladığı regl süresi geçilmelidir.
+  ///
+  /// [today]: bugünün tarihi. Gelecekte **başlayan** bir dönem üretilmesini
+  /// engellemek için gerekiyor; kullanıcı yaşamadığı bir kanamayı kaydedemez.
   List<PeriodLog> toggleDay(
     List<PeriodLog> logs,
     DateTime date, {
     int ongoingLength = PeriodLog.defaultOngoingLength,
+    DateTime? today,
   }) {
     final cleanDate = DateTime(date.year, date.month, date.day);
+    final reference = today ?? DateTime.now();
+    final cleanToday = DateTime(reference.year, reference.month, reference.day);
     final newList = List<PeriodLog>.from(logs);
 
     // Check if the day is already in any period
@@ -109,21 +115,42 @@ class PeriodService {
         newList[foundIndex].endDate = cleanDate.subtract(
           const Duration(days: 1),
         );
+      } else if (logEnd == null) {
+        // Devam eden kayıt: bu günden sonrası veri değil, projeksiyon.
+        // Bölmek, yarın başlayan devam eden bir dönem yaratıyordu; kaydı
+        // bir önceki günde kapatmak yeterli.
+        newList[foundIndex].endDate = cleanDate.subtract(
+          const Duration(days: 1),
+        );
       } else {
-        // Split the period into two
-        final newPeriodFirstPart = PeriodLog(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          startDate: log.startDate,
-          endDate: cleanDate.subtract(const Duration(days: 1)),
-        );
-        final newPeriodSecondPart = PeriodLog(
-          id: (DateTime.now().millisecondsSinceEpoch + 1).toString(),
-          startDate: cleanDate.add(const Duration(days: 1)),
-          endDate: log.endDate,
-        );
+        // Ortadaki bir gün siliniyor: dönem ikiye ayrılır.
+        final secondStart = cleanDate.add(const Duration(days: 1));
+
         newList.removeAt(foundIndex);
-        newList.add(newPeriodFirstPart);
-        newList.add(newPeriodSecondPart);
+        newList.add(
+          PeriodLog(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            startDate: log.startDate,
+            endDate: cleanDate.subtract(const Duration(days: 1)),
+          ),
+        );
+
+        // İkinci parça gelecekte başlıyorsa atılıyor. Ana ekrandaki "Reglim
+        // bitti" düğmesi tam buraya düşüyordu: kayıt bugünün ötesine
+        // uzandığı için dönem ikiye bölünüyor, ikinci parça yarın
+        // başlıyordu. `lastPeriodStart` geleceğe kayınca döngü günü null
+        // oluyor, başlık ile çelenk boşalıyordu — düğme işe yaramıyor gibi
+        // görünüyordu. Gelecekte başlayan bir dönem zaten kullanıcının
+        // yaşamadığı bir şey.
+        if (!secondStart.isAfter(cleanToday)) {
+          newList.add(
+            PeriodLog(
+              id: (DateTime.now().millisecondsSinceEpoch + 1).toString(),
+              startDate: secondStart,
+              endDate: log.endDate,
+            ),
+          );
+        }
       }
     } else {
       // It is not a period day. We need to add it.
