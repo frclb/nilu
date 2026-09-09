@@ -5,6 +5,7 @@ import '../../../domain/models/daily_log.dart';
 import '../../../domain/models/log_vocabulary.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../../design_system/app_colors.dart';
+import '../../../design_system/app_snack.dart';
 
 /// Gün detay sayfasını açar.
 ///
@@ -242,12 +243,9 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                         );
                         if (!context.mounted) return;
                         if (!success) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                context.tr('calendar_future_date_error'),
-                              ),
-                            ),
+                          AppSnack.error(
+                            context,
+                            context.tr('calendar_future_date_error'),
                           );
                         }
                       },

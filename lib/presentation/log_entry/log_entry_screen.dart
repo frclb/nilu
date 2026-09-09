@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../design_system/app_palette.dart';
+import '../../design_system/app_snack.dart';
 import 'package:provider/provider.dart';
 import 'widgets/log_entry_app_bar.dart';
 import 'widgets/log_entry_header.dart';
@@ -54,16 +55,7 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
     }
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.tr('home_log_saved')),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      );
+      AppSnack.show(context, context.tr('home_log_saved'));
       NavigationService().pop();
     }
   }

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_flavor.dart';
 import 'app_palette.dart';
+import 'app_snack.dart';
 import 'app_tokens.dart';
 
 /// Uygulama teması.
@@ -227,14 +228,11 @@ class AppTheme {
       ),
 
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: isLight ? AppPalette.ink900 : AppPalette.night700,
+        backgroundColor: AppSnack.background(brightness),
         contentTextStyle: textTheme.bodyMedium?.copyWith(
-          color: AppPalette.sand50,
+          color: AppSnack.foreground,
         ),
-        // Varsayılan eylem rengi `inversePrimary`; koyu snackbar zemininde
-        // metinden ayırt edilemiyordu. plum300 her iki zeminde de 6.4:1
-        // üzerinde kontrast veriyor.
-        actionTextColor: AppPalette.plum300,
+        actionTextColor: AppSnack.actionForeground,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),

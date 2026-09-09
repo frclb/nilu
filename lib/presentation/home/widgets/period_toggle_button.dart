@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../design_system/app_snack.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../localization/app_localizations.dart';
 import '../../calendar/view_models/calendar_view_model.dart';
@@ -11,10 +12,11 @@ import '../../calendar/view_models/calendar_view_model.dart';
 /// dokun, sayfayı kaydır, "Regl işaretle"ye bas. Uygulamanın en sık yapılan
 /// işi dört dokunuş uzaktaydı.
 ///
-/// Üç durum var, çünkü iki durum yetmiyordu. Düğme eskiden günü kaydın
-/// dışına çıkarıp içine alan kör bir anahtardı; "Reglim bitti" son kanama
-/// gününü işaretlemek yerine siliyordu. Şimdi eylemler açık: başlat, bitir,
-/// bir de bitirdikten sonra geri al.
+/// Alan tek bir şey gösteriyor: sıradaki eylem. Eylem kalmadığında — regl
+/// bugün kapatıldığında — yerini sessiz bir durum satırı alıyor. Geri alma
+/// ikisinde de aynı yerden geliyor: eylemin hemen ardından çıkan geçici
+/// bildirimden. Ekranda sürekli duran bir "Geri al" hem tutarsızdı hem de
+/// geri alınacak bir şey kalmadığında da orada duruyordu.
 class PeriodToggleButton extends StatefulWidget {
   const PeriodToggleButton({super.key});
 
@@ -25,13 +27,11 @@ class PeriodToggleButton extends StatefulWidget {
 class _PeriodToggleButtonState extends State<PeriodToggleButton> {
   bool _busy = false;
 
-  /// [undo] verilirse, iş bittiğinde geri alma sunan bir bildirim gösterilir.
   Future<void> _run(
     Future<bool> Function() action, {
-    String? confirmation,
-    VoidCallback? undo,
+    required String confirmation,
+    required VoidCallback undo,
   }) async {
-    final messenger = ScaffoldMessenger.of(context);
     final failed = context.tr('home_period_toggle_failed');
     final undoLabel = context.tr('home_period_undo');
 
@@ -41,22 +41,10 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
     setState(() => _busy = false);
 
     if (!ok) {
-      messenger.showSnackBar(SnackBar(content: Text(failed)));
+      AppSnack.error(context, failed);
       return;
     }
-
-    if (confirmation == null || undo == null) return;
-    messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(confirmation),
-          // Varsayılan dört saniye, yanlış dokunuşu fark edip geri almak için
-          // kısa kalıyor.
-          duration: const Duration(seconds: 6),
-          action: SnackBarAction(label: undoLabel, onPressed: undo),
-        ),
-      );
+    AppSnack.show(context, confirmation, undoLabel: undoLabel, onUndo: undo);
   }
 
   @override
@@ -71,8 +59,6 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
       child: SizedBox(
         height: 52,
         child: switch (action) {
-          // Başlatma yanlışlıkla da yapılabilir. Ekranda kalan "Reglim bitti"
-          // bir çıkış yolu değil — o, bugünü işaretli bırakıp dönemi kapatır.
           PeriodAction.start => FilledButton.icon(
             onPressed: _busy
                 ? null
@@ -93,7 +79,13 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
           // Bitirme yıkıcı bir eylem değil ama geri alınabilir olduğu belli
           // olsun diye daha sakin duruyor.
           PeriodAction.end => OutlinedButton.icon(
-            onPressed: _busy ? null : () => _run(viewModel.endPeriodToday),
+            onPressed: _busy
+                ? null
+                : () => _run(
+                    viewModel.endPeriodToday,
+                    confirmation: context.tr('home_period_ended'),
+                    undo: () => viewModel.reopenPeriodToday(),
+                  ),
             icon: const Icon(Icons.stop_circle_outlined, size: 20),
             label: Text(context.tr('home_period_end')),
             style: OutlinedButton.styleFrom(
@@ -105,12 +97,9 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
             ),
           ),
 
-          // Kaydedildi. Düğme yerine onay duruyor: basılacak bir şey
-          // kalmadığında düğme göstermek, basınca bir şey olmayacağı için
-          // uygulamayı bozuk gösteriyor.
-          PeriodAction.endedToday => _EndedToday(
-            onUndo: _busy ? null : () => _run(viewModel.reopenPeriodToday),
-          ),
+          // Basılacak bir şey kalmadı. Düğme bırakmak, basınca hiçbir şey
+          // olmayacağı için uygulamayı bozuk gösterirdi.
+          PeriodAction.endedToday => const _EndedToday(),
         },
       ),
     );
@@ -118,9 +107,7 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
 }
 
 class _EndedToday extends StatelessWidget {
-  final VoidCallback? onUndo;
-
-  const _EndedToday({required this.onUndo});
+  const _EndedToday();
 
   @override
   Widget build(BuildContext context) {
@@ -133,22 +120,19 @@ class _EndedToday extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: t.border),
       ),
-      padding: const EdgeInsets.only(left: 18, right: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.check_circle_outline, size: 20, color: t.success),
           const SizedBox(width: 10),
-          Expanded(
+          Flexible(
             child: Text(
               context.tr('home_period_ended_today'),
-              style: theme.textTheme.bodyMedium?.copyWith(color: t.text),
+              style: theme.textTheme.bodyMedium?.copyWith(color: t.textMuted),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-          ),
-          TextButton(
-            onPressed: onUndo,
-            child: Text(context.tr('home_period_undo')),
           ),
         ],
       ),

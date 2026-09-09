@@ -808,6 +808,7 @@
   "home_period_start": "O meu período começou",
   "home_period_started": "Início da menstruação guardado",
   "home_period_end": "O meu período terminou",
+  "home_period_ended": "Fim da menstruação guardado",
   "home_period_ended_today": "A tua menstruação terminou hoje",
   "home_period_undo": "Anular",
   "home_period_toggle_failed": "Não foi possível marcar este dia.",

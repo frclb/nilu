@@ -808,6 +808,7 @@
   "home_period_start": "Me ha venido la regla",
   "home_period_started": "Inicio de la regla guardado",
   "home_period_end": "Se me ha ido la regla",
+  "home_period_ended": "Fin de la regla guardado",
   "home_period_ended_today": "Tu regla terminó hoy",
   "home_period_undo": "Deshacer",
   "home_period_toggle_failed": "No se ha podido marcar este día.",

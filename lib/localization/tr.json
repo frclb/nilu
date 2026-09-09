@@ -808,6 +808,7 @@
   "home_period_start": "Reglim başladı",
   "home_period_started": "Regl başlangıcı kaydedildi",
   "home_period_end": "Reglim bitti",
+  "home_period_ended": "Reglin bittiği kaydedildi",
   "home_period_ended_today": "Reglin bugün bitti",
   "home_period_undo": "Geri al",
   "home_period_toggle_failed": "Bu gün işaretlenemedi.",

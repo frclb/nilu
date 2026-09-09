@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../design_system/app_tokens.dart';
+import '../../../design_system/app_snack.dart';
 import 'package:provider/provider.dart';
 import '../../../design_system/app_colors.dart';
 import '../../../localization/app_localizations.dart';
@@ -211,28 +211,16 @@ class CalendarDayHeader extends StatelessWidget {
     final success = await viewModel.togglePeriodDay(date);
     if (!context.mounted) return;
 
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(
-          success
-              ? context.tr(
-                  wasPeriod
-                      ? 'calendar_period_unmarked'
-                      : 'calendar_period_marked',
-                  params: {'date': '${date.day}/${date.month}'},
-                )
-              : context.tr('calendar_future_date_error'),
-        ),
-        backgroundColor: !success
-            ? context.tokens.danger
-            : wasPeriod
-            ? Colors.grey.shade700
-            : AppColors.flowMedium,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 2),
+    if (!success) {
+      AppSnack.error(context, context.tr('calendar_future_date_error'));
+      return;
+    }
+
+    AppSnack.show(
+      context,
+      context.tr(
+        wasPeriod ? 'calendar_period_unmarked' : 'calendar_period_marked',
+        params: {'date': '${date.day}/${date.month}'},
       ),
     );
   }
