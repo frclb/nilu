@@ -2,12 +2,13 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:period_tracker/design_system/app_contrast.dart';
 import 'package:period_tracker/design_system/app_snack.dart';
 import 'package:period_tracker/design_system/app_tokens.dart';
 
 /// WCAG göreli parlaklık — bağımsız hesap.
 ///
-/// `Color.computeLuminance` kullanılmıyor: [AppSnack.readableOn] de onu
+/// `Color.computeLuminance` kullanılmıyor: [AppContrast.on] da onu
 /// kullanıyor, aynı hesabı iki yerde kullanmak testi kör ederdi.
 double _luminance(Color c) {
   double channel(double v) {
@@ -70,7 +71,7 @@ void main() {
       // metot WCAG eşiğine göre değil "hangisi hoş durur"a göre karar
       // veriyor; koyu temada kontrast 3.1'e düşmüştü.
       expect(
-        _contrast(tokens.danger, AppSnack.readableOn(tokens.danger)),
+        _contrast(tokens.danger, AppContrast.on(tokens.danger)),
         greaterThanOrEqualTo(minimum),
         reason: '$label: hata metni uyarı zemininde okunmuyor',
       );

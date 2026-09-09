@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_scrim.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 class HealthLibrarySearchBar extends StatelessWidget {
   final TextEditingController controller;
@@ -17,11 +18,9 @@ class HealthLibrarySearchBar extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final bgColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
-    final inputBgColor = isDark
-        ? Colors.black.withAlpha(51)
-        : AppColors.backgroundLight;
-    final hintColor = isDark ? Colors.grey.shade400 : Colors.grey.shade400;
+    final bgColor = context.tokens.surface;
+    final inputBgColor = isDark ? AppScrim.veil(51) : context.tokens.background;
+    final hintColor = context.tokens.textMuted;
 
     return Container(
       color: bgColor,
@@ -36,7 +35,7 @@ class HealthLibrarySearchBar extends StatelessWidget {
           onChanged: onChanged,
           textInputAction: TextInputAction.search,
           style: TextStyle(
-            color: isDark ? Colors.white : Colors.black,
+            color: context.tokens.text,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),

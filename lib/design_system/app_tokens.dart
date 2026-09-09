@@ -49,6 +49,14 @@ class AppTokens extends ThemeExtension<AppTokens> {
   final Color ovulation;
   final Color ovulationTint;
 
+  /// Doğurganlık penceresi işareti.
+  ///
+  /// `flowTint`ten ayrı: o, hücrenin altına serilen bir zemin tülü ve koyu
+  /// temada zeminle 1.35:1 kontrasta düşüyor. Açıklama satırındaki nokta ise
+  /// **ön planda** duruyor, görünmesi gerekiyor. İkisini aynı sayması
+  /// doğurganlık noktasını koyu temada kaybetmişti.
+  final Color fertile;
+
   /// Döngü fazları.
   ///
   /// Menstrüasyon [flow], yumurtlama [ovulation] renklerini kullanır —
@@ -81,6 +89,7 @@ class AppTokens extends ThemeExtension<AppTokens> {
     required this.flowTint,
     required this.ovulation,
     required this.ovulationTint,
+    required this.fertile,
     required this.phaseFollicular,
     required this.phaseLuteal,
     required this.success,
@@ -115,6 +124,7 @@ class AppTokens extends ThemeExtension<AppTokens> {
     flowTint: AppPalette.rose200,
     ovulation: AppPalette.iris500,
     ovulationTint: AppPalette.iris100,
+    fertile: AppPalette.rose200,
     phaseFollicular: AppPalette.success,
     phaseLuteal: AppPalette.clay600,
     success: AppPalette.success,
@@ -138,6 +148,8 @@ class AppTokens extends ThemeExtension<AppTokens> {
     flowTint: Color(0xFF43222C),
     ovulation: Color(0xFF9E85C6),
     ovulationTint: Color(0xFF2E2540),
+    // Açık pembe her iki zeminde de okunuyor; rol rengi ikisinde de aynı.
+    fertile: AppPalette.rose200,
     phaseFollicular: Color(0xFF5FB3A1),
     phaseLuteal: AppPalette.clay400,
     success: Color(0xFF5FB3A1),
@@ -162,6 +174,7 @@ class AppTokens extends ThemeExtension<AppTokens> {
     Color? flowTint,
     Color? ovulation,
     Color? ovulationTint,
+    Color? fertile,
     Color? phaseFollicular,
     Color? phaseLuteal,
     Color? success,
@@ -184,6 +197,7 @@ class AppTokens extends ThemeExtension<AppTokens> {
       flowTint: flowTint ?? this.flowTint,
       ovulation: ovulation ?? this.ovulation,
       ovulationTint: ovulationTint ?? this.ovulationTint,
+      fertile: fertile ?? this.fertile,
       phaseFollicular: phaseFollicular ?? this.phaseFollicular,
       phaseLuteal: phaseLuteal ?? this.phaseLuteal,
       success: success ?? this.success,
@@ -212,6 +226,7 @@ class AppTokens extends ThemeExtension<AppTokens> {
       flowTint: mix(flowTint, other.flowTint),
       ovulation: mix(ovulation, other.ovulation),
       ovulationTint: mix(ovulationTint, other.ovulationTint),
+      fertile: mix(fertile, other.fertile),
       phaseFollicular: mix(phaseFollicular, other.phaseFollicular),
       phaseLuteal: mix(phaseLuteal, other.phaseLuteal),
       success: mix(success, other.success),

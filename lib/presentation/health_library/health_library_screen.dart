@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import '../widgets/ad_banner.dart';
-import '../../design_system/app_colors.dart';
 import '../../domain/models/article.dart';
 import '../../localization/app_localizations.dart';
 import 'widgets/health_library_app_bar.dart';
@@ -35,12 +35,7 @@ class _HealthLibraryScreenState extends State<HealthLibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    final bgColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.backgroundLight;
+    final bgColor = context.tokens.background;
 
     final results = ArticleCatalog.filter(
       category: _category,

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../design_system/app_palette.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 import '../../../domain/models/cycle_info.dart';
 import '../../../domain/models/log_vocabulary.dart';
 import '../../../core/navigation/route_names.dart';
@@ -29,7 +27,6 @@ class SymptomAnalysisCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final viewModel = context.watch<CalendarViewModel>();
 
     final frequencies = InsightsService.symptomFrequencies(viewModel.dailyLogs);
@@ -49,10 +46,8 @@ class SymptomAnalysisCard extends StatelessWidget {
             periodLength: viewModel.cycleInfo.averagePeriodLength,
           );
 
-    final textColor = isDark ? AppPalette.nightInk : AppColors.textMainLight;
-    final subtitleColor = isDark
-        ? AppColors.textMutedWarmDark
-        : AppColors.textMutedLight;
+    final textColor = context.tokens.text;
+    final subtitleColor = context.tokens.textMuted;
 
     return AppCard(
       padding: const EdgeInsets.all(20),
@@ -113,9 +108,7 @@ class SymptomAnalysisCard extends StatelessWidget {
                 ),
                 textColor: textColor,
                 subtitleColor: subtitleColor,
-                trackColor: isDark
-                    ? AppColors.borderDark
-                    : AppColors.borderGrayLight,
+                trackColor: context.tokens.border,
               ),
             ],
 

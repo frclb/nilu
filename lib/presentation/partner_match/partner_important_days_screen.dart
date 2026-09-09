@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_scrim.dart';
 import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/navigation/route_names.dart';
 import '../../localization/app_localizations.dart';
-import '../../design_system/app_colors.dart';
 
 class PartnerImportantDaysScreen extends StatelessWidget {
   const PartnerImportantDaysScreen({super.key});
@@ -14,24 +14,20 @@ class PartnerImportantDaysScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     // Base colors from HTML
-    final bgColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.backgroundLight;
+    final bgColor = context.tokens.background;
     final primaryColor = Theme.of(context).colorScheme.primary;
-    final textMainColor = isDark ? Colors.white : Colors.black87;
-    final textMutedColor = isDark ? Colors.grey[400] : Colors.grey[500];
+    final textMainColor = context.tokens.text;
+    final textMutedColor = context.tokens.textMuted;
 
     // Card background and border colors
     final summaryBgColor = isDark
         ? primaryColor.withValues(alpha: 0.2)
         : primaryColor.withValues(alpha: 0.1);
     final summaryBorderColor = primaryColor.withValues(alpha: 0.2);
-    final eventBgColor = isDark
-        ? primaryColor.withValues(alpha: 0.1)
-        : Colors.white;
+    final eventBgColor = context.tokens.surface;
     final eventBorderColor = isDark
         ? primaryColor.withValues(alpha: 0.1)
-        : Colors.grey[200]!;
+        : context.tokens.surfaceAlt;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -75,7 +71,7 @@ class PartnerImportantDaysScreen extends StatelessWidget {
                 summaryBorderColor,
                 primaryColor,
                 textMainColor,
-                textMutedColor!,
+                textMutedColor,
               ),
               const SizedBox(height: 32),
               Padding(
@@ -96,7 +92,7 @@ class PartnerImportantDaysScreen extends StatelessWidget {
                 context: context,
                 icon: Icons.water_drop_outlined,
                 iconBgColor: primaryColor,
-                iconColor: Colors.white,
+                iconColor: Theme.of(context).colorScheme.onPrimary,
                 title: context.tr('partner_notif_period_start_short'),
                 dateText: "14 Eyl",
                 dateBgColor: isDark
@@ -121,7 +117,7 @@ class PartnerImportantDaysScreen extends StatelessWidget {
                 dateText: "17 Eyl",
                 dateBgColor: isDark
                     ? primaryColor.withValues(alpha: 0.3)
-                    : Colors.grey[200]!,
+                    : context.tokens.surfaceAlt,
                 dateTextColor: textMutedColor,
                 relativeTimeText: context.tr('partner_important_days_est_5'),
                 tipText: context.tr('partner_important_days_tip_2'),
@@ -141,7 +137,7 @@ class PartnerImportantDaysScreen extends StatelessWidget {
                 dateText: "22 Eyl",
                 dateBgColor: isDark
                     ? primaryColor.withValues(alpha: 0.3)
-                    : Colors.grey[200]!,
+                    : context.tokens.surfaceAlt,
                 dateTextColor: textMutedColor,
                 relativeTimeText: context.tr('partner_important_days_est_10'),
                 tipText: context.tr('partner_important_days_tip_3'),
@@ -289,9 +285,7 @@ class PartnerImportantDaysScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.black.withValues(alpha: 0.2)
-                        : Colors.white.withValues(alpha: 0.5),
+                    color: isDark ? AppScrim.veil(51) : AppScrim.frost(128),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -299,7 +293,7 @@ class PartnerImportantDaysScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontStyle: FontStyle.italic,
-                      color: isDark ? Colors.grey[300] : Colors.grey[700],
+                      color: context.tokens.textMuted,
                       height: 1.4,
                     ),
                   ),
@@ -319,7 +313,7 @@ class PartnerImportantDaysScreen extends StatelessWidget {
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryColor,
-        foregroundColor: Colors.white,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         elevation: 0,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

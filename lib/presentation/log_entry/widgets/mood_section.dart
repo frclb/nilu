@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_scrim.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../../domain/models/log_vocabulary.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 class MoodSection extends StatefulWidget {
   final List<String> initialMoods;
@@ -38,7 +39,6 @@ class _MoodSectionState extends State<MoodSection> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     final moods = List.generate(
       _moodCodes.length,
@@ -65,10 +65,7 @@ class _MoodSectionState extends State<MoodSection> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.mood,
-                color: isDark ? Colors.white : theme.colorScheme.primary,
-              ),
+              Icon(Icons.mood, color: Theme.of(context).colorScheme.primary),
               const SizedBox(width: 8),
               Text(
                 context.tr('log_mood'),
@@ -105,14 +102,12 @@ class _MoodSectionState extends State<MoodSection> {
                         border: Border.all(
                           color: isSelected
                               ? theme.colorScheme.primary
-                              : (isDark
-                                    ? AppColors.borderSlateDark
-                                    : AppColors.borderSlate),
+                              : (context.tokens.border),
                           width: 2,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withAlpha(26),
+                            color: AppScrim.veil(26),
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -122,7 +117,7 @@ class _MoodSectionState extends State<MoodSection> {
                         moods[index]['icon'] as IconData,
                         size: 32,
                         color: isSelected
-                            ? Colors.white
+                            ? Theme.of(context).colorScheme.onPrimary
                             : theme.textTheme.labelLarge?.color?.withAlpha(127),
                       ),
                     ),
@@ -133,9 +128,7 @@ class _MoodSectionState extends State<MoodSection> {
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         color: isSelected
-                            ? (isDark
-                                  ? Colors.white
-                                  : theme.colorScheme.primary)
+                            ? (Theme.of(context).colorScheme.primary)
                             : theme.textTheme.labelLarge?.color,
                       ),
                     ),

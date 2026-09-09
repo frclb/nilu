@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import '../../localization/app_localizations.dart';
-import '../../design_system/app_colors.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : AppColors.textMainLight;
-    final mutedColor = isDark
-        ? AppColors.textMutedDark
-        : AppColors.textMutedLight;
+    final textColor = context.tokens.text;
+    final mutedColor = context.tokens.textMuted;
 
     return Scaffold(
       appBar: AppBar(

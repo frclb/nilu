@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 class SharedInfoSection extends StatelessWidget {
   const SharedInfoSection({super.key});
@@ -12,7 +11,7 @@ class SharedInfoSection extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final headerColor = isDark ? Colors.white : AppColors.textMainSlate;
+    final headerColor = context.tokens.text;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -28,7 +27,7 @@ class SharedInfoSection extends StatelessWidget {
                 color: headerColor,
               ),
             ),
-            Icon(Icons.info, color: Colors.grey.shade400, size: 20),
+            Icon(Icons.info, color: context.tokens.textFaint, size: 20),
           ],
         ),
         const SizedBox(height: 16),
@@ -71,8 +70,8 @@ class SharedInfoSection extends StatelessWidget {
     ThemeData theme,
   ) {
     final iconBg = theme.colorScheme.primary.withAlpha(25);
-    final titleColor = isDark ? Colors.white : AppColors.textMainSlate;
-    final descColor = isDark ? Colors.grey.shade400 : Colors.grey.shade500;
+    final titleColor = context.tokens.text;
+    final descColor = context.tokens.textMuted;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -88,7 +87,7 @@ class SharedInfoSection extends StatelessWidget {
             ),
             child: Icon(
               icon,
-              color: isDark ? Colors.white : theme.colorScheme.primary,
+              color: Theme.of(context).colorScheme.primary,
               size: 20,
             ),
           ),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_contrast.dart';
 import '../../design_system/app_theme.dart';
 import '../health_check/heavy_bleeding_screen.dart';
 import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../localization/app_localizations.dart';
-import '../../design_system/app_colors.dart';
 import '../../core/navigation/route_names.dart';
 import 'package:provider/provider.dart';
 import '../../domain/view_models/user_view_model.dart';
@@ -17,8 +17,6 @@ class ProfileSettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -31,7 +29,7 @@ class ProfileSettingsScreen extends StatelessWidget {
         title: Text(
           context.tr('profile_title'),
           style: TextStyle(
-            color: isDark ? Colors.white : AppColors.textMainLight,
+            color: context.tokens.text,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -260,8 +258,8 @@ class ProfileSettingsScreen extends StatelessWidget {
                             backgroundColor: WidgetStatePropertyAll(
                               context.tokens.danger,
                             ),
-                            foregroundColor: const WidgetStatePropertyAll(
-                              Colors.white,
+                            foregroundColor: WidgetStatePropertyAll(
+                              AppContrast.on(context.tokens.danger),
                             ),
                           ),
                           child: Text(context.tr('delete')),

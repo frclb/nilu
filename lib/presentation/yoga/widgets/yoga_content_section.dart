@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_scrim.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
-import '../../../design_system/app_palette.dart';
 import '../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 class YogaContentSection extends StatelessWidget {
   const YogaContentSection({super.key});
@@ -14,21 +13,15 @@ class YogaContentSection extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     // ── Colour palette ──
-    final textColor = isDark ? Colors.white : AppColors.textMainSlate;
-    final mutedColor = isDark
-        ? AppPalette.nightInkMuted
-        : AppColors.textMutedSlate;
-    final cardColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
-    final borderColor = isDark
-        ? Colors.white.withAlpha(12)
-        : AppColors.borderSlateLight;
+    final textColor = context.tokens.text;
+    final mutedColor = context.tokens.textMuted;
+    final cardColor = context.tokens.surface;
+    final borderColor = context.tokens.border;
     final primaryColor = Theme.of(context).colorScheme.primary;
     final primaryBgColor = isDark
         ? primaryColor.withAlpha(25)
         : primaryColor.withAlpha(25);
-    final tagSecondaryBg = isDark
-        ? Colors.white.withAlpha(25)
-        : AppColors.borderSlate;
+    final tagSecondaryBg = isDark ? AppScrim.frost(25) : context.tokens.border;
     final tagSecondaryText = context.tokens.textMuted;
 
     return Padding(

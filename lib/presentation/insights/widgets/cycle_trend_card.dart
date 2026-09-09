@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../design_system/app_palette.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../localization/app_localizations.dart';
 import 'cycle_trend_chart.dart';
 import '../../../presentation/calendar/view_models/calendar_view_model.dart';
-import '../../../design_system/app_colors.dart';
 import '../../../core/navigation/route_names.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
@@ -45,10 +43,8 @@ class CycleTrendCard extends StatelessWidget {
     final variation = InsightsService.variation(points);
     final regularity = InsightsService.regularity(points);
 
-    final textColor = isDark ? AppPalette.nightInk : AppColors.textMainLight;
-    final subtitleColor = isDark
-        ? AppColors.textMutedWarmDark
-        : AppColors.textMutedLight;
+    final textColor = context.tokens.text;
+    final subtitleColor = context.tokens.textMuted;
 
     return AppCard(
       padding: const EdgeInsets.all(20),
@@ -99,9 +95,7 @@ class CycleTrendCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? Colors.white
-                            : theme.colorScheme.primary,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -111,9 +105,7 @@ class CycleTrendCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: isDark
-                            ? AppColors.backgroundDark
-                            : AppColors.backgroundLight,
+                        color: context.tokens.background,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
@@ -181,14 +173,14 @@ class _ConsultationNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final amber = isDark ? AppPalette.clay400 : AppColors.moodOrangeText;
+    final amber = context.tokens.accent;
 
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isDark
-            ? AppColors.moodOrangeText.withAlpha(38)
-            : AppColors.moodOrangeBg,
+            ? context.tokens.accent.withAlpha(38)
+            : context.tokens.accentTint,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: amber.withAlpha(60)),
       ),
@@ -215,9 +207,7 @@ class _ConsultationNote extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.5,
-                    color: isDark
-                        ? AppColors.textMutedWarmDark
-                        : AppColors.textMutedLight,
+                    color: context.tokens.textMuted,
                   ),
                 ),
               ],
@@ -322,7 +312,7 @@ class _InsightBox extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isDark
-            ? AppColors.surfaceDark.withAlpha(127)
+            ? context.tokens.surface.withAlpha(127)
             : context.tokens.brandTint,
         borderRadius: BorderRadius.circular(8),
       ),

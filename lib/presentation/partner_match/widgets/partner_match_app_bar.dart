@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_scrim.dart';
+import '../../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/navigation/route_names.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 class PartnerMatchAppBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -14,9 +15,9 @@ class PartnerMatchAppBar extends StatelessWidget
     final isDark = theme.brightness == Brightness.dark;
 
     final bgColor = isDark
-        ? AppColors.backgroundDark.withValues(alpha: 0.8)
-        : AppColors.backgroundLight.withValues(alpha: 0.8);
-    final textColor = isDark ? Colors.white : theme.colorScheme.primary;
+        ? context.tokens.background.withValues(alpha: 0.8)
+        : context.tokens.background.withValues(alpha: 0.8);
+    final textColor = Theme.of(context).colorScheme.primary;
 
     return Container(
       color: bgColor,
@@ -35,9 +36,7 @@ class PartnerMatchAppBar extends StatelessWidget
                 },
                 icon: Icon(Icons.arrow_back, color: textColor),
                 style: IconButton.styleFrom(
-                  hoverColor: isDark
-                      ? Colors.white.withAlpha(25)
-                      : Colors.black.withAlpha(12),
+                  hoverColor: isDark ? AppScrim.frost(25) : AppScrim.veil(12),
                 ),
               ),
               Text(
@@ -60,8 +59,8 @@ class PartnerMatchAppBar extends StatelessWidget
                     icon: Icon(Icons.notifications_none, color: textColor),
                     style: IconButton.styleFrom(
                       hoverColor: isDark
-                          ? Colors.white.withValues(alpha: 0.1)
-                          : Colors.black.withValues(alpha: 0.05),
+                          ? AppScrim.frost(26)
+                          : AppScrim.veil(13),
                     ),
                   ),
                   IconButton(
@@ -71,8 +70,8 @@ class PartnerMatchAppBar extends StatelessWidget
                     icon: Icon(Icons.settings, color: textColor),
                     style: IconButton.styleFrom(
                       hoverColor: isDark
-                          ? Colors.white.withValues(alpha: 0.1)
-                          : Colors.black.withValues(alpha: 0.05),
+                          ? AppScrim.frost(26)
+                          : AppScrim.veil(13),
                     ),
                   ),
                 ],

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 class PrivacyControlSection extends StatefulWidget {
   const PrivacyControlSection({super.key});
@@ -18,12 +17,9 @@ class _PrivacyControlSectionState extends State<PrivacyControlSection> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
-    final headerColor = isDark ? Colors.white : AppColors.textMainSlate;
-    final dividerColor = isDark
-        ? Colors.white.withAlpha(25)
-        : Colors.grey.shade100;
+    final headerColor = context.tokens.text;
+    final dividerColor = context.tokens.surfaceAlt;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,9 +51,7 @@ class _PrivacyControlSectionState extends State<PrivacyControlSection> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? Colors.white
-                                : AppColors.textMainSlate,
+                            color: context.tokens.text,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -65,9 +59,7 @@ class _PrivacyControlSectionState extends State<PrivacyControlSection> {
                           context.tr('partner_match_allow_sharing_desc'),
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDark
-                                ? Colors.grey.shade400
-                                : Colors.grey.shade500,
+                            color: context.tokens.textMuted,
                           ),
                         ),
                       ],
@@ -81,7 +73,7 @@ class _PrivacyControlSectionState extends State<PrivacyControlSection> {
                         _masterToggle = val;
                       });
                     },
-                    activeThumbColor: Colors.white,
+                    activeThumbColor: context.tokens.surface,
                     activeTrackColor: theme.colorScheme.primary,
                   ),
                 ],
@@ -101,16 +93,14 @@ class _PrivacyControlSectionState extends State<PrivacyControlSection> {
                       Icon(
                         Icons.visibility_off,
                         size: 18,
-                        color: Colors.grey.shade400,
+                        color: context.tokens.textFaint,
                       ),
                       const SizedBox(width: 8),
                       Text(
                         context.tr('partner_match_hide_symptoms'),
                         style: TextStyle(
                           fontSize: 14,
-                          color: isDark
-                              ? Colors.grey.shade300
-                              : Colors.grey.shade700,
+                          color: context.tokens.textMuted,
                         ),
                       ),
                     ],
@@ -122,7 +112,7 @@ class _PrivacyControlSectionState extends State<PrivacyControlSection> {
                         _detailToggle = val;
                       });
                     },
-                    activeThumbColor: Colors.white,
+                    activeThumbColor: context.tokens.surface,
                     activeTrackColor: theme.colorScheme.primary,
                   ),
                 ],
@@ -137,11 +127,11 @@ class _PrivacyControlSectionState extends State<PrivacyControlSection> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.lock, size: 14, color: Colors.grey.shade400),
+            Icon(Icons.lock, size: 14, color: context.tokens.textFaint),
             const SizedBox(width: 4),
             Text(
               context.tr('partner_match_encryption_notice'),
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
+              style: TextStyle(fontSize: 12, color: context.tokens.textFaint),
             ),
           ],
         ),

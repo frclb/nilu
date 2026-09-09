@@ -9,7 +9,6 @@ import '../../data/repositories/period_repository.dart';
 import '../../domain/models/period_log.dart';
 import '../../presentation/calendar/view_models/calendar_view_model.dart';
 import '../../localization/app_localizations.dart';
-import '../../design_system/app_colors.dart';
 
 class OnboardingCycleLengthScreen extends StatefulWidget {
   const OnboardingCycleLengthScreen({super.key});
@@ -81,8 +80,8 @@ class _OnboardingCycleLengthScreenState
     final isDark = theme.brightness == Brightness.dark;
 
     final bgColor = context.tokens.background;
-    final textColor = isDark ? Colors.white : AppColors.textMainSlate;
-    final textSecondaryColor = isDark ? Colors.grey[400]! : Colors.grey[600]!;
+    final textColor = context.tokens.text;
+    final textSecondaryColor = context.tokens.textMuted;
     final primaryColor = theme.colorScheme.primary;
 
     return Scaffold(
@@ -132,7 +131,7 @@ class _OnboardingCycleLengthScreenState
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
                       color: isActive
-                          ? (isDark ? Colors.white : primaryColor)
+                          ? (Theme.of(context).colorScheme.primary)
                           : primaryColor.withAlpha(
                               (isDark ? 0.4 : 0.2 * 255).toInt(),
                             ),
@@ -274,18 +273,14 @@ class _OnboardingCycleLengthScreenState
               decoration: BoxDecoration(
                 color: context.tokens.surface,
                 border: Border(
-                  top: BorderSide(
-                    color: isDark
-                        ? Colors.white.withAlpha(12)
-                        : primaryColor.withAlpha(12),
-                  ),
+                  top: BorderSide(color: context.tokens.surfaceAlt),
                 ),
               ),
               child: ElevatedButton(
                 onPressed: _completeOnboarding,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   minimumSize: const Size(double.infinity, 56),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_snack.dart';
 import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/repositories/notification_settings_repository.dart';
 import '../../domain/models/notification_settings.dart';
 import '../../localization/app_localizations.dart';
-import '../../design_system/app_colors.dart';
 
 class PartnerNotificationSettingsScreen extends StatefulWidget {
   const PartnerNotificationSettingsScreen({super.key});
@@ -75,14 +75,12 @@ class _PartnerNotificationSettingsScreenState
 
     // Base colors matching the HTML design
     // Dark: bg #1E1415, Light: bg #F8F6F6
-    final bgColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.backgroundLight;
+    final bgColor = context.tokens.background;
     final primaryColor = Theme.of(
       context,
     ).colorScheme.primary; // Primary color from design
-    final textMainColor = isDark ? Colors.white : Colors.black87;
-    final textMutedColor = isDark ? Colors.grey[400] : Colors.grey[500];
+    final textMainColor = context.tokens.text;
+    final textMutedColor = context.tokens.textMuted;
 
     // Card colors
     final cardBgColor = isDark
@@ -384,9 +382,9 @@ class _PartnerNotificationSettingsScreenState
               Switch(
                 value: switchValue,
                 onChanged: onSwitchChanged,
-                activeThumbColor: Colors.white,
+                activeThumbColor: context.tokens.surface,
                 activeTrackColor: primaryColor,
-                inactiveThumbColor: Colors.white,
+                inactiveThumbColor: context.tokens.surface,
                 inactiveTrackColor: context.tokens.border,
                 trackOutlineColor: WidgetStateProperty.resolveWith<Color?>(
                   (states) => Colors.transparent,
@@ -471,14 +469,14 @@ class _PartnerNotificationSettingsScreenState
                   children: [
                     const Icon(
                       Icons.check_circle,
-                      color: Colors.white,
+                      color: AppSnack.foreground,
                       size: 20,
                     ),
                     const SizedBox(width: 12),
                     Text(
                       savedMessage,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppSnack.foreground,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -501,7 +499,7 @@ class _PartnerNotificationSettingsScreenState
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: primaryColor,
-            foregroundColor: Colors.white,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
             elevation: 8,
             shadowColor: primaryColor.withValues(alpha: 0.2),
             padding: const EdgeInsets.symmetric(vertical: 16),

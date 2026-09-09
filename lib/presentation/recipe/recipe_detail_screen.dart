@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import '../widgets/favorite_button.dart';
 import 'widgets/recipe_hero_header.dart';
 import 'widgets/recipe_content_section.dart';
-import '../../design_system/app_colors.dart';
 
 class RecipeDetailScreen extends StatelessWidget {
   const RecipeDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    final bgColor = isDark
-        ? AppColors.backgroundDeepDark
-        : AppColors.backgroundLight;
+    final bgColor = context.tokens.background;
     final bottomBarBg = bgColor;
 
     return Scaffold(

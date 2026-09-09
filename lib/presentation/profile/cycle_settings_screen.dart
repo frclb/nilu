@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_scrim.dart';
 import '../../design_system/app_tokens.dart';
-import '../../design_system/app_palette.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../data/repositories/cycle_settings_repository.dart';
 import '../../presentation/calendar/view_models/calendar_view_model.dart';
 import '../../localization/app_localizations.dart';
-import '../../design_system/app_colors.dart';
 
 class CycleSettingsScreen extends StatefulWidget {
   const CycleSettingsScreen({super.key});
@@ -64,26 +63,22 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark
-          ? AppColors.backgroundNavyDark
-          : AppColors.backgroundLightAlt,
+      backgroundColor: context.tokens.surfaceAlt,
       appBar: AppBar(
         title: Text(
           context.tr('cycle_settings_title'),
           style: theme.textTheme.titleMedium?.copyWith(
-            color: isDark ? Colors.white : Colors.black87,
+            color: context.tokens.text,
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: isDark
-            ? AppColors.backgroundNavyDark
-            : AppColors.backgroundLightAlt,
+        backgroundColor: context.tokens.surfaceAlt,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new,
-            color: isDark ? Colors.white : Colors.black87,
+            color: context.tokens.text,
             size: 20,
           ),
           onPressed: () => context.pop(),
@@ -171,13 +166,11 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withAlpha(12)
-                        : AppPalette.rose50,
+                    color: context.tokens.brandTint,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isDark
-                          ? Colors.white.withAlpha(25)
+                          ? AppScrim.frost(25)
                           : Theme.of(context).colorScheme.primary.withAlpha(38),
                     ),
                   ),
@@ -188,7 +181,7 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                         Icons.info_outline,
                         size: 18,
                         color: isDark
-                            ? Colors.grey[400]
+                            ? context.tokens.textFaint
                             : Theme.of(context).colorScheme.primary,
                       ),
                       const SizedBox(width: 8),
@@ -197,7 +190,7 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                           context.tr('cycle_settings_note'),
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDark ? Colors.grey[400] : Colors.grey[700],
+                            color: context.tokens.textMuted,
                             height: 1.4,
                           ),
                         ),
@@ -239,7 +232,7 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceNavyDark : Colors.white,
+        color: context.tokens.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: context.tokens.border),
       ),
@@ -254,7 +247,7 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white : Colors.black87,
+                  color: context.tokens.text,
                 ),
               ),
               Text(

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_contrast.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../localization/date_names.dart';
-import '../../../design_system/app_colors.dart';
 import '../../../domain/models/daily_log.dart';
 
 import 'package:provider/provider.dart';
@@ -206,12 +206,12 @@ class CalendarGrid extends StatelessWidget {
                 children: [
                   _buildLegendItem(
                     context,
-                    AppColors.flowMedium,
+                    context.tokens.flow,
                     context.tr('calendar_legend_period'),
                   ),
                   _buildLegendItem(
                     context,
-                    AppColors.flowLight,
+                    context.tokens.flowSoft,
                     context.tr('calendar_legend_predicted'),
                   ),
                   // Hormonal doğum kontrolünde takvimde doğurganlık ve
@@ -226,7 +226,7 @@ class CalendarGrid extends StatelessWidget {
                     // farklı şeyler söylüyordu.
                     _buildLegendItem(
                       context,
-                      AppColors.fertileLight,
+                      context.tokens.fertile,
                       context.tr('calendar_legend_fertility'),
                     ),
                     _buildLegendItem(
@@ -252,7 +252,15 @@ class CalendarGrid extends StatelessWidget {
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            // Doğurganlık tonu bilerek soluk — hücrede zemine serilen tülü
+            // temsil ediyor. Açık temada beyaz yüzeye karşı 1.46:1 kalıyor,
+            // yani nokta olarak seçilmiyordu. Saç teli inceliğinde bir
+            // çerçeve, dolgunun açıklığından bağımsız olarak sınırı veriyor.
+            border: Border.all(color: context.tokens.border),
+          ),
         ),
         const SizedBox(width: 4),
         Text(
@@ -333,11 +341,12 @@ class _DayTile extends StatelessWidget {
     // --- Renk Hesaplamaları ---
     Color textColor;
     if (isFaded) {
-      textColor = isDark ? Colors.grey.shade800 : Colors.grey.shade300;
+      textColor = context.tokens.textFaint;
     } else if (isPeriod) {
-      textColor = Colors.white;
+      // Akış rengi koyu temada açık pembe; beyaz metin orada okunmuyor.
+      textColor = AppContrast.on(context.tokens.flow);
     } else if (isSelected) {
-      textColor = Colors.white;
+      textColor = theme.colorScheme.onPrimary;
     } else if (isToday) {
       textColor = theme.colorScheme.primary;
     } else {
@@ -375,7 +384,7 @@ class _DayTile extends StatelessWidget {
                   children: [
                     if (isPeriod && (hasPeriodBefore || hasPeriodAfter))
                       _buildConnector(
-                        color: AppColors.flowMedium,
+                        color: context.tokens.flow,
                         openLeft: hasPeriodBefore,
                         openRight: hasPeriodAfter,
                         inset: inset,
@@ -385,7 +394,9 @@ class _DayTile extends StatelessWidget {
                         !isPeriod &&
                         (hasPredictedBefore || hasPredictedAfter))
                       _buildConnector(
-                        color: AppColors.flowLight.withAlpha(isDark ? 30 : 50),
+                        color: context.tokens.flowSoft.withAlpha(
+                          isDark ? 30 : 50,
+                        ),
                         openLeft: hasPredictedBefore,
                         openRight: hasPredictedAfter,
                         inset: inset,
@@ -419,7 +430,7 @@ class _DayTile extends StatelessWidget {
                             ? [
                                 BoxShadow(
                                   color: isPeriod
-                                      ? AppColors.flowMedium.withAlpha(80)
+                                      ? context.tokens.flow.withAlpha(80)
                                       : theme.colorScheme.primary.withAlpha(60),
                                   blurRadius: 8,
                                   spreadRadius: 1,
@@ -501,19 +512,22 @@ class _DayTile extends StatelessWidget {
     bool isDark,
     ThemeData theme,
   ) {
+    // `context` bu yardımcıda yok; roller temadan okunuyor.
+    final t = theme.extension<AppTokens>() ?? AppTokens.light;
+
     if (isPeriod && isSelected) {
-      return AppColors.flowMedium;
+      return t.flow;
     } else if (isPeriod) {
-      return AppColors.flowMedium;
+      return t.flow;
     } else if (isSelected) {
       return theme.colorScheme.primary;
     } else if (isPredicted) {
-      return AppColors.flowLight.withAlpha(isDark ? 20 : 35);
+      return t.flowSoft.withAlpha(isDark ? 20 : 35);
     } else if (isFertile) {
       return isDark
           // Koyu temada %6 opaklıktaydı; doğurgan günler hiç görünmüyordu.
-          ? AppColors.fertileLight.withAlpha(45)
-          : AppColors.fertileLight.withAlpha(30);
+          ? t.fertile.withAlpha(45)
+          : t.fertile.withAlpha(30);
     }
     return Colors.transparent;
   }
@@ -526,9 +540,10 @@ class _DayTile extends StatelessWidget {
     ThemeData theme,
     bool isDark,
   ) {
+    final t = theme.extension<AppTokens>() ?? AppTokens.light;
     if (isSelected && isPeriod) {
-      // Seçili regl günü: beyaz halka ile göster
-      return Border.all(color: Colors.white, width: 2.5);
+      // Seçili regl günü: dolgunun üstünde okunan halka
+      return Border.all(color: AppContrast.on(t.flow), width: 2.5);
     } else if (isSelected) {
       // Seçili normal gün: primary renk halkası
       return Border.all(color: theme.colorScheme.primary, width: 2.5);
@@ -553,22 +568,22 @@ class _DayTile extends StatelessWidget {
   }) {
     if (isFaded) return const SizedBox.shrink();
 
+    // `context` bu yardımcıda yok; roller temadan okunuyor.
+    final t = theme.extension<AppTokens>() ?? AppTokens.light;
     List<Widget> dots = [];
 
     // Yumurtlama noktası
     if (isOvulation) {
-      dots.add(_dot(Colors.deepPurple.shade400, 6));
+      dots.add(_dot(t.ovulation, 6));
     }
     // Doğurganlık noktası
     else if (isFertile && !isPeriod) {
-      dots.add(
-        _dot(isDark ? Colors.pink.shade300 : theme.colorScheme.primary, 5),
-      );
+      dots.add(_dot(t.flow, 5));
     }
 
     // Log noktası (yumurtlama/doğurganlık varsa ek olarak)
     if (hasLog && !isPeriod) {
-      dots.add(_dot(isDark ? Colors.grey.shade500 : Colors.grey.shade400, 4));
+      dots.add(_dot(t.textFaint, 4));
     }
 
     if (dots.isEmpty) return const SizedBox.shrink();

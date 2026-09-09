@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/repositories/profile_repository.dart';
-import '../../design_system/app_colors.dart';
 import '../../localization/app_localizations.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
@@ -82,26 +81,22 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark
-          ? AppColors.backgroundNavyDark
-          : AppColors.backgroundLightAlt,
+      backgroundColor: context.tokens.surfaceAlt,
       appBar: AppBar(
         title: Text(
           context.tr('personal_info_title'),
           style: theme.textTheme.titleMedium?.copyWith(
-            color: isDark ? Colors.white : Colors.black87,
+            color: context.tokens.text,
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: isDark
-            ? AppColors.backgroundNavyDark
-            : AppColors.backgroundLightAlt,
+        backgroundColor: context.tokens.surfaceAlt,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new,
-            color: isDark ? Colors.white : Colors.black87,
+            color: context.tokens.text,
             size: 20,
           ),
           onPressed: () => context.pop(),
@@ -181,7 +176,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: isDark ? Colors.grey[400] : Colors.grey[600],
+            color: context.tokens.textMuted,
           ),
         ),
         const SizedBox(height: 8),
@@ -189,14 +184,11 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           controller: controller,
           keyboardType: keyboardType,
           validator: validator,
-          style: TextStyle(
-            fontSize: 16,
-            color: isDark ? Colors.white : Colors.black87,
-          ),
+          style: TextStyle(fontSize: 16, color: context.tokens.text),
           decoration: InputDecoration(
             hintText: hint,
             filled: true,
-            fillColor: isDark ? AppColors.surfaceNavyDark : Colors.white,
+            fillColor: context.tokens.surface,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 16,
@@ -226,7 +218,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: isDark ? Colors.grey[400] : Colors.grey[600],
+            color: context.tokens.textMuted,
           ),
         ),
         const SizedBox(height: 8),
@@ -237,7 +229,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.surfaceNavyDark : Colors.white,
+              color: context.tokens.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: context.tokens.border),
             ),
@@ -249,14 +241,14 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     color: value == null
-                        ? (isDark ? Colors.grey[600] : Colors.grey[500])
-                        : (isDark ? Colors.white : Colors.black87),
+                        ? (context.tokens.textMuted)
+                        : (context.tokens.text),
                   ),
                 ),
                 Icon(
                   Icons.calendar_today_outlined,
                   size: 18,
-                  color: isDark ? Colors.grey[500] : Colors.grey[500],
+                  color: context.tokens.textMuted,
                 ),
               ],
             ),

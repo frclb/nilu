@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import '../../domain/services/session_plan.dart';
 import '../session/session_screen.dart';
 import '../../../localization/app_localizations.dart';
 import 'widgets/exercise_hero_header.dart';
 import 'widgets/exercise_content_section.dart';
-import '../../design_system/app_colors.dart';
 
 class ExerciseDetailScreen extends StatelessWidget {
   const ExerciseDetailScreen({super.key});
@@ -12,16 +12,11 @@ class ExerciseDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
-    final bottomBarBg = isDark
-        ? AppColors.backgroundDark
-        : Colors.white; // gradient base
+    final bottomBarBg = context.tokens.surface; // gradient base
 
     return Scaffold(
-      backgroundColor: isDark
-          ? AppColors.backgroundDark
-          : AppColors.backgroundLight,
+      backgroundColor: context.tokens.background,
       body: Stack(
         children: [
           // Main Scrollable Area
@@ -69,7 +64,7 @@ class ExerciseDetailScreen extends StatelessWidget {
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   minimumSize: const Size(double.infinity, 56),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),

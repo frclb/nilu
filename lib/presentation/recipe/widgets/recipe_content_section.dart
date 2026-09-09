@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../design_system/app_palette.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 class RecipeContentSection extends StatelessWidget {
   const RecipeContentSection({super.key});
@@ -13,15 +11,13 @@ class RecipeContentSection extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     // ── Colour palette ──
-    final bgColor = isDark
-        ? AppColors.backgroundDeepDark
-        : AppColors.backgroundLight;
-    final textColor = isDark ? AppPalette.rose50 : AppColors.textMainLight;
+    final bgColor = context.tokens.background;
+    final textColor = context.tokens.text;
     final mutedColor = context.tokens.textMuted;
     final surfaceColor = context.tokens.surface;
     final borderColor = context.tokens.border;
     final primaryColor = Theme.of(context).colorScheme.primary;
-    final dotColor = isDark ? Colors.white.withAlpha(51) : Colors.grey.shade300;
+    final dotColor = context.tokens.border;
 
     return Container(
       decoration: BoxDecoration(
@@ -128,12 +124,8 @@ class RecipeContentSection extends StatelessWidget {
                     Expanded(
                       child: _buildBenefitItem(
                         icon: Icons.water_drop,
-                        iconBgColor: isDark
-                            ? AppPalette.clay600.withAlpha(25)
-                            : AppPalette.clay100,
-                        iconColor: isDark
-                            ? AppPalette.clay400
-                            : AppPalette.clay600,
+                        iconBgColor: context.tokens.accentTint,
+                        iconColor: context.tokens.accent,
                         title: context.tr('recipe_omega3'),
                         subtitle: context.tr('recipe_omega3_desc'),
                         textColor: textColor,

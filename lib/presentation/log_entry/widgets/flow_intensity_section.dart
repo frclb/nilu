@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_scrim.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../../domain/models/log_vocabulary.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 class FlowIntensitySection extends StatefulWidget {
   final String? initialValue;
@@ -61,7 +62,7 @@ class _FlowIntensitySectionState extends State<FlowIntensitySection> {
             children: [
               Icon(
                 Icons.water_drop,
-                color: isDark ? Colors.white : theme.colorScheme.primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(width: 8),
               Text(
@@ -95,18 +96,14 @@ class _FlowIntensitySectionState extends State<FlowIntensitySection> {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? (isDark
-                                  ? Colors.white.withAlpha(25)
+                                  ? AppScrim.frost(25)
                                   : theme.colorScheme.primary.withAlpha(12))
                             : theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isSelected
-                              ? (isDark
-                                    ? Colors.white
-                                    : theme.colorScheme.primary)
-                              : (isDark
-                                    ? AppColors.borderSlateDark
-                                    : AppColors.borderSlate),
+                              ? (Theme.of(context).colorScheme.primary)
+                              : (context.tokens.border),
                           width: 2,
                         ),
                       ),
@@ -115,9 +112,7 @@ class _FlowIntensitySectionState extends State<FlowIntensitySection> {
                           Icon(
                             options[index]['icon'] as IconData,
                             color: isSelected
-                                ? (isDark
-                                      ? Colors.white
-                                      : theme.colorScheme.primary)
+                                ? (Theme.of(context).colorScheme.primary)
                                 : theme.textTheme.labelLarge?.color?.withAlpha(
                                     127,
                                   ),
@@ -129,9 +124,7 @@ class _FlowIntensitySectionState extends State<FlowIntensitySection> {
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                               color: isSelected
-                                  ? (isDark
-                                        ? Colors.white
-                                        : theme.colorScheme.primary)
+                                  ? (Theme.of(context).colorScheme.primary)
                                   : theme.textTheme.labelLarge?.color,
                             ),
                           ),

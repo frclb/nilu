@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/app_card.dart';
-import '../../../design_system/app_palette.dart';
 import 'package:provider/provider.dart';
 import '../../../../domain/models/log_vocabulary.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../../design_system/app_colors.dart';
 import '../../../../design_system/phase_colors.dart';
 import '../../../../design_system/app_tokens.dart';
 import '../../../../domain/models/cycle_info.dart';
@@ -94,34 +92,26 @@ class CalendarSummarySection extends StatelessWidget {
                       if (hasFlow)
                         _buildChip(
                           icon: Icons.water_drop,
-                          iconColor: AppColors.flowMedium,
+                          iconColor: context.tokens.flow,
                           label: context.tr(
                             LogVocabulary.flowKey(dailyLog.flowIntensity!),
                           ),
-                          textColor: isDark
-                              ? AppPalette.rose200
-                              : theme.colorScheme.primary,
-                          bgColor: isDark
-                              ? AppColors.secondaryPinkDark
-                              : context.tokens.brandTint,
-                          borderColor: isDark
-                              ? theme.colorScheme.primary.withAlpha(25)
-                              : AppPalette.rose200,
+                          textColor: theme.colorScheme.primary,
+                          bgColor: context.tokens.brandTint,
+                          borderColor: theme.colorScheme.primary.withAlpha(25),
                         ),
                       if (hasMoods)
                         ...dailyLog.moods.map(
                           (mood) => _buildChip(
                             icon: Icons.sentiment_satisfied,
-                            iconColor: AppColors.moodOrangeIcon,
+                            iconColor: context.tokens.accent,
                             label: context.tr(LogVocabulary.moodKey(mood)),
-                            textColor: isDark
-                                ? AppPalette.clay400
-                                : AppColors.moodOrangeText,
+                            textColor: context.tokens.accent,
                             bgColor: isDark
-                                ? AppColors.moodOrangeText.withAlpha(51)
-                                : AppColors.moodOrangeBg,
+                                ? context.tokens.accent.withAlpha(51)
+                                : context.tokens.accentTint,
                             borderColor: isDark
-                                ? AppColors.moodOrangeIcon.withAlpha(51)
+                                ? context.tokens.accent.withAlpha(51)
                                 : theme.colorScheme.tertiary.withAlpha(38),
                           ),
                         ),
@@ -131,14 +121,14 @@ class CalendarSummarySection extends StatelessWidget {
                             .map(
                               (symptom) => _buildChip(
                                 icon: Icons.healing,
-                                iconColor: AppColors.energyPurpleIcon,
+                                iconColor: context.tokens.ovulation,
                                 label: context.tr(
                                   LogVocabulary.symptomKey(symptom),
                                 ),
                                 textColor: context.tokens.ovulation,
                                 bgColor: isDark
-                                    ? AppColors.energyPurpleText.withAlpha(51)
-                                    : AppColors.energyPurpleBg,
+                                    ? context.tokens.ovulation.withAlpha(51)
+                                    : context.tokens.ovulationTint,
                                 borderColor: context.tokens.ovulation.withAlpha(
                                   51,
                                 ),
@@ -159,12 +149,7 @@ class CalendarSummarySection extends StatelessWidget {
                   ),
 
                 const SizedBox(height: 20),
-                Divider(
-                  color: isDark
-                      ? AppColors.borderDark
-                      : AppColors.borderSlateLight,
-                  height: 1,
-                ),
+                Divider(color: context.tokens.border, height: 1),
                 const SizedBox(height: 20),
 
                 // Notes (gerçek veriden)
@@ -177,15 +162,13 @@ class CalendarSummarySection extends StatelessWidget {
                         height: 48,
                         decoration: BoxDecoration(
                           color: isDark
-                              ? AppColors.borderSlateDark.withAlpha(76)
+                              ? context.tokens.border.withAlpha(76)
                               : context.tokens.surfaceAlt,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.note_alt_outlined,
-                          color: isDark
-                              ? AppColors.textMutedSlateDark
-                              : AppColors.textMutedSlate,
+                          color: context.tokens.textMuted,
                         ),
                       ),
                       const SizedBox(width: 16),

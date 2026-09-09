@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 import '../../../domain/models/article.dart';
 
 /// Kategori şeridi. Seçim durumu ekranda tutulur; burada tutulduğunda
@@ -18,7 +18,6 @@ class HealthLibraryCategories extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     const categories = ArticleCategory.values;
 
@@ -33,15 +32,15 @@ class HealthLibraryCategories extends StatelessWidget {
 
           final bgColor = isSelected
               ? theme.colorScheme.primary
-              : (isDark ? AppColors.surfaceWarmDark : Colors.white);
+              : (context.tokens.surface);
 
           final textColor = isSelected
-              ? Colors.white
-              : (isDark ? Colors.grey.shade300 : Colors.grey.shade600);
+              ? Theme.of(context).colorScheme.onPrimary
+              : (context.tokens.textMuted);
 
           final borderColor = isSelected
               ? Colors.transparent
-              : (isDark ? Colors.white.withAlpha(25) : Colors.grey.shade100);
+              : (context.tokens.surfaceAlt);
 
           return Padding(
             padding: const EdgeInsets.only(right: 12),

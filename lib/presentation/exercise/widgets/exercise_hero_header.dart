@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_scrim.dart';
 import '../../../design_system/content_illustration.dart';
 import '../../widgets/favorite_button.dart';
 import 'package:go_router/go_router.dart';
@@ -36,7 +37,7 @@ class ExerciseHeroHeader extends StatelessWidget {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    Colors.black.withAlpha(102),
+                    AppScrim.veil(102),
                     Colors.transparent,
                     Colors.transparent,
                   ],
@@ -66,7 +67,7 @@ class ExerciseHeroHeader extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.black.withAlpha(76),
+                    color: AppScrim.veil(76),
                     shape: BoxShape.circle,
                   ),
                   child: const FavoriteButton(contentId: 'exercise_light_flow'),
@@ -89,11 +90,11 @@ class ExerciseHeroHeader extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: Colors.white.withAlpha(76),
+          color: AppScrim.frost(76),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withAlpha(51)),
+          border: Border.all(color: AppScrim.frost(51)),
         ),
-        child: Center(child: Icon(icon, color: Colors.white, size: 24)),
+        child: Center(child: Icon(icon, color: AppScrim.ink, size: 24)),
       ),
     );
   }

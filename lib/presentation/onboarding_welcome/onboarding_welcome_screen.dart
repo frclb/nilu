@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_scrim.dart';
+import '../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
 import 'package:go_router/go_router.dart';
-import '../../design_system/app_colors.dart';
 
 class OnboardingWelcomeScreen extends StatefulWidget {
   const OnboardingWelcomeScreen({super.key});
@@ -42,10 +43,8 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final bgColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.backgroundLight;
-    final textColor = isDark ? Colors.white : AppColors.textMainSlate;
+    final bgColor = context.tokens.background;
+    final textColor = context.tokens.text;
 
     final pages = [
       _buildPage(
@@ -192,7 +191,9 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                         onPressed: _nextPage,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: theme.colorScheme.primary,
-                          foregroundColor: Colors.white,
+                          foregroundColor: Theme.of(
+                            context,
+                          ).colorScheme.onPrimary,
                           minimumSize: const Size(double.infinity, 56),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -267,7 +268,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDark ? Colors.white.withAlpha(12) : Colors.white,
+              color: context.tokens.surface,
               shape: BoxShape.circle,
               border: Border.all(
                 color: theme.colorScheme.primary.withAlpha(25),
@@ -277,7 +278,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                   ? []
                   : [
                       BoxShadow(
-                        color: Colors.black.withAlpha(26),
+                        color: AppScrim.veil(26),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),

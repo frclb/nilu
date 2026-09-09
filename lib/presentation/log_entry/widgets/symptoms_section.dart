@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_scrim.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../../domain/models/log_vocabulary.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 class SymptomsSection extends StatefulWidget {
   final List<String> initialSymptoms;
@@ -31,7 +32,6 @@ class _SymptomsSectionState extends State<SymptomsSection> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     // Saklanan değerler kanonik kodlardır; etiketler lokalizasyondan gelir.
     final symptoms = _symptomCodes
@@ -54,10 +54,7 @@ class _SymptomsSectionState extends State<SymptomsSection> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.healing,
-                color: isDark ? Colors.white : theme.colorScheme.primary,
-              ),
+              Icon(Icons.healing, color: Theme.of(context).colorScheme.primary),
               const SizedBox(width: 8),
               Text(
                 context.tr('log_symptoms'),
@@ -101,16 +98,14 @@ class _SymptomsSectionState extends State<SymptomsSection> {
                     border: Border.all(
                       color: isSelected
                           ? theme.colorScheme.primary
-                          : (isDark
-                                ? AppColors.borderSlateDark
-                                : AppColors.borderSlate),
+                          : (context.tokens.border),
                       width: 1,
                     ),
                     boxShadow: isSelected
                         ? null
                         : [
                             BoxShadow(
-                              color: Colors.black.withAlpha(26),
+                              color: AppScrim.veil(26),
                               blurRadius: 2,
                               offset: const Offset(0, 1),
                             ),
@@ -122,7 +117,7 @@ class _SymptomsSectionState extends State<SymptomsSection> {
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: isSelected
-                          ? Colors.white
+                          ? Theme.of(context).colorScheme.onPrimary
                           : theme.textTheme.labelLarge?.color,
                     ),
                   ),

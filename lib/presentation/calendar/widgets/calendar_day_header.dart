@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../design_system/app_snack.dart';
 import 'package:provider/provider.dart';
-import '../../../design_system/app_colors.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../localization/date_names.dart';
 import '../view_models/calendar_view_model.dart';
@@ -127,7 +127,7 @@ class CalendarDayHeader extends StatelessWidget {
                     isPeriod ? Icons.water_drop : Icons.water_drop_outlined,
                     size: 18,
                     color: isPeriod
-                        ? AppColors.flowMedium
+                        ? context.tokens.flow
                         : theme.colorScheme.primary,
                   ),
                   label: Text(
@@ -141,7 +141,7 @@ class CalendarDayHeader extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: isPeriod
-                          ? AppColors.flowMedium
+                          ? context.tokens.flow
                           : theme.colorScheme.primary,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
@@ -155,7 +155,7 @@ class CalendarDayHeader extends StatelessWidget {
                     ),
                     side: BorderSide(
                       color: isPeriod
-                          ? AppColors.flowMedium.withAlpha(102)
+                          ? context.tokens.flow.withAlpha(102)
                           : theme.colorScheme.primary.withAlpha(76),
                     ),
                     shape: RoundedRectangleBorder(
@@ -244,34 +244,34 @@ class _DayStatus {
     if (isPeriod) {
       return _DayStatus(
         context.tr('calendar_status_period'),
-        AppColors.flowMedium,
+        context.tokens.flow,
         Icons.water_drop,
       );
     }
     if (isOvulation) {
       return _DayStatus(
         context.tr('calendar_status_ovulation'),
-        Colors.deepPurple.shade400,
+        context.tokens.ovulation,
         Icons.star,
       );
     }
     if (isFertile) {
       return _DayStatus(
         context.tr('calendar_status_fertile'),
-        Colors.pink.shade300,
+        context.tokens.flow,
         Icons.favorite,
       );
     }
     if (isPredicted) {
       return _DayStatus(
         context.tr('calendar_status_predicted'),
-        AppColors.flowLight,
+        context.tokens.flowSoft,
         Icons.water_drop_outlined,
       );
     }
     return _DayStatus(
       context.tr('calendar_status_normal'),
-      Colors.grey,
+      context.tokens.textMuted,
       Icons.circle_outlined,
     );
   }

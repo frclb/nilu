@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import '../../domain/services/session_plan.dart';
 import '../session/session_screen.dart';
 import '../widgets/favorite_button.dart';
 import 'widgets/yoga_video_player.dart';
 import 'widgets/yoga_content_section.dart';
 import '../../localization/app_localizations.dart';
-import '../../design_system/app_colors.dart';
 
 class YogaDetailScreen extends StatelessWidget {
   const YogaDetailScreen({super.key});
@@ -15,13 +15,9 @@ class YogaDetailScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final bgColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.backgroundLight;
+    final bgColor = context.tokens.background;
     final primaryColor = Theme.of(context).colorScheme.primary;
-    final headerBorder = isDark
-        ? Colors.white.withAlpha(12)
-        : primaryColor.withAlpha(25);
+    final headerBorder = context.tokens.border;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -40,10 +36,7 @@ class YogaDetailScreen extends StatelessWidget {
                 surfaceTintColor: Colors.transparent,
                 elevation: 0,
                 leading: IconButton(
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: isDark ? Colors.white : AppColors.textMainSlate,
-                  ),
+                  icon: Icon(Icons.arrow_back, color: context.tokens.text),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
                 centerTitle: true,
@@ -52,7 +45,7 @@ class YogaDetailScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppColors.textMainSlate,
+                    color: context.tokens.text,
                   ),
                 ),
                 actions: [const FavoriteButton(contentId: 'yoga_gentle_flow')],
@@ -108,7 +101,7 @@ class YogaDetailScreen extends StatelessWidget {
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     minimumSize: const Size(double.infinity, 56),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),

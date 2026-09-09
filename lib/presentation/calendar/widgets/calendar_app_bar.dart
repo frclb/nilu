@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../../design_system/app_colors.dart';
 import '../../../../core/navigation/route_names.dart';
 
 class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -11,10 +11,9 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final onSurface = theme.colorScheme.onSurface;
-    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      color: isDark ? AppColors.backgroundDark : Colors.white,
+      color: context.tokens.surface,
       child: SafeArea(
         bottom: false,
         child: Padding(

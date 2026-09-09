@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_scrim.dart';
+import '../../design_system/app_tokens.dart';
 import '../../data/repositories/pairing_repository.dart';
 import '../../domain/services/pairing_token.dart';
-import '../../design_system/app_palette.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../../domain/view_models/user_view_model.dart';
 import '../../../localization/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-import '../../design_system/app_colors.dart';
 
 class PartnerQrGenScreen extends StatefulWidget {
   const PartnerQrGenScreen({super.key});
@@ -65,15 +65,11 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final bgColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.backgroundLight;
-    final surfaceColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
+    final bgColor = context.tokens.background;
+    final surfaceColor = context.tokens.surface;
     final primaryColor = theme.colorScheme.primary;
-    final textMainColor = isDark ? Colors.white : AppColors.textMainSlate;
-    final textMutedColor = isDark
-        ? AppPalette.nightInkMuted
-        : AppColors.textMutedSlate;
+    final textMainColor = context.tokens.text;
+    final textMutedColor = context.tokens.textMuted;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -164,15 +160,11 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
                         decoration: BoxDecoration(
                           color: surfaceColor,
                           borderRadius: BorderRadius.circular(32),
-                          border: Border.all(
-                            color: Colors.white.withAlpha(
-                              (isDark ? 0.05 : 0.40 * 255).toInt(),
-                            ),
-                          ),
+                          border: Border.all(color: context.tokens.border),
                           boxShadow: [
                             BoxShadow(
                               color: isDark
-                                  ? Colors.black.withAlpha(76)
+                                  ? AppScrim.veil(76)
                                   : primaryColor.withAlpha(20),
                               blurRadius: 30,
                               offset: const Offset(0, 10),
@@ -188,11 +180,11 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
                               backgroundColor: Colors.transparent,
                               eyeStyle: QrEyeStyle(
                                 eyeShape: QrEyeShape.square,
-                                color: isDark ? Colors.white : Colors.black87,
+                                color: context.tokens.text,
                               ),
                               dataModuleStyle: QrDataModuleStyle(
                                 dataModuleShape: QrDataModuleShape.circle,
-                                color: isDark ? Colors.white : Colors.black87,
+                                color: context.tokens.text,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -203,9 +195,7 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                color: isDark
-                                    ? Colors.white.withAlpha(12)
-                                    : Colors.grey.shade100,
+                                color: context.tokens.surfaceAlt,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               // Kodun tamamı gösteriliyor: kamera
@@ -272,11 +262,7 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
                     },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: textMainColor,
-                      side: BorderSide(
-                        color: isDark
-                            ? Colors.white.withAlpha(51)
-                            : Colors.grey.shade300,
-                      ),
+                      side: BorderSide(color: context.tokens.border),
                       minimumSize: const Size(double.infinity, 56),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
-import '../../../design_system/app_palette.dart';
 
 class SettingsItem {
   final String title;
@@ -39,7 +38,7 @@ class SettingsGroup extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: isDark ? Colors.grey[400] : Colors.grey[500],
+              color: context.tokens.textMuted,
               letterSpacing: 1.0,
             ),
           ),
@@ -102,8 +101,8 @@ class SettingsGroup extends StatelessWidget {
                             Icon(
                               Icons.chevron_right,
                               color: isDark
-                                  ? Colors.grey[500]
-                                  : Colors.grey[400],
+                                  ? context.tokens.textMuted
+                                  : context.tokens.textFaint,
                             ),
                           ],
                         ),
@@ -114,7 +113,7 @@ class SettingsGroup extends StatelessWidget {
                     Divider(
                       height: 1,
                       thickness: 1,
-                      color: isDark ? AppPalette.night700 : Colors.grey[50]!,
+                      color: context.tokens.surfaceAlt,
                       indent: 72,
                     ),
                 ],

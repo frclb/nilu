@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../design_system/app_palette.dart';
+import '../../design_system/app_tokens.dart';
 import '../../design_system/app_snack.dart';
 import 'package:provider/provider.dart';
 import 'widgets/log_entry_app_bar.dart';
@@ -116,16 +116,9 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
                 bottom: 16 + MediaQuery.of(context).padding.bottom,
               ),
               decoration: BoxDecoration(
-                color: isDark
-                    ? AppPalette.night800.withAlpha(229)
-                    : Colors.white.withAlpha(204),
+                color: context.tokens.surface.withAlpha(229),
                 border: Border(
-                  top: BorderSide(
-                    color: isDark
-                        ? Colors.white.withAlpha(12)
-                        : theme.colorScheme.primary.withAlpha(12),
-                    width: 1,
-                  ),
+                  top: BorderSide(color: context.tokens.surfaceAlt, width: 1),
                 ),
               ),
               child: SizedBox(
@@ -134,7 +127,7 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
                   onPressed: _saveLog,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -161,12 +154,7 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
   Widget _buildDivider(bool isDark, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      child: Divider(
-        color: isDark
-            ? Colors.white.withAlpha(25)
-            : theme.colorScheme.primary.withAlpha(25),
-        height: 1,
-      ),
+      child: Divider(color: context.tokens.border, height: 1),
     );
   }
 }

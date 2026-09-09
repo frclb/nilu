@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../../core/navigation/route_names.dart';
-import '../../../design_system/app_colors.dart';
 
 class HealthLibraryAppBar extends StatelessWidget
     implements PreferredSizeWidget {
@@ -13,8 +13,8 @@ class HealthLibraryAppBar extends StatelessWidget
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final bgColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
-    final textColor = isDark ? Colors.white : AppColors.textMainSlate;
+    final bgColor = context.tokens.surface;
+    final textColor = context.tokens.text;
 
     return Container(
       color: bgColor,
@@ -44,7 +44,7 @@ class HealthLibraryAppBar extends StatelessWidget
                 style: IconButton.styleFrom(
                   hoverColor: isDark
                       ? theme.colorScheme.primary.withAlpha(51)
-                      : AppColors.backgroundLight,
+                      : context.tokens.background,
                 ),
               ),
             ],

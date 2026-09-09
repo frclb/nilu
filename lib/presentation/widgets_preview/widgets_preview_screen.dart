@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_scrim.dart';
 import '../../design_system/app_tokens.dart';
 import '../../design_system/content_illustration.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:math' as math;
 import '../../localization/app_localizations.dart';
-import '../../design_system/app_colors.dart';
 
 class WidgetsPreviewScreen extends StatelessWidget {
   const WidgetsPreviewScreen({super.key});
@@ -15,20 +15,16 @@ class WidgetsPreviewScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     // Base colors matching HTML
-    final bgColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.backgroundLight;
+    final bgColor = context.tokens.background;
     final primaryColor = Theme.of(context).colorScheme.primary; // #551b26 HTML
     final accentSoft = isDark
         ? context.tokens.surfaceAlt
         : context.tokens.brandTint;
 
-    final textMainColor = isDark ? Colors.white : Colors.black87;
+    final textMainColor = context.tokens.text;
 
     // Card background
-    final cardBgColor = isDark
-        ? AppColors.textMainSlate
-        : Colors.white; // dark:bg-slate-900 HTML
+    final cardBgColor = context.tokens.surface;
     final borderColor = isDark
         ? accentSoft.withValues(alpha: 0.1)
         : accentSoft.withValues(alpha: 0.3);
@@ -36,7 +32,7 @@ class WidgetsPreviewScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: isDark ? AppColors.backgroundDark : Colors.white,
+        backgroundColor: context.tokens.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
@@ -326,15 +322,10 @@ class WidgetsPreviewScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? context.tokens.text
-                            : Colors.white,
+                        color: context.tokens.surface,
                         shape: BoxShape.circle,
                         boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 4,
-                          ),
+                          BoxShadow(color: AppScrim.veil(13), blurRadius: 4),
                         ],
                       ),
                       child: Icon(
@@ -438,16 +429,13 @@ class WidgetsPreviewScreen extends StatelessWidget {
                           color: primaryColor,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? AppColors.textMainSlate
-                                : Colors.white,
+                            color: context.tokens.surface,
                             width: 2,
                           ),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.favorite,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onPrimary,
                           size: 10,
                         ),
                       ),

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_scrim.dart';
 import '../../design_system/app_tokens.dart';
-import '../../design_system/app_palette.dart';
 import '../../design_system/content_illustration.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
 import '../../domain/view_models/user_view_model.dart';
-import '../../design_system/app_colors.dart';
 
 class OnboardingSuccessScreen extends StatelessWidget {
   const OnboardingSuccessScreen({super.key});
@@ -31,16 +30,13 @@ class OnboardingSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
-    final bgColor = isDark ? AppColors.backgroundDeepDark : Colors.white;
+    final bgColor = context.tokens.surface;
     final textColor = context.tokens.text;
-    final textSecondaryColor = isDark ? Colors.grey[400]! : Colors.grey[600]!;
+    final textSecondaryColor = context.tokens.textMuted;
     final primaryColor =
         theme.colorScheme.primary; // Often #f04299 based on provided HTML
-    final subtlePink = isDark
-        ? Colors.white.withValues(alpha: 0.05)
-        : AppPalette.rose50.withValues(alpha: 0.5);
+    final subtlePink = context.tokens.brandTint;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -70,7 +66,7 @@ class OnboardingSuccessScreen extends StatelessWidget {
                     width: 40,
                     child: IconButton(
                       icon: const Icon(Icons.close),
-                      color: Colors.grey[400],
+                      color: context.tokens.textFaint,
                       onPressed: () => _completeOnboarding(context),
                     ),
                   ),
@@ -114,7 +110,7 @@ class OnboardingSuccessScreen extends StatelessWidget {
                                 color: subtlePink,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.02),
+                                    color: AppScrim.veil(5),
                                     blurRadius: 10,
                                     spreadRadius: 2,
                                   ),
@@ -156,9 +152,7 @@ class OnboardingSuccessScreen extends StatelessWidget {
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withValues(
-                                        alpha: 0.1,
-                                      ),
+                                      color: AppScrim.veil(26),
                                       blurRadius: 10,
                                       offset: const Offset(0, 4),
                                     ),
@@ -225,12 +219,16 @@ class OnboardingSuccessScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.lock, size: 16, color: Colors.grey[500]),
+                      Icon(
+                        Icons.lock,
+                        size: 16,
+                        color: context.tokens.textMuted,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         context.tr('onboarding_success_privacy'),
                         style: TextStyle(
-                          color: Colors.grey[500],
+                          color: context.tokens.textMuted,
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                         ),
@@ -244,7 +242,7 @@ class OnboardingSuccessScreen extends StatelessWidget {
                     onPressed: () => _completeOnboarding(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
-                      foregroundColor: Colors.white,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
                       minimumSize: const Size(double.infinity, 56),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),

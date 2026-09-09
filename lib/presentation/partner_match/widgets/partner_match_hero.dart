@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_scrim.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../design_system/app_card.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 class PartnerMatchHero extends StatelessWidget {
   const PartnerMatchHero({super.key});
@@ -11,10 +12,8 @@ class PartnerMatchHero extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final titleColor = isDark
-        ? Colors.white
-        : AppColors.textMainSlate; // slate-900
-    final descColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
+    final titleColor = context.tokens.text; // slate-900
+    final descColor = context.tokens.textMuted;
 
     return Column(
       children: [
@@ -39,16 +38,14 @@ class PartnerMatchHero extends StatelessWidget {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.black.withAlpha(51)
-                    : Colors.white.withAlpha(102),
+                color: isDark ? AppScrim.veil(51) : AppScrim.frost(102),
                 shape: BoxShape.circle,
                 boxShadow: AppCard.shadow(),
               ),
               child: Icon(
                 Icons.diversity_1, // close enough equivalent
                 size: 60,
-                color: isDark ? Colors.white : theme.colorScheme.primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           ),

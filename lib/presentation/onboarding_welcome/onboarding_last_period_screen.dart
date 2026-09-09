@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_scrim.dart';
 import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/navigation/route_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../localization/app_localizations.dart';
 import '../../localization/date_names.dart';
-import '../../design_system/app_colors.dart';
 
 class OnboardingLastPeriodScreen extends StatefulWidget {
   const OnboardingLastPeriodScreen({super.key});
@@ -54,11 +54,9 @@ class _OnboardingLastPeriodScreenState
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final bgColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.backgroundLight;
-    final cardColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
-    final textMainColor = isDark ? Colors.white : AppColors.textMainLight;
+    final bgColor = context.tokens.background;
+    final cardColor = context.tokens.surface;
+    final textMainColor = context.tokens.text;
     final textSecondaryColor = context.tokens.textMuted;
     final primaryColor = theme.colorScheme.primary;
 
@@ -99,7 +97,7 @@ class _OnboardingLastPeriodScreenState
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
                       color: isActive
-                          ? (isDark ? Colors.white : primaryColor)
+                          ? (Theme.of(context).colorScheme.primary)
                           : primaryColor.withAlpha(
                               (isDark ? 0.4 : 0.2 * 255).toInt(),
                             ),
@@ -151,16 +149,12 @@ class _OnboardingLastPeriodScreenState
                         decoration: BoxDecoration(
                           color: cardColor,
                           borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: isDark
-                                ? Colors.white.withAlpha(12)
-                                : primaryColor.withAlpha(25),
-                          ),
+                          border: Border.all(color: context.tokens.border),
                           boxShadow: isDark
                               ? null
                               : [
                                   BoxShadow(
-                                    color: Colors.black.withAlpha(26),
+                                    color: AppScrim.veil(26),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
                                   ),
@@ -179,9 +173,7 @@ class _OnboardingLastPeriodScreenState
                                   ),
                                   onPressed: _previousMonth,
                                   style: IconButton.styleFrom(
-                                    hoverColor: isDark
-                                        ? Colors.white10
-                                        : primaryColor.withAlpha(12),
+                                    hoverColor: context.tokens.surfaceAlt,
                                   ),
                                 ),
                                 Text(
@@ -199,9 +191,7 @@ class _OnboardingLastPeriodScreenState
                                   ),
                                   onPressed: _nextMonth,
                                   style: IconButton.styleFrom(
-                                    hoverColor: isDark
-                                        ? Colors.white10
-                                        : primaryColor.withAlpha(12),
+                                    hoverColor: context.tokens.surfaceAlt,
                                   ),
                                 ),
                               ],
@@ -221,9 +211,7 @@ class _OnboardingLastPeriodScreenState
                                     style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
-                                      color: isDark
-                                          ? Colors.grey[500]
-                                          : textSecondaryColor.withAlpha(178),
+                                      color: context.tokens.textFaint,
                                     ),
                                   ),
                                 );
@@ -251,15 +239,9 @@ class _OnboardingLastPeriodScreenState
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: isDark
-                              ? Colors.white.withAlpha(12)
-                              : primaryColor.withAlpha(12),
+                          color: context.tokens.surfaceAlt,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isDark
-                                ? Colors.white.withAlpha(12)
-                                : primaryColor.withAlpha(25),
-                          ),
+                          border: Border.all(color: context.tokens.border),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -268,7 +250,7 @@ class _OnboardingLastPeriodScreenState
                             Icon(
                               Icons.info_outline,
                               size: 16,
-                              color: isDark ? Colors.white : primaryColor,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                             const SizedBox(width: 8),
                             Flexible(
@@ -276,9 +258,7 @@ class _OnboardingLastPeriodScreenState
                                 context.tr('onb_last_period_hint'),
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: isDark
-                                      ? Colors.grey[300]
-                                      : textSecondaryColor,
+                                  color: context.tokens.textMuted,
                                 ),
                               ),
                             ),
@@ -296,13 +276,9 @@ class _OnboardingLastPeriodScreenState
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: isDark ? AppColors.backgroundDark : Colors.white,
+                color: context.tokens.surface,
                 border: Border(
-                  top: BorderSide(
-                    color: isDark
-                        ? Colors.white.withAlpha(12)
-                        : primaryColor.withAlpha(12),
-                  ),
+                  top: BorderSide(color: context.tokens.surfaceAlt),
                 ),
               ),
               child: ElevatedButton(
@@ -320,7 +296,7 @@ class _OnboardingLastPeriodScreenState
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   minimumSize: const Size(double.infinity, 56),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -414,10 +390,8 @@ class _OnboardingLastPeriodScreenState
                   fontSize: 14,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                   color: isSelected
-                      ? Colors.white
-                      : (isDark
-                            ? Colors.grey[200]
-                            : textMainColor.withAlpha(204)),
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : (context.tokens.text),
                 ),
               ),
             ),

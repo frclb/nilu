@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'app_contrast.dart';
 import 'app_palette.dart';
 import 'app_tokens.dart';
 
@@ -56,31 +57,10 @@ class AppSnack {
       );
   }
 
-  /// [background] üzerinde okunan metin rengi.
-  ///
-  /// Flutter'ın `estimateBrightnessForColor` metodu "hangisi hoş durur"a göre
-  /// karar veriyor, WCAG eşiğine göre değil: koyu temanın uyarı rengini koyu
-  /// sayıp açık metin seçiyor ve kontrast 3.1'e düşüyordu. Burada iki aday
-  /// ölçülüp kazanan seçiliyor.
-  static Color readableOn(Color background) {
-    double ratio(Color a, Color b) {
-      final la = a.computeLuminance();
-      final lb = b.computeLuminance();
-      final lighter = la > lb ? la : lb;
-      final darker = la > lb ? lb : la;
-      return (lighter + 0.05) / (darker + 0.05);
-    }
-
-    return ratio(background, AppPalette.sand50) >=
-            ratio(background, AppPalette.ink900)
-        ? AppPalette.sand50
-        : AppPalette.ink900;
-  }
-
   /// Hata bildirimi.
   static void error(BuildContext context, String message) {
     final background = context.tokens.danger;
-    final onBackground = readableOn(background);
+    final onBackground = AppContrast.on(background);
 
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()

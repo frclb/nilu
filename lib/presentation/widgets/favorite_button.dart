@@ -74,7 +74,7 @@ class _FavoriteButtonState extends State<FavoriteButton> {
       onPressed: _toggle,
       style: ElevatedButton.styleFrom(
         backgroundColor: theme.colorScheme.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         minimumSize: const Size(double.infinity, 56),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 8,

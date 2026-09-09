@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
+import '../../../design_system/app_scrim.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../domain/view_models/user_view_model.dart';
@@ -125,9 +127,9 @@ class CustomBottomNav extends StatelessWidget {
             width: 1,
           ),
         ),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Colors.black12,
+            color: AppScrim.veil(31),
             blurRadius: 15,
             offset: Offset(0, -5),
           ),
@@ -170,7 +172,7 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final primary = theme.colorScheme.primary;
-    final muted = theme.textTheme.labelLarge?.color ?? Colors.grey;
+    final muted = theme.textTheme.labelLarge?.color ?? context.tokens.textMuted;
     final color = isActive ? primary : muted;
     final label = context.tr(destination.labelKey);
 

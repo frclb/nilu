@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../design_system/app_card.dart';
 import '../article_screen.dart';
-import '../../../design_system/app_palette.dart';
 import '../../../design_system/content_illustration.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 import '../../../domain/models/article.dart';
 
 class HealthLibraryArticleList extends StatelessWidget {
@@ -43,7 +42,7 @@ class HealthLibraryArticleList extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : AppColors.textMainSlate,
+                  color: context.tokens.text,
                 ),
               ),
               Text(
@@ -51,9 +50,7 @@ class HealthLibraryArticleList extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: isDark
-                      ? AppPalette.plum500
-                      : theme.colorScheme.primary,
+                  color: theme.colorScheme.primary,
                 ),
               ),
             ],
@@ -136,9 +133,7 @@ class HealthLibraryArticleList extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? AppPalette.plum500
-                            : theme.colorScheme.primary,
+                        color: theme.colorScheme.primary,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -150,7 +145,7 @@ class HealthLibraryArticleList extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : AppColors.textMainSlate,
+                        color: context.tokens.text,
                         height: 1.3,
                       ),
                     ),
@@ -163,9 +158,7 @@ class HealthLibraryArticleList extends StatelessWidget {
                             Icon(
                               Icons.schedule,
                               size: 14,
-                              color: isDark
-                                  ? Colors.grey.shade400
-                                  : Colors.grey.shade500,
+                              color: context.tokens.textMuted,
                             ),
                             const SizedBox(width: 4),
                             Text(
@@ -177,9 +170,7 @@ class HealthLibraryArticleList extends StatelessWidget {
                                   ),
                               style: TextStyle(
                                 fontSize: 12,
-                                color: isDark
-                                    ? Colors.grey.shade400
-                                    : Colors.grey.shade500,
+                                color: context.tokens.textMuted,
                               ),
                             ),
                           ],
@@ -187,7 +178,7 @@ class HealthLibraryArticleList extends StatelessWidget {
                         Icon(
                           Icons.bookmark_border,
                           size: 20,
-                          color: Colors.grey.shade400,
+                          color: context.tokens.textFaint,
                         ),
                       ],
                     ),

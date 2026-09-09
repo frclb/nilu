@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_scrim.dart';
 import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
-import '../../design_system/app_colors.dart';
 
 class PartnerSupportScreen extends StatefulWidget {
   const PartnerSupportScreen({super.key});
@@ -58,15 +58,13 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
     final primaryColor = Theme.of(context).colorScheme.primary;
     final bgColor = isDark
         ? context.tokens.background
-        : AppColors.backgroundLight;
+        : context.tokens.background;
     final surfaceColor = context.tokens.surface;
-    final textMainColor = isDark ? Colors.white : AppColors.textMainSlate;
+    final textMainColor = context.tokens.text;
     final textMutedColor = isDark
-        ? Colors.white.withAlpha(153)
-        : AppColors.textMutedSlate;
-    final borderColor = isDark
-        ? Colors.white.withAlpha(12)
-        : AppColors.borderSlateLight;
+        ? AppScrim.frost(153)
+        : context.tokens.textMuted;
+    final borderColor = context.tokens.border;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -289,7 +287,7 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
             ? []
             : [
                 BoxShadow(
-                  color: Colors.black.withAlpha(26),
+                  color: AppScrim.veil(26),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -462,7 +460,7 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
               ? []
               : [
                   BoxShadow(
-                    color: Colors.black.withAlpha(26),
+                    color: AppScrim.veil(26),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -481,15 +479,15 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
                 color: isCompleted ? primaryColor : Colors.transparent,
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
-                  color: isCompleted
-                      ? primaryColor
-                      : (isDark
-                            ? Colors.white.withAlpha(51)
-                            : Colors.grey.shade300),
+                  color: isCompleted ? primaryColor : (context.tokens.border),
                 ),
               ),
               child: isCompleted
-                  ? const Icon(Icons.check, size: 14, color: Colors.white)
+                  ? Icon(
+                      Icons.check,
+                      size: 14,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    )
                   : null,
             ),
             const SizedBox(width: 16),
@@ -580,7 +578,7 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
           surfaceColor: surfaceColor,
           borderColor: borderColor,
           icon: Icons.chair,
-          iconColor: Colors.purple,
+          iconColor: context.tokens.ovulation,
           title: context.tr('partner_support_tip_1'),
           desc: context.tr('partner_support_tip_1_desc'),
           textMainColor: textMainColor,
@@ -592,7 +590,7 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
           surfaceColor: surfaceColor,
           borderColor: borderColor,
           icon: Icons.record_voice_over,
-          iconColor: Colors.pink,
+          iconColor: context.tokens.flow,
           title: context.tr('partner_support_tip_2'),
           desc: context.tr('partner_support_tip_2_desc'),
           textMainColor: textMainColor,
@@ -623,7 +621,7 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
             ? []
             : [
                 BoxShadow(
-                  color: Colors.black.withAlpha(26),
+                  color: AppScrim.veil(26),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -704,7 +702,7 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
             gradient: LinearGradient(
               colors: isDark
                   ? [surfaceColor, primaryColor.withAlpha(25)]
-                  : [Colors.white, primaryColor.withAlpha(12)],
+                  : [context.tokens.surface, primaryColor.withAlpha(12)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),

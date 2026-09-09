@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../core/navigation/route_names.dart';
 import '../../data/repositories/privacy_settings_repository.dart';
-import '../../design_system/app_colors.dart';
 import '../../domain/services/app_lock_service.dart';
 import '../../domain/services/data_export_service.dart';
 import '../../domain/services/premium_gate.dart';
@@ -94,26 +93,22 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark
-          ? AppColors.backgroundNavyDark
-          : AppColors.backgroundLightAlt,
+      backgroundColor: context.tokens.surfaceAlt,
       appBar: AppBar(
         title: Text(
           context.tr('privacy_title'),
           style: theme.textTheme.titleMedium?.copyWith(
-            color: isDark ? Colors.white : Colors.black87,
+            color: context.tokens.text,
             fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: isDark
-            ? AppColors.backgroundNavyDark
-            : AppColors.backgroundLightAlt,
+        backgroundColor: context.tokens.surfaceAlt,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new,
-            color: isDark ? Colors.white : Colors.black87,
+            color: context.tokens.text,
             size: 20,
           ),
           onPressed: () => context.pop(),
@@ -126,7 +121,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceNavyDark : Colors.white,
+                    color: context.tokens.surface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: context.tokens.border),
                   ),
@@ -165,7 +160,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                     },
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDark ? Colors.grey[500] : Colors.grey[600],
+                      color: context.tokens.textMuted,
                     ),
                   ),
                 ),
@@ -174,7 +169,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceNavyDark : Colors.white,
+                    color: context.tokens.surface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: context.tokens.border),
                   ),
@@ -284,11 +279,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
       child: SwitchListTile(
         title: Row(
           children: [
-            Icon(
-              icon,
-              size: 20,
-              color: isDark ? Colors.grey[400] : Colors.grey[600],
-            ),
+            Icon(icon, size: 20, color: context.tokens.textMuted),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -296,7 +287,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white : Colors.black87,
+                  color: context.tokens.text,
                 ),
               ),
             ),
@@ -304,12 +295,12 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
         ),
         value: value,
         onChanged: onChanged,
-        activeThumbColor: AppColors.accentAmber,
-        activeTrackColor: AppColors.accentAmber.withAlpha(127),
-        inactiveThumbColor: Colors.white,
+        activeThumbColor: context.tokens.warning,
+        activeTrackColor: context.tokens.warning.withAlpha(127),
+        inactiveThumbColor: context.tokens.surface,
         inactiveTrackColor: isDark
             ? context.tokens.surfaceAlt
-            : Colors.grey[300],
+            : context.tokens.border,
       ),
     );
   }
@@ -325,7 +316,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceNavyDark : Colors.white,
+        color: context.tokens.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: context.tokens.border),
       ),
@@ -342,7 +333,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
         trailing: Icon(
           Icons.chevron_right,
           size: 20,
-          color: isDark ? Colors.grey[600] : Colors.grey[400],
+          color: context.tokens.textFaint,
         ),
         onTap: () => isDestructive
             ? _showDeleteAccountDialog(context, isDark)
@@ -358,16 +349,14 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
         title: Text(context.tr('privacy_export')),
         content: Text(
           context.tr('privacy_export_desc'),
-          style: TextStyle(color: isDark ? Colors.grey[300] : Colors.grey[700]),
+          style: TextStyle(color: context.tokens.textMuted),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
               context.tr('cancel'),
-              style: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey[600],
-              ),
+              style: TextStyle(color: context.tokens.textMuted),
             ),
           ),
           ElevatedButton(
@@ -500,7 +489,9 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
             },
             style: AppTheme.dialogAction().copyWith(
               backgroundColor: WidgetStatePropertyAll(context.tokens.danger),
-              foregroundColor: const WidgetStatePropertyAll(Colors.white),
+              foregroundColor: WidgetStatePropertyAll(
+                Theme.of(context).colorScheme.onPrimary,
+              ),
             ),
             child: Text(context.tr('privacy_delete_confirm')),
           ),

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../design_system/app_card.dart';
-import '../../../design_system/app_palette.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 class NotesSection extends StatelessWidget {
   final TextEditingController controller;
@@ -12,7 +11,6 @@ class NotesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -23,7 +21,7 @@ class NotesSection extends StatelessWidget {
             children: [
               Icon(
                 Icons.edit_note,
-                color: isDark ? Colors.white : theme.colorScheme.primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(width: 8),
               Text(
@@ -40,13 +38,9 @@ class NotesSection extends StatelessWidget {
           Container(
             height: 120,
             decoration: BoxDecoration(
-              color: isDark ? AppPalette.night800 : Colors.white,
+              color: context.tokens.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isDark
-                    ? AppColors.borderSlateDark
-                    : AppColors.borderSlate,
-              ),
+              border: Border.all(color: context.tokens.border),
               boxShadow: AppCard.shadow(),
             ),
             padding: const EdgeInsets.all(16),

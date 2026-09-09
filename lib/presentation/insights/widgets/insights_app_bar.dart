@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/navigation/route_names.dart';
-import '../../../design_system/app_palette.dart';
 import '../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 /// İçgörüler başlığı.
 ///
@@ -20,11 +19,10 @@ class InsightsAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
-    final surfaceColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
-    final textColor = isDark ? AppPalette.nightInk : AppColors.textMainLight;
-    final borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
+    final surfaceColor = context.tokens.surface;
+    final textColor = context.tokens.text;
+    final borderColor = context.tokens.border;
 
     return Container(
       decoration: BoxDecoration(

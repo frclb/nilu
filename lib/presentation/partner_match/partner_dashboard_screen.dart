@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../design_system/app_palette.dart';
+import '../../design_system/app_scrim.dart';
 import '../../design_system/app_tokens.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
@@ -11,7 +11,6 @@ import '../../localization/relative_time.dart';
 import '../../domain/view_models/partner_view_model.dart';
 import '../../domain/view_models/user_view_model.dart';
 import '../../domain/services/partner_suggestion_engine.dart';
-import '../../design_system/app_colors.dart';
 
 class PartnerDashboardScreen extends StatefulWidget {
   const PartnerDashboardScreen({super.key});
@@ -70,22 +69,16 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
     final isDark = theme.brightness == Brightness.dark;
     final vm = context.watch<PartnerViewModel>();
 
-    final bgColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.backgroundLight;
-    final surfaceColor = isDark ? AppColors.surfaceWarmDark : Colors.white;
+    final bgColor = context.tokens.background;
+    final surfaceColor = context.tokens.surface;
     final primaryColor = Theme.of(context).colorScheme.primary;
     // Marka pembesi sabit yazılıydı; premium tema çeşitleri bu ekranda
     // uygulanmıyordu.
     final warmAccent = context.tokens.flowSoft;
-    final textMainColor = isDark ? Colors.white : AppColors.textMainSlate;
-    final textMutedColor = isDark
-        ? AppPalette.nightInkMuted
-        : AppColors.textMutedSlate;
-    final borderColor = isDark
-        ? Colors.white.withAlpha(12)
-        : AppColors.borderSlateLight;
-    final warmBg = isDark ? AppPalette.night800 : context.tokens.brandTint;
+    final textMainColor = context.tokens.text;
+    final textMutedColor = context.tokens.textMuted;
+    final borderColor = context.tokens.border;
+    final warmBg = context.tokens.brandTint;
 
     // Pulse animasyonu tetikle
     if (vm.hasNewUpdate) {
@@ -316,10 +309,10 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
           child: Center(
             child: Text(
               userName.isNotEmpty ? userName[0].toUpperCase() : 'P',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
             ),
           ),
@@ -343,7 +336,7 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: AppColors.accentGreen.withAlpha(20),
+            color: context.tokens.success.withAlpha(20),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -352,18 +345,18 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
               Container(
                 width: 6,
                 height: 6,
-                decoration: const BoxDecoration(
-                  color: AppColors.accentGreen,
+                decoration: BoxDecoration(
+                  color: context.tokens.success,
                   shape: BoxShape.circle,
                 ),
               ),
               const SizedBox(width: 6),
               Text(
                 context.tr('pv_connected'),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.accentGreen,
+                  color: context.tokens.success,
                 ),
               ),
             ],
@@ -535,13 +528,11 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white.withAlpha(8)
-                          : Colors.white.withAlpha(180),
+                      color: isDark ? AppScrim.frost(8) : AppScrim.frost(180),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: isDark
-                            ? Colors.white.withAlpha(12)
+                            ? AppScrim.frost(12)
                             : primaryColor.withAlpha(20),
                       ),
                     ),
@@ -551,7 +542,7 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                         color: isDark
-                            ? Colors.white.withAlpha(220)
+                            ? AppScrim.frost(220)
                             : primaryColor.withAlpha(200),
                       ),
                     ),
@@ -615,7 +606,7 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
                     ? []
                     : [
                         BoxShadow(
-                          color: Colors.black.withAlpha(26),
+                          color: AppScrim.veil(26),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -1034,7 +1025,7 @@ class _NotConnectedState extends StatelessWidget {
               label: Text(context.tr('pv_invite_partner')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
-                foregroundColor: Colors.white,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 12,

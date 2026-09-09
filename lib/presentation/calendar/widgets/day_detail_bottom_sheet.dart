@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import 'package:provider/provider.dart';
 import '../view_models/calendar_view_model.dart';
 import '../../../domain/models/daily_log.dart';
 import '../../../domain/models/log_vocabulary.dart';
 import '../../../localization/app_localizations.dart';
-import '../../../../design_system/app_colors.dart';
 import '../../../design_system/app_snack.dart';
 
 /// Gün detay sayfasını açar.
@@ -201,7 +201,7 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                           _getFertilityText(context, isFertile, isOvulation),
                           style: theme.textTheme.labelMedium?.copyWith(
                             color: (isFertile || isOvulation)
-                                ? AppColors.moodOrangeText
+                                ? context.tokens.accent
                                 : theme.textTheme.bodySmall?.color,
                             fontWeight: (isFertile || isOvulation)
                                 ? FontWeight.bold
@@ -236,7 +236,7 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                     ),
                     trailing: Switch(
                       value: isPeriod,
-                      activeThumbColor: AppColors.flowMedium,
+                      activeThumbColor: context.tokens.flow,
                       onChanged: (_) async {
                         final success = await viewModel.togglePeriodDay(
                           widget.date,

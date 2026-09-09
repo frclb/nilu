@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 class ExerciseContentSection extends StatelessWidget {
   const ExerciseContentSection({super.key});
@@ -12,12 +11,8 @@ class ExerciseContentSection extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final bgColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.backgroundLight;
-    final textColor = isDark
-        ? Colors.white
-        : AppColors.textMainSlate; // slate-900
+    final bgColor = context.tokens.background;
+    final textColor = context.tokens.text; // slate-900
 
     return Container(
       decoration: BoxDecoration(
@@ -35,7 +30,7 @@ class ExerciseContentSection extends StatelessWidget {
               height: 6,
               margin: const EdgeInsets.only(bottom: 24),
               decoration: BoxDecoration(
-                color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
+                color: context.tokens.border,
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
@@ -136,7 +131,7 @@ class ExerciseContentSection extends StatelessWidget {
             context.tr('exercise_desc_text'),
             style: TextStyle(
               fontSize: 14,
-              color: isDark ? Colors.grey.shade300 : Colors.grey.shade600,
+              color: context.tokens.textMuted,
               height: 1.6,
             ),
           ),
@@ -163,15 +158,7 @@ class ExerciseContentSection extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 20,
-            color: isDark
-                ? Colors.white
-                : theme
-                      .colorScheme
-                      .primary, // using primary-light essentially via white or primary
-          ),
+          Icon(icon, size: 20, color: theme.colorScheme.primary),
           const SizedBox(width: 8),
           Flexible(
             child: Text(
@@ -180,7 +167,7 @@ class ExerciseContentSection extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : theme.colorScheme.primary,
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           ),
@@ -198,8 +185,8 @@ class ExerciseContentSection extends StatelessWidget {
     ThemeData theme,
   ) {
     final iconBg = context.tokens.brandTint;
-    final titleColor = isDark ? Colors.white : AppColors.textMainSlate;
-    final descColor = isDark ? Colors.grey.shade400 : Colors.grey.shade500;
+    final titleColor = context.tokens.text;
+    final descColor = context.tokens.textMuted;
 
     return Container(
       padding: const EdgeInsets.all(16),

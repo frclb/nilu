@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_scrim.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
 import '../article_screen.dart';
-import '../../../design_system/app_palette.dart';
 import '../../../design_system/content_illustration.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../domain/models/article.dart';
@@ -38,13 +38,13 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
               children: [
                 ContentIllustration(seed: article.titleKey, icon: article.icon),
                 Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
                       colors: [
-                        Colors.black87,
-                        Colors.black54,
+                        AppScrim.veil(222),
+                        AppScrim.veil(138),
                         Colors.transparent,
                       ],
                       stops: [0.0, 0.4, 1.0],
@@ -62,9 +62,7 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.black.withAlpha(153)
-                          : Colors.white.withAlpha(229),
+                      color: isDark ? AppScrim.veil(153) : AppScrim.frost(229),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
@@ -72,9 +70,7 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: isDark
-                            ? AppPalette.plum500
-                            : theme.colorScheme.primary,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
                   ),
@@ -100,7 +96,7 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
                         child: Text(
                           context.tr(article.tagKey),
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppScrim.ink,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
@@ -111,7 +107,7 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
                       Text(
                         context.tr(article.titleKey),
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppScrim.ink,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           height: 1.2,
@@ -122,7 +118,7 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
                         children: [
                           Icon(
                             Icons.schedule,
-                            color: Colors.white.withAlpha(229),
+                            color: AppScrim.frost(229),
                             size: 16,
                           ),
                           const SizedBox(width: 8),
@@ -133,7 +129,7 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
                                 // çıkarsa çıksın aynı süreyi gösteriyordu.
                                 .replaceAll('{min}', '${article.readMinutes}'),
                             style: TextStyle(
-                              color: Colors.white.withAlpha(229),
+                              color: AppScrim.frost(229),
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),

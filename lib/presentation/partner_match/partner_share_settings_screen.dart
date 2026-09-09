@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import '../../design_system/app_scrim.dart';
 import 'package:flutter/material.dart';
 import '../../design_system/content_illustration.dart';
 import 'package:go_router/go_router.dart';
@@ -256,7 +257,7 @@ class _PartnerShareSettingsScreenState
                 ? []
                 : [
                     BoxShadow(
-                      color: Colors.black.withAlpha(26),
+                      color: AppScrim.veil(26),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../../core/navigation/navigation_service.dart';
 
@@ -8,18 +9,12 @@ class LogEntryAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         border: Border(
-          bottom: BorderSide(
-            color: isDark
-                ? Colors.white.withAlpha(12)
-                : theme.colorScheme.primary.withAlpha(12),
-            width: 1,
-          ),
+          bottom: BorderSide(color: context.tokens.surfaceAlt, width: 1),
         ),
       ),
       child: SafeArea(
@@ -34,9 +29,7 @@ class LogEntryAppBar extends StatelessWidget implements PreferredSizeWidget {
                 icon: const Icon(Icons.close),
                 color: theme.colorScheme.onSurface,
                 style: IconButton.styleFrom(
-                  backgroundColor: isDark
-                      ? Colors.white.withAlpha(12)
-                      : theme.colorScheme.primary.withAlpha(12),
+                  backgroundColor: context.tokens.surfaceAlt,
                 ),
               ),
               Text(

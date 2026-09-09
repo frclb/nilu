@@ -1,8 +1,9 @@
 import 'dart:ui';
+import '../../../design_system/app_scrim.dart';
+import '../../../design_system/app_tokens.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/content_illustration.dart';
 import '../../../localization/app_localizations.dart';
-import '../../../design_system/app_colors.dart';
 
 class RecipeHeroHeader extends StatelessWidget {
   /// Gerçek fotoğraf tedarik edilince buraya bir adres verilir; adres ölürse
@@ -14,10 +15,7 @@ class RecipeHeroHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final gradientEnd = isDark
-        ? AppColors.backgroundDeepDark
-        : AppColors.backgroundLight;
+    final gradientEnd = context.tokens.background;
 
     return SizedBox(
       height: 320,
@@ -41,11 +39,7 @@ class RecipeHeroHeader extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withAlpha(76),
-                    Colors.transparent,
-                    gradientEnd,
-                  ],
+                  colors: [AppScrim.veil(76), Colors.transparent, gradientEnd],
                   stops: const [0.0, 0.4, 1.0],
                 ),
               ),
@@ -110,10 +104,10 @@ class RecipeHeroHeader extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.black.withAlpha(51),
+              color: AppScrim.veil(51),
               shape: BoxShape.circle,
             ),
-            child: Center(child: Icon(icon, color: Colors.white, size: 24)),
+            child: Center(child: Icon(icon, color: AppScrim.ink, size: 24)),
           ),
         ),
       ),

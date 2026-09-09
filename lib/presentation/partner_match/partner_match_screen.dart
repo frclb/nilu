@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_tokens.dart';
 import 'widgets/pairing_requests_section.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/navigation/route_names.dart';
-import '../../../design_system/app_colors.dart';
 import 'widgets/partner_match_app_bar.dart';
 import 'widgets/partner_match_hero.dart';
 import 'widgets/shared_info_section.dart';
@@ -24,11 +24,8 @@ class PartnerMatchScreen extends StatelessWidget {
     }
 
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
-    final bgColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.backgroundLight;
+    final bgColor = context.tokens.background;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -74,13 +71,7 @@ class PartnerMatchScreen extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: bgColor,
-              border: Border(
-                top: BorderSide(
-                  color: isDark
-                      ? Colors.white.withAlpha(12)
-                      : Colors.grey.shade200,
-                ),
-              ),
+              border: Border(top: BorderSide(color: context.tokens.border)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -91,7 +82,7 @@ class PartnerMatchScreen extends StatelessWidget {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     minimumSize: const Size(double.infinity, 56),
                     elevation: 8,
                     shadowColor: theme.colorScheme.primary.withAlpha(76),
@@ -136,9 +127,7 @@ class PartnerMatchScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: isDark
-                          ? Colors.grey.shade400
-                          : Colors.grey.shade500,
+                      color: context.tokens.textMuted,
                     ),
                   ),
                 ),
@@ -161,7 +150,7 @@ class PartnerMatchScreen extends StatelessWidget {
           context.tr('partner_match_how_it_works'),
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
+            color: context.tokens.text,
           ),
         ),
         content: Column(
@@ -242,16 +231,13 @@ class PartnerMatchScreen extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
-                  color: isDark ? Colors.white : Colors.black87,
+                  color: context.tokens.text,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 desc,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                ),
+                style: TextStyle(fontSize: 12, color: context.tokens.textMuted),
               ),
             ],
           ),

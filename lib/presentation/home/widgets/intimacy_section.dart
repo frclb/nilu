@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../../../domain/view_models/intimacy_view_model.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../localization/relative_time.dart';
-import '../../../design_system/app_colors.dart';
 
 /// Ana ekrandaki duygusal yakınlık bölümü — iki küçük kompakt kart.
 /// Tıklandığında BottomSheet ile detaylı seçim yapılır.
@@ -323,7 +322,6 @@ class _MiniDesireCard extends StatelessWidget {
 
   void _showDesireSheet(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     final options = [
       _Option(
@@ -355,7 +353,7 @@ class _MiniDesireCard extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceWarmDark : Colors.white,
+            color: context.tokens.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
@@ -368,7 +366,7 @@ class _MiniDesireCard extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withAlpha(80),
+                    color: context.tokens.textFaint.withAlpha(80),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -542,7 +540,6 @@ class _MiniAffectionCard extends StatelessWidget {
 
   void _showAffectionSheet(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     final options = [
       _Option(
@@ -600,7 +597,7 @@ class _MiniAffectionCard extends StatelessWidget {
                 maxHeight: MediaQuery.of(context).size.height * 0.6,
               ),
               decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceWarmDark : Colors.white,
+                color: context.tokens.surface,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(24),
                 ),
@@ -615,7 +612,7 @@ class _MiniAffectionCard extends StatelessWidget {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey.withAlpha(80),
+                        color: context.tokens.textFaint.withAlpha(80),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),

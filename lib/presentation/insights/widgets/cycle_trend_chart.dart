@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../localization/date_names.dart';
-import '../../../design_system/app_colors.dart';
 import '../../../domain/services/insights_service.dart';
 
 /// Gözlenmiş döngü uzunluklarının sütun grafiği.
@@ -38,9 +38,7 @@ class CycleTrendChart extends StatelessWidget {
     final barColor = isDark
         ? theme.colorScheme.primary.withAlpha(200)
         : theme.colorScheme.primary;
-    final labelColor = isDark
-        ? AppColors.textMutedWarmDark
-        : AppColors.textMutedLight;
+    final labelColor = context.tokens.textMuted;
 
     return SizedBox(
       height: 176,
@@ -60,7 +58,7 @@ class CycleTrendChart extends StatelessWidget {
                 label: context.shortMonthName(point.startDate.month),
                 color: barColor,
                 labelColor: labelColor,
-                valueColor: isDark ? Colors.white : AppColors.textMainLight,
+                valueColor: context.tokens.text,
               ),
             ),
         ],

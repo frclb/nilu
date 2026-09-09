@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_scrim.dart';
 import '../../design_system/app_tokens.dart';
 import '../../data/datasources/remote/firestore_datasource.dart';
 import '../../domain/services/pairing_token.dart';
@@ -9,7 +10,6 @@ import '../../../domain/services/partner_code.dart';
 import '../../../domain/view_models/user_view_model.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
-import '../../design_system/app_colors.dart';
 
 /// Kamera kullanılamadığında gösterilen ekran.
 ///
@@ -25,7 +25,7 @@ class _ScanUnavailable extends StatelessWidget {
     final denied = error.errorCode == MobileScannerErrorCode.permissionDenied;
 
     return ColoredBox(
-      color: Colors.black,
+      color: AppScrim.cameraBackground,
       child: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -35,7 +35,7 @@ class _ScanUnavailable extends StatelessWidget {
               Icon(
                 denied ? Icons.no_photography_outlined : Icons.videocam_off,
                 size: 48,
-                color: Colors.white70,
+                color: AppScrim.inkMuted,
               ),
               const SizedBox(height: 16),
               Text(
@@ -46,7 +46,7 @@ class _ScanUnavailable extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppScrim.ink,
                   fontSize: 15,
                   height: 1.5,
                 ),
@@ -159,7 +159,6 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
 
   void _showConfirmationDialog(String code) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     showModalBottomSheet(
       context: context,
@@ -170,11 +169,11 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
         return Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceWarmDark : Colors.white,
+            color: context.tokens.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withAlpha(51),
+                color: AppScrim.veil(51),
                 blurRadius: 20,
                 offset: const Offset(0, -5),
               ),
@@ -203,7 +202,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppColors.textMainSlate,
+                    color: context.tokens.text,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -212,7 +211,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
-                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                    color: context.tokens.textMuted,
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -222,7 +221,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
                   onPressed: () => _confirmConnection(code),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppScrim.ink,
                     minimumSize: const Size(double.infinity, 56),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -249,9 +248,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
                     _scannerController.start(); // resume scanning
                   },
                   style: TextButton.styleFrom(
-                    foregroundColor: isDark
-                        ? Colors.grey.shade400
-                        : Colors.grey.shade600,
+                    foregroundColor: context.tokens.textMuted,
                     minimumSize: const Size(double.infinity, 56),
                   ),
                   child: Text(
@@ -310,14 +307,15 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Better for scanner background
+      backgroundColor:
+          AppScrim.cameraBackground, // Better for scanner background
       appBar: AppBar(
         title: Text(context.tr('partner_scan_title')),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: AppScrim.ink),
         titleTextStyle: const TextStyle(
-          color: Colors.white,
+          color: AppScrim.ink,
           fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
@@ -358,7 +356,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
               context.tr('partner_scan_helper'),
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Colors.white70,
+                color: AppScrim.inkMuted,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -379,7 +377,7 @@ class _ScannerOverlayShape extends ShapeBorder {
   final double cutOutSize;
 
   const _ScannerOverlayShape({
-    this.borderColor = Colors.white,
+    this.borderColor = AppScrim.ink,
     this.borderWidth = 8.0,
     this.borderLength = 30.0,
     this.borderRadius = 12.0,
@@ -416,7 +414,7 @@ class _ScannerOverlayShape extends ShapeBorder {
   @override
   void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {
     final paint = Paint()
-      ..color = Colors.black
+      ..color = AppScrim.cameraBackground
           .withAlpha(165) // Darker overlay for better contrast
       ..style = PaintingStyle.fill;
 
