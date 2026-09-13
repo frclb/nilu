@@ -46,15 +46,18 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
     });
 
     final denied = context.tr('health_permission_denied');
+    final unavailable = context.tr('health_permission_unavailable');
     final noneFound = context.tr('health_import_none');
     final calendar = context.read<CalendarViewModel>();
 
-    final granted = await _health.requestPermissions();
+    final access = await _health.requestPermissions();
     if (!mounted) return;
-    if (!granted) {
+    if (access != HealthAccess.granted) {
       setState(() {
         _busy = false;
-        _result = denied;
+        // İstem hiç açılamadıysa kullanıcıya "sen reddettin" dememeli:
+        // karar onun değildi ve yapabileceği bir şey yok.
+        _result = access == HealthAccess.denied ? denied : unavailable;
       });
       return;
     }

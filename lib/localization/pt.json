@@ -643,6 +643,7 @@
   "health_sync_point_local": "Os dados não saem do teu dispositivo.",
   "health_import_button": "Importar da Saúde",
   "health_permission_denied": "A permissão não foi concedida, nada foi importado.",
+  "health_permission_unavailable": "Não foi possível aceder aos dados de Saúde. A ligação à Saúde está desativada neste dispositivo ou nesta versão.",
   "health_import_none": "Não há registos novos para importar.",
   "health_import_done": "{count} períodos importados.",
   "health_unavailable": "Os dados de saúde não estão disponíveis neste dispositivo.",

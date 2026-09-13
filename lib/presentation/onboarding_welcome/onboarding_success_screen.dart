@@ -77,139 +77,156 @@ class OnboardingSuccessScreen extends StatelessWidget {
 
             // Main Content Area
             //
-            // Kaydırılabilir: yazı boyutu büyüdüğünde başlık ve açıklama
-            // sabit yükseklikli yığının dışına taşıyordu.
+            // Sığdığında ortalanır, sığmadığında kayar.
+            //
+            // Yalnızca `SingleChildScrollView` yetmiyordu: kaydırma görünümü
+            // çocuğunu kendi içeriği kadar yapıyor, `Stack` da görünümü
+            // doldurmayı bırakıyor. `Alignment.center` işlevsiz kalıyor,
+            // içerik yukarı toplanıp altta büyük bir boşluk bırakıyordu —
+            // uzun ekranlı telefonlarda açıkça görünüyor. `minHeight` yığına
+            // eski yüksekliğini geri veriyor.
             Expanded(
-              child: SingleChildScrollView(
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Decorative Background Blob
-                    Positioned(
-                      top: MediaQuery.of(context).size.height * 0.15,
-                      child: Container(
-                        width: 250,
-                        height: 250,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: primaryColor.withValues(alpha: 0.1),
-                        ),
-                      ),
+              child: LayoutBuilder(
+                builder: (context, constraints) => SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
                     ),
-
-                    // Illustration Container
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Stack(
+                      alignment: Alignment.center,
                       children: [
-                        Container(
-                          width: 280,
-                          height: 280,
-                          margin: const EdgeInsets.only(bottom: 32),
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                height: double.infinity,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: subtlePink,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppScrim.veil(5),
-                                      blurRadius: 10,
-                                      spreadRadius: 2,
+                        // Decorative Background Blob
+                        Positioned(
+                          top: MediaQuery.of(context).size.height * 0.15,
+                          child: Container(
+                            width: 250,
+                            height: 250,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: primaryColor.withValues(alpha: 0.1),
+                            ),
+                          ),
+                        ),
+
+                        // Illustration Container
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 280,
+                              height: 280,
+                              margin: const EdgeInsets.only(bottom: 32),
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: subtlePink,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppScrim.veil(5),
+                                          blurRadius: 10,
+                                          spreadRadius: 2,
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                clipBehavior: Clip.antiAlias,
-                                child: Stack(
-                                  children: [
-                                    // Gradient overlay
-                                    Container(
+                                    clipBehavior: Clip.antiAlias,
+                                    child: Stack(
+                                      children: [
+                                        // Gradient overlay
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topRight,
+                                              end: Alignment.bottomLeft,
+                                              colors: [
+                                                primaryColor.withValues(
+                                                  alpha: 0.2,
+                                                ),
+                                                Colors.transparent,
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        // Karşılama illüstrasyonu uygulama içinde çiziliyor: onboarding'in
+                                        // son adımı ağ bağlantısına bağlı olmamalı.
+                                        const ContentIllustration(
+                                          seed: 'onboarding_success',
+                                          icon: Icons.local_florist,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  // Floating checkmark badge
+                                  Positioned(
+                                    bottom: 24,
+                                    right: 24,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topRight,
-                                          end: Alignment.bottomLeft,
-                                          colors: [
-                                            primaryColor.withValues(alpha: 0.2),
-                                            Colors.transparent,
-                                          ],
+                                        color: bgColor,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppScrim.veil(26),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                                        border: Border.all(
+                                          color: context.tokens.surfaceAlt,
+                                          width: 4,
                                         ),
                                       ),
-                                    ),
-                                    // Karşılama illüstrasyonu uygulama içinde çiziliyor: onboarding'in
-                                    // son adımı ağ bağlantısına bağlı olmamalı.
-                                    const ContentIllustration(
-                                      seed: 'onboarding_success',
-                                      icon: Icons.local_florist,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              // Floating checkmark badge
-                              Positioned(
-                                bottom: 24,
-                                right: 24,
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: bgColor,
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppScrim.veil(26),
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 4),
+                                      child: Icon(
+                                        Icons.check_circle,
+                                        color: primaryColor,
+                                        size: 32,
                                       ),
-                                    ],
-                                    border: Border.all(
-                                      color: context.tokens.surfaceAlt,
-                                      width: 4,
                                     ),
                                   ),
-                                  child: Icon(
-                                    Icons.check_circle,
-                                    color: primaryColor,
-                                    size: 32,
-                                  ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
+                            ),
 
-                        // Text Content
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                          child: Column(
-                            children: [
-                              Text(
-                                context.tr('onboarding_success_title'),
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.w800,
-                                  color: textColor,
-                                  letterSpacing: -0.5,
-                                ),
+                            // Text Content
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32.0,
                               ),
-                              const SizedBox(height: 16),
-                              Text(
-                                context.tr('onboarding_success_desc'),
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: textSecondaryColor,
-                                  height: 1.5,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    context.tr('onboarding_success_title'),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.w800,
+                                      color: textColor,
+                                      letterSpacing: -0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    context.tr('onboarding_success_desc'),
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: textSecondaryColor,
+                                      height: 1.5,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),

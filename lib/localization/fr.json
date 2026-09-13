@@ -643,6 +643,7 @@
   "health_sync_point_local": "Les données ne quittent pas ton appareil.",
   "health_import_button": "Importer depuis Santé",
   "health_permission_denied": "Autorisation non accordée, rien n’a été importé.",
+  "health_permission_unavailable": "Impossible d'accéder aux données Santé. La connexion Santé est désactivée sur cet appareil ou dans cette version.",
   "health_import_none": "Aucun nouveau relevé à importer.",
   "health_import_done": "{count} règles importées.",
   "health_unavailable": "Les données de santé ne sont pas disponibles sur cet appareil.",

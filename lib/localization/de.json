@@ -643,6 +643,7 @@
   "health_sync_point_local": "Die Daten verlassen dein Gerät nicht.",
   "health_import_button": "Aus Health importieren",
   "health_permission_denied": "Keine Berechtigung erteilt, es wurde nichts importiert.",
+  "health_permission_unavailable": "Auf Gesundheitsdaten konnte nicht zugegriffen werden. Die Health-Verbindung ist auf diesem Gerät oder in dieser Version deaktiviert.",
   "health_import_none": "Keine neuen Aufzeichnungen zum Importieren.",
   "health_import_done": "{count} Perioden importiert.",
   "health_unavailable": "Gesundheitsdaten sind auf diesem Gerät nicht verfügbar.",

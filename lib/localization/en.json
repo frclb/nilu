@@ -643,6 +643,7 @@
   "health_sync_point_local": "The data never leaves your device.",
   "health_import_button": "Import from Health",
   "health_permission_denied": "Permission was not granted, nothing was imported.",
+  "health_permission_unavailable": "Health data could not be accessed. The Health connection is off on this device or in this build.",
   "health_import_none": "No new records to import.",
   "health_import_done": "{count} periods imported.",
   "health_unavailable": "Health data is not available on this device.",

@@ -643,6 +643,7 @@
   "health_sync_point_local": "Veri cihazından çıkmaz.",
   "health_import_button": "Sağlık'tan içeri aktar",
   "health_permission_denied": "İzin verilmedi, hiçbir şey aktarılmadı.",
+  "health_permission_unavailable": "Sağlık verisine erişilemedi. Bu cihazda veya bu sürümde Sağlık bağlantısı kapalı.",
   "health_import_none": "Aktarılacak yeni kayıt bulunamadı.",
   "health_import_done": "{count} dönem içeri aktarıldı.",
   "health_unavailable": "Bu cihazda sağlık verisi kullanılamıyor.",

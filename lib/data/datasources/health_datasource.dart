@@ -5,6 +5,19 @@ import 'package:uuid/uuid.dart';
 import '../../domain/models/period_log.dart';
 import '../../domain/services/health_import.dart';
 
+/// Sağlık verisine erişim isteğinin sonucu.
+enum HealthAccess {
+  /// Kullanıcı izin verdi.
+  granted,
+
+  /// Kullanıcı istemi gördü ve reddetti.
+  denied,
+
+  /// İstem hiç açılamadı — yetki yok ya da platform desteklemiyor.
+  /// Kullanıcının yapabileceği bir şey yok.
+  unavailable,
+}
+
 /// Apple Sağlık / Health Connect köprüsü.
 ///
 /// Apple Watch ve diğer uygulamaların verisi zaten HealthKit'e akıyor;
@@ -64,7 +77,13 @@ class HealthDatasource {
   /// bir uygulamanın hangi veriye erişimi reddedildiğini bilmesi de bilgi
   /// sızdırır). Bu yüzden "izin var mı" diye sormak yerine doğrudan istenip
   /// sonucuna bakılıyor.
-  Future<bool> requestPermissions({bool includeWrite = false}) async {
+  ///
+  /// Üç sonuç ayrı tutuluyor. Önce yalnızca "oldu / olmadı" vardı ve istem
+  /// hiç açılamadığında da "olmadı" dönüyordu; ekran bunu "izin verilmedi"
+  /// diye gösteriyordu. Kullanıcıya hiçbir şey sorulmamışken ona reddetmiş
+  /// gibi davranmak yanlış — üstelik yapabileceği bir şey de yok, sorun
+  /// derlemede HealthKit yetkisinin bulunmaması.
+  Future<HealthAccess> requestPermissions({bool includeWrite = false}) async {
     try {
       await _ensureConfigured();
       final types = includeWrite ? [...readTypes, ...writeTypes] : readTypes;
@@ -72,13 +91,16 @@ class HealthDatasource {
         ...readTypes.map((_) => HealthDataAccess.READ),
         if (includeWrite) ...writeTypes.map((_) => HealthDataAccess.READ_WRITE),
       ];
-      return await _health.requestAuthorization(
+      final granted = await _health.requestAuthorization(
         types,
         permissions: permissions,
       );
+      return granted ? HealthAccess.granted : HealthAccess.denied;
     } on Exception catch (e) {
+      // İstem açılamadı: yetki yok, HealthKit kapalı ya da platform
+      // desteklemiyor. Kullanıcının kararı değil.
       debugPrint('Health authorization failed: $e');
-      return false;
+      return HealthAccess.unavailable;
     }
   }
 
