@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Widget'ın Debug karşılığı; gerekçesi için bkz. Runner/RunnerDebug.entitlements.
+
+  App Group olmadan widget kurulur ama veri okuyamaz — uygulamanın yazdığı
+  döngü özetine erişimi o grup üzerinden.
+-->
+<plist version="1.0">
+<dict/>
+</plist>
