@@ -326,36 +326,45 @@ class _DayTile extends StatelessWidget {
     // alt satırın başında: çubuk hücrenin sağ kenarına kadar düz uzanıp
     // hiçbir şeye bağlanmadan kesiliyordu. Aynısı satır başındaki
     // pazartesi için solda oluyordu.
-    final opensLeft = !startsCalendarRow(date);
-    final opensRight = !endsCalendarRow(date);
+    final rowStart = startsCalendarRow(date);
+    final rowEnd = endsCalendarRow(date);
 
-    final hasPeriodBefore =
+    // Önce "dönem burada sürüyor mu" (tarih), sonra "komşusu yanımda mı"
+    // (satır). İkisi ayrı: satır sonundaki pazar için dönem sürüyor ama
+    // komşu yan hücrede değil, bir alt satırın başında.
+    final periodPrev =
         isPeriod &&
-        opensLeft &&
         context.select<CalendarViewModel, bool>(
           (v) => v.isPeriodDay(date.subtract(const Duration(days: 1))),
         );
-    final hasPeriodAfter =
+    final periodNext =
         isPeriod &&
-        opensRight &&
         context.select<CalendarViewModel, bool>(
           (v) => v.isPeriodDay(date.add(const Duration(days: 1))),
         );
 
-    final hasPredictedBefore =
+    final hasPeriodBefore = periodPrev && !rowStart;
+    final hasPeriodAfter = periodNext && !rowEnd;
+    final periodContinuesLeft = periodPrev && rowStart;
+    final periodContinuesRight = periodNext && rowEnd;
+
+    final predictedPrev =
         isPredicted &&
         !isPeriod &&
-        opensLeft &&
         context.select<CalendarViewModel, bool>(
           (v) => v.isPredictedPeriodDay(date.subtract(const Duration(days: 1))),
         );
-    final hasPredictedAfter =
+    final predictedNext =
         isPredicted &&
         !isPeriod &&
-        opensRight &&
         context.select<CalendarViewModel, bool>(
           (v) => v.isPredictedPeriodDay(date.add(const Duration(days: 1))),
         );
+
+    final hasPredictedBefore = predictedPrev && !rowStart;
+    final hasPredictedAfter = predictedNext && !rowEnd;
+    final predictedContinuesLeft = predictedPrev && rowStart;
+    final predictedContinuesRight = predictedNext && rowEnd;
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -404,23 +413,34 @@ class _DayTile extends StatelessWidget {
                 return Stack(
                   alignment: Alignment.center,
                   children: [
-                    if (isPeriod && (hasPeriodBefore || hasPeriodAfter))
+                    if (isPeriod &&
+                        (hasPeriodBefore ||
+                            hasPeriodAfter ||
+                            periodContinuesLeft ||
+                            periodContinuesRight))
                       _buildConnector(
                         color: context.tokens.flow,
                         openLeft: hasPeriodBefore,
                         openRight: hasPeriodAfter,
+                        continuesLeft: periodContinuesLeft,
+                        continuesRight: periodContinuesRight,
                         inset: inset,
                       ),
 
                     if (isPredicted &&
                         !isPeriod &&
-                        (hasPredictedBefore || hasPredictedAfter))
+                        (hasPredictedBefore ||
+                            hasPredictedAfter ||
+                            predictedContinuesLeft ||
+                            predictedContinuesRight))
                       _buildConnector(
                         color: context.tokens.flowSoft.withAlpha(
                           isDark ? 30 : 50,
                         ),
                         openLeft: hasPredictedBefore,
                         openRight: hasPredictedAfter,
+                        continuesLeft: predictedContinuesLeft,
+                        continuesRight: predictedContinuesRight,
                         inset: inset,
                       ),
 
@@ -503,23 +523,55 @@ class _DayTile extends StatelessWidget {
   ///
   /// Bant, komşu gün de aynı türdeyse o yöne doğru hücre kenarına kadar
   /// uzanır ve köşesi düz kalır; değilse dairenin hizasında yuvarlanır.
+  /// Ardışık günleri birleştiren bant.
+  ///
+  /// Her uç üç durumdan birinde:
+  ///
+  /// * **kapalı** — dönem burada bitiyor: içeriden başlayan yuvarlak uç.
+  /// * **açık** — yandaki hücre de aynı döneme ait: düz uç, hücre kenarına
+  ///   kadar; iki hücrenin bandı birleşip tek pill oluyor.
+  /// * **devam** — dönem sürüyor ama sonraki gün bir alt satırın başında.
+  ///   Bant hücre kenarına kadar gidiyor ve giderken **sönüyor**.
+  ///
+  /// Üçüncüsü olmadan hafta sınırını aşan dönem iki ayrı dönem gibi
+  /// okunuyordu: pazar tek başına bir daire, pazartesi ayrı bir pill.
+  /// Düz kesilen bir uç da işe yaramıyor — kartın kenar boşluğunda durduğu
+  /// için "devam ediyor" değil "kopmuş" görünüyor. Sönen uç, bandın kenarın
+  /// ötesine aktığını anlatıyor.
   Widget _buildConnector({
     required Color color,
     required bool openLeft,
     required bool openRight,
+    required bool continuesLeft,
+    required bool continuesRight,
     required double inset,
   }) {
+    final flatLeft = openLeft || continuesLeft;
+    final flatRight = openRight || continuesRight;
+    final fades = continuesLeft || continuesRight;
+
     return Positioned(
-      left: openLeft ? 0 : inset,
-      right: openRight ? 0 : inset,
+      left: flatLeft ? 0 : inset,
+      right: flatRight ? 0 : inset,
       top: 0,
       bottom: 0,
       child: Container(
         decoration: BoxDecoration(
-          color: color,
+          color: fades ? null : color,
+          gradient: fades
+              ? LinearGradient(
+                  colors: [
+                    continuesLeft ? color.withAlpha(0) : color,
+                    color,
+                    color,
+                    continuesRight ? color.withAlpha(0) : color,
+                  ],
+                  stops: const [0.0, 0.45, 0.55, 1.0],
+                )
+              : null,
           borderRadius: BorderRadius.horizontal(
-            left: openLeft ? Radius.zero : const Radius.circular(20),
-            right: openRight ? Radius.zero : const Radius.circular(20),
+            left: flatLeft ? Radius.zero : const Radius.circular(20),
+            right: flatRight ? Radius.zero : const Radius.circular(20),
           ),
         ),
       ),
