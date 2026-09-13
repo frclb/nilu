@@ -434,8 +434,12 @@ class _DayTile extends StatelessWidget {
                             predictedContinuesLeft ||
                             predictedContinuesRight))
                       _buildConnector(
+                        // Koyu temada bant zemine karşı 1.11:1 kalıyordu —
+                        // ölçülebilir ama görülemez. Açık zeminde renk farkı
+                        // da yardım ediyor, koyuda hem parlaklık hem renk
+                        // sıkıştığı için daha çok opaklık gerekiyor.
                         color: context.tokens.flowSoft.withAlpha(
-                          isDark ? 30 : 50,
+                          isDark ? 100 : 50,
                         ),
                         openLeft: hasPredictedBefore,
                         openRight: hasPredictedAfter,
@@ -596,7 +600,9 @@ class _DayTile extends StatelessWidget {
     } else if (isSelected) {
       return theme.colorScheme.primary;
     } else if (isPredicted) {
-      return t.flowSoft.withAlpha(isDark ? 20 : 35);
+      // Daire ile bant tek şekil gibi görünsün diye ikisi aynı oranda
+      // (bant opaklığının ~%65'i).
+      return t.flowSoft.withAlpha(isDark ? 65 : 35);
     } else if (isFertile) {
       return isDark
           // Koyu temada %6 opaklıktaydı; doğurgan günler hiç görünmüyordu.

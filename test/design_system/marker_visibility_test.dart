@@ -77,6 +77,42 @@ void main() {
     }
   });
 
+  test('tahmin bandı her iki temada seçilebiliyor', () {
+    // Takvimde tahmini regl, rol renginin düşük opaklıkla zemine serilmesiyle
+    // çiziliyor. Koyu temada opaklık 30'du ve bant zeminle 1.11:1 kalıyordu —
+    // ölçülebilir ama görülemez. Açık zeminde renk farkı da yardım ediyor;
+    // koyuda hem parlaklık hem renk sıkıştığı için daha çok opaklık gerekiyor.
+    Color over(Color fg, int alpha, Color bg) {
+      final t = alpha / 255.0;
+      int mix(double f, double b) => (t * f + (1 - t) * b).round();
+      return Color.fromARGB(
+        255,
+        mix(fg.r * 255, bg.r * 255),
+        mix(fg.g * 255, bg.g * 255),
+        mix(fg.b * 255, bg.b * 255),
+      );
+    }
+
+    // Eşik tema başına ayrı. Tek bir parlaklık sayısı ikisini eşit sayardı:
+    // beyaz zeminde pembe hem parlaklıkta hem renkte ayrışıyor ve 1.20'de
+    // rahat görünüyor; koyu zeminde ikisi de sıkıştığı için aynı sayı
+    // görünmezliğe denk geliyor. Bunlar birer **taban** — mevcut değerin
+    // altına düşmeyi engelliyor, WCAG'ın grafik nesneler için istediği 3:1'i
+    // karşıladıkları iddiası değil. Bant metnin arkasına serilen bir zemin,
+    // tek başına duran bir işaret değil; daha da güçlendirmek tasarım kararı.
+    for (final entry in {
+      'açık': (AppTokens.light, 50, 1.20),
+      'koyu': (AppTokens.dark, 100, 1.45),
+    }.entries) {
+      final (t, alpha, floor) = entry.value;
+      expect(
+        _contrast(over(t.flowSoft, alpha, t.surface), t.surface),
+        greaterThanOrEqualTo(floor),
+        reason: '${entry.key}: tahmin bandı zeminden ayrışmıyor',
+      );
+    }
+  });
+
   test('doğurganlık işareti koyu temada görünür', () {
     // Açık temada `fertile` ile `flowTint` aynı tonu paylaşıyor; ayrım
     // değerde değil rolde. Koyu temada ise ayrışıyorlar ve kaybolan da
