@@ -101,7 +101,7 @@ void main() {
     // karşıladıkları iddiası değil. Bant metnin arkasına serilen bir zemin,
     // tek başına duran bir işaret değil; daha da güçlendirmek tasarım kararı.
     for (final entry in {
-      'açık': (AppTokens.light, 50, 1.20),
+      'açık': (AppTokens.light, 90, 1.40),
       'koyu': (AppTokens.dark, 100, 1.45),
     }.entries) {
       final (t, alpha, floor) = entry.value;
