@@ -14,6 +14,15 @@ import '../view_models/calendar_view_model.dart';
 /// Yalnızca takvimi gösterir: seçili günün bilgisi ve o güne uygulanan
 /// eylemler [CalendarDayHeader]'ın işi. Eskiden ikisi de burada duruyordu ve
 /// seçili gün bilgisi, alttaki özet bölümüyle birebir tekrar ediyordu.
+/// [date] takvim ızgarasında satırın **ilk** hücresinde mi?
+///
+/// Izgara her zaman pazartesi ile başlıyor (`previousMonthFill =
+/// firstWeekday - 1`), yani pazartesi ilk sütun, pazar son sütun.
+bool startsCalendarRow(DateTime date) => date.weekday == DateTime.monday;
+
+/// [date] satırın **son** hücresinde mi?
+bool endsCalendarRow(DateTime date) => date.weekday == DateTime.sunday;
+
 class CalendarGrid extends StatelessWidget {
   const CalendarGrid({super.key});
 
@@ -310,14 +319,25 @@ class _DayTile extends StatelessWidget {
 
     final isToday = DateUtils.isSameDay(date, DateTime.now());
 
-    // Ardışık gün kontrolü (bağlantı barları için)
+    // Ardışık gün kontrolü (bağlantı barları için).
+    //
+    // Komşuluk yalnızca tarihe bakıyordu. Satır sonundaki pazar günü için
+    // "ertesi gün de regl" doğru ama o gün takvimde yan hücrede değil, bir
+    // alt satırın başında: çubuk hücrenin sağ kenarına kadar düz uzanıp
+    // hiçbir şeye bağlanmadan kesiliyordu. Aynısı satır başındaki
+    // pazartesi için solda oluyordu.
+    final opensLeft = !startsCalendarRow(date);
+    final opensRight = !endsCalendarRow(date);
+
     final hasPeriodBefore =
         isPeriod &&
+        opensLeft &&
         context.select<CalendarViewModel, bool>(
           (v) => v.isPeriodDay(date.subtract(const Duration(days: 1))),
         );
     final hasPeriodAfter =
         isPeriod &&
+        opensRight &&
         context.select<CalendarViewModel, bool>(
           (v) => v.isPeriodDay(date.add(const Duration(days: 1))),
         );
@@ -325,12 +345,14 @@ class _DayTile extends StatelessWidget {
     final hasPredictedBefore =
         isPredicted &&
         !isPeriod &&
+        opensLeft &&
         context.select<CalendarViewModel, bool>(
           (v) => v.isPredictedPeriodDay(date.subtract(const Duration(days: 1))),
         );
     final hasPredictedAfter =
         isPredicted &&
         !isPeriod &&
+        opensRight &&
         context.select<CalendarViewModel, bool>(
           (v) => v.isPredictedPeriodDay(date.add(const Duration(days: 1))),
         );
