@@ -16,50 +16,48 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Partner modunda kayıt girilmiyor: ne "+" düğmesi ne de yakınlık
+    // bölümü gösteriliyor. İkisi aynı koşuldan besleniyor ama ayrı isimle
+    // duruyorlar; biri değişirse diğeri sessizce peşinden gitmesin.
+    final isOwner = !context.watch<UserViewModel>().isPartner;
+    final showFab = isOwner;
+
     return Scaffold(
-      body: Stack(
-        children: [
-          RefreshIndicator(
-            onRefresh: () => context.read<CalendarViewModel>().refreshData(),
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                const SliverToBoxAdapter(child: HomeHeader()),
-                SliverPadding(
-                  padding: const EdgeInsets.only(
-                    bottom: 120,
-                  ), // padding for FAB
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      const CycleMasthead(),
-                      PeriodToggleButton(),
-                      const DailySuggestionCard(),
-                      const TwoColumnWidgets(),
-                      if (!context.watch<UserViewModel>().isPartner)
-                        const IntimacySection(),
-                    ]),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (!context.watch<UserViewModel>().isPartner)
-            Positioned(
-              right: 24,
-              bottom: 24,
-              child: FloatingActionButton(
-                heroTag: 'home_fab',
-                onPressed: () {
-                  NavigationService().push(RouteNames.logEntry);
-                },
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                elevation: 4,
-                shape: const CircleBorder(),
-                child: const Icon(Icons.add, size: 32),
+      // FAB elle `Positioned` ile yerleştiriliyordu: güvenli alanı ve
+      // klavyeyi hesaba katmıyordu. Scaffold'un kendi yuvası ikisini de
+      // yapıyor.
+      floatingActionButton: showFab
+          ? FloatingActionButton(
+              heroTag: 'home_fab',
+              onPressed: () => NavigationService().push(RouteNames.logEntry),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              elevation: 4,
+              shape: const CircleBorder(),
+              child: const Icon(Icons.add, size: 32),
+            )
+          : null,
+      body: RefreshIndicator(
+        onRefresh: () => context.read<CalendarViewModel>().refreshData(),
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            const SliverToBoxAdapter(child: HomeHeader()),
+            SliverPadding(
+              // Listenin sonu FAB'ın altında kalmasın.
+              padding: EdgeInsets.only(bottom: showFab ? 120 : 24),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  const CycleMasthead(),
+                  PeriodToggleButton(),
+                  DailySuggestionCard(reserveFabSpace: showFab),
+                  const TwoColumnWidgets(),
+                  if (isOwner) const IntimacySection(),
+                ]),
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }

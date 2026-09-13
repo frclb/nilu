@@ -9,7 +9,18 @@ import '../../../domain/services/phase_guide.dart';
 import '../../calendar/view_models/calendar_view_model.dart';
 
 class DailySuggestionCard extends StatelessWidget {
-  const DailySuggestionCard({super.key});
+  /// Ana ekranın "+" düğmesi için sağda yer bırakılsın mı?
+  ///
+  /// Bu, kaydırma alanındaki **tek sağa yaslı dokunulabilir** öğe; FAB da
+  /// sağa yaslı. İkisi aynı sütunda olduğu için "Tümünü Gör" düğmenin altında
+  /// kalıyor ve okunmuyordu. Kartların üstünden geçmesi sorun değil — onlar
+  /// köşeye yaslı bağlantı değil.
+  final bool reserveFabSpace;
+
+  const DailySuggestionCard({super.key, this.reserveFabSpace = false});
+
+  /// FAB'ın kapladığı genişlik: 56 çap + 24 kenar boşluğu + 8 pay.
+  static const double _fabClearance = 88;
 
   @override
   Widget build(BuildContext context) {
@@ -24,32 +35,45 @@ class DailySuggestionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                context.tr('home_daily_suggestion_title'),
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  NavigationService().push(RouteNames.healthLibrary);
-                },
-                child: Text(
-                  context.tr('home_see_all'),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 10,
-                    color: theme.colorScheme.primary,
+          Padding(
+            padding: EdgeInsets.only(
+              right: reserveFabSpace ? _fabClearance : 0,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  context.tr('home_daily_suggestion_title'),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    letterSpacing: -0.5,
                   ),
                 ),
-              ),
-            ],
+                // Dokunma hedefi 10 piksellik bir yazıydı — parmakla
+                // isabet ettirmek zordu. `TextButton` en az 48 piksellik bir
+                // alan veriyor.
+                TextButton(
+                  onPressed: () =>
+                      NavigationService().push(RouteNames.healthLibrary),
+                  style: TextButton.styleFrom(
+                    minimumSize: const Size(0, 44),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  child: Text(
+                    context.tr('home_see_all'),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
           Card(
