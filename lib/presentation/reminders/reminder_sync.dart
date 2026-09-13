@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/navigation/navigation_service.dart';
 import '../../data/local/reminder_scheduler.dart';
+import '../../design_system/app_theme.dart';
 import '../../data/repositories/notification_settings_repository.dart';
 import '../../domain/services/reminder_planner.dart';
 import '../../localization/app_localizations.dart';
@@ -80,6 +82,17 @@ class _ReminderSyncState extends State<ReminderSync> {
       // Plan boşken sormuyoruz — hatırlatacak bir şey yokken izin istemek
       // kullanıcıya anlamsız gelir. İlk kurulum tamamlanıp tahminler
       // oluştuğunda soruluyor. iOS sistem istemini yalnızca bir kez gösterir.
+      //
+      // Sistem isteminden **önce** gerekçe gösteriliyor. Kamera, Face ID ve
+      // Sağlık izinlerinin gerekçesi Info.plist'ten sisteme geçiyor ve
+      // istemde görünüyor; bildirim isteminde öyle bir alan yok. Kullanıcı
+      // ana ekrana düşer düşmez bağlamsız bir kutu görüyordu — hem reddetme
+      // oranını artırıyor hem de iOS istemi bir daha göstermediği için
+      // kararı kalıcı hâle getiriyordu.
+      if (!mounted) return;
+      final wantsToBeAsked = await _explainReminders();
+      if (!wantsToBeAsked || !mounted) return;
+
       final granted = await _scheduler.requestPermission();
       if (!granted || !mounted) return;
 
@@ -88,6 +101,40 @@ class _ReminderSyncState extends State<ReminderSync> {
     } finally {
       _running = false;
     }
+  }
+
+  /// Sistem izin isteminden önceki gerekçe.
+  ///
+  /// "Şimdi değil" sistem istemini hiç açmıyor: iOS onu bir kez gösterip bir
+  /// daha göstermediği için, kullanıcının hazır olmadığı anda yakmak kalıcı
+  /// bir kayıp olurdu. Sonraki açılışta yeniden sorulur.
+  Future<bool> _explainReminders() async {
+    // Diyalog **router'ın** navigator'ından açılıyor. `ReminderSync`
+    // `MaterialApp.builder` içinde, yani Navigator'ın üstünde duruyor;
+    // kendi context'iyle `showDialog` çağırmak "No Navigator" hatası verir
+    // ve gerekçe hiç görünmezdi.
+    final dialogContext = NavigationService().navigatorKey.currentContext;
+    if (dialogContext == null) return false;
+
+    final result = await showDialog<bool>(
+      context: dialogContext,
+      builder: (ctx) => AlertDialog(
+        title: Text(ctx.tr('reminder_permission_title')),
+        content: Text(ctx.tr('reminder_permission_body')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.tr('reminder_permission_later')),
+          ),
+          FilledButton(
+            style: AppTheme.dialogAction(),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(ctx.tr('reminder_permission_continue')),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
   }
 
   @override

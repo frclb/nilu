@@ -40,15 +40,13 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>This app needs camera access to scan your partner's QR code for pairing.</string>
+	<string>Partnerinle eşleşmek için onun QR kodunu okutmak üzere kamera kullanılır. Görüntü cihazından çıkmaz.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Uygulama kilidi açıkken sağlık verilerinize yalnızca siz erişebilesiniz diye Face ID kullanılır.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Regl, uyku ve nabız verilerini Sağlık uygulamasından okuyup döngü tahminlerini iyileştirmek için kullanılır.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Bu uygulamada işaretlediğin regl günleri, izin verirsen Sağlık uygulamasına da yazılır.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app needs photo library access to let you pick a QR code image.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

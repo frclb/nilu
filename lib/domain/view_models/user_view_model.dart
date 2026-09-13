@@ -213,19 +213,31 @@ class UserViewModel extends ChangeNotifier {
   ///
   /// Yerel silmeden **önce** çağrılmalı: `_myId` temizlendikten sonra hangi
   /// dokümanın silineceği bilinemez.
-  Future<void> deleteRemoteData() async {
+  /// Hesap gerçekten silindi mi? Kimlik silinemediyse `false`.
+  Future<bool> deleteRemoteData() async {
     final uid = _myId;
-    if (uid == null || uid.isEmpty) return;
+    if (uid == null || uid.isEmpty) return true;
 
     await _firestoreDS.deleteUserData(uid, partnerId: _partnerId);
 
     try {
-      await _authDS.signOut();
       await SubscriptionService.logout();
     } catch (e) {
-      // Uzak veri silindi; oturum kapatma başarısız olsa da akış sürmeli.
-      debugPrint('Sign out after data deletion failed: $e');
+      debugPrint('Subscription logout after data deletion failed: $e');
     }
+
+    // Veriden sonra kimliğin kendisi. Silinemezse oturumu kapatıp geri
+    // dönüyoruz: çağıran taraf kullanıcıya yeniden giriş yapması gerektiğini
+    // söylemeli, "hesabın silindi" dememeli.
+    final deleted = await _authDS.deleteAccount();
+    if (!deleted) {
+      try {
+        await _authDS.signOut();
+      } catch (e) {
+        debugPrint('Sign out after failed account delete: $e');
+      }
+    }
+    return deleted;
   }
 
   /// Yerel veri tamamen silindikten sonra durumu sıfırdan okur.

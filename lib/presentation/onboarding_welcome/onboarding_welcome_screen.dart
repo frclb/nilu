@@ -259,143 +259,173 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
     String description,
   ) {
     final isDark = theme.brightness == Brightness.dark;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Top Icon
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: context.tokens.surface,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: theme.colorScheme.primary.withAlpha(25),
-                width: 1,
-              ),
-              boxShadow: isDark
-                  ? []
-                  : [
-                      BoxShadow(
-                        color: AppScrim.veil(26),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-            ),
-            child: Icon(topIcon, size: 48, color: theme.colorScheme.primary),
-          ),
 
-          const SizedBox(height: 24),
-
-          // Hero illustration area
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              constraints: const BoxConstraints(maxWidth: 320),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    theme.colorScheme.primary.withAlpha(20),
-                    theme.colorScheme.primary.withAlpha(5),
-                  ],
+    // Sayfa kaydırılabilir: sığdığında ortalanıyor, sığmadığında kayıyor.
+    // Önceden sabit bir sütundu ve çizim `Expanded` içindeydi — yazı boyutu
+    // büyüdüğünde çizime kalan yer içeriğinden küçülüyor, ekran taşıyordu.
+    // En büyük **normal** boyutta (erişilebilirlik bile değil) 49 piksel
+    // taşıyordu; kullanıcının ilk gördüğü ekran bu.
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Top Icon
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: context.tokens.surface,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withAlpha(25),
+                      width: 1,
+                    ),
+                    boxShadow: isDark
+                        ? []
+                        : [
+                            BoxShadow(
+                              color: AppScrim.veil(26),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                  ),
+                  child: Icon(
+                    topIcon,
+                    size: 48,
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
-                border: Border.all(
-                  color: theme.colorScheme.primary.withAlpha(25),
+
+                const SizedBox(height: 24),
+
+                // Hero illustration area
+                //
+                // Yükseklik sınırlı, içerik `FittedBox` ile küçülüyor: yazı
+                // büyüdüğünde çizim ezilmek yerine orantılı olarak küçülüyor.
+                ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxHeight: 300,
+                    minHeight: 120,
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          theme.colorScheme.primary.withAlpha(20),
+                          theme.colorScheme.primary.withAlpha(5),
+                        ],
+                      ),
+                      border: Border.all(
+                        color: theme.colorScheme.primary.withAlpha(25),
+                      ),
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Decorative circles
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 160,
+                                height: 160,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: theme.colorScheme.primary.withAlpha(
+                                    12,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: 120,
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: theme.colorScheme.primary.withAlpha(
+                                    20,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                topIcon,
+                                size: 64,
+                                color: theme.colorScheme.primary.withAlpha(153),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                          Icon(
+                            Icons.water_drop,
+                            size: 32,
+                            color: theme.colorScheme.primary.withAlpha(102),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.local_florist,
+                                size: 24,
+                                color: theme.colorScheme.primary.withAlpha(76),
+                              ),
+                              const SizedBox(width: 16),
+                              Icon(
+                                Icons.sunny,
+                                size: 24,
+                                color: theme.colorScheme.primary.withAlpha(76),
+                              ),
+                              const SizedBox(width: 16),
+                              Icon(
+                                Icons.nights_stay,
+                                size: 24,
+                                color: theme.colorScheme.primary.withAlpha(76),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Decorative circles
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        width: 160,
-                        height: 160,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: theme.colorScheme.primary.withAlpha(12),
-                        ),
-                      ),
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: theme.colorScheme.primary.withAlpha(20),
-                        ),
-                      ),
-                      Icon(
-                        topIcon,
-                        size: 64,
-                        color: theme.colorScheme.primary.withAlpha(153),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  Icon(
-                    Icons.water_drop,
-                    size: 32,
-                    color: theme.colorScheme.primary.withAlpha(102),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.local_florist,
-                        size: 24,
-                        color: theme.colorScheme.primary.withAlpha(76),
-                      ),
-                      const SizedBox(width: 16),
-                      Icon(
-                        Icons.sunny,
-                        size: 24,
-                        color: theme.colorScheme.primary.withAlpha(76),
-                      ),
-                      const SizedBox(width: 16),
-                      Icon(
-                        Icons.nights_stay,
-                        size: 24,
-                        color: theme.colorScheme.primary.withAlpha(76),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
 
-          const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-          // Text Content
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.primary,
-              letterSpacing: -0.5,
+                // Text Content
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  description,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: textColor.withAlpha(204),
+                    height: 1.5,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          Text(
-            description,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              color: textColor.withAlpha(204),
-              height: 1.5,
-            ),
-          ),
-          // Removed the 24px bottom space to give more room for the image
-        ],
+        ),
       ),
     );
   }

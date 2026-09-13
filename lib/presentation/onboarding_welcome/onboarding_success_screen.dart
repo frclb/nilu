@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/app_info.dart';
 import '../../design_system/app_scrim.dart';
 import '../../design_system/app_tokens.dart';
 import '../../design_system/content_illustration.dart';
@@ -54,7 +55,7 @@ class OnboardingSuccessScreen extends StatelessWidget {
                 children: [
                   const SizedBox(width: 40), // Empty space for balance
                   Text(
-                    'FLOWELL',
+                    AppInfo.displayName.toUpperCase(),
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -75,136 +76,141 @@ class OnboardingSuccessScreen extends StatelessWidget {
             ),
 
             // Main Content Area
+            //
+            // Kaydırılabilir: yazı boyutu büyüdüğünde başlık ve açıklama
+            // sabit yükseklikli yığının dışına taşıyordu.
             Expanded(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Decorative Background Blob
-                  Positioned(
-                    top: MediaQuery.of(context).size.height * 0.15,
-                    child: Container(
-                      width: 250,
-                      height: 250,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: primaryColor.withValues(alpha: 0.1),
+              child: SingleChildScrollView(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Decorative Background Blob
+                    Positioned(
+                      top: MediaQuery.of(context).size.height * 0.15,
+                      child: Container(
+                        width: 250,
+                        height: 250,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: primaryColor.withValues(alpha: 0.1),
+                        ),
                       ),
                     ),
-                  ),
 
-                  // Illustration Container
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 280,
-                        height: 280,
-                        margin: const EdgeInsets.only(bottom: 32),
-                        child: Stack(
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              height: double.infinity,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: subtlePink,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppScrim.veil(5),
-                                    blurRadius: 10,
-                                    spreadRadius: 2,
-                                  ),
-                                ],
-                              ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Stack(
-                                children: [
-                                  // Gradient overlay
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topRight,
-                                        end: Alignment.bottomLeft,
-                                        colors: [
-                                          primaryColor.withValues(alpha: 0.2),
-                                          Colors.transparent,
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  // Karşılama illüstrasyonu uygulama içinde çiziliyor: onboarding'in
-                                  // son adımı ağ bağlantısına bağlı olmamalı.
-                                  const ContentIllustration(
-                                    seed: 'onboarding_success',
-                                    icon: Icons.local_florist,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // Floating checkmark badge
-                            Positioned(
-                              bottom: 24,
-                              right: 24,
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
+                    // Illustration Container
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 280,
+                          height: 280,
+                          margin: const EdgeInsets.only(bottom: 32),
+                          child: Stack(
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                height: double.infinity,
                                 decoration: BoxDecoration(
-                                  color: bgColor,
                                   shape: BoxShape.circle,
+                                  color: subtlePink,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppScrim.veil(26),
+                                      color: AppScrim.veil(5),
                                       blurRadius: 10,
-                                      offset: const Offset(0, 4),
+                                      spreadRadius: 2,
                                     ),
                                   ],
-                                  border: Border.all(
-                                    color: context.tokens.surfaceAlt,
-                                    width: 4,
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: Stack(
+                                  children: [
+                                    // Gradient overlay
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topRight,
+                                          end: Alignment.bottomLeft,
+                                          colors: [
+                                            primaryColor.withValues(alpha: 0.2),
+                                            Colors.transparent,
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    // Karşılama illüstrasyonu uygulama içinde çiziliyor: onboarding'in
+                                    // son adımı ağ bağlantısına bağlı olmamalı.
+                                    const ContentIllustration(
+                                      seed: 'onboarding_success',
+                                      icon: Icons.local_florist,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Floating checkmark badge
+                              Positioned(
+                                bottom: 24,
+                                right: 24,
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: bgColor,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppScrim.veil(26),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                    border: Border.all(
+                                      color: context.tokens.surfaceAlt,
+                                      width: 4,
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    Icons.check_circle,
+                                    color: primaryColor,
+                                    size: 32,
                                   ),
                                 ),
-                                child: Icon(
-                                  Icons.check_circle,
-                                  color: primaryColor,
-                                  size: 32,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Text Content
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                context.tr('onboarding_success_title'),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w800,
+                                  color: textColor,
+                                  letterSpacing: -0.5,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Text Content
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                        child: Column(
-                          children: [
-                            Text(
-                              context.tr('onboarding_success_title'),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.w800,
-                                color: textColor,
-                                letterSpacing: -0.5,
+                              const SizedBox(height: 16),
+                              Text(
+                                context.tr('onboarding_success_desc'),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: textSecondaryColor,
+                                  height: 1.5,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              context.tr('onboarding_success_desc'),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: textSecondaryColor,
-                                height: 1.5,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
 
@@ -225,12 +231,16 @@ class OnboardingSuccessScreen extends StatelessWidget {
                         color: context.tokens.textMuted,
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        context.tr('onboarding_success_privacy'),
-                        style: TextStyle(
-                          color: context.tokens.textMuted,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
+                      // Esnek: uzun çeviride ve büyük yazıda satıra sığmayıp
+                      // sağdan taşıyordu.
+                      Flexible(
+                        child: Text(
+                          context.tr('onboarding_success_privacy'),
+                          style: TextStyle(
+                            color: context.tokens.textMuted,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ],

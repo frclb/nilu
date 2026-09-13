@@ -53,6 +53,33 @@ class FirebaseAuthDataSource {
     }
   }
 
+  /// Kimlik hesabını **kalıcı olarak** siler.
+  ///
+  /// App Store 5.1.1(v): hesap oluşturmayı destekleyen uygulama, hesabın
+  /// silinmesini de sunmak zorunda. "Hesabımı Sil" yalnızca Firestore
+  /// verisini siliyor ve oturumu kapatıyordu; Apple hesabıyla girmiş bir
+  /// kullanıcının kimliği Firebase'de duruyordu — yeniden giriş yaptığında
+  /// aynı uid ile geri geliyordu, yani hesap silinmemişti.
+  ///
+  /// Kimlik bilgisi eskimişse Firebase `requires-recent-login` döndürür; o
+  /// durumda çağıran tarafın kullanıcıyı yeniden doğrulaması gerekir.
+  /// Silinemezse `false` döner ki akış sessizce başarılı görünmesin.
+  Future<bool> deleteAccount() async {
+    if (!FirebaseConfig.isAvailable) return true;
+    final user = _auth.currentUser;
+    if (user == null) return true;
+    try {
+      await user.delete();
+      return true;
+    } on FirebaseAuthException catch (e) {
+      debugPrint('Account delete failed: ${e.code}');
+      return false;
+    } catch (e) {
+      debugPrint('Account delete failed: $e');
+      return false;
+    }
+  }
+
   Future<void> signOut() async {
     if (!FirebaseConfig.isAvailable) return;
     try {

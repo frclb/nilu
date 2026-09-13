@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -16,6 +18,7 @@ import 'domain/view_models/partner_view_model.dart';
 import 'domain/view_models/user_view_model.dart';
 import 'domain/view_models/subscription_view_model.dart';
 import 'domain/services/subscription_service.dart';
+import 'core/app_info.dart';
 import 'core/firebase/firebase_config.dart';
 import 'data/local/secure_store.dart';
 
@@ -39,19 +42,37 @@ void main() async {
     SecureStore.sensitiveKeys,
   );
 
-  // Firebase Init
-  await FirebaseConfig.init();
-
-  // RevenueCat Init
-  await SubscriptionService.init();
-
-  // Reklam SDK'sı. Kişiselleştirme kapalı; bkz. AdsDatasource.
-  await AdsDatasource.init();
+  // Ağ bağımlı SDK'lar. Üçü de kendi içinde hata yutuyor ama **süre**
+  // sınırı yoktu: uçak modunda ya da kopuk bağlantıda `initialize()`
+  // dakikalarca bekleyebiliyor ve o süre boyunca ekranda hiçbir şey yok.
+  // Açılış hiçbir koşulda ağa bağlı olmamalı — biri gecikirse uygulama
+  // onsuz açılır, SDK arka planda kendi kendine toparlar.
+  await _bootstrap('Firebase', FirebaseConfig.init);
+  await _bootstrap('RevenueCat', SubscriptionService.init);
+  await _bootstrap('Ads', AdsDatasource.init);
 
   // UserViewModel'ı önceden oluştur (router'a ihtiyaç duyduğu için)
   final userViewModel = UserViewModel();
 
   runApp(PeriodTrackerApp(userViewModel: userViewModel));
+}
+
+/// Açılışta bir SDK'yı başlatır; [limit] içinde bitmezse vazgeçer.
+///
+/// Vazgeçmek başlatmayı iptal etmiyor — çağrı arka planda sürüyor, yalnızca
+/// ilk kare onu beklemiyor.
+Future<void> _bootstrap(
+  String name,
+  Future<void> Function() init, {
+  Duration limit = const Duration(seconds: 4),
+}) async {
+  try {
+    await init().timeout(limit);
+  } on TimeoutException {
+    debugPrint('$name init timed out after ${limit.inSeconds}s — continuing.');
+  } catch (e) {
+    debugPrint('$name init failed: $e');
+  }
 }
 
 class PeriodTrackerApp extends StatefulWidget {
@@ -119,7 +140,7 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
         builder: (context, themeViewModel, _) {
           final flavor = themeViewModel.flavor;
           return MaterialApp.router(
-            title: 'Period Tracker',
+            title: AppInfo.displayName,
             theme: AppTheme.light(flavor),
             darkTheme: AppTheme.dark(flavor),
             themeMode: ThemeMode.system,
@@ -144,8 +165,31 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
             // hangi ekranda olunursa olunsun kilit uygulanır.
             // ReminderSync kilidin içinde: bildirim planı ekran kilitliyken
             // de tazelenmeli, kullanıcı uygulamayı açmasa bile.
-            builder: (context, child) => AppLockGate(
-              child: ReminderSync(child: child ?? const SizedBox.shrink()),
+            // Yazı ölçeği üst sınırı.
+            //
+            // iOS erişilebilirlik boyutları 3.1 kata kadar çıkıyor. Ekranlar
+            // bu ölçekte kullanılmaz hâle geliyordu: onboarding'de 689
+            // piksel taşma, takvim ve grafikler ekran dışına çıkıyordu.
+            // Sınırsız desteklemek yazı boyutuna göre yeniden düzenlenen
+            // bir tasarım gerektiriyor; o gelene kadar sınır, uygulamayı
+            // kırık değil sadece daha az büyük tutuyor.
+            //
+            // 1.5 seçildi: iOS'un **erişilebilirlik dışı** en büyük boyutu
+            // (~1.35) tamamen destekleniyor, üstüne de pay kalıyor.
+            builder: (context, child) => MediaQuery.withClampedTextScaling(
+              maxScaleFactor: 1.5,
+              // Boşluğa dokunmak klavyeyi kapatır.
+              //
+              // Kapatmanın tek yolu klavyenin kendi tuşuydu; "Ad Soyad" gibi
+              // tek satırlık alanlarda dönüş tuşu klavyeyi kapatmıyor ve
+              // kullanıcı altındaki kaydet düğmesine ulaşamıyordu.
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                child: AppLockGate(
+                  child: ReminderSync(child: child ?? const SizedBox.shrink()),
+                ),
+              ),
             ),
           );
         },

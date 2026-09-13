@@ -476,15 +476,23 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               final router = GoRouter.of(context);
               final userViewModel = context.read<UserViewModel>();
               final doneMessage = context.tr('privacy_delete_done');
+              final reauthMessage = context.tr('privacy_delete_reauth');
               Navigator.of(ctx).pop();
 
               // Önce uzak veri: yerel silme `myId`'yi temizliyor, ondan
               // sonra hangi dokümanın silineceği bilinemez.
-              await userViewModel.deleteRemoteData();
+              final accountDeleted = await userViewModel.deleteRemoteData();
               await _repository.deleteAllLocalData();
               await userViewModel.reloadAfterDataWipe();
 
-              messenger.showSnackBar(SnackBar(content: Text(doneMessage)));
+              // Kimlik silinemediyse (Firebase eskimiş oturumu reddeder)
+              // "hesabın silindi" demek yanlış olur: veri gitti ama hesap
+              // duruyor ve yeniden girişte geri geliyor.
+              messenger.showSnackBar(
+                SnackBar(
+                  content: Text(accountDeleted ? doneMessage : reauthMessage),
+                ),
+              );
               router.goNamed(RouteNames.onboarding);
             },
             style: AppTheme.dialogAction().copyWith(
