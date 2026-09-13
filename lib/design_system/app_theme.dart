@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'app_flavor.dart';
 import 'app_palette.dart';
 import 'app_snack.dart';
@@ -46,13 +45,16 @@ class AppTheme {
     // küçük çiziyor ve 20px'te `ğ` ile `g` birbirinden ayrılmıyordu.
     // Türkçe birincil dil olduğu için diakritikleri sağlam çizen Lora
     // seçildi.
-    final body = GoogleFonts.interTextTheme(
-      base.textTheme,
-    ).apply(bodyColor: t.text, displayColor: t.text);
+    // Yazı tipleri pakete gömülü (bkz. pubspec `fonts:`). Önce
+    // `google_fonts` ile çalışma anında indiriliyorlardı; ilk açılışta ağ
+    // yavaşsa ekran sistem yazı tipiyle açılıp sonra değişiyordu.
+    final body = base.textTheme
+        .apply(fontFamily: 'Inter')
+        .apply(bodyColor: t.text, displayColor: t.text);
 
-    final display = GoogleFonts.frauncesTextTheme(
-      base.textTheme,
-    ).apply(bodyColor: t.text, displayColor: t.text);
+    final display = base.textTheme
+        .apply(fontFamily: 'Fraunces')
+        .apply(bodyColor: t.text, displayColor: t.text);
 
     final textTheme = body.copyWith(
       displayLarge: display.displayLarge?.copyWith(

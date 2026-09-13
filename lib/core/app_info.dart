@@ -7,8 +7,7 @@
 ///
 /// Değiştirirken birlikte güncellenmesi gerekenler:
 /// * `ios/Runner/Info.plist` → `CFBundleDisplayName`, `CFBundleName`
-/// * `android/app/src/main/AndroidManifest.xml` → `android:label`
-/// * Mağaza listeleme adı
+/// * App Store listeleme adı
 class AppInfo {
   const AppInfo._();
 

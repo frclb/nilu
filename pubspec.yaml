@@ -34,7 +34,6 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  google_fonts: ^8.0.2
   flutter_localizations:
     sdk: flutter
   go_router: ^17.1.0
@@ -101,6 +100,35 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - lib/localization/
+
+  # Yazı tipleri pakete gömülü.
+  #
+  # Önce `google_fonts` kullanılıyordu ve dosyaları **çalışma anında**
+  # fonts.gstatic.com'dan indiriyordu: ilk açılışta ağ yavaşsa uygulama
+  # sistem yazı tipiyle açılıp sonra bir anda değişiyordu, üstelik tamamen
+  # görsel bir şey için ağa ve Google'a bağımlıydı. "Verilerin cihazında
+  # kalır" diyen bir uygulamada ilk açılışta dışarı istek gitmesi tutarsızdı.
+  #
+  # Yalnızca kullanılan kalınlıklar var (tasarımda 400/500/600/700 geçiyor).
+  # Tek bir 800 kullanımı için ayrı dosya taşınmıyor; Flutter en yakın
+  # kalınlığa düşüyor.
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+    - family: Fraunces
+      fonts:
+        - asset: assets/fonts/Fraunces-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Fraunces-Bold.ttf
+          weight: 700
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
