@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../design_system/app_snack.dart';
+import '../../../design_system/app_theme.dart';
+import '../../../localization/date_names.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../localization/app_localizations.dart';
 import '../../calendar/view_models/calendar_view_model.dart';
@@ -47,6 +49,59 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
     AppSnack.show(context, confirmation, undoLabel: undoLabel, onUndo: undo);
   }
 
+  /// Tahmin edilen tarihten çok önce regl başlatılıyorsa onay ister.
+  ///
+  /// Kazara dokunuş döngüyü sessizce yeniden yazıyordu: "17 gün var" bir
+  /// anda "1. gün" oluyor, `lastPeriodStart` kayıyor ve bütün tahminler
+  /// bununla birlikte kayıyor. Geri alma yolu var ama geçici; kazayı baştan
+  /// durdurmak daha iyi.
+  ///
+  /// Gecikmede **sormuyoruz**: regl gecikmesi olağan ve kullanıcı zaten
+  /// bekliyor olur. Yalnızca beklenenden bir haftadan fazla erkenken
+  /// soruluyor — o kadar erken bir başlangıç ya gerçekten olağandışı ya da
+  /// yanlış dokunuş.
+  static const int _earlyStartThresholdDays = 7;
+
+  Future<bool> _confirmEarlyStart(CalendarViewModel viewModel) async {
+    final info = viewModel.cycleInfo;
+    final daysLeft = info.daysUntilNextPeriod;
+    final predicted = info.predictedNextPeriod;
+
+    if (daysLeft == null ||
+        predicted == null ||
+        daysLeft <= _earlyStartThresholdDays) {
+      return true;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(ctx.tr('home_period_early_title')),
+        content: Text(
+          ctx.tr(
+            'home_period_early_body',
+            params: {
+              'n': '$daysLeft',
+              'date': '${predicted.day} ${ctx.monthName(predicted.month)}',
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.tr('cancel')),
+          ),
+          FilledButton(
+            style: AppTheme.dialogAction(),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(ctx.tr('home_period_early_confirm')),
+          ),
+        ],
+      ),
+    );
+    return confirmed ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
@@ -62,11 +117,18 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
           PeriodAction.start => FilledButton.icon(
             onPressed: _busy
                 ? null
-                : () => _run(
-                    viewModel.startPeriodToday,
-                    confirmation: context.tr('home_period_started'),
-                    undo: () => viewModel.undoPeriodStart(),
-                  ),
+                : () async {
+                    // Metin onay diyaloğundan **önce** okunuyor: sonrasında
+                    // `context` bir async boşluğun ötesinde kalıyor.
+                    final confirmation = context.tr('home_period_started');
+                    if (!await _confirmEarlyStart(viewModel)) return;
+                    if (!mounted) return;
+                    await _run(
+                      viewModel.startPeriodToday,
+                      confirmation: confirmation,
+                      undo: () => viewModel.undoPeriodStart(),
+                    );
+                  },
             icon: const Icon(Icons.water_drop_outlined, size: 20),
             label: Text(context.tr('home_period_start')),
             style: FilledButton.styleFrom(

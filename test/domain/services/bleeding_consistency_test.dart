@@ -242,6 +242,68 @@ void main() {
     });
   });
 
+  group('yanlışlıkla başlatıp bitirme', () {
+    /// Ana ekranın "bitti"yi geri alma eylemi: dönem bugün açıldıysa kaydı
+    /// tamamen kaldırır, daha eskiyse yalnızca yeniden açar.
+    List<PeriodLog> undoEnd(List<PeriodLog> logs) {
+      final today = dayAt(0);
+      for (final log in logs) {
+        final end = log.endDate;
+        if (end == null || !end.isAtSameMomentAs(today)) continue;
+        if (log.firstDay.isAtSameMomentAs(today)) {
+          return periods.toggleDay(logs, today, today: today);
+        }
+        log.endDate = null;
+        return logs;
+      }
+      return logs;
+    }
+
+    test('bugün açılan dönem geri alınınca kayıt tamamen silinir', () {
+      // Döngünün ortasında yanlışlıkla başlat → bitir. Yalnızca yeniden
+      // açmak bir günlük sahte bir dönem bırakırdı ve `lastPeriodStart`
+      // kaydığı için bütün tahminler bozuk kalırdı.
+      final original = [
+        PeriodLog(id: 'a', startDate: dayAt(40), endDate: dayAt(36)),
+        PeriodLog(id: 'b', startDate: dayAt(12), endDate: dayAt(8)),
+      ];
+      final before = service.getCycleInfo(original, userPeriodLength: 5);
+
+      var logs = periods.startPeriod([...original], dayAt(0));
+      logs = periods.endPeriod(logs, dayAt(0));
+      expect(bleedingToday(logs), isTrue, reason: 'bugün kayıtlı olmalı');
+
+      logs = undoEnd(logs);
+
+      expect(logs, hasLength(2), reason: 'bugünkü kayıt kalkmalı');
+      expect(bleedingToday(logs), isFalse);
+
+      final after = service.getCycleInfo(logs, userPeriodLength: 5);
+      expect(
+        after.lastPeriodStart,
+        before.lastPeriodStart,
+        reason: 'tahmin çapası başlangıçtaki yerine dönmeli',
+      );
+      expect(after.currentCycleDay, before.currentCycleDay);
+    });
+
+    test('eski dönemin bitirilmesi geri alınınca kayıt yerinde kalır', () {
+      // Dönem gerçekten dün başlamışsa oradaki günler veri; geri alma
+      // yalnızca "bitirmeyi" geri almalı.
+      var logs = <PeriodLog>[
+        PeriodLog(id: 'a', startDate: dayAt(2), endDate: null),
+      ];
+      logs = periods.endPeriod(logs, dayAt(0));
+      expect(logs.single.endDate, dayAt(0));
+
+      logs = undoEnd(logs);
+
+      expect(logs, hasLength(1), reason: 'kayıt silinmemeli');
+      expect(logs.single.startDate, dayAt(2));
+      expect(logs.single.isOngoing, isTrue, reason: 'yeniden açılmalı');
+    });
+  });
+
   group('takvim kaydı ile beklentiyi ayırır', () {
     test('devam eden dönemin bugünden sonrası kayıt değil beklentidir', () {
       final log = PeriodLog(id: 'a', startDate: dayAt(1), endDate: null);

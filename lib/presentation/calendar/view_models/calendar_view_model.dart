@@ -200,18 +200,38 @@ class CalendarViewModel extends ChangeNotifier {
     return true;
   }
 
-  /// "Geri al" — bugün kapatılan dönemi yeniden açar.
+  /// "Reglim bitti"yi geri alır.
+  ///
+  /// Dönem **bugün açıldıysa** kayıt tamamen kaldırılıyor: o durumda
+  /// kullanıcı yanlışlıkla başlatıp bitirmiştir ve yalnızca yeniden açmak
+  /// onu bir günlük sahte bir dönemle baş başa bırakır — üstelik o kayıt
+  /// `lastPeriodStart`'ı kaydırdığı için bütün tahminler de bozuk kalır.
+  ///
+  /// Dönem daha eskiyse geri alma "bitirmeyi" geri alır, yani kayıt yeniden
+  /// açılır; oradaki günler gerçek veri.
   Future<bool> reopenPeriodToday() async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
+
     for (final log in _periodLogs) {
       final end = log.endDate;
-      if (end != null &&
-          DateTime(end.year, end.month, end.day).isAtSameMomentAs(today)) {
-        log.endDate = null;
-        break;
+      if (end == null) continue;
+      if (!DateTime(end.year, end.month, end.day).isAtSameMomentAs(today)) {
+        continue;
       }
+
+      if (log.firstDay.isAtSameMomentAs(today)) {
+        _periodLogs = _periodService.toggleDay(
+          _periodLogs,
+          today,
+          today: today,
+        );
+      } else {
+        log.endDate = null;
+      }
+      break;
     }
+
     await _persistPeriods();
     return true;
   }
