@@ -10,6 +10,23 @@ class SubscriptionService {
 
   static final Completer<void> _readyCompleter = Completer<void>();
 
+  /// `Purchases.configure` başarıyla tamamlandı mı?
+  ///
+  /// Yapılandırılmamış SDK'ya sormak **yakalanabilir bir hata değil**:
+  /// PurchasesHybridCommon Swift tarafında `fatalError` atıyor ve süreç
+  /// çöküyor. Dart'taki `try/catch` buna dokunamıyor — açılışta SDK'lar
+  /// ilk kareden sonraya alınınca uygulama tam da böyle çöktü:
+  ///
+  ///     PurchasesHybridCommon/CommonFunctionality.swift:21: Fatal error:
+  ///     Purchases has not been configured.
+  ///
+  /// Bu yüzden koruma çağıranda değil burada: her giriş noktası önce buna
+  /// bakıyor. Sıralamayı bilmek servisin işi, ekranların değil.
+  static bool _configured = false;
+
+  /// SDK kullanılabilir durumda mı.
+  static bool get isConfigured => _configured;
+
   /// Yapılandırma denemesi bittiğinde tamamlanır (başarılı olmasa da).
   ///
   /// Açılış artık bu SDK'yı beklemiyor; ilk kare hemen çiziliyor. Abonelik
@@ -31,6 +48,7 @@ class SubscriptionService {
 
       final configuration = PurchasesConfiguration(storeConfig.apiKey);
       await Purchases.configure(configuration);
+      _configured = true;
     } catch (e) {
       debugPrint("RevenueCat init error: $e");
     } finally {
@@ -39,6 +57,7 @@ class SubscriptionService {
   }
 
   static Future<void> login(String uid) async {
+    if (!_configured) return;
     try {
       await Purchases.logIn(uid);
     } catch (e) {
@@ -47,6 +66,7 @@ class SubscriptionService {
   }
 
   static Future<void> logout() async {
+    if (!_configured) return;
     try {
       await Purchases.logOut();
     } catch (e) {
@@ -55,6 +75,7 @@ class SubscriptionService {
   }
 
   static Future<Offerings?> getOfferings() async {
+    if (!_configured) return null;
     try {
       return await Purchases.getOfferings();
     } catch (e) {
@@ -64,6 +85,7 @@ class SubscriptionService {
   }
 
   static Future<bool> isPremium() async {
+    if (!_configured) return false;
     try {
       CustomerInfo customerInfo = await Purchases.getCustomerInfo();
       // 'premium' adlı entitlement kontrol ediliyor. RevenueCat panelinden 'premium' entitlement oluşturulmalı.
@@ -75,6 +97,7 @@ class SubscriptionService {
   }
 
   static Future<bool> purchasePackage(Package package) async {
+    if (!_configured) return false;
     try {
       final purchaseResult = await Purchases.purchase(
         PurchaseParams.package(package),
@@ -92,6 +115,7 @@ class SubscriptionService {
   }
 
   static Future<bool> restorePurchases() async {
+    if (!_configured) return false;
     try {
       CustomerInfo customerInfo = await Purchases.restorePurchases();
       return customerInfo.entitlements.all['premium']?.isActive ?? false;
