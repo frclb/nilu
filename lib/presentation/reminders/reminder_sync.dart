@@ -44,6 +44,17 @@ class _ReminderSyncState extends State<ReminderSync> {
   /// Aynı anda birden fazla planlama çalışmasın.
   bool _running = false;
 
+  /// Bu oturumda izin sorusu kapandı mı?
+  ///
+  /// "Şimdi değil" hiçbir iz bırakmıyordu: plan imzası uygulanmadığı için
+  /// bir sonraki yeniden çizimde `_sync` baştan çalışıyor ve kutu geri
+  /// geliyordu. Kullanıcı kapatıyor, ekran tazeleniyor, kutu yine açılıyor.
+  ///
+  /// Oturumla sınırlı: uygulamayı yeniden açtığında tekrar sorulur. Kalıcı
+  /// olarak susturmuyoruz çünkü hatırlatıcılar ayarlarda hâlâ açık görünüyor;
+  /// bir daha hiç sormamak kullanıcıya çalışmayan bir anahtar bırakırdı.
+  bool _permissionSettledThisSession = false;
+
   Future<void> _sync(CalendarViewModel viewModel) async {
     if (_running) return;
     _running = true;
@@ -89,12 +100,23 @@ class _ReminderSyncState extends State<ReminderSync> {
       // ana ekrana düşer düşmez bağlamsız bir kutu görüyordu — hem reddetme
       // oranını artırıyor hem de iOS istemi bir daha göstermediği için
       // kararı kalıcı hâle getiriyordu.
-      if (!mounted) return;
+      if (_permissionSettledThisSession || !mounted) return;
+
       final wantsToBeAsked = await _explainReminders();
-      if (!wantsToBeAsked || !mounted) return;
+      if (!wantsToBeAsked) {
+        _permissionSettledThisSession = true;
+        return;
+      }
+      if (!mounted) return;
 
       final granted = await _scheduler.requestPermission();
-      if (!granted || !mounted) return;
+      if (!granted) {
+        // iOS sistem istemini ikinci kez göstermiyor; tekrar sormanın
+        // karşılığı yok.
+        _permissionSettledThisSession = true;
+        return;
+      }
+      if (!mounted) return;
 
       await _scheduler.apply(plan, localize: context.tr);
       _applied = signature;
