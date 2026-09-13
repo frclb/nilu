@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import '../services/subscription_pricing.dart';
@@ -62,10 +64,25 @@ class SubscriptionViewModel extends ChangeNotifier {
   }
 
   Future<void> _init() async {
+    // Önce sorulur: yapılandırma henüz bitmemişse servis hatayı yutup
+    // "premium değil" döner, ekran da beklemeden açılır.
     await checkPremiumStatus();
     await fetchOfferings();
     _isLoading = false;
     notifyListeners();
+
+    // Yapılandırma bittiğinde bir kez daha sorulur.
+    //
+    // Açılış artık SDK'yı beklemiyor; ilk sorgu yapılandırmasız yapılıyor ve
+    // cevabı her zaman "premium değil" oluyordu. Beklemek de çözüm değil:
+    // `init` hiç çağrılmadığında (test, farklı giriş noktası) o bekleyiş hiç
+    // bitmez. Dinlemek ikisini de çözüyor — hazır olmazsa hiçbir şey olmaz.
+    unawaited(
+      SubscriptionService.ready.then((_) async {
+        await checkPremiumStatus();
+        await fetchOfferings();
+      }),
+    );
   }
 
   Future<void> checkPremiumStatus() async {

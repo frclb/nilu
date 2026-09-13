@@ -42,19 +42,32 @@ void main() async {
     SecureStore.sensitiveKeys,
   );
 
-  // Ağ bağımlı SDK'lar. Üçü de kendi içinde hata yutuyor ama **süre**
-  // sınırı yoktu: uçak modunda ya da kopuk bağlantıda `initialize()`
-  // dakikalarca bekleyebiliyor ve o süre boyunca ekranda hiçbir şey yok.
-  // Açılış hiçbir koşulda ağa bağlı olmamalı — biri gecikirse uygulama
-  // onsuz açılır, SDK arka planda kendi kendine toparlar.
-  await _bootstrap('Firebase', FirebaseConfig.init);
-  await _bootstrap('RevenueCat', SubscriptionService.init);
-  await _bootstrap('Ads', AdsDatasource.init);
-
   // UserViewModel'ı önceden oluştur (router'a ihtiyaç duyduğu için)
   final userViewModel = UserViewModel();
 
   runApp(PeriodTrackerApp(userViewModel: userViewModel));
+
+  // Ağ bağımlı SDK'lar ilk kareden **sonra** başlıyor.
+  //
+  // Önce `runApp`'ten önce ve **sırayla** bekleniyorlardı. Zaman aşımı
+  // eklenmesi sonsuz beklemeyi kesti ama toplamı kesmedi: üçü arka arkaya
+  // dörder saniye, yani en kötü durumda on iki saniye beyaz ekran. Gerçek
+  // cihazda ölçüldü, reklam SDK'sı tek başına dördünü yakıyordu.
+  //
+  // Hiçbiri ilk kare için gerekli değil: ana ekran yalnızca cihazdaki
+  // veriyi gösteriyor. Üçü birden ve paralel başlıyor; bitince kimlik
+  // durumu tazeleniyor.
+  unawaited(_startServices(userViewModel));
+}
+
+/// SDK'ları ilk kareden sonra, hep birlikte başlatır.
+Future<void> _startServices(UserViewModel userViewModel) async {
+  await Future.wait([
+    _bootstrap('Firebase', FirebaseConfig.init),
+    _bootstrap('RevenueCat', SubscriptionService.init),
+    _bootstrap('Ads', AdsDatasource.init),
+  ]);
+  await userViewModel.refreshAuthState();
 }
 
 /// Açılışta bir SDK'yı başlatır; [limit] içinde bitmezse vazgeçer.

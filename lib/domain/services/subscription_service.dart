@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
@@ -5,6 +7,15 @@ class SubscriptionService {
   // RevenueCat API keys
   static const _appleApiKey =
       'appl_api_key_placeholder'; // TODO: Gerçek Apple API anahtarınızı girin
+
+  static final Completer<void> _readyCompleter = Completer<void>();
+
+  /// Yapılandırma denemesi bittiğinde tamamlanır (başarılı olmasa da).
+  ///
+  /// Açılış artık bu SDK'yı beklemiyor; ilk kare hemen çiziliyor. Abonelik
+  /// durumunu okuyan taraf burayı bekliyor, yoksa yapılandırma bitmeden
+  /// sorup "premium değil" cevabını alıyordu.
+  static Future<void> get ready => _readyCompleter.future;
 
   static Future<void> init() async {
     try {
@@ -22,6 +33,8 @@ class SubscriptionService {
       await Purchases.configure(configuration);
     } catch (e) {
       debugPrint("RevenueCat init error: $e");
+    } finally {
+      if (!_readyCompleter.isCompleted) _readyCompleter.complete();
     }
   }
 

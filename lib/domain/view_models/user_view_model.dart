@@ -58,6 +58,14 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Firebase açılıştan sonra hazır olduğunda kimlik durumunu tazeler.
+  ///
+  /// `_loadState` ilk karede çalışıyor ve o sırada Firebase henüz
+  /// başlatılmamış olabiliyor — açılış artık onu beklemiyor. O anda
+  /// `currentUser` null döner ve oturum açmış kullanıcının uid'si
+  /// tazelenmez; bu çağrı açığı kapatıyor.
+  Future<void> refreshAuthState() => _loadState();
+
   /// Onboarding'in tamamlandığını işaretler.
   ///
   /// Ekranlar `SharedPreferences`'a doğrudan yazmamalıdır: o yol bellek içi
