@@ -102,12 +102,16 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
       return;
     }
 
+    // View model kamerayı durdurmadan **önce** okunuyor: `stop()` artık
+    // await ediliyor ve sonrasında `context` bir async boşluğun ötesinde
+    // kalıyor.
+    final userViewModel = context.read<UserViewModel>();
+
     setState(() {
       _isProcessing = true;
     });
-    _scannerController.stop();
+    await _pauseScanner();
 
-    final userViewModel = context.read<UserViewModel>();
     final token = PairingToken.normalize(raw!);
     final ownerUid = await _remote.resolvePairingToken(token);
     if (!mounted) return;
@@ -119,15 +123,51 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     );
 
     if (!status.isValid) {
-      setState(() => _isProcessing = false);
-      await _scannerController.start();
-      if (!mounted) return;
+      // Mesaj kamerayı yeniden başlatmadan **önce** gösteriliyor. Ters
+      // sırada, başlatma hata verdiğinde mesaja hiç sıra gelmiyordu:
+      // kullanıcı neyin yanlış olduğunu öğrenemeden kamera aynı kodu
+      // okumaya devam ediyordu.
       _showScanError(status);
+      await _resumeScanner();
+      if (!mounted) return;
+      setState(() => _isProcessing = false);
       return;
     }
 
     _scannedToken = token;
+    // `_isProcessing` açık kalıyor: onay sayfası kapanana kadar yeni
+    // okuma işlenmemeli.
     _showConfirmationDialog(ownerUid!);
+  }
+
+  /// Kamerayı durdurur.
+  ///
+  /// `stop()` await edilmiyordu ve hemen ardından `start()` çağrılıyordu;
+  /// denetleyici daha durmayı bitirmemişken:
+  ///
+  ///     MobileScannerException(controllerInitializing, The
+  ///     MobileScannerController is still initializing.)
+  ///
+  /// İstisna yakalanmadığı için hata mesajı hiç gösterilmiyor, `_isProcessing`
+  /// da sıfırlandığı için bir sonraki kare aynı yoldan geçiyordu — kamera
+  /// aynı geçersiz kodu durmadan okumaya çalışıyordu.
+  Future<void> _pauseScanner() async {
+    try {
+      await _scannerController.stop();
+    } on MobileScannerException catch (e) {
+      // Zaten durmuş ya da hiç başlamamış olabilir; ikisi de sorun değil.
+      debugPrint('Scanner stop failed: ${e.errorCode}');
+    }
+  }
+
+  /// Kamerayı yeniden başlatır; başlatılamazsa ekran yine de kullanılabilir
+  /// kalır (kullanıcı geri dönüp tekrar girebilir).
+  Future<void> _resumeScanner() async {
+    try {
+      await _scannerController.start();
+    } on MobileScannerException catch (e) {
+      debugPrint('Scanner start failed: ${e.errorCode}');
+    }
   }
 
   /// Geçersiz kodu bildirir ve taramaya devam eder.
