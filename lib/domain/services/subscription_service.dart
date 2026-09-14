@@ -68,6 +68,14 @@ class SubscriptionService {
   static Future<void> logout() async {
     if (!_configured) return;
     try {
+      // Anonim kullanıcıda çıkış yapılamaz; RevenueCat bunu hata sayıp
+      // günlüğe ERROR basıyordu:
+      //
+      //     LogOut was called but the current user is anonymous.
+      //
+      // Oysa yapılacak bir şey yok, kullanıcı zaten kimliksiz. Sahte
+      // hatalar günlüğü kirletiyor ve gerçek olanları gizliyor.
+      if (await Purchases.isAnonymous) return;
       await Purchases.logOut();
     } catch (e) {
       debugPrint("RevenueCat logout error: $e");
