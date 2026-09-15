@@ -107,6 +107,11 @@ Uygulama tek bir telefon genişliği varsayılarak yazılmıştı; iPad'de kartl
 | 600–899 pt | Sütun 600 pt'de ortalanır, alt menü kalır — iPad mini, katlanabilir açıkken |
 | ≥ 900 pt | Ortalanmış sütun + **yan menü** — iPad 13" portre, bütün iPad'ler yatay |
 
+Kütüphane ve Analiz ayrıca **700 pt'den sonra iki sütuna** açılıyor: makale
+kartları ızgaraya, iki analiz kartı yan yana geçiyor. Bu ikisi 1000 pt'ye
+kadar genişleyebiliyor — 600 pt'lik tek sütun sınırına sıkıştırılsalardı her
+sütun 280 pt'ye düşerdi.
+
 Karar cihaz adına değil **gelen genişliğe** göre veriliyor: iPadOS 26
 pencereleri serbestçe boyutlandırıyor ve katlanabilir telefon açılıp
 kapandığında genişlik çalışma anında değişiyor.

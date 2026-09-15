@@ -118,6 +118,10 @@ Düzen cihaz adına göre değil gelen genişliğe göre kararını verir
 | 600–899 pt | 600 pt'de ortalanmış sütun, alt menü |
 | ≥ 900 pt | Ortalanmış sütun + yan menü ([side_nav_rail.dart](lib/presentation/home/widgets/side_nav_rail.dart)) |
 
+Kütüphane ve Analiz `AppColumns` ile 700 pt'den sonra iki sütuna açılır ve
+1000 pt'ye kadar genişler. Eşik içerikten geliyor: kütüphane kartı 96 pt
+görsel + başlık taşıyor, kart başına ~320 pt gerekiyor.
+
 iPadOS pencereleri serbestçe boyutlandırıyor ve katlanabilir telefonlar
 çalışma anında genişlik değiştiriyor; "iPad mi?" sorusunun sabit bir cevabı
 yok, "şu an kaç pt?" sorusunun var.

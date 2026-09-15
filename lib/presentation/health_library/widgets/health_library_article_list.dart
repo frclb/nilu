@@ -5,6 +5,7 @@ import '../article_screen.dart';
 import '../../../design_system/content_illustration.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../domain/models/article.dart';
+import '../../../design_system/app_layout.dart';
 
 class HealthLibraryArticleList extends StatelessWidget {
   final List<Article> articles;
@@ -73,16 +74,17 @@ class HealthLibraryArticleList extends StatelessWidget {
             ),
           )
         else
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+          Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            itemCount: articles.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 16),
-            itemBuilder: (context, index) {
-              final article = articles[index];
-              return _buildArticleCard(context, article, theme, isDark);
-            },
+            // Kart yüksekliği sabit (96 pt görsel), o yüzden iki sütunda
+            // satırlar birbirini tutuyor — ızgara için ayrı bir bileşene
+            // gerek yok.
+            child: AppColumns(
+              children: [
+                for (final article in articles)
+                  _buildArticleCard(context, article, theme, isDark),
+              ],
+            ),
           ),
       ],
     );

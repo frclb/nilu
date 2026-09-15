@@ -45,6 +45,21 @@ abstract final class AppLayout {
   /// Yan gezinme menüsünün genişliği.
   static const double railWidth = 88;
 
+  /// İki sütuna açılabilen gövdelerin azami genişliği.
+  ///
+  /// [contentMaxWidth] tek sütunun okunur genişliği; iki sütun oraya
+  /// sıkıştırılırsa her biri 280 pt'ye düşüp kart içeriği okunmaz oluyor.
+  static const double wideContentMaxWidth = 1000;
+
+  /// İki sütunun anlamlı olduğu en dar içerik genişliği.
+  ///
+  /// Kütüphane kartı 96 pt görsel + 16 pt boşluk + başlık taşıyor; altına
+  /// düştüğü noktada başlık iki satıra bölünüp üç noktaya kaçıyor. Kart
+  /// başına ~320 pt gerekiyor: 2×320 + 16 sütun arası + 2×24 kenar ≈ 700.
+  ///
+  /// iPad mini (744) içeride, katlanabilir açıkken (626) dışarıda kalıyor.
+  static const double twoColumnMin = 700;
+
   static LayoutClass classOf(double width) {
     if (width < compactMax) return LayoutClass.compact;
     if (width < expandedMin) return LayoutClass.medium;
@@ -138,5 +153,75 @@ class SliverContentWidth extends StatelessWidget {
         sliver: sliver,
       ),
     );
+  }
+}
+
+/// Dar ekranda tek sütun, geniş ekranda iki sütun.
+///
+/// Sütun sayısına **gelen genişliğe** göre karar verir, pencere genişliğine
+/// göre değil: yan gezinme menüsü açıkken gövde pencereden bir menü kadar
+/// dar kalıyor ve pencere genişliği yanıltıyor.
+///
+/// Aradaki boşluğu da kendisi koyar; çağıran tarafta ayrıca ayırıcı
+/// `SizedBox` bırakılmamalı, yoksa tek sütunda boşluk ikiye katlanır.
+class AppColumns extends StatelessWidget {
+  const AppColumns({super.key, required this.children, this.spacing = 16});
+
+  final List<Widget> children;
+
+  /// Hem sütunlar hem satırlar arasındaki boşluk.
+  final double spacing;
+
+  @override
+  Widget build(BuildContext context) {
+    if (children.isEmpty) return const SizedBox.shrink();
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final twoUp =
+            constraints.hasBoundedWidth &&
+            constraints.maxWidth >= AppLayout.twoColumnMin;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: twoUp ? _pairedRows() : _singleColumn(),
+        );
+      },
+    );
+  }
+
+  List<Widget> _singleColumn() {
+    final out = <Widget>[];
+    for (var i = 0; i < children.length; i++) {
+      if (i > 0) out.add(SizedBox(height: spacing));
+      out.add(children[i]);
+    }
+    return out;
+  }
+
+  List<Widget> _pairedRows() {
+    final out = <Widget>[];
+    for (var i = 0; i < children.length; i += 2) {
+      if (i > 0) out.add(SizedBox(height: spacing));
+
+      final right = i + 1 < children.length ? children[i + 1] : null;
+      out.add(
+        Row(
+          // `stretch` daha derli toplu dururdu ama kaydırma görünümü içinde
+          // satırın dikey kısıtı serbest: sıkı kısıt dağıtmak için önce
+          // yüksekliği bilmek gerekiyor. `start` ikisini de doğal boyunda
+          // bırakıp üstten hizalıyor.
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: children[i]),
+            SizedBox(width: spacing),
+            // Tek sayıda öğede son kart yarım genişlikte kalır; ızgara
+            // bozulmasın diye yanı boş bırakılıyor.
+            Expanded(child: right ?? const SizedBox.shrink()),
+          ],
+        ),
+      );
+    }
+    return out;
   }
 }

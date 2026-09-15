@@ -161,7 +161,7 @@ açılıyor; tanıtım görüntüsü için orası daha iyi duruyor.
 flutter test
 ```
 
-45 dosyada 544 test var. Çoğu saf mantığı ve depolamayı kapsar (döngü
+46 dosyada 561 test var. Çoğu saf mantığı ve depolamayı kapsar (döngü
 hesabı, tahmin, şifreli depolama, eski veri kurtarma, abonelik korumaları).
 Yanına üç tür daha eklendi:
 
@@ -170,7 +170,7 @@ Yanına üç tür daha eklendi:
 | Kaynak taraması | Sabit renk kaçağı, uzak görsel, eksik efsane işareti |
 | Kontrast | Gerçek `ThemeData` üzerinden, açık/koyu × dört tema için WCAG oranı |
 | Arayüz | Yönlendirme, alt gezinme, uygulama kilidi kapısı |
-| Ekran boyutu | On cihaz genişliğinde taşma ve menü seçimi |
+| Ekran boyutu | On cihaz genişliğinde taşma, menü seçimi, sütun sayısı |
 
 Ekranların görsel doğruluğunu hâlâ elle doğrulamanız gerekir; testler
 düzenin *doğru göründüğünü* değil, kurallara uyduğunu kontrol eder.

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:period_tracker/design_system/app_card.dart';
 import 'package:period_tracker/design_system/app_layout.dart';
+import 'package:period_tracker/presentation/health_library/widgets/health_library_article_list.dart';
 import 'package:period_tracker/domain/view_models/user_view_model.dart';
 import 'package:period_tracker/core/navigation/tab_navigation_shell.dart';
 import 'package:period_tracker/main.dart';
@@ -97,6 +99,96 @@ void main() {
         );
       });
     }
+  });
+
+  group('her sekme her boyutta taşmadan çizilir', () {
+    // Ana ekranı açmak yetmiyor: kütüphane ve analiz geniş ekranda iki sütuna
+    // açılıyor ve o düzen yalnızca o sekmelere girilince kuruluyor.
+    for (final device in [
+      phones.first, // en dar telefon
+      phones[3], // katlanabilir kapalı — geniş ama kısa
+      tablets.first, // katlanabilir açık — iki sütun eşiğinin hemen altı
+      tablets[1], // iPad mini — iki sütun eşiğinin hemen üstü
+      tablets[4], // iPad 13" portre
+      tablets.last, // iPad 13" yatay — yan menülü
+    ]) {
+      testWidgets('$device bütün sekmeler', (tester) async {
+        await openAt(tester, device);
+
+        final destinations = navDestinations(isPartner: false);
+        for (final destination in destinations.skip(1)) {
+          // Seçili hedef dolu simgeyi gösterir; henüz girmediklerimiz boş
+          // varyantla duruyor.
+          final tab = find.byIcon(destination.icon);
+          expect(
+            tab,
+            findsWidgets,
+            reason: '$device: ${destination.labelKey} sekmesi bulunamadı',
+          );
+
+          await tester.tap(tab.first);
+          // `pumpAndSettle` değil: takvim verisi yüklenirken dönen
+          // `CircularProgressIndicator` hiç durmuyor ve settle sonsuza
+          // kadar bekliyor. Taşma yerleşim sırasında bildiriliyor, iki kare
+          // yetiyor.
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 400));
+
+          expect(
+            tester.takeException(),
+            isNull,
+            reason:
+                '$device: ${destination.labelKey} sekmesinde düzen hatası var',
+          );
+        }
+      });
+    }
+  });
+
+  group('kütüphane geniş ekranda iki sütuna açılır', () {
+    /// Kütüphane sekmesine geçip makale kartlarının konumlarını döndürür.
+    ///
+    /// `AppColumns`'un kendi geometrisi ayrı sınanıyor
+    /// (`test/design_system/app_columns_test.dart`); burada **ekranın onu
+    /// gerçekten kullandığı** doğrulanıyor.
+    Future<List<Rect>> articleRects(
+      WidgetTester tester,
+      DeviceSize device,
+    ) async {
+      await openAt(tester, device);
+
+      final library = navDestinations(
+        isPartner: false,
+      ).firstWhere((d) => d.labelKey == 'nav_library');
+      await tester.tap(find.byIcon(library.icon).first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      final cards = find.descendant(
+        of: find.byType(HealthLibraryArticleList),
+        matching: find.byType(AppCard),
+      );
+      expect(
+        cards,
+        findsAtLeast(2),
+        reason: '$device: karşılaştırmak için en az iki makale gerekiyor',
+      );
+      return [tester.getRect(cards.at(0)), tester.getRect(cards.at(1))];
+    }
+
+    testWidgets('iPad 13" portrede kartlar yan yana', (tester) async {
+      final rects = await articleRects(tester, tablets[4]);
+
+      expect(rects[0].top, rects[1].top, reason: 'aynı satırda olmalı');
+      expect(rects[1].left, greaterThan(rects[0].right));
+    });
+
+    testWidgets('telefonda kartlar alt alta', (tester) async {
+      final rects = await articleRects(tester, phones[1]);
+
+      expect(rects[0].left, rects[1].left, reason: 'tek sütun korunmalı');
+      expect(rects[1].top, greaterThan(rects[0].bottom));
+    });
   });
 
   group('gezinme menüsü genişliğe göre yer değiştirir', () {

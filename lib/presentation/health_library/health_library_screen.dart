@@ -52,6 +52,9 @@ class _HealthLibraryScreenState extends State<HealthLibraryScreen> {
       backgroundColor: bgColor,
       appBar: const HealthLibraryAppBar(),
       body: AppContentWidth(
+        // Makale listesi geniş ekranda iki sütuna açılıyor; tek sütunun
+        // okunur genişliğine sıkıştırılırsa kartlar 280 pt'ye düşer.
+        maxWidth: AppLayout.wideContentMaxWidth,
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.only(bottom: 16),
