@@ -147,24 +147,37 @@ class ProfileSettingsScreen extends StatelessWidget {
               SettingsGroup(
                 title: context.tr('profile_other'),
                 items: [
-                  SettingsItem(
-                    title: context.tr('profile_notifications'),
-                    icon: Icons.notifications_none_outlined,
-                    iconColor: Theme.of(context).colorScheme.primary,
-                    iconBgColor: context.tokens.brandTint,
-                    onTap: () {
-                      context.pushNamed(RouteNames.notificationSettings);
-                    },
-                  ),
-                  SettingsItem(
-                    title: context.tr('health_sync_title'),
-                    icon: Icons.favorite_outline,
-                    iconColor: Theme.of(context).colorScheme.primary,
-                    iconBgColor: context.tokens.brandTint,
-                    onTap: () {
-                      context.pushNamed(RouteNames.healthSync);
-                    },
-                  ),
+                  // Genel bildirimler ve Apple Sağlık partnere gösterilmiyor.
+                  //
+                  // İkisi de cihazın **kendi** döngü verisine dayanıyor;
+                  // partnerin öyle bir verisi yok. Genel bildirim anahtarları
+                  // yalnızca `ReminderSync`'i besliyor ve o partner modunda
+                  // çalışmıyor — partner açıp kapattığı hâlde hiçbir şeyin
+                  // değişmediği anahtarlar görüyordu. Sağlık içe aktarma da
+                  // aktaracak bir şey bulamazdı.
+                  //
+                  // Partnerin kendi bildirim ayarları yukarıdaki "Partner
+                  // Ayarları" grubunda.
+                  if (!context.watch<UserViewModel>().isPartner) ...[
+                    SettingsItem(
+                      title: context.tr('profile_notifications'),
+                      icon: Icons.notifications_none_outlined,
+                      iconColor: Theme.of(context).colorScheme.primary,
+                      iconBgColor: context.tokens.brandTint,
+                      onTap: () {
+                        context.pushNamed(RouteNames.notificationSettings);
+                      },
+                    ),
+                    SettingsItem(
+                      title: context.tr('health_sync_title'),
+                      icon: Icons.favorite_outline,
+                      iconColor: Theme.of(context).colorScheme.primary,
+                      iconBgColor: context.tokens.brandTint,
+                      onTap: () {
+                        context.pushNamed(RouteNames.healthSync);
+                      },
+                    ),
+                  ],
                   SettingsItem(
                     title: context.tr('appearance_title'),
                     icon: Icons.palette_outlined,

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -352,6 +355,35 @@ void main() {
       // Sahibin metniyle izin kutusu partnere hiç açılmamalı.
       expect(find.byType(AlertDialog), findsNothing);
     });
+
+    testWidgets('profilde cihazın kendi verisine dayanan ayarlar yok', (
+      tester,
+    ) async {
+      await openAt(tester, tablets[4]);
+
+      final profile = navDestinations(
+        isPartner: true,
+      ).firstWhere((d) => d.labelKey == 'nav_profile');
+      await tester.tap(find.byIcon(profile.icon).first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      // Beklenen metinler sözlükten okunuyor: sabit yazılsalardı bir çeviri
+      // düzeltmesi testi sessizce yalancı geçirirdi.
+      String label(String key) => _dictionary[key] as String;
+
+      // Genel bildirim anahtarları yalnızca `ReminderSync`'i besliyor ve o
+      // partner modunda çalışmıyor — açıp kapattığı hâlde hiçbir şeyin
+      // değişmediği anahtarlar gösterilmemeli. Sağlık içe aktarmanın da
+      // partnerde aktaracağı veri yok.
+      expect(find.text(label('profile_notifications')), findsNothing);
+      expect(find.text(label('health_sync_title')), findsNothing);
+
+      // Partnerin kendi bildirim ayarları duruyor.
+      expect(find.text(label('profile_notification_settings')), findsOneWidget);
+      // Herkese açık olanlar da duruyor.
+      expect(find.text(label('appearance_title')), findsOneWidget);
+    });
   });
 
   group('düzen sınıfı eşikleri', () {
@@ -385,3 +417,11 @@ void main() {
     });
   });
 }
+
+/// Testin çizdiği yerelin sözlüğü.
+///
+/// `flutter test` yerel ayar vermiyor; uygulama desteklenen diller içinden
+/// İngilizceye düşüyor.
+final Map<String, dynamic> _dictionary =
+    jsonDecode(File('lib/localization/en.json').readAsStringSync())
+        as Map<String, dynamic>;

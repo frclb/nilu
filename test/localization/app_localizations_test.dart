@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -93,5 +94,28 @@ void main() {
         reason: '$code.json anahtar seti en.json ile aynı değil',
       );
     }
+  });
+
+  group('partner sözcüğü tutarlı çevrilmiş', () {
+    // Regresyon: `partner_important_days_summary_title` Türkçede "İş
+    // ortağınızın döngüsü" diyordu — makine çevirisi "partner"ı iş bağlamında
+    // almış. Hemen altındaki açıklama zaten "Partnerinizin" diyordu, yani
+    // aynı kartın içinde iki ayrı sözcük kullanılıyordu.
+    test('tr.json "iş ortağı" demiyor', () {
+      final map =
+          jsonDecode(File('lib/localization/tr.json').readAsStringSync())
+              as Map<String, dynamic>;
+
+      final offenders = map.entries
+          .where((e) => e.value.toString().toLowerCase().contains('iş ortağ'))
+          .map((e) => e.key)
+          .toList();
+
+      expect(
+        offenders,
+        isEmpty,
+        reason: 'romantik partner kastediliyor; "iş ortağı" yanlış: $offenders',
+      );
+    });
   });
 }
