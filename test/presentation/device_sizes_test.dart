@@ -155,6 +155,60 @@ void main() {
     }
   });
 
+  group('profil alt ekranları taşmadan açılır', () {
+    // Bunlar ayrı rotalar ve sekme taramasına girmiyorlar; hiçbiri otomatik
+    // olarak çizilmiyordu. Takvimdeki gibi cihaza göre değişen bir düzen
+    // hatası buralarda da fark edilmeden kalabilir.
+    //
+    // Her ekran kendi testinde ve uygulama baştan açılıyor: geri gitmek
+    // güvenilir değil. Uygulamanın geri oku özel bir `IconButton`, yani
+    // `pageBack()` bulamıyor; `Navigator.pop` ise bazı ekranlar sekmenin
+    // içinde açıldığı için yanlış yığından çıkarıp kabuğu kaldırıyor.
+    //
+    // Cihaz en dar telefon: sığmama sorunu önce orada çıkar.
+    const settingsKeys = [
+      'profile_personal_info',
+      'profile_cycle_settings',
+      'profile_bleeding_check',
+      'profile_notifications',
+      'health_sync_title',
+      'appearance_title',
+      'profile_privacy_security',
+      'privacy_policy_title',
+      'terms_of_service_title',
+    ];
+
+    for (final key in settingsKeys) {
+      testWidgets('iPhone 16e — $key', (tester) async {
+        await openAt(tester, phones.first);
+
+        final profile = navDestinations(
+          isPartner: false,
+        ).firstWhere((d) => d.labelKey == 'nav_profile');
+        await tester.tap(find.byIcon(profile.icon).first);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 400));
+
+        // Profil listesi tek bir `Column`: bütün maddeler çiziliyor, yani
+        // `find.text` ekran dışındakileri de buluyor ama dokunma başarısız
+        // oluyor. `scrollUntilVisible` burada kaydırmıyor bile — aradığı
+        // widget zaten bulunmuş durumda.
+        final item = find.text(_dictionary[key] as String);
+        await tester.ensureVisible(item);
+        await tester.pump();
+        await tester.tap(item);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
+
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: '$key ekranında düzen hatası var',
+        );
+      });
+    }
+  });
+
   group('kütüphane geniş ekranda iki sütuna açılır', () {
     /// Kütüphane sekmesine geçip makale kartlarının konumlarını döndürür.
     ///
