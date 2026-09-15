@@ -375,15 +375,21 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
               errorBuilder: (context, error) => _ScanUnavailable(error: error),
             ),
             // Scanner overlay
+            //
+            // Kesim alanı **gelen genişlikten** hesaplanıyor, ekranınkinden
+            // değil: geniş ekranda önizleme okunur genişlikte ortalanıyor ve
+            // ekran genişliğinin %70'i kutunun kendisinden büyük çıkıyordu.
             Positioned.fill(
-              child: Container(
-                decoration: ShapeDecoration(
-                  shape: _ScannerOverlayShape(
-                    borderColor: Theme.of(context).primaryColor,
-                    borderRadius: 12,
-                    borderLength: 40,
-                    borderWidth: 6,
-                    cutOutSize: MediaQuery.of(context).size.width * 0.70,
+              child: LayoutBuilder(
+                builder: (context, constraints) => Container(
+                  decoration: ShapeDecoration(
+                    shape: _ScannerOverlayShape(
+                      borderColor: Theme.of(context).primaryColor,
+                      borderRadius: 12,
+                      borderLength: 40,
+                      borderWidth: 6,
+                      cutOutSize: constraints.biggest.shortestSide * 0.70,
+                    ),
                   ),
                 ),
               ),

@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 /// Genişliğe göre düzen sınıfı.
 ///
@@ -224,4 +224,31 @@ class AppColumns extends StatelessWidget {
     }
     return out;
   }
+}
+
+/// İçerik sütununun sağ alt köşesine yerleşen kayan düğme konumu.
+///
+/// `endFloat` ekranın sağ kenarını kullanıyor. Geniş ekranda içerik ortada
+/// [AppLayout.contentMaxWidth] genişliğinde kalınca düğme sütundan 200 pt
+/// uzakta, bomboş bir alanda duruyor ve neye ait olduğu anlaşılmıyordu.
+///
+/// Sütun kadar içeri kayıyor; dar ekranda `endFloat` ile birebir aynı.
+class ContentEndFloatFab extends FloatingActionButtonLocation {
+  const ContentEndFloatFab({this.maxWidth = AppLayout.contentMaxWidth});
+
+  /// Düğmenin hizalanacağı sütunun azami genişliği.
+  final double maxWidth;
+
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    final base = FloatingActionButtonLocation.endFloat.getOffset(
+      scaffoldGeometry,
+    );
+    final slack = scaffoldGeometry.scaffoldSize.width - maxWidth;
+    if (slack <= 0) return base;
+    return Offset(base.dx - slack / 2, base.dy);
+  }
+
+  @override
+  String toString() => 'ContentEndFloatFab($maxWidth)';
 }

@@ -87,6 +87,37 @@ class _OnboardingCycleLengthScreenState
 
     return Scaffold(
       backgroundColor: bgColor,
+      // Eylem çubuğu gövdenin değil `Scaffold`'un altında: içerik
+      // sütununun içinde kalınca zemini geniş ekranda 600 pt'de
+      // kesilip sayfanın üstünde sert kenarlı bir dikdörtgen
+      // bırakıyordu. Burada tam genişlikte ve dibe sabitli.
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: context.tokens.surface,
+          border: Border(top: BorderSide(color: context.tokens.surfaceAlt)),
+        ),
+        child: AppContentWidth(
+          // Zemin tam genişlikte, düğme okunur sütunda kalıyor.
+          child: ElevatedButton(
+            onPressed: _completeOnboarding,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              minimumSize: const Size(double.infinity, 56),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 8,
+              shadowColor: primaryColor.withAlpha(76),
+            ),
+            child: Text(
+              context.tr('onb_finish_setup'),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+      ),
       body: AppContentWidth(
         child: SafeArea(
           child: Column(
@@ -270,34 +301,6 @@ class _OnboardingCycleLengthScreenState
                         ),
                       ),
                     ],
-                  ),
-                ),
-              ),
-
-              // Bottom Action
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: context.tokens.surface,
-                  border: Border(
-                    top: BorderSide(color: context.tokens.surfaceAlt),
-                  ),
-                ),
-                child: ElevatedButton(
-                  onPressed: _completeOnboarding,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    minimumSize: const Size(double.infinity, 56),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 8,
-                    shadowColor: primaryColor.withAlpha(76),
-                  ),
-                  child: Text(
-                    context.tr('onb_finish_setup'),
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

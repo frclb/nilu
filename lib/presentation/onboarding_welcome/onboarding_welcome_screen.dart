@@ -84,34 +84,37 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
 
     return Scaffold(
       backgroundColor: bgColor,
-      body: AppContentWidth(
-        child: Stack(
-          children: [
-            // Background Gradient decoration
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: MediaQuery.of(context).size.height * 0.6,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      theme.colorScheme.primary.withAlpha(12),
-                      Colors.transparent,
-                    ],
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(48),
-                    bottomRight: Radius.circular(48),
-                  ),
+      // Sarmalayıcı `Stack`'in **içinde**: dekoratif degrade tam genişlikte
+      // kalmalı. Dışarıda olduğunda 600 pt'de kesiliyor ve zeminle arasında
+      // görünür bir dikey dikiş bırakıyordu.
+      body: Stack(
+        children: [
+          // Background Gradient decoration
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    theme.colorScheme.primary.withAlpha(12),
+                    Colors.transparent,
+                  ],
+                ),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(48),
+                  bottomRight: Radius.circular(48),
                 ),
               ),
             ),
+          ),
 
-            SafeArea(
+          AppContentWidth(
+            child: SafeArea(
               child: Column(
                 children: [
                   // Top Action Bar
@@ -249,8 +252,8 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

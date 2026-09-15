@@ -9,6 +9,8 @@ import 'package:period_tracker/domain/view_models/user_view_model.dart';
 import 'package:period_tracker/core/navigation/tab_navigation_shell.dart';
 import 'package:period_tracker/main.dart';
 import 'package:period_tracker/presentation/home/widgets/custom_bottom_nav.dart';
+import 'package:period_tracker/presentation/home/widgets/cycle_masthead.dart';
+import 'package:period_tracker/presentation/log_entry/log_entry_screen.dart';
 import 'package:period_tracker/presentation/home/widgets/side_nav_rail.dart';
 
 /// Uygulamayı sattığımız her cihaz boyutunda açar.
@@ -188,6 +190,74 @@ void main() {
 
       expect(rects[0].left, rects[1].left, reason: 'tek sütun korunmalı');
       expect(rects[1].top, greaterThan(rects[0].bottom));
+    });
+  });
+
+  group('kayan düğme içerik sütununa hizalanır', () {
+    /// Ana ekrandaki "+" düğmesinin ve içerik sütununun sağ kenarları.
+    Future<(double fabRight, double contentRight)> edges(
+      WidgetTester tester,
+      DeviceSize device,
+    ) async {
+      await openAt(tester, device);
+
+      final fab = tester.getRect(find.byType(FloatingActionButton));
+      final content = tester.getRect(find.byType(CycleMasthead));
+      return (fab.right, content.right);
+    }
+
+    testWidgets('iPad 13" portrede düğme sütunun yanında durur', (
+      tester,
+    ) async {
+      final (fabRight, contentRight) = await edges(tester, tablets[4]);
+
+      // Ekranın sağ kenarına yapışsaydı aradaki fark 200 pt'yi geçerdi.
+      expect(
+        (fabRight - contentRight).abs(),
+        lessThan(40),
+        reason: 'düğme içerik sütunundan kopmamalı',
+      );
+    });
+
+    testWidgets('telefonda konum değişmez', (tester) async {
+      final (fabRight, contentRight) = await edges(tester, phones[1]);
+
+      expect((fabRight - contentRight).abs(), lessThan(40));
+    });
+  });
+
+  group('alt eylem çubuğu ekranın dibinde durur', () {
+    // `Scaffold` gövdeye gevşek kısıt veriyor; `Stack` içeriğine göre
+    // büzülünce `Positioned(bottom: 0)` ekranın değil içeriğin dibine
+    // yapışıyordu. Telefonda içerik ekranı doldurduğu için görünmüyordu,
+    // iPad'de çubuk sayfanın ortasında havada kalıyordu.
+    testWidgets('kayıt ekranında iPad boyutunda', (tester) async {
+      final device = tablets[4];
+      await openAt(tester, device);
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(
+        find.byType(LogEntryScreen),
+        findsOneWidget,
+        reason: 'kayıt ekranı açılmadan iddia sınanamaz',
+      );
+      // `ElevatedButton.icon` alt sınıf üretiyor; `find.byType` tam tip
+      // eşlediği için onu bulamıyor.
+      final save = find.descendant(
+        of: find.byType(LogEntryScreen),
+        matching: find.byWidgetPredicate((w) => w is ElevatedButton),
+      );
+      expect(save, findsOneWidget, reason: 'kaydet düğmesi bulunamadı');
+
+      final bar = tester.getRect(save);
+      expect(
+        bar.bottom,
+        greaterThan(device.points.height - 140),
+        reason: 'eylem çubuğu ekranın dibine yakın olmalı',
+      );
     });
   });
 

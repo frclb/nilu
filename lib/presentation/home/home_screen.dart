@@ -27,6 +27,9 @@ class HomeScreen extends StatelessWidget {
       // FAB elle `Positioned` ile yerleştiriliyordu: güvenli alanı ve
       // klavyeyi hesaba katmıyordu. Scaffold'un kendi yuvası ikisini de
       // yapıyor.
+      // Düğme ekranın sağ kenarına değil içerik sütununa hizalanıyor;
+      // geniş ekranda aradaki boşlukta yapayalnız kalıyordu.
+      floatingActionButtonLocation: const ContentEndFloatFab(),
       floatingActionButton: showFab
           ? FloatingActionButton(
               heroTag: 'home_fab',
