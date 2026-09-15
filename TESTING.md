@@ -4,11 +4,18 @@
 
 | Amaç | Komut | Gereken |
 |---|---|---|
-| Kendi iPhone'unuzda denemek | `flutter run -d <device-id>` | Xcode + kablo (ilk seferde) |
+| Kendi iPhone'unuzda denemek | `flutter run -d "HürkanÇ"` | Xcode + kablo (ilk seferde) |
 | iOS simülatöründe denemek | `flutter run -d "iPhone 17"` | Xcode |
-| Android telefonda denemek | `flutter run -d <device-id>` | Android SDK **(bu makinede kurulu değil)** |
-| Sadece arayüze bakmak | `flutter run -d chrome` | Chrome |
 | Mantığı doğrulamak | `flutter test` | — |
+
+Uygulama yalnızca iOS için geliştiriliyor; Android ve web platform klasörleri
+kaldırıldı.
+
+**Aynı anda tek yol kullanın.** Terminalden `flutter run` ile Xcode'dan ⌘R'yi
+birlikte çalıştırmak iki derlemenin aynı klasörü paylaşmasına yol açıyor ve
+`Framework 'Pods_Runner' not found` ya da `unable to initiate PIF transfer
+session` gibi yanıltıcı hatalar veriyor. Yol değiştirirken araya
+`flutter clean` koyun.
 
 ---
 
@@ -26,8 +33,14 @@ Telefonda çıkan "Bu bilgisayara güven" sorusuna **Güven** deyin.
 ```bash
 open ios/Runner.xcworkspace
 ```
-Runner → Signing & Capabilities → Team: kendi Apple ID'niz. Ücretsiz hesap
-7 günlük geçici imza verir, denemek için yeterlidir.
+Runner → Signing & Capabilities → Team: kendi Apple ID'niz. **CycleWidget
+hedefinde de** aynı takım seçili olmalı; uzantı ayrı imzalanıyor.
+
+Ücretsiz hesap 7 günlük geçici imza verir — süre dolunca uygulama açılmaz
+olur, aynı komutla yeniden kurmak gerekir. Ücretsiz takımlar HealthKit ve App
+Groups yetkilerini de vermiyor; bu yüzden Debug ayrı bir yetki dosyası
+kullanıyor (bkz. README → İmzalama ve yetkiler). O yapılandırmada sağlık
+senkronizasyonu ve widget çalışmaz, geri kalan her şey çalışır.
 
 **d) Çalıştırın**
 ```bash
@@ -86,25 +99,7 @@ curl -s -o /dev/null -w "%{http_code}\n" https://raw.githubusercontent.com/Cocoa
 
 ---
 
-## 3. Android'de
-
-Bu makinede Android SDK kurulu değil (`flutter doctor` → `[✗] Android toolchain`).
-Play Store'a çıkacaksanız kurulumu şart:
-
-```bash
-brew install --cask android-studio
-```
-Android Studio'yu açıp SDK + bir AVD (emülatör) oluşturun, sonra:
-```bash
-flutter doctor --android-licenses
-```
-```bash
-flutter run -d emulator-5554
-```
-
----
-
-## 4. Uygulamayı gezerken nelere bakın
+## 3. Uygulamayı gezerken nelere bakın
 
 Bu turda değişen davranışlar — hepsi elle doğrulanabilir:
 
@@ -143,27 +138,38 @@ Bu turda değişen davranışlar — hepsi elle doğrulanabilir:
 
 ---
 
-## 5. Ekran görüntüsü almak (mağaza için)
+## 4. Ekran görüntüsü almak (mağaza için)
 
 Simülatörde uygulama açıkken:
 ```bash
 xcrun simctl io booted screenshot ~/Desktop/rcapp-01.png
 ```
 
-Mağaza 6.7" ve 6.5" boyut ister; iPhone 17 Pro Max ve iPhone 16 Plus
-simülatörlerinde aynı komutu tekrarlayın.
+App Store Connect'in istediği boyut zamanla değişiyor — formun o an hangi
+cihazı zorunlu tuttuğuna bakın ve o simülatörde komutu tekrarlayın. Uygulama
+şu an iPad'i de hedeflediği için iPad ekran görüntüsü de isteniyor
+([STORE_CHECKLIST.md](STORE_CHECKLIST.md) §3'e bakın).
 
 ---
 
-## 6. Otomatik testler
+## 5. Otomatik testler
 
 ```bash
 flutter test
 ```
 
-101 test var; hepsi saf mantığı ve depolamayı kapsar (döngü hesabı, tahmin,
-şifreli depolama, eski veri kurtarma). Arayüz testi yoktur — onu elle
-doğrulamanız gerekir.
+44 dosyada 522 test var. Çoğu saf mantığı ve depolamayı kapsar (döngü
+hesabı, tahmin, şifreli depolama, eski veri kurtarma, abonelik korumaları).
+Yanına üç tür daha eklendi:
+
+| Tür | Ne yakalar |
+|---|---|
+| Kaynak taraması | Sabit renk kaçağı, uzak görsel, eksik efsane işareti |
+| Kontrast | Gerçek `ThemeData` üzerinden, açık/koyu × dört tema için WCAG oranı |
+| Arayüz | Yönlendirme, alt gezinme, uygulama kilidi kapısı |
+
+Ekranların görsel doğruluğunu hâlâ elle doğrulamanız gerekir; testler
+düzenin *doğru göründüğünü* değil, kurallara uyduğunu kontrol eder.
 
 Yükleme öncesi tam kontrol:
 ```bash

@@ -1,19 +1,27 @@
-# Mağaza Yayın Kontrol Listesi
+# App Store Yayın Kontrol Listesi
 
-App Store ve Google Play yüklemesi için gereken adımlar. ✅ = kodda hazır,
-⬜ = sizin yapmanız gerekiyor (hesap, sır veya tasarım gerektiriyor).
+Uygulama **yalnızca iOS** için çıkıyor; `android/`, `linux/`, `macos/`, `web/`
+ve `windows/` klasörleri depodan kaldırıldı. Bu liste App Store yüklemesi için
+gerekenleri kapsar. ✅ = kodda hazır, ⬜ = sizin yapmanız gerekiyor (hesap, sır
+veya tasarım gerektiriyor).
+
+> Bir gün başka bir platforma dönülecekse klasör `flutter create --platforms=android .`
+> ile yeniden üretilir; kod tarafında platforma özel bir şey yok.
 
 ---
 
 ## 1. Uygulama kimliği
 
-| Alan | iOS | Android | Durum |
-|---|---|---|---|
-| Bundle / Application ID | `com.furkan.rcperiodtracker` | `com.furkan.rcperiodtracker` | ✅ eşitlendi |
-| Görünen ad | Period Tracker | Period Tracker | ✅ |
-| Sürüm | `1.0.0` (build 1) | `1.0.0` (versionCode 1) | ✅ `pubspec.yaml:19` |
-| Minimum sürüm | iOS 15.0 | API 24 | ✅ |
-| Desteklenen diller | tr, en, de, es, fr, pt | aynı | ✅ altısı da eşit (`dart run tool/check_localization.dart`) |
+| Alan | Değer | Durum |
+|---|---|---|
+| Bundle ID | `com.furkan.rcperiodtracker` | ✅ |
+| Görünen ad | Period Tracker | ✅ `CFBundleDisplayName` + `CFBundleName` |
+| Sürüm | `1.0.0` (build 1) | ✅ [pubspec.yaml:19](pubspec.yaml) |
+| Minimum iOS | 15.0 (CycleWidget hedefi 17.0) | ✅ |
+| Cihaz ailesi | iPhone **ve** iPad (`TARGETED_DEVICE_FAMILY = "1,2"`) | ⬜ karar bekliyor, §3'e bakın |
+| Yön | Yalnızca dikey (iPad'de ters dikey de) | ✅ |
+| Desteklenen diller | tr, en, de, es, fr, pt | ✅ altısı da eşit (`dart run tool/check_localization.dart`) |
+| Şifreleme beyanı | `ITSAppUsesNonExemptEncryption` = `false` | ✅ — yükleme sırasında soru sorulmaz |
 
 > iOS deployment target 13.0'dı ama Podfile ve Firebase 15.0 istiyor — düzeltildi.
 > Uyumsuz kalsaydı App Store doğrulaması reddederdi.
@@ -24,30 +32,45 @@ Her yüklemede build numarası artmalıdır.
 
 ---
 
-## 2. İmzalama
+## 2. İmzalama ve yetkiler
 
-**iOS** ⬜
-Xcode → Runner → Signing & Capabilities → Team seçin. Apple Developer
-Program üyeliği ($99/yıl) gerekir. Otomatik imzalama yeterlidir.
+**Apple Developer Program üyeliği ($99/yıl)** ⬜
+Mağazaya yükleme, HealthKit, App Groups ve push bildirim bunsuz çalışmaz.
+Üyelik alındıktan sonra Xcode → Runner → Signing & Capabilities → Team seçin.
+Otomatik imzalama yeterlidir. **CycleWidget hedefinde de aynı takımı seçin**
+— ayrı bir hedef, kendi takımını istiyor.
 
-**Android** ⬜
-```bash
-keytool -genkey -v -keystore ~/rcapp-release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias rcapp
+**Yetkiler yapılandırmaya göre ayrılmıştır:**
+
+| Yapılandırma | Dosya | HealthKit | App Groups |
+|---|---|---|---|
+| Debug | `Runner/RunnerDebug.entitlements` | yok | yok |
+| Release / Profile | `Runner/Runner.entitlements` | var | var |
+
+Ücretsiz ("kişisel") Apple takımları HealthKit ve App Groups yetkisini
+vermiyor; Xcode profil üretemeyip derlemeyi durduruyordu:
+
 ```
-Sonra `android/key.properties.example` dosyasını `android/key.properties`
-olarak kopyalayıp doldurun. Dosya `.gitignore`'da; **keystore'u kaybederseniz
-uygulamanın güncellemelerini bir daha yayınlayamazsınız** — yedekleyin.
+Personal development teams … do not support the HealthKit Access
+(Verifiable Health Records) capability.
+```
+
+Debug bu yetkileri içermediği için uygulama ücretsiz hesapla telefona
+kurulabiliyor; mağaza derlemesi (Release) tam yetkilerle çıkıyor. Debug'da
+**sağlık senkronizasyonu ve ana ekran widget'ı çalışmaz** — bunları test
+etmek üyelik gerektirir. Aynısı `CycleWidget/CycleWidgetDebug.entitlements`
+için de geçerli.
+
+Ücretli üyelik alındığında bu ayrıma gerek kalmaz: Debug'ın
+`CODE_SIGN_ENTITLEMENTS` ayarı `Runner/Runner.entitlements` yapılıp
+`*Debug.entitlements` dosyaları silinebilir.
 
 ---
 
 ## 3. Görseller
 
-**App ikonu** ✅ — marka lotusu üretildi ve tüm platform boyutlarına uygulandı.
-
-| Öğe | Durum |
-|---|---|
-| iOS app ikonu (21 boyut, 1024 alfasız) | ✅ |
-| Android adaptive icon (foreground + #551B26 zemin) | ✅ |
+**App ikonu** ✅ — marka lotusu üretildi ve tüm iOS boyutlarına uygulandı
+(21 boyut, 1024 alfasız).
 
 İkonu değiştirmek isterseniz:
 ```bash
@@ -56,22 +79,31 @@ python3 tool/generate_icon.py && dart run flutter_launcher_icons
 Kendi tasarımınızı kullanacaksanız `assets/icon/app_icon.png` dosyasını
 (1024×1024, şeffaflıksız) değiştirip yalnızca ikinci komutu çalıştırın.
 
-**Ekran görüntüleri** ⬜ — mağaza formlarında hâlâ sizden isteniyor:
+> `flutter_launcher_icons` yapılandırmasındaki Android anahtarları kaldırıldı;
+> `android/` yokken komut AndroidManifest.xml arayıp çöküyor ve iOS
+> ikonlarına hiç sıra gelmiyordu.
 
-| Gerekli | Ölçü |
+**Ekran görüntüleri** ⬜ — App Store Connect formunda sizden isteniyor.
+
+Uygulama şu an **iPad'i de hedefliyor** (`TARGETED_DEVICE_FAMILY = "1,2"`).
+App Store Connect bu durumda iPad ekran görüntülerini de zorunlu tutar ve
+inceleme uygulamayı iPad'de açar. İki seçenek:
+
+| Seçenek | Ne yapmalı |
 |---|---|
-| iPhone ekran görüntüsü | 6.7" ve 6.5" — her biri 3-10 adet |
-| Android ekran görüntüsü | telefon için en az 2 adet |
-| Play özellik grafiği | 1024×500 |
+| iPad'i desteklemeye devam et | Düzeni iPad'de test edin ve iPad ekran görüntüsü de hazırlayın |
+| Yalnızca iPhone çık | Xcode → Runner → General → Supported Destinations'tan iPad'i kaldırın (`TARGETED_DEVICE_FAMILY = 1`) |
 
-Ekran görüntülerini [TESTING.md](TESTING.md) §5'teki simülatör akışıyla alabilirsiniz.
+Ekran görüntülerini [TESTING.md](TESTING.md)'deki simülatör akışıyla
+alabilirsiniz. Her boyut için 3–10 adet istenir; App Store Connect o an hangi
+cihaz boyutunu zorunlu tuttuğunu formda gösterir.
 
 ---
 
 ## 4. Gizlilik beyanları
 
-Her iki mağaza da hangi veriyi topladığınızı beyan etmenizi zorunlu tutar.
-Aşağıdakiler **koddan çıkarılmıştır** — formları buna göre doldurun.
+App Store, hangi veriyi topladığınızı beyan etmenizi zorunlu tutar.
+Aşağıdakiler **koddan çıkarılmıştır** — formu buna göre doldurun.
 
 ### Toplanan / işlenen veri
 
@@ -84,35 +116,39 @@ Aşağıdakiler **koddan çıkarılmıştır** — formları buna göre doldurun
 | Cihaz kimliği | FCM push token | Firebase açıksa Firestore | Hayır |
 | Satın alma | Abonelik durumu | RevenueCat açıksa | Hayır |
 
-**Önemli:** Firebase yapılandırma dosyaları eklenmediği sürece uygulama
+**Önemli:** Firebase yapılandırma dosyası eklenmediği sürece uygulama
 **yerel-only** çalışır; hiçbir veri cihazdan çıkmaz. Firebase'i açtığınızda
 yukarıdaki "Firestore" satırları geçerli olur ve beyanı güncellemelisiniz.
 
 ### Apple — App Privacy
-- "Data Used to Track You": **Hayır**
+- "Data Used to Track You": **Hayır** (reklamlar kişiselleştirilmiyor, ATT istenmiyor)
 - "Data Linked to You": Health & Fitness, Sensitive Info, Contact Info,
   Identifiers, Purchases (Firebase açıksa)
 - "Data Not Collected": Firebase kapalıyken hepsi
 
-### Google Play — Data Safety
-- Veri şifreleniyor mu: **Evet** (cihazda; ağda TLS)
-- Kullanıcı silme talep edebilir mi: **Evet** — Profil → Gizlilik → Hesabımı Sil
-- Sağlık verisi beyanı: **Evet**, "Health and fitness → Health info"
+### Hesap silme ✅
+Apple, hesap oluşturan uygulamalarda **uygulama içinden hesap silmeyi**
+zorunlu tutar (App Store Review Guideline 5.1.1(v)).
+Profil → Gizlilik → Hesabımı Sil; yerel veriyle birlikte Firestore'daki
+profil, loglar ve yakınlık dokümanı da siliniyor, ardından kimliğin kendisi
+kaldırılıyor. (Önceden yalnızca cihazdaki veri siliniyordu — bağlı partner
+hesap silindikten sonra da veriyi okuyabiliyordu.)
 
 ### Gizlilik politikası URL'si ⬜
-Her iki mağaza da **herkese açık bir URL** ister. Uygulama içindeki
-gizlilik metni ([privacy_policy_screen.dart](lib/presentation/legal/privacy_policy_screen.dart))
-yeterli değildir. Metni bir web sayfasına koyup URL'i mağaza formlarına girin.
+App Store **herkese açık bir URL** ister. Uygulama içindeki gizlilik metni
+([privacy_policy_screen.dart](lib/presentation/legal/privacy_policy_screen.dart))
+yeterli değildir. Metni bir web sayfasına koyup URL'i mağaza formuna girin.
 
 ---
 
 ## 5. Kategori ve içerik
 
-- **Kategori:** Health & Fitness (her iki mağazada)
-- **Yaş sınırı:** Apple 12+ / Play "Teen" — cinsel sağlık içeriği nedeniyle
-- Play'de **Sağlık Uygulamaları beyanı** doldurulmalıdır ⬜
+- **Kategori:** Health & Fitness
+- **Yaş sınırı:** 12+ — cinsel sağlık içeriği nedeniyle
 - Uygulama tıbbi teşhis koymaz; bunu mağaza açıklamasına da yazın
-  (kod tarafında [terms_section2_content] zaten belirtiyor)
+  (kod tarafında `terms_section2_content` zaten belirtiyor)
+- Sağlık içeriklerinin **uzman gözünden geçirilmesi** ⬜ — inceleme sağlık
+  iddialarına dikkat ediyor
 
 ---
 
@@ -120,37 +156,33 @@ yeterli değildir. Metni bir web sayfasına koyup URL'i mağaza formlarına giri
 
 | Ne | Neden gerekli | Nasıl |
 |---|---|---|
-| Firebase yapılandırması | Partner senkronizasyonu ve push bildirim | `flutterfire configure` |
+| `GoogleService-Info.plist` | Partner senkronizasyonu ve push bildirim | `flutterfire configure` |
 | Firestore kuralları | Veri güvenliği | `firebase deploy --only firestore:rules` |
-| RevenueCat API anahtarı | Premium satın alma | [subscription_service.dart:6](lib/domain/services/subscription_service.dart) — şu an placeholder |
-| Android SDK | Play derlemesi | Bu makinede kurulu değil (`flutter doctor` ✗) |
+| RevenueCat API anahtarı | Premium satın alma | [subscription_service.dart](lib/domain/services/subscription_service.dart) — şu an `appl_api_key_placeholder` |
+| Gerçek AdMob kimlikleri | Reklam alanının dolması | `Info.plist` → `GADApplicationIdentifier` ve [ads_datasource.dart](lib/data/datasources/ads_datasource.dart) — şu an Google'ın test kimlikleri |
 
 Bunlar bağlanmadan uygulama **çalışır ama** partner özelliği yerel kalır,
-premium ekranı satın alma yapmaz.
+premium ekranı satın alma yapmaz, reklam alanı boş görünür. Yapılandırılmamış
+SDK'lara istek gitmiyor: RevenueCat anahtarsızken çağrı yapılsa süreç
+`fatalError` ile çöküyordu, bu yüzden altı giriş noktası da korumalı
+(`test/domain/services/subscription_guard_test.dart`).
 
 ---
 
 ## 7. Derleme ve yükleme
 
-**iOS**
-```bash
-flutter build ipa --release
-```
-Çıkan `build/ios/ipa/*.ipa` dosyasını Transporter ile veya
-`xcrun altool` ile App Store Connect'e yükleyin.
-
-**Android**
-```bash
-flutter build appbundle --release
-```
-`build/app/outputs/bundle/release/app-release.aab` dosyasını Play Console'a
-yükleyin. (APK değil, AAB istiyor.)
-
 **Her yüklemeden önce:**
 ```bash
 flutter analyze --fatal-infos && flutter test && dart run tool/check_localization.dart
 ```
+522 test geçiyor.
 
+**Derleme:**
+```bash
+flutter build ipa --release
+```
+Çıkan `build/ios/ipa/*.ipa` dosyasını Transporter ile veya `xcrun altool` ile
+App Store Connect'e yükleyin.
 
 ---
 
@@ -169,7 +201,7 @@ Beyan edilenler koddan çıkarıldı:
 |---|---|
 | Yakınlık durumu (sağlık) | `intimacy/{uid}` — yalnızca partner paylaşımı açıkken |
 | Kullanıcı kimliği | Firebase anonim UID |
-| Cihaz kimliği | FCM jetonu (bildirim için) |
+| Cihaz kimliği | FCM jetonu (bildirim) ve reklam (üçüncü taraf reklam amacı beyan edildi) |
 | Satın alma geçmişi | RevenueCat |
 
 **Cihazdan çıkmayanlar:** günlük sağlık kayıtları (`saveDailyLog` tanımlı ama
@@ -183,26 +215,39 @@ Gerekçeli API olarak yalnızca `UserDefaults` (CA92.1) beyan edildi —
 
 **Yerelleştirilmiş izin metinleri** ✅
 
-`ios/Runner/<dil>.lproj/InfoPlist.strings` — kamera, fotoğraf ve Face ID
-açıklamaları altı dilde. Öncesinde `Info.plist` içindeki İngilizce metin
-Türkçe cihazda da İngilizce çıkıyordu.
+`ios/Runner/<dil>.lproj/InfoPlist.strings` — kamera ve Face ID açıklamaları
+altı dilde. Öncesinde `Info.plist` içindeki İngilizce metin Türkçe cihazda da
+İngilizce çıkıyordu. Kullanılmayan `NSPhotoLibraryUsageDescription`
+kaldırıldı — istemediğiniz bir izni beyan etmek incelemede soru doğuruyor.
 
 ---
 
 ## Reklam
 
-Şu an **hiçbir reklam SDK'sı yok** ve `NSPrivacyTracking` `false` beyan
-edildi. Reklam eklenecekse aşağıdakiler zorunlu olur:
+Uygulamada **AdMob var** (`google_mobile_ads`), ama reklamlar
+**kişiselleştirilmiyor**: `AdRequest(nonPersonalizedAds: true)`. Reklam
+kimliği (IDFA) kullanılmıyor, ATT izni istenmiyor ve `NSPrivacyTracking`
+`false` beyan edildi. İçerik derecesi `MaxAdContentRating.g` ile sınırlı.
+
+Karşılığı gelirin düşmesi; bilinçli bir takas — uygulama kullanıcıya üç yerde
+verisinin cihazda kaldığını söylüyor, davranış verisiyle hedefli reklam bu
+sözle çelişirdi.
+
+**`SKAdNetworkItems`** ✅ — `Info.plist` içinde 50 reklam ağı kimliği.
+Bunlar olmadan kişiselleştirilmemiş reklamlarda bile yükleme atfı çalışmaz ve
+eCPM düşer; IDFA gerektirmezler, gizlilik açısından bedelsizdir.
+
+**Kişiselleştirilmiş reklama geçilecek olursa** şunlar zorunlu olur:
 
 1. `PrivacyInfo.xcprivacy` içinde `NSPrivacyTracking` `true`, ilgili veri
-   tipleri `NSPrivacyCollectedDataTypeTracking` `true`, ve reklam ağının
+   tiplerinde `NSPrivacyCollectedDataTypeTracking` `true`, ve reklam ağının
    alan adları `NSPrivacyTrackingDomains` listesine.
-2. `Info.plist` içine `NSUserTrackingUsageDescription` ve uygulama içinde
-   ATT izin isteği (`AppTrackingTransparency`). İzin alınmadan IDFA
-   kullanılamaz.
+2. `Info.plist` içine `NSUserTrackingUsageDescription` ve uygulama içinde ATT
+   izin isteği (`AppTrackingTransparency`). İzin alınmadan IDFA kullanılamaz.
 3. App Store Connect "App Privacy" formunda "Used for Tracking" işaretlemesi.
 
 **Dikkat:** Bu bir regl takip uygulaması. Sağlık verisi GDPR'da özel nitelikli
 veri (Md. 9), KVKK'da da özel nitelikli kişisel veri. Bu veriyi reklam
 hedeflemesinde kullanmak ya da reklam ağına aktarmak ayrı bir açık rıza
-gerektirir ve emsali kötüdür. Kişiselleştirilmemiş reklam bu riski taşımaz.
+gerektirir ve emsali kötüdür. Mevcut kişiselleştirilmemiş kurulum bu riski
+taşımıyor.

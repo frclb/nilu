@@ -78,13 +78,13 @@ dev_dependencies:
 
 # Uygulama ikonu. Kaynak görseli `python3 tool/generate_icon.py` üretir,
 # platform boyutlarını `dart run flutter_launcher_icons` oluşturur.
+# Uygulama yalnızca iOS için çıkıyor. `android:` anahtarları buradayken
+# `dart run flutter_launcher_icons` Android'i önce üretmeye çalışıp
+# AndroidManifest.xml bulamadan çöküyor ve iOS ikonlarına hiç sıra gelmiyor.
 flutter_launcher_icons:
   image_path: "assets/icon/app_icon.png"
   ios: true
   remove_alpha_ios: true          # App Store şeffaflık kabul etmiyor
-  android: "ic_launcher"
-  adaptive_icon_background: "#551B26"
-  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -8,7 +8,11 @@ alır.
 ## Gereksinimler
 
 - Flutter (stable), Dart SDK `^3.10.7`
-- iOS derlemesi için Xcode, Android için JDK 17
+- Xcode
+
+Uygulama **yalnızca iOS** için geliştiriliyor. Android, web ve masaüstü
+platform klasörleri kaldırıldı; gerekirse
+`flutter create --platforms=android .` ile yeniden üretilebilir.
 
 ## Kurulum
 
@@ -39,7 +43,11 @@ datasource'lar canlanır. Yapılandırma dosyaları `.gitignore`'dadır.
 | Biçimlendirme | `dart format lib test` |
 | Lokalizasyon denetimi | `dart run tool/check_localization.dart` |
 | iOS release | `flutter build ios --release` |
-| Android release | `flutter build appbundle --release` |
+| Cihaza kur | `flutter run -d "<cihaz>"` |
+
+`flutter install` **derlemez**, hazır paket bekler; kendi başına çalıştırmak
+eski sürümü kaldırıp yerine bir şey koymaz. Cihaza kurmak için `flutter run`
+kullanın ya da önce `flutter build ios --debug` çalıştırın.
 
 CI (`.github/workflows/ci.yml`) her push ve PR'da biçim, analiz, test ve
 lokalizasyon denetimini çalıştırır.
@@ -51,7 +59,7 @@ lib/
 ├── core/          # Firebase bootstrap, go_router yapılandırması, navigasyon
 ├── data/          # Repository'ler (yerel depolama) + uzak datasource'lar
 ├── domain/        # Modeller, saf iş mantığı servisleri, ViewModel'lar
-├── design_system/ # AppColors + AppTheme (light/dark)
+├── design_system/ # AppTokens (rol renkleri) + AppTheme (light/dark)
 ├── localization/  # JSON tabanlı i18n
 └── presentation/  # Feature-first ekranlar ve widget'lar
 ```
@@ -80,11 +88,30 @@ Referans dil `tr`, fallback dil `en`: bir anahtar aktif dilde yoksa otomatik
 olarak İngilizceye düşülür, ham anahtar kodu ekrana çıkmaz. Yeni bir anahtar
 eklerken en azından `tr.json` ve `en.json` güncellenmelidir — CI bunu denetler.
 
-## Release imzalama (Android)
+## İmzalama ve yetkiler
 
-`android/key.properties.example` dosyasını `android/key.properties` olarak
-kopyalayıp doldurun. Dosya yoksa release derlemesi debug anahtarıyla imzalanır
-(yerel test için); mağaza yüklemesinde dosya zorunludur.
+Debug ile Release **farklı yetki dosyaları** kullanıyor:
+
+| Yapılandırma | Dosya | HealthKit + App Groups |
+|---|---|---|
+| Debug | `ios/Runner/RunnerDebug.entitlements` | yok |
+| Release / Profile | `ios/Runner/Runner.entitlements` | var |
+
+Sebebi: ücretsiz ("kişisel") Apple takımları bu iki yetkiyi vermiyor ve Xcode
+profil üretemeyip derlemeyi durduruyor. Debug'ı yetkisiz bırakmak ücretsiz
+hesapla cihaza kurmayı mümkün kılıyor; mağaza derlemesi tam yetkilerle
+çıkıyor. Bu yapılandırmada sağlık senkronizasyonu ve ana ekran widget'ı
+çalışmaz.
+
+Ücretli Apple Developer Program üyeliği alındığında Debug'ın
+`CODE_SIGN_ENTITLEMENTS` ayarı asıl dosyaya döndürülüp `*Debug.entitlements`
+dosyaları silinebilir.
+
+## Yazı tipleri
+
+Inter ve Fraunces `assets/fonts/` altında **pakete gömülü** (bkz. pubspec
+`fonts:`). Önce `google_fonts` ile çalışma anında indiriliyorlardı; ilk
+açılışta ağ yavaşsa ekran sistem yazı tipiyle açılıp sonra değişiyordu.
 
 ## Firestore güvenlik kuralları
 
