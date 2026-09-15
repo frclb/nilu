@@ -59,16 +59,35 @@ class NotificationSettingsRepository {
       symptomsEnabled: prefs.getBool(_pSymptomsKey) ?? defaults.symptomsEnabled,
       dailySupportEnabled:
           prefs.getBool(_pDailySupportKey) ?? defaults.dailySupportEnabled,
-      periodStartValue:
-          prefs.getString(_pPeriodStartValueKey) ?? defaults.periodStartValue,
-      ovulationValue:
-          prefs.getString(_pOvulationValueKey) ?? defaults.ovulationValue,
-      symptomsValue:
-          prefs.getString(_pSymptomsValueKey) ?? defaults.symptomsValue,
-      dailySupportValue:
-          prefs.getString(_pDailySupportValueKey) ?? defaults.dailySupportValue,
+      // Tanınmayan bir değer depoda kalmışsa varsayılana düşülür. Doğrudan
+      // geçirilseydi `DropdownButton` onu listede bulamayıp assert atacak ve
+      // ekran açılmayacaktı — eski sürümün yazdığı bir değer, kullanıcının
+      // açamadığı bir ekrana dönüşürdü.
+      periodStartValue: _oneOf(
+        prefs.getString(_pPeriodStartValueKey),
+        PartnerNotificationSettings.periodStartValues,
+        defaults.periodStartValue,
+      ),
+      ovulationValue: _oneOf(
+        prefs.getString(_pOvulationValueKey),
+        PartnerNotificationSettings.ovulationValues,
+        defaults.ovulationValue,
+      ),
+      symptomsValue: _oneOf(
+        prefs.getString(_pSymptomsValueKey),
+        PartnerNotificationSettings.symptomsValues,
+        defaults.symptomsValue,
+      ),
+      dailySupportValue: _oneOf(
+        prefs.getString(_pDailySupportValueKey),
+        PartnerNotificationSettings.dailySupportValues,
+        defaults.dailySupportValue,
+      ),
     );
   }
+
+  static String _oneOf(String? stored, Set<String> allowed, String fallback) =>
+      allowed.contains(stored) ? stored! : fallback;
 
   Future<void> savePartnerSettings(PartnerNotificationSettings settings) async {
     final prefs = await SharedPreferences.getInstance();

@@ -107,6 +107,44 @@ class _AssistantScreenState extends State<AssistantScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('assistant_title'))),
+      // Giriş çubuğu gövdenin değil `Scaffold`'un altında: içerik
+      // sütununun içinde kalınca zemini geniş ekranda 600 pt'de
+      // kesilip sayfanın üstünde sert kenarlı bir dikdörtgen
+      // bırakıyordu.
+      bottomNavigationBar: Container(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.md,
+          AppSpacing.lg,
+          MediaQuery.of(context).padding.bottom + AppSpacing.md,
+        ),
+        decoration: BoxDecoration(
+          color: t.surface,
+          border: Border(top: BorderSide(color: t.border)),
+        ),
+        child: AppContentWidth(
+          // Zemin tam genişlikte, giriş alanı okunur sütunda kalıyor.
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  textInputAction: TextInputAction.send,
+                  onSubmitted: _ask,
+                  decoration: InputDecoration(
+                    hintText: context.tr('assistant_hint'),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              IconButton.filled(
+                onPressed: () => _ask(_controller.text),
+                icon: const Icon(Icons.arrow_upward),
+              ),
+            ],
+          ),
+        ),
+      ),
       body: AppContentWidth(
         child: Column(
           children: [
@@ -126,37 +164,6 @@ class _AssistantScreenState extends State<AssistantScreen> {
                         );
                       },
                     ),
-            ),
-            Container(
-              padding: EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.md,
-                AppSpacing.lg,
-                MediaQuery.of(context).padding.bottom + AppSpacing.md,
-              ),
-              decoration: BoxDecoration(
-                color: t.surface,
-                border: Border(top: BorderSide(color: t.border)),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      textInputAction: TextInputAction.send,
-                      onSubmitted: _ask,
-                      decoration: InputDecoration(
-                        hintText: context.tr('assistant_hint'),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  IconButton.filled(
-                    onPressed: () => _ask(_controller.text),
-                    icon: const Icon(Icons.arrow_upward),
-                  ),
-                ],
-              ),
             ),
           ],
         ),

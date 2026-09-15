@@ -68,99 +68,88 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
 
     return Scaffold(
       appBar: const LogEntryAppBar(),
-      body: AppContentWidth(
-        // `Scaffold` gövdeye **gevşek** kısıt veriyor; `Stack` de en uzun
-        // konumlandırılmamış çocuğuna göre büzülüyor. İçerik ekrandan
-        // kısaysa `Positioned(bottom: 0)` ekranın dibine değil içeriğin
-        // dibine yapışıyor ve eylem çubuğu ortada havada kalıyordu.
-        // Telefonda içerik ekranı doldurduğu için görünmüyordu.
-        child: SizedBox.expand(
-          child: Stack(
-            children: [
-              // Scrollable Content
-              SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.only(bottom: 100),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const LogEntryHeader(),
-                    FlowIntensitySection(
-                      initialValue: _flowIntensity,
-                      onChanged: (value) {
-                        _flowIntensity = value;
-                      },
-                    ),
-                    _buildDivider(isDark, theme),
-                    SymptomsSection(
-                      initialSymptoms: _symptoms,
-                      onChanged: (value) {
-                        _symptoms = value;
-                      },
-                    ),
-                    _buildDivider(isDark, theme),
-                    MoodSection(
-                      initialMoods: _moods,
-                      onChanged: (value) {
-                        _moods = value;
-                      },
-                    ),
-                    _buildDivider(isDark, theme),
-                    NotesSection(controller: _notesController),
-                  ],
-                ),
-              ),
-
-              // Fixed Bottom Action Bar
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: EdgeInsets.only(
-                    left: 24,
-                    right: 24,
-                    top: 16,
-                    bottom: 16 + MediaQuery.of(context).padding.bottom,
-                  ),
-                  decoration: BoxDecoration(
-                    color: context.tokens.surface.withAlpha(229),
-                    border: Border(
-                      top: BorderSide(
-                        color: context.tokens.surfaceAlt,
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                  child: SizedBox(
-                    height: 48,
-                    child: ElevatedButton.icon(
-                      onPressed: _saveLog,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.colorScheme.primary,
-                        foregroundColor: Theme.of(
-                          context,
-                        ).colorScheme.onPrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 4,
-                        shadowColor: theme.colorScheme.primary.withAlpha(102),
-                      ),
-                      icon: const Icon(Icons.check, size: 20),
-                      label: Text(
-                        context.tr('log_save_button'),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+      // Eylem çubuğu gövdenin değil `Scaffold`'un altında: içerik
+      // sütununun içinde kalınca zemini geniş ekranda 600 pt'de
+      // kesilip sayfanın üstünde sert kenarlı bir dikdörtgen
+      // bırakıyordu. Burada tam genişlikte ve dibe sabitli — üstelik
+      // gövdenin `Stack`'inin ekranı doldurmasına da bağlı değil.
+      bottomNavigationBar: Container(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 16,
+          bottom: 16 + MediaQuery.of(context).padding.bottom,
+        ),
+        decoration: BoxDecoration(
+          color: context.tokens.surface.withAlpha(229),
+          border: Border(
+            top: BorderSide(color: context.tokens.surfaceAlt, width: 1),
           ),
+        ),
+        child: AppContentWidth(
+          // Zemin tam genişlikte, düğme okunur sütunda kalıyor.
+          child: SizedBox(
+            height: 48,
+            child: ElevatedButton.icon(
+              onPressed: _saveLog,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 4,
+                shadowColor: theme.colorScheme.primary.withAlpha(102),
+              ),
+              icon: const Icon(Icons.check, size: 20),
+              label: Text(
+                context.tr('log_save_button'),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      body: AppContentWidth(
+        child: Stack(
+          children: [
+            // Scrollable Content
+            SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.only(bottom: 100),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const LogEntryHeader(),
+                  FlowIntensitySection(
+                    initialValue: _flowIntensity,
+                    onChanged: (value) {
+                      _flowIntensity = value;
+                    },
+                  ),
+                  _buildDivider(isDark, theme),
+                  SymptomsSection(
+                    initialSymptoms: _symptoms,
+                    onChanged: (value) {
+                      _symptoms = value;
+                    },
+                  ),
+                  _buildDivider(isDark, theme),
+                  MoodSection(
+                    initialMoods: _moods,
+                    onChanged: (value) {
+                      _moods = value;
+                    },
+                  ),
+                  _buildDivider(isDark, theme),
+                  NotesSection(controller: _notesController),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
