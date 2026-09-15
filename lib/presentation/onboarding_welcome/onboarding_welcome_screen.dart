@@ -15,6 +15,34 @@ class OnboardingWelcomeScreen extends StatefulWidget {
 }
 
 class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
+  /// Tanıtım sayfasının azami genişliği.
+  ///
+  /// Okuma sütunundan geniş: kahraman çizimin ekranı doldurması için yer
+  /// gerekiyor. Metin ve düğmeler kendi içlerinde [_textMaxWidth] ile
+  /// daraltılıyor, yoksa 760 pt'lik bir satır okunmuyor.
+  static const double _pageMaxWidth = 760;
+
+  /// Başlık, açıklama ve düğmelerin azami genişliği.
+  static const double _textMaxWidth = 520;
+
+  /// Kahraman çizimin kaplayacağı dikey oran (dar / geniş ekran).
+  ///
+  /// Sabit 300 pt'ydi. Sayfa alanı iPhone 16e'de ~477, iPad portrede ~1085,
+  /// katlanabilir kapalıyken ~320 pt: tek bir sayı üçünde birden doğru
+  /// durmuyor. Kısa ekranda çizim metnin yerini yiyip **açıklamayı
+  /// kırpıyordu** (iPhone 16e'de ikinci satır yarısından kesiliyordu),
+  /// geniş ekranda ise doğal boyutunda kalıp sayfayı boş bırakıyordu.
+  static const double _heroRatio = 0.45;
+  static const double _heroRatioWide = 0.55;
+  static const double _heroMin = 120;
+  static const double _heroMax = 620;
+
+  /// Üstteki simge rozetinin görünmesi için gereken en az sayfa yüksekliği.
+  ///
+  /// Rozet kahraman çizimdeki simgenin aynısını gösteriyor — süs. Kısa
+  /// ekranda 104 pt (rozet + boşluk) metne yer açmaktan daha değerli değil.
+  static const double _badgeMinPageHeight = 420;
+
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -114,6 +142,10 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
           ),
 
           AppContentWidth(
+            // Onboarding tam ekran bir tanıtım: 600 pt'lik okuma sütunu
+            // 1032 pt'lik bir ekranda içeriği ortada küçük bir ada
+            // bırakıyordu. Gövde geniş, **metin** kendi içinde dar.
+            maxWidth: _pageMaxWidth,
             child: SafeArea(
               child: Column(
                 children: [
@@ -165,88 +197,99 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                       bottom: 24,
                     ),
                     decoration: BoxDecoration(color: bgColor.withAlpha(204)),
-                    child: Column(
-                      children: [
-                        // Dots Indicator (6 dots)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(4, (index) {
-                            final isActive = index == _currentPage;
-                            return AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              width: isActive ? 24 : 10,
-                              height: 10,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: isActive
-                                    ? theme.colorScheme.primary
-                                    : theme.colorScheme.primary.withAlpha(
-                                        (isDark ? 0.4 : 0.2 * 255).toInt(),
-                                      ),
-                              ),
-                            );
-                          }),
-                        ),
-
-                        const SizedBox(height: 32),
-
-                        // CTA Button
-                        ElevatedButton(
-                          onPressed: _nextPage,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.colorScheme.primary,
-                            foregroundColor: Theme.of(
-                              context,
-                            ).colorScheme.onPrimary,
-                            minimumSize: const Size(double.infinity, 56),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 8,
-                            shadowColor: theme.colorScheme.primary.withAlpha(
-                              76,
-                            ),
-                          ),
-                          child: Row(
+                    // Nokta göstergesi ve düğmeler metinle aynı genişlikte:
+                    // sayfa 760 pt'ye açılınca tam genişlikte bir "Devam Et"
+                    // düğmesi hem çirkin hem de dokunma hedefi olarak abartılı
+                    // oluyordu.
+                    child: AppContentWidth(
+                      maxWidth: _textMaxWidth,
+                      child: Column(
+                        children: [
+                          // Dots Indicator (6 dots)
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                context.tr('onboarding_continue'),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                            children: List.generate(4, (index) {
+                              final isActive = index == _currentPage;
+                              return AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 4,
                                 ),
+                                width: isActive ? 24 : 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: isActive
+                                      ? theme.colorScheme.primary
+                                      : theme.colorScheme.primary.withAlpha(
+                                          (isDark ? 0.4 : 0.2 * 255).toInt(),
+                                        ),
+                                ),
+                              );
+                            }),
+                          ),
+
+                          const SizedBox(height: 32),
+
+                          // CTA Button
+                          ElevatedButton(
+                            onPressed: _nextPage,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.colorScheme.primary,
+                              foregroundColor: Theme.of(
+                                context,
+                              ).colorScheme.onPrimary,
+                              minimumSize: const Size(double.infinity, 56),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                              const SizedBox(width: 8),
-                              const Icon(Icons.arrow_forward, size: 20),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        OutlinedButton(
-                          onPressed: () {
-                            context.pushNamed(RouteNames.partnerScan);
-                          },
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: theme.colorScheme.primary,
-                            minimumSize: const Size(double.infinity, 56),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+                              elevation: 8,
+                              shadowColor: theme.colorScheme.primary.withAlpha(
+                                76,
+                              ),
                             ),
-                            side: BorderSide(color: theme.colorScheme.primary),
-                          ),
-                          child: Text(
-                            context.tr('onboarding_partner_login'),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  context.tr('onboarding_continue'),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Icon(Icons.arrow_forward, size: 20),
+                              ],
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 16),
+                          OutlinedButton(
+                            onPressed: () {
+                              context.pushNamed(RouteNames.partnerScan);
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: theme.colorScheme.primary,
+                              minimumSize: const Size(double.infinity, 56),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              side: BorderSide(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            child: Text(
+                              context.tr('onboarding_partner_login'),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -274,167 +317,202 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
     // En büyük **normal** boyutta (erişilebilirlik bile değil) 49 piksel
     // taşıyordu; kullanıcının ilk gördüğü ekran bu.
     return LayoutBuilder(
-      builder: (context, constraints) => SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: constraints.maxHeight),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Top Icon
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: context.tokens.surface,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: theme.colorScheme.primary.withAlpha(25),
-                      width: 1,
+      builder: (context, constraints) {
+        final wide = constraints.maxWidth >= AppLayout.compactMax;
+
+        final heroMaxHeight =
+            (constraints.maxHeight * (wide ? _heroRatioWide : _heroRatio))
+                .clamp(_heroMin, _heroMax);
+        final showBadge = constraints.maxHeight >= _badgeMinPageHeight;
+
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Top Icon — kısa ekranda gizli, bkz.
+                  // [_badgeMinPageHeight].
+                  if (showBadge) ...[
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: context.tokens.surface,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: theme.colorScheme.primary.withAlpha(25),
+                          width: 1,
+                        ),
+                        boxShadow: isDark
+                            ? []
+                            : [
+                                BoxShadow(
+                                  color: AppScrim.veil(26),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                      ),
+                      child: Icon(
+                        topIcon,
+                        size: 48,
+                        color: theme.colorScheme.primary,
+                      ),
                     ),
-                    boxShadow: isDark
-                        ? []
-                        : [
-                            BoxShadow(
-                              color: AppScrim.veil(26),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // Hero illustration area
+                  //
+                  // Yükseklik sınırlı, içerik `FittedBox` ile küçülüyor: yazı
+                  // büyüdüğünde çizim ezilmek yerine orantılı olarak küçülüyor.
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: heroMaxHeight,
+                      minHeight: _heroMin,
+                    ),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(24),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            theme.colorScheme.primary.withAlpha(20),
+                            theme.colorScheme.primary.withAlpha(5),
+                          ],
+                        ),
+                        border: Border.all(
+                          color: theme.colorScheme.primary.withAlpha(25),
+                        ),
+                      ),
+                      child: FittedBox(
+                        // Geniş ekranda `contain`: çizim yer varken büyüyüp
+                        // kutuyu dolduruyor. Dar ekranda `scaleDown` kalıyor —
+                        // `contain` orada da kutuyu doldurduğu için kahraman
+                        // alanı 260'tan 300 pt'ye çıkıyor ve açıklama metnini
+                        // ekranın dışına itiyordu.
+                        fit: wide ? BoxFit.contain : BoxFit.scaleDown,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Decorative circles
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Container(
+                                  width: 160,
+                                  height: 160,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: theme.colorScheme.primary.withAlpha(
+                                      12,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 120,
+                                  height: 120,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: theme.colorScheme.primary.withAlpha(
+                                      20,
+                                    ),
+                                  ),
+                                ),
+                                Icon(
+                                  topIcon,
+                                  size: 64,
+                                  color: theme.colorScheme.primary.withAlpha(
+                                    153,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                            Icon(
+                              Icons.water_drop,
+                              size: 32,
+                              color: theme.colorScheme.primary.withAlpha(102),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.local_florist,
+                                  size: 24,
+                                  color: theme.colorScheme.primary.withAlpha(
+                                    76,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Icon(
+                                  Icons.sunny,
+                                  size: 24,
+                                  color: theme.colorScheme.primary.withAlpha(
+                                    76,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Icon(
+                                  Icons.nights_stay,
+                                  size: 24,
+                                  color: theme.colorScheme.primary.withAlpha(
+                                    76,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
-                  ),
-                  child: Icon(
-                    topIcon,
-                    size: 48,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Hero illustration area
-                //
-                // Yükseklik sınırlı, içerik `FittedBox` ile küçülüyor: yazı
-                // büyüdüğünde çizim ezilmek yerine orantılı olarak küçülüyor.
-                ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxHeight: 300,
-                    minHeight: 120,
-                  ),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          theme.colorScheme.primary.withAlpha(20),
-                          theme.colorScheme.primary.withAlpha(5),
-                        ],
-                      ),
-                      border: Border.all(
-                        color: theme.colorScheme.primary.withAlpha(25),
-                      ),
-                    ),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Decorative circles
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Container(
-                                width: 160,
-                                height: 160,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: theme.colorScheme.primary.withAlpha(
-                                    12,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: theme.colorScheme.primary.withAlpha(
-                                    20,
-                                  ),
-                                ),
-                              ),
-                              Icon(
-                                topIcon,
-                                size: 64,
-                                color: theme.colorScheme.primary.withAlpha(153),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 24),
-                          Icon(
-                            Icons.water_drop,
-                            size: 32,
-                            color: theme.colorScheme.primary.withAlpha(102),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.local_florist,
-                                size: 24,
-                                color: theme.colorScheme.primary.withAlpha(76),
-                              ),
-                              const SizedBox(width: 16),
-                              Icon(
-                                Icons.sunny,
-                                size: 24,
-                                color: theme.colorScheme.primary.withAlpha(76),
-                              ),
-                              const SizedBox(width: 16),
-                              Icon(
-                                Icons.nights_stay,
-                                size: 24,
-                                color: theme.colorScheme.primary.withAlpha(76),
-                              ),
-                            ],
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-                // Text Content
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
-                    letterSpacing: -0.5,
+                  // Text Content
+                  //
+                  // Kahraman çizim sayfa kadar geniş olabiliyor ama metin
+                  // okunur kalmalı: 760 pt'lik bir açıklama satırı gözün
+                  // satır başını bulmasını zorlaştırıyor.
+                  AppContentWidth(
+                    maxWidth: _textMaxWidth,
+                    child: Column(
+                      children: [
+                        Text(
+                          title,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.primary,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          description,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: textColor.withAlpha(204),
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  description,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: textColor.withAlpha(204),
-                    height: 1.5,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
