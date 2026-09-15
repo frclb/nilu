@@ -147,8 +147,11 @@ xcrun simctl io booted screenshot ~/Desktop/rcapp-01.png
 
 App Store Connect'in istediği boyut zamanla değişiyor — formun o an hangi
 cihazı zorunlu tuttuğuna bakın ve o simülatörde komutu tekrarlayın. Uygulama
-şu an iPad'i de hedeflediği için iPad ekran görüntüsü de isteniyor
-([STORE_CHECKLIST.md](STORE_CHECKLIST.md) §3'e bakın).
+iPhone'u da iPad'i de hedefliyor, dolayısıyla **iki taraf için de** görüntü
+isteniyor ([STORE_CHECKLIST.md](STORE_CHECKLIST.md) §3).
+
+iPad'i yatay çevirmek için simülatörde `Cmd`+`←`. Yatayda yan gezinme menüsü
+açılıyor; tanıtım görüntüsü için orası daha iyi duruyor.
 
 ---
 
@@ -158,7 +161,7 @@ cihazı zorunlu tuttuğuna bakın ve o simülatörde komutu tekrarlayın. Uygula
 flutter test
 ```
 
-44 dosyada 522 test var. Çoğu saf mantığı ve depolamayı kapsar (döngü
+45 dosyada 544 test var. Çoğu saf mantığı ve depolamayı kapsar (döngü
 hesabı, tahmin, şifreli depolama, eski veri kurtarma, abonelik korumaları).
 Yanına üç tür daha eklendi:
 
@@ -167,6 +170,7 @@ Yanına üç tür daha eklendi:
 | Kaynak taraması | Sabit renk kaçağı, uzak görsel, eksik efsane işareti |
 | Kontrast | Gerçek `ThemeData` üzerinden, açık/koyu × dört tema için WCAG oranı |
 | Arayüz | Yönlendirme, alt gezinme, uygulama kilidi kapısı |
+| Ekran boyutu | On cihaz genişliğinde taşma ve menü seçimi |
 
 Ekranların görsel doğruluğunu hâlâ elle doğrulamanız gerekir; testler
 düzenin *doğru göründüğünü* değil, kurallara uyduğunu kontrol eder.

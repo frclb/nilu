@@ -107,6 +107,24 @@ hesapla cihaza kurmayı mümkün kılıyor; mağaza derlemesi tam yetkilerle
 `CODE_SIGN_ENTITLEMENTS` ayarı asıl dosyaya döndürülüp `*Debug.entitlements`
 dosyaları silinebilir.
 
+## Ekran uyumu
+
+Düzen cihaz adına göre değil gelen genişliğe göre kararını verir
+([app_layout.dart](lib/design_system/app_layout.dart)):
+
+| Genişlik | Düzen |
+|---|---|
+| < 600 pt | Tek sütun, kenardan kenara, alt menü |
+| 600–899 pt | 600 pt'de ortalanmış sütun, alt menü |
+| ≥ 900 pt | Ortalanmış sütun + yan menü ([side_nav_rail.dart](lib/presentation/home/widgets/side_nav_rail.dart)) |
+
+iPadOS pencereleri serbestçe boyutlandırıyor ve katlanabilir telefonlar
+çalışma anında genişlik değiştiriyor; "iPad mi?" sorusunun sabit bir cevabı
+yok, "şu an kaç pt?" sorusunun var.
+
+`AppContentWidth` daraltmayı `Padding` ile yapar, `Center`/`Align` ile değil:
+ikisi de dikey kısıtı gevşetip gövdesi `Stack` olan ekranları büzüyor.
+
 ## Yazı tipleri
 
 Inter ve Fraunces `assets/fonts/` altında **pakete gömülü** (bkz. pubspec

@@ -4,6 +4,7 @@ import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/navigation/route_names.dart';
 import '../../localization/app_localizations.dart';
+import '../../design_system/app_layout.dart';
 
 class PartnerImportantDaysScreen extends StatelessWidget {
   const PartnerImportantDaysScreen({super.key});
@@ -58,97 +59,102 @@ class PartnerImportantDaysScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildSummaryCard(
-                context,
-                summaryBgColor,
-                summaryBorderColor,
-                primaryColor,
-                textMainColor,
-                textMutedColor,
-              ),
-              const SizedBox(height: 32),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Text(
-                  context.tr('partner_important_days_upcoming'),
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.0,
-                    color: textMutedColor,
+      body: AppContentWidth(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 24.0,
+            ),
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildSummaryCard(
+                  context,
+                  summaryBgColor,
+                  summaryBorderColor,
+                  primaryColor,
+                  textMainColor,
+                  textMutedColor,
+                ),
+                const SizedBox(height: 32),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  child: Text(
+                    context.tr('partner_important_days_upcoming'),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
+                      color: textMutedColor,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              // Period Start Event (Red)
-              _buildEventItem(
-                context: context,
-                icon: Icons.water_drop_outlined,
-                iconBgColor: primaryColor,
-                iconColor: Theme.of(context).colorScheme.onPrimary,
-                title: context.tr('partner_notif_period_start_short'),
-                dateText: "14 Eyl",
-                dateBgColor: isDark
-                    ? primaryColor.withValues(alpha: 0.3)
-                    : primaryColor.withValues(alpha: 0.1),
-                dateTextColor: context.tokens.danger,
-                relativeTimeText: context.tr('partner_important_days_est_2'),
-                tipText: context.tr('partner_important_days_tip_1'),
-                bgColor: eventBgColor,
-                borderColor: eventBorderColor,
-                textMainColor: textMainColor,
-                textMutedColor: textMutedColor,
-              ),
-              const SizedBox(height: 16),
-              // Fertility Window Event (Orange)
-              _buildEventItem(
-                context: context,
-                icon: Icons.auto_awesome_outlined, // Sparkles approximation
-                iconBgColor: context.tokens.warning.withAlpha(51),
-                iconColor: context.tokens.warning,
-                title: context.tr('partner_important_days_fertility'),
-                dateText: "17 Eyl",
-                dateBgColor: isDark
-                    ? primaryColor.withValues(alpha: 0.3)
-                    : context.tokens.surfaceAlt,
-                dateTextColor: textMutedColor,
-                relativeTimeText: context.tr('partner_important_days_est_5'),
-                tipText: context.tr('partner_important_days_tip_2'),
-                bgColor: eventBgColor,
-                borderColor: eventBorderColor,
-                textMainColor: textMainColor,
-                textMutedColor: textMutedColor,
-              ),
-              const SizedBox(height: 16),
-              // Ovulation Day Event (Blue)
-              _buildEventItem(
-                context: context,
-                icon: Icons.favorite_border, // Heart approximation
-                iconBgColor: context.tokens.ovulation.withAlpha(51),
-                iconColor: context.tokens.ovulation,
-                title: context.tr('partner_important_days_ovulation'),
-                dateText: "22 Eyl",
-                dateBgColor: isDark
-                    ? primaryColor.withValues(alpha: 0.3)
-                    : context.tokens.surfaceAlt,
-                dateTextColor: textMutedColor,
-                relativeTimeText: context.tr('partner_important_days_est_10'),
-                tipText: context.tr('partner_important_days_tip_3'),
-                bgColor: eventBgColor,
-                borderColor: eventBorderColor,
-                textMainColor: textMainColor,
-                textMutedColor: textMutedColor,
-              ),
-              const SizedBox(height: 32),
-              _buildSettingsButton(context, primaryColor),
-            ],
+                const SizedBox(height: 16),
+                // Period Start Event (Red)
+                _buildEventItem(
+                  context: context,
+                  icon: Icons.water_drop_outlined,
+                  iconBgColor: primaryColor,
+                  iconColor: Theme.of(context).colorScheme.onPrimary,
+                  title: context.tr('partner_notif_period_start_short'),
+                  dateText: "14 Eyl",
+                  dateBgColor: isDark
+                      ? primaryColor.withValues(alpha: 0.3)
+                      : primaryColor.withValues(alpha: 0.1),
+                  dateTextColor: context.tokens.danger,
+                  relativeTimeText: context.tr('partner_important_days_est_2'),
+                  tipText: context.tr('partner_important_days_tip_1'),
+                  bgColor: eventBgColor,
+                  borderColor: eventBorderColor,
+                  textMainColor: textMainColor,
+                  textMutedColor: textMutedColor,
+                ),
+                const SizedBox(height: 16),
+                // Fertility Window Event (Orange)
+                _buildEventItem(
+                  context: context,
+                  icon: Icons.auto_awesome_outlined, // Sparkles approximation
+                  iconBgColor: context.tokens.warning.withAlpha(51),
+                  iconColor: context.tokens.warning,
+                  title: context.tr('partner_important_days_fertility'),
+                  dateText: "17 Eyl",
+                  dateBgColor: isDark
+                      ? primaryColor.withValues(alpha: 0.3)
+                      : context.tokens.surfaceAlt,
+                  dateTextColor: textMutedColor,
+                  relativeTimeText: context.tr('partner_important_days_est_5'),
+                  tipText: context.tr('partner_important_days_tip_2'),
+                  bgColor: eventBgColor,
+                  borderColor: eventBorderColor,
+                  textMainColor: textMainColor,
+                  textMutedColor: textMutedColor,
+                ),
+                const SizedBox(height: 16),
+                // Ovulation Day Event (Blue)
+                _buildEventItem(
+                  context: context,
+                  icon: Icons.favorite_border, // Heart approximation
+                  iconBgColor: context.tokens.ovulation.withAlpha(51),
+                  iconColor: context.tokens.ovulation,
+                  title: context.tr('partner_important_days_ovulation'),
+                  dateText: "22 Eyl",
+                  dateBgColor: isDark
+                      ? primaryColor.withValues(alpha: 0.3)
+                      : context.tokens.surfaceAlt,
+                  dateTextColor: textMutedColor,
+                  relativeTimeText: context.tr('partner_important_days_est_10'),
+                  tipText: context.tr('partner_important_days_tip_3'),
+                  bgColor: eventBgColor,
+                  borderColor: eventBorderColor,
+                  textMainColor: textMainColor,
+                  textMutedColor: textMutedColor,
+                ),
+                const SizedBox(height: 32),
+                _buildSettingsButton(context, primaryColor),
+              ],
+            ),
           ),
         ),
       ),

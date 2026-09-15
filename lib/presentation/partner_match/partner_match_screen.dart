@@ -11,6 +11,7 @@ import '../../../localization/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../../domain/view_models/user_view_model.dart';
 import 'partner_dashboard_screen.dart';
+import '../../design_system/app_layout.dart';
 
 class PartnerMatchScreen extends StatelessWidget {
   const PartnerMatchScreen({super.key});
@@ -30,111 +31,113 @@ class PartnerMatchScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: const PartnerMatchAppBar(),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(
+      body: AppContentWidth(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  top: 8,
+                  bottom: 20,
+                ),
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: const [
+                    PartnerMatchHero(),
+
+                    // Bekleyen istekler en üstte: erişimi vermek sahibin
+                    // kararı ve bekleyen bir istek varsa ilk görülmesi
+                    // gereken şey o.
+                    PairingRequestsSection(),
+
+                    SizedBox(height: 32),
+                    SharedInfoSection(),
+                    SizedBox(height: 32),
+                    PrivacyControlSection(),
+                    SizedBox(height: 32),
+                  ],
+                ),
+              ),
+            ),
+
+            // Fixed Bottom Action Area
+            Container(
+              padding: EdgeInsets.only(
                 left: 20,
                 right: 20,
-                top: 8,
-                bottom: 20,
+                top: 20,
+                bottom: MediaQuery.of(context).padding.bottom + 16,
               ),
-              physics: const BouncingScrollPhysics(),
+              decoration: BoxDecoration(
+                color: bgColor,
+                border: Border(top: BorderSide(color: context.tokens.border)),
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: const [
-                  PartnerMatchHero(),
-
-                  // Bekleyen istekler en üstte: erişimi vermek sahibin
-                  // kararı ve bekleyen bir istek varsa ilk görülmesi
-                  // gereken şey o.
-                  PairingRequestsSection(),
-
-                  SizedBox(height: 32),
-                  SharedInfoSection(),
-                  SizedBox(height: 32),
-                  PrivacyControlSection(),
-                  SizedBox(height: 32),
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      context.pushNamed(RouteNames.partnerQrGen);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      minimumSize: const Size(double.infinity, 56),
+                      elevation: 8,
+                      shadowColor: theme.colorScheme.primary.withAlpha(76),
+                    ),
+                    icon: const Icon(Icons.qr_code_2, size: 20),
+                    label: Text(
+                      context.tr('partner_match_invite_button'),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      context.pushNamed(RouteNames.partnerScan);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: theme.colorScheme.primary,
+                      side: BorderSide(
+                        color: theme.colorScheme.primary.withAlpha(127),
+                      ),
+                      minimumSize: const Size(double.infinity, 56),
+                    ),
+                    icon: const Icon(Icons.qr_code_scanner, size: 20),
+                    label: Text(
+                      context.tr('partner_match_scan_button'),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () {
+                      _showHowItWorksDialog(context);
+                    },
+                    child: Text(
+                      context.tr('partner_match_how_it_works'),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: context.tokens.textMuted,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
-
-          // Fixed Bottom Action Area
-          Container(
-            padding: EdgeInsets.only(
-              left: 20,
-              right: 20,
-              top: 20,
-              bottom: MediaQuery.of(context).padding.bottom + 16,
-            ),
-            decoration: BoxDecoration(
-              color: bgColor,
-              border: Border(top: BorderSide(color: context.tokens.border)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () {
-                    context.pushNamed(RouteNames.partnerQrGen);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    minimumSize: const Size(double.infinity, 56),
-                    elevation: 8,
-                    shadowColor: theme.colorScheme.primary.withAlpha(76),
-                  ),
-                  icon: const Icon(Icons.qr_code_2, size: 20),
-                  label: Text(
-                    context.tr('partner_match_invite_button'),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: () {
-                    context.pushNamed(RouteNames.partnerScan);
-                  },
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: theme.colorScheme.primary,
-                    side: BorderSide(
-                      color: theme.colorScheme.primary.withAlpha(127),
-                    ),
-                    minimumSize: const Size(double.infinity, 56),
-                  ),
-                  icon: const Icon(Icons.qr_code_scanner, size: 20),
-                  label: Text(
-                    context.tr('partner_match_scan_button'),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                GestureDetector(
-                  onTap: () {
-                    _showHowItWorksDialog(context);
-                  },
-                  child: Text(
-                    context.tr('partner_match_how_it_works'),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: context.tokens.textMuted,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

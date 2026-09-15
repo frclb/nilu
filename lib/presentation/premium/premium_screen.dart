@@ -8,6 +8,7 @@ import '../../domain/services/premium_gate.dart';
 import '../../domain/services/subscription_pricing.dart';
 import '../../domain/view_models/subscription_view_model.dart';
 import '../../localization/app_localizations.dart';
+import '../../design_system/app_layout.dart';
 
 /// Premium tanıtım ve satın alma ekranı.
 ///
@@ -38,9 +39,11 @@ class PremiumScreen extends StatelessWidget {
         ),
         title: Text(context.tr('premium_title')),
       ),
-      body: viewModel.isPremium
-          ? const _ActiveState()
-          : _OfferState(viewModel: viewModel),
+      body: AppContentWidth(
+        child: viewModel.isPremium
+            ? const _ActiveState()
+            : _OfferState(viewModel: viewModel),
+      ),
     );
   }
 }

@@ -8,6 +8,7 @@ import 'widgets/health_library_article_list.dart';
 import 'widgets/health_library_categories.dart';
 import 'widgets/health_library_featured_article.dart';
 import 'widgets/health_library_search_bar.dart';
+import '../../design_system/app_layout.dart';
 
 /// Sağlık kütüphanesi.
 ///
@@ -50,36 +51,38 @@ class _HealthLibraryScreenState extends State<HealthLibraryScreen> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: const HealthLibraryAppBar(),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.only(bottom: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            HealthLibrarySearchBar(
-              controller: _searchController,
-              onChanged: (value) => setState(() => _query = value),
-            ),
-            HealthLibraryCategories(
-              selected: _category,
-              onSelected: (category) => setState(() => _category = category),
-            ),
-            if (showFeatured)
-              HealthLibraryFeaturedArticle(
-                article: ArticleCatalog.all.firstWhere((a) => a.isFeatured),
+      body: AppContentWidth(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              HealthLibrarySearchBar(
+                controller: _searchController,
+                onChanged: (value) => setState(() => _query = value),
               ),
-            HealthLibraryArticleList(
-              articles: showFeatured
-                  ? results.where((a) => !a.isFeatured).toList()
-                  : results,
-              emptyQuery: _query,
-            ),
+              HealthLibraryCategories(
+                selected: _category,
+                onSelected: (category) => setState(() => _category = category),
+              ),
+              if (showFeatured)
+                HealthLibraryFeaturedArticle(
+                  article: ArticleCatalog.all.firstWhere((a) => a.isFeatured),
+                ),
+              HealthLibraryArticleList(
+                articles: showFeatured
+                    ? results.where((a) => !a.isFeatured).toList()
+                    : results,
+                emptyQuery: _query,
+              ),
 
-            // Reklam yalnızca burada ve içerik ekranlarında. Takvim, kayıt ve
-            // analiz ekranlarında yok: kullanıcının semptom girdiği yerde
-            // reklam göstermek hem rahatsız edici hem bağlam olarak yanlış.
-            const AdBanner(),
-          ],
+              // Reklam yalnızca burada ve içerik ekranlarında. Takvim, kayıt ve
+              // analiz ekranlarında yok: kullanıcının semptom girdiği yerde
+              // reklam göstermek hem rahatsız edici hem bağlam olarak yanlış.
+              const AdBanner(),
+            ],
+          ),
         ),
       ),
     );

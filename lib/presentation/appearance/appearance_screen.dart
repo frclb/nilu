@@ -6,6 +6,7 @@ import '../../design_system/app_flavor.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/view_models/theme_view_model.dart';
 import '../../localization/app_localizations.dart';
+import '../../design_system/app_layout.dart';
 
 /// Tema çeşidi seçimi.
 ///
@@ -20,33 +21,35 @@ class AppearanceScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('appearance_title'))),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        children: [
-          Text(
-            context.tr('appearance_desc'),
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: t.textMuted),
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          for (final flavor in AppFlavor.values) ...[
-            _FlavorTile(
-              flavor: flavor,
-              selected: viewModel.flavor == flavor,
-              locked: !viewModel.canUse(flavor),
-              onTap: () async {
-                final ok = await viewModel.select(flavor);
-                if (!ok && context.mounted) {
-                  // Kilitli temaya dokunmak paywall'a götürür; sessizce
-                  // hiçbir şey yapmamak kullanıcıyı şaşırtırdı.
-                  context.pushNamed(RouteNames.premium);
-                }
-              },
+      body: AppContentWidth(
+        child: ListView(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          children: [
+            Text(
+              context.tr('appearance_desc'),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: t.textMuted),
             ),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.xl),
+            for (final flavor in AppFlavor.values) ...[
+              _FlavorTile(
+                flavor: flavor,
+                selected: viewModel.flavor == flavor,
+                locked: !viewModel.canUse(flavor),
+                onTap: () async {
+                  final ok = await viewModel.select(flavor);
+                  if (!ok && context.mounted) {
+                    // Kilitli temaya dokunmak paywall'a götürür; sessizce
+                    // hiçbir şey yapmamak kullanıcıyı şaşırtırdı.
+                    context.pushNamed(RouteNames.premium);
+                  }
+                },
+              ),
+              const SizedBox(height: AppSpacing.md),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

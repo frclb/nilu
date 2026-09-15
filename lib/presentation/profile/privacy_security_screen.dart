@@ -14,6 +14,7 @@ import '../../domain/services/premium_gate.dart';
 import '../../domain/view_models/subscription_view_model.dart';
 import '../../domain/view_models/user_view_model.dart';
 import '../../localization/app_localizations.dart';
+import '../../design_system/app_layout.dart';
 
 class PrivacySecurityScreen extends StatefulWidget {
   const PrivacySecurityScreen({super.key});
@@ -114,151 +115,153 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: context.tokens.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: context.tokens.border),
-                  ),
-                  child: Column(
-                    children: [
-                      // Eskiden burada iki anahtar vardı — "Biyometrik
-                      // Kilit" ve "PIN Kodu" — ve ikisi de yalnızca bir
-                      // tercih kaydediyordu. Tek anahtara indirildi:
-                      // uygulama kendi PIN'ini saklamıyor, cihazın kimlik
-                      // doğrulamasını kullanıyor (biyometri, yoksa cihaz
-                      // şifresi). Parola saklamamak, saklamanın her
-                      // türlüsünden güvenli.
-                      _buildSwitchTile(
-                        context.tr('privacy_app_lock'),
-                        _lockEnabled,
-                        _toggleLock,
-                        isDark,
-                        Icons.lock_outline,
-                        true,
-                      ),
-                    ],
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.only(top: 8, left: 4, right: 4),
-                  child: Text(
-                    switch (_capability) {
-                      LockCapability.biometric => context.tr(
-                        'lock_hint_biometric',
-                      ),
-                      LockCapability.deviceCredential => context.tr(
-                        'lock_hint_device',
-                      ),
-                      LockCapability.none => context.tr('lock_unavailable'),
-                    },
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: context.tokens.textMuted,
+      body: AppContentWidth(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: context.tokens.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: context.tokens.border),
+                    ),
+                    child: Column(
+                      children: [
+                        // Eskiden burada iki anahtar vardı — "Biyometrik
+                        // Kilit" ve "PIN Kodu" — ve ikisi de yalnızca bir
+                        // tercih kaydediyordu. Tek anahtara indirildi:
+                        // uygulama kendi PIN'ini saklamıyor, cihazın kimlik
+                        // doğrulamasını kullanıyor (biyometri, yoksa cihaz
+                        // şifresi). Parola saklamamak, saklamanın her
+                        // türlüsünden güvenli.
+                        _buildSwitchTile(
+                          context.tr('privacy_app_lock'),
+                          _lockEnabled,
+                          _toggleLock,
+                          isDark,
+                          Icons.lock_outline,
+                          true,
+                        ),
+                      ],
                     ),
                   ),
-                ),
 
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: context.tokens.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: context.tokens.border),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.lock_outline,
-                        size: 18,
-                        color: context.tokens.success,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          context.tr('privacy_encryption_notice'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: context.tokens.textMuted,
-                          ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8, left: 4, right: 4),
+                    child: Text(
+                      switch (_capability) {
+                        LockCapability.biometric => context.tr(
+                          'lock_hint_biometric',
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Reklam bildirimi. Ücretsiz sürümde reklam gösteriliyorsa
-                // kullanıcı bunu gizlilik ekranında görmeli — hem de ne
-                // toplanmadığıyla birlikte.
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: context.tokens.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: context.tokens.border),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.campaign_outlined,
-                        size: 18,
+                        LockCapability.deviceCredential => context.tr(
+                          'lock_hint_device',
+                        ),
+                        LockCapability.none => context.tr('lock_unavailable'),
+                      },
+                      style: TextStyle(
+                        fontSize: 12,
                         color: context.tokens.textMuted,
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              context.tr('privacy_ads_title'),
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: context.tokens.text,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              context.tr('privacy_ads_notice'),
-                              style: TextStyle(
-                                fontSize: 12,
-                                height: 1.5,
-                                color: context.tokens.textMuted,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 24),
-                _buildActionTile(
-                  context,
-                  context.tr('privacy_export'),
-                  Icons.file_download_outlined,
-                  isDark,
-                ),
-                const SizedBox(height: 16),
-                _buildActionTile(
-                  context,
-                  context.tr('privacy_delete_account'),
-                  Icons.person_remove_outlined,
-                  isDark,
-                  isDestructive: true,
-                ),
-              ],
-            ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: context.tokens.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: context.tokens.border),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.lock_outline,
+                          size: 18,
+                          color: context.tokens.success,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            context.tr('privacy_encryption_notice'),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: context.tokens.textMuted,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Reklam bildirimi. Ücretsiz sürümde reklam gösteriliyorsa
+                  // kullanıcı bunu gizlilik ekranında görmeli — hem de ne
+                  // toplanmadığıyla birlikte.
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: context.tokens.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: context.tokens.border),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.campaign_outlined,
+                          size: 18,
+                          color: context.tokens.textMuted,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                context.tr('privacy_ads_title'),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: context.tokens.text,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                context.tr('privacy_ads_notice'),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  height: 1.5,
+                                  color: context.tokens.textMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+                  _buildActionTile(
+                    context,
+                    context.tr('privacy_export'),
+                    Icons.file_download_outlined,
+                    isDark,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildActionTile(
+                    context,
+                    context.tr('privacy_delete_account'),
+                    Icons.person_remove_outlined,
+                    isDark,
+                    isDestructive: true,
+                  ),
+                ],
+              ),
+      ),
     );
   }
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/services/session_plan.dart';
 import '../../localization/app_localizations.dart';
+import '../../design_system/app_layout.dart';
 
 /// Rehberli seans: adımları sırayla, zamanlayıcıyla gösterir.
 ///
@@ -100,19 +101,21 @@ class _SessionScreenState extends State<SessionScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: SafeArea(
-        child: done
-            ? _Finished(total: widget.plan.total, clock: _clock)
-            : _Active(
-                plan: widget.plan,
-                index: index,
-                elapsed: _elapsed,
-                running: _running,
-                clock: _clock,
-                onToggle: _toggle,
-                onSkip: _skip,
-                theme: theme,
-              ),
+      body: AppContentWidth(
+        child: SafeArea(
+          child: done
+              ? _Finished(total: widget.plan.total, clock: _clock)
+              : _Active(
+                  plan: widget.plan,
+                  index: index,
+                  elapsed: _elapsed,
+                  running: _running,
+                  clock: _clock,
+                  onToggle: _toggle,
+                  onSkip: _skip,
+                  theme: theme,
+                ),
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../design_system/app_tokens.dart';
 import '../../localization/app_localizations.dart';
+import '../../design_system/app_layout.dart';
 
 class TermsOfServiceScreen extends StatelessWidget {
   const TermsOfServiceScreen({super.key});
@@ -29,47 +30,49 @@ class TermsOfServiceScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.tr('terms_last_updated'),
-              style: TextStyle(color: mutedColor, fontSize: 13),
-            ),
-            const SizedBox(height: 24),
-            _buildSection(
-              context,
-              textColor,
-              mutedColor,
-              title: context.tr('terms_section1_title'),
-              content: context.tr('terms_section1_content'),
-            ),
-            _buildSection(
-              context,
-              textColor,
-              mutedColor,
-              title: context.tr('terms_section2_title'),
-              content: context.tr('terms_section2_content'),
-            ),
-            _buildSection(
-              context,
-              textColor,
-              mutedColor,
-              title: context.tr('terms_section3_title'),
-              content: context.tr('terms_section3_content'),
-            ),
-            _buildSection(
-              context,
-              textColor,
-              mutedColor,
-              title: context.tr('terms_section4_title'),
-              content: context.tr('terms_section4_content'),
-            ),
-            const SizedBox(height: 32),
-          ],
+      body: AppContentWidth(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                context.tr('terms_last_updated'),
+                style: TextStyle(color: mutedColor, fontSize: 13),
+              ),
+              const SizedBox(height: 24),
+              _buildSection(
+                context,
+                textColor,
+                mutedColor,
+                title: context.tr('terms_section1_title'),
+                content: context.tr('terms_section1_content'),
+              ),
+              _buildSection(
+                context,
+                textColor,
+                mutedColor,
+                title: context.tr('terms_section2_title'),
+                content: context.tr('terms_section2_content'),
+              ),
+              _buildSection(
+                context,
+                textColor,
+                mutedColor,
+                title: context.tr('terms_section3_title'),
+                content: context.tr('terms_section3_content'),
+              ),
+              _buildSection(
+                context,
+                textColor,
+                mutedColor,
+                title: context.tr('terms_section4_title'),
+                content: context.tr('terms_section4_content'),
+              ),
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );

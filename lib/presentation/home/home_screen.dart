@@ -10,6 +10,7 @@ import 'widgets/two_column_widgets.dart';
 import 'widgets/intimacy_section.dart';
 import '../../core/navigation/navigation_service.dart';
 import '../../core/navigation/route_names.dart';
+import '../../design_system/app_layout.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -37,26 +38,28 @@ class HomeScreen extends StatelessWidget {
               child: const Icon(Icons.add, size: 32),
             )
           : null,
-      body: RefreshIndicator(
-        onRefresh: () => context.read<CalendarViewModel>().refreshData(),
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          slivers: [
-            const SliverToBoxAdapter(child: HomeHeader()),
-            SliverPadding(
-              // Listenin sonu FAB'ın altında kalmasın.
-              padding: EdgeInsets.only(bottom: showFab ? 120 : 24),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  const CycleMasthead(),
-                  PeriodToggleButton(),
-                  DailySuggestionCard(reserveFabSpace: showFab),
-                  const TwoColumnWidgets(),
-                  if (isOwner) const IntimacySection(),
-                ]),
+      body: AppContentWidth(
+        child: RefreshIndicator(
+          onRefresh: () => context.read<CalendarViewModel>().refreshData(),
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              const SliverToBoxAdapter(child: HomeHeader()),
+              SliverPadding(
+                // Listenin sonu FAB'ın altında kalmasın.
+                padding: EdgeInsets.only(bottom: showFab ? 120 : 24),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    const CycleMasthead(),
+                    PeriodToggleButton(),
+                    DailySuggestionCard(reserveFabSpace: showFab),
+                    const TwoColumnWidgets(),
+                    if (isOwner) const IntimacySection(),
+                  ]),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

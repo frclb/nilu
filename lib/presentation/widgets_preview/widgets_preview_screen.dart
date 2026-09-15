@@ -5,6 +5,7 @@ import '../../design_system/content_illustration.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:math' as math;
 import '../../localization/app_localizations.dart';
+import '../../design_system/app_layout.dart';
 
 class WidgetsPreviewScreen extends StatelessWidget {
   const WidgetsPreviewScreen({super.key});
@@ -53,38 +54,43 @@ class WidgetsPreviewScreen extends StatelessWidget {
           SizedBox(width: 48), // For centering title accurately
         ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildSmallWidgetSection(
-                context,
-                primaryColor,
-                accentSoft,
-                cardBgColor,
-                borderColor,
-              ),
-              const SizedBox(height: 32),
-              _buildMediumWidgetSection(
-                context,
-                primaryColor,
-                accentSoft,
-                cardBgColor,
-                borderColor,
-              ),
-              const SizedBox(height: 32),
-              _buildPartnerWidgetSection(
-                context,
-                primaryColor,
-                accentSoft,
-                cardBgColor,
-                borderColor,
-              ),
-              const SizedBox(height: 32),
-            ],
+      body: AppContentWidth(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 24.0,
+            ),
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildSmallWidgetSection(
+                  context,
+                  primaryColor,
+                  accentSoft,
+                  cardBgColor,
+                  borderColor,
+                ),
+                const SizedBox(height: 32),
+                _buildMediumWidgetSection(
+                  context,
+                  primaryColor,
+                  accentSoft,
+                  cardBgColor,
+                  borderColor,
+                ),
+                const SizedBox(height: 32),
+                _buildPartnerWidgetSection(
+                  context,
+                  primaryColor,
+                  accentSoft,
+                  cardBgColor,
+                  borderColor,
+                ),
+                const SizedBox(height: 32),
+              ],
+            ),
           ),
         ),
       ),

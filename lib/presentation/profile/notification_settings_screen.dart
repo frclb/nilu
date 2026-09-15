@@ -8,6 +8,7 @@ import '../../domain/services/reminder_planner.dart';
 import '../../localization/app_localizations.dart';
 import '../calendar/view_models/calendar_view_model.dart';
 import '../../design_system/app_tokens.dart';
+import '../../design_system/app_layout.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
@@ -108,55 +109,57 @@ class _NotificationSettingsScreenState
           onPressed: () => context.pop(),
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: context.tokens.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: context.tokens.border),
+      body: AppContentWidth(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: context.tokens.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: context.tokens.border),
+                    ),
+                    child: Column(
+                      children: [
+                        _buildSwitchTile(
+                          context.tr('notif_period_reminders'),
+                          _settings.periodReminders,
+                          (val) =>
+                              _update(_settings.copyWith(periodReminders: val)),
+                          Icons.water_drop_outlined,
+                          true,
+                        ),
+                        _buildSwitchTile(
+                          context.tr('notif_fertile_window'),
+                          _settings.fertileWindow,
+                          (val) =>
+                              _update(_settings.copyWith(fertileWindow: val)),
+                          Icons.child_care,
+                          true,
+                        ),
+                        _buildSwitchTile(
+                          context.tr('notif_daily_logs'),
+                          _settings.dailyLogs,
+                          (val) => _update(_settings.copyWith(dailyLogs: val)),
+                          Icons.edit_note,
+                          true,
+                        ),
+                        _buildSwitchTile(
+                          context.tr('notif_partner_updates'),
+                          _settings.partnerUpdates,
+                          (val) =>
+                              _update(_settings.copyWith(partnerUpdates: val)),
+                          Icons.group_outlined,
+                          false,
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Column(
-                    children: [
-                      _buildSwitchTile(
-                        context.tr('notif_period_reminders'),
-                        _settings.periodReminders,
-                        (val) =>
-                            _update(_settings.copyWith(periodReminders: val)),
-                        Icons.water_drop_outlined,
-                        true,
-                      ),
-                      _buildSwitchTile(
-                        context.tr('notif_fertile_window'),
-                        _settings.fertileWindow,
-                        (val) =>
-                            _update(_settings.copyWith(fertileWindow: val)),
-                        Icons.child_care,
-                        true,
-                      ),
-                      _buildSwitchTile(
-                        context.tr('notif_daily_logs'),
-                        _settings.dailyLogs,
-                        (val) => _update(_settings.copyWith(dailyLogs: val)),
-                        Icons.edit_note,
-                        true,
-                      ),
-                      _buildSwitchTile(
-                        context.tr('notif_partner_updates'),
-                        _settings.partnerUpdates,
-                        (val) =>
-                            _update(_settings.copyWith(partnerUpdates: val)),
-                        Icons.group_outlined,
-                        false,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+                ],
+              ),
+      ),
     );
   }
 

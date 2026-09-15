@@ -3,6 +3,7 @@ import 'widgets/calendar_app_bar.dart';
 import 'widgets/calendar_day_header.dart';
 import 'widgets/calendar_grid.dart';
 import 'widgets/calendar_summary_section.dart';
+import '../../design_system/app_layout.dart';
 
 /// Takvim ekranı.
 ///
@@ -27,23 +28,25 @@ class CalendarScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CalendarAppBar(),
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          const SliverToBoxAdapter(child: CalendarGrid()),
-          const SliverToBoxAdapter(child: CalendarDayHeader()),
-          SliverPadding(
-            // Alt menü çubuğunun altında kalan içerik olmasın.
-            padding: EdgeInsets.only(
-              bottom: 24 + MediaQuery.of(context).padding.bottom,
+      body: AppContentWidth(
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            const SliverToBoxAdapter(child: CalendarGrid()),
+            const SliverToBoxAdapter(child: CalendarDayHeader()),
+            SliverPadding(
+              // Alt menü çubuğunun altında kalan içerik olmasın.
+              padding: EdgeInsets.only(
+                bottom: 24 + MediaQuery.of(context).padding.bottom,
+              ),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  const CalendarSummarySection(),
+                ]),
+              ),
             ),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                const CalendarSummarySection(),
-              ]),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

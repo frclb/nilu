@@ -10,6 +10,7 @@ import '../../../core/navigation/route_names.dart';
 import '../../data/repositories/share_settings_repository.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/models/share_settings.dart';
+import '../../design_system/app_layout.dart';
 
 class PartnerShareSettingsScreen extends StatefulWidget {
   const PartnerShareSettingsScreen({super.key});
@@ -92,80 +93,82 @@ class _PartnerShareSettingsScreenState
           child: Container(color: borderColor, height: 1.0),
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : !userViewModel.hasPartner
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.link_off, size: 64, color: textMutedColor),
-                  const SizedBox(height: 16),
-                  Text(
-                    context.tr('partner_none_title'),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: textMainColor,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    context.tr('partner_none_desc'),
-                    style: TextStyle(fontSize: 14, color: textMutedColor),
-                  ),
-                ],
-              ),
-            )
-          : SafeArea(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 24.0,
-                      ),
-                      physics: const BouncingScrollPhysics(),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildProfileHeader(
-                            context,
-                            isDark,
-                            primaryColor,
-                            textMainColor,
-                            textMutedColor,
-                            bgColor,
-                          ),
-                          const SizedBox(height: 32),
-                          _buildSettingsGroup(
-                            context,
-                            isDark,
-                            primaryColor,
-                            surfaceColor,
-                            textMainColor,
-                            textMutedColor,
-                            borderColor,
-                          ),
-                          const SizedBox(height: 32),
-                          _buildSecurityInfo(
-                            context,
-                            isDark,
-                            primaryColor,
-                            surfaceColor,
-                            textMainColor,
-                            textMutedColor,
-                            borderColor,
-                          ),
-                        ],
+      body: AppContentWidth(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : !userViewModel.hasPartner
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.link_off, size: 64, color: textMutedColor),
+                    const SizedBox(height: 16),
+                    Text(
+                      context.tr('partner_none_title'),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: textMainColor,
                       ),
                     ),
-                  ),
-                  _buildBottomAction(context, isDark, textMutedColor),
-                ],
+                    const SizedBox(height: 8),
+                    Text(
+                      context.tr('partner_none_desc'),
+                      style: TextStyle(fontSize: 14, color: textMutedColor),
+                    ),
+                  ],
+                ),
+              )
+            : SafeArea(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 24.0,
+                        ),
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _buildProfileHeader(
+                              context,
+                              isDark,
+                              primaryColor,
+                              textMainColor,
+                              textMutedColor,
+                              bgColor,
+                            ),
+                            const SizedBox(height: 32),
+                            _buildSettingsGroup(
+                              context,
+                              isDark,
+                              primaryColor,
+                              surfaceColor,
+                              textMainColor,
+                              textMutedColor,
+                              borderColor,
+                            ),
+                            const SizedBox(height: 32),
+                            _buildSecurityInfo(
+                              context,
+                              isDark,
+                              primaryColor,
+                              surfaceColor,
+                              textMainColor,
+                              textMutedColor,
+                              borderColor,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _buildBottomAction(context, isDark, textMutedColor),
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 

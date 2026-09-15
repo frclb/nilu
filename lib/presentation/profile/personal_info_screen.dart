@@ -3,6 +3,7 @@ import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../localization/app_localizations.dart';
+import '../../design_system/app_layout.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
   const PersonalInfoScreen({super.key});
@@ -102,60 +103,64 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Form(
-              key: _formKey,
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _buildTextField(
-                    context,
-                    label: context.tr('personal_info_name'),
-                    hint: context.tr('personal_info_name_hint'),
-                    controller: _nameController,
-                    isDark: isDark,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    context,
-                    label: context.tr('personal_info_email'),
-                    hint: context.tr('personal_info_email_hint'),
-                    controller: _emailController,
-                    isDark: isDark,
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      final text = value?.trim() ?? '';
-                      if (text.isEmpty) return null; // İsteğe bağlı alan
-                      final valid = RegExp(
-                        r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
-                      ).hasMatch(text);
-                      return valid
-                          ? null
-                          : context.tr('personal_info_email_invalid');
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  _buildBirthDateField(context, isDark),
-                  const SizedBox(height: 32),
-                  ElevatedButton(
-                    onPressed: _save,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+      body: AppContentWidth(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Form(
+                key: _formKey,
+                child: ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    _buildTextField(
+                      context,
+                      label: context.tr('personal_info_name'),
+                      hint: context.tr('personal_info_name_hint'),
+                      controller: _nameController,
+                      isDark: isDark,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildTextField(
+                      context,
+                      label: context.tr('personal_info_email'),
+                      hint: context.tr('personal_info_email_hint'),
+                      controller: _emailController,
+                      isDark: isDark,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        final text = value?.trim() ?? '';
+                        if (text.isEmpty) return null; // İsteğe bağlı alan
+                        final valid = RegExp(
+                          r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+                        ).hasMatch(text);
+                        return valid
+                            ? null
+                            : context.tr('personal_info_email_invalid');
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    _buildBirthDateField(context, isDark),
+                    const SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: _save,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        foregroundColor: Theme.of(
+                          context,
+                        ).colorScheme.onPrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        context.tr('save'),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    child: Text(
-                      context.tr('save'),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+      ),
     );
   }
 

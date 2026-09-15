@@ -18,8 +18,8 @@ veya tasarım gerektiriyor).
 | Görünen ad | Period Tracker | ✅ `CFBundleDisplayName` + `CFBundleName` |
 | Sürüm | `1.0.0` (build 1) | ✅ [pubspec.yaml:19](pubspec.yaml) |
 | Minimum iOS | 15.0 (CycleWidget hedefi 17.0) | ✅ |
-| Cihaz ailesi | iPhone **ve** iPad (`TARGETED_DEVICE_FAMILY = "1,2"`) | ⬜ karar bekliyor, §3'e bakın |
-| Yön | Yalnızca dikey (iPad'de ters dikey de) | ✅ |
+| Cihaz ailesi | iPhone **ve** iPad (`TARGETED_DEVICE_FAMILY = "1,2"`) | ✅ ikisi de destekleniyor |
+| Yön | iPhone dikey; iPad dikey + yatay | ✅ |
 | Desteklenen diller | tr, en, de, es, fr, pt | ✅ altısı da eşit (`dart run tool/check_localization.dart`) |
 | Şifreleme beyanı | `ITSAppUsesNonExemptEncryption` = `false` | ✅ — yükleme sırasında soru sorulmaz |
 
@@ -85,18 +85,40 @@ Kendi tasarımınızı kullanacaksanız `assets/icon/app_icon.png` dosyasını
 
 **Ekran görüntüleri** ⬜ — App Store Connect formunda sizden isteniyor.
 
-Uygulama şu an **iPad'i de hedefliyor** (`TARGETED_DEVICE_FAMILY = "1,2"`).
-App Store Connect bu durumda iPad ekran görüntülerini de zorunlu tutar ve
-inceleme uygulamayı iPad'de açar. İki seçenek:
-
-| Seçenek | Ne yapmalı |
-|---|---|
-| iPad'i desteklemeye devam et | Düzeni iPad'de test edin ve iPad ekran görüntüsü de hazırlayın |
-| Yalnızca iPhone çık | Xcode → Runner → General → Supported Destinations'tan iPad'i kaldırın (`TARGETED_DEVICE_FAMILY = 1`) |
+Uygulama hem iPhone hem iPad'i hedefliyor, dolayısıyla App Store Connect
+**her ikisi için de** ekran görüntüsü ister ve inceleme uygulamayı iPad'de de
+açar. Düzen iki tarafta da doğrulandı (bkz. "Ekran uyumu" bölümü).
 
 Ekran görüntülerini [TESTING.md](TESTING.md)'deki simülatör akışıyla
 alabilirsiniz. Her boyut için 3–10 adet istenir; App Store Connect o an hangi
-cihaz boyutunu zorunlu tuttuğunu formda gösterir.
+cihaz boyutunu zorunlu tuttuğunu formda gösterir. iPad görüntülerini yatayda
+almak yan menüyü gösterdiği için daha iyi tanıtır.
+
+---
+
+## Ekran uyumu
+
+Uygulama tek bir telefon genişliği varsayılarak yazılmıştı; iPad'de kartlar
+1032 pt'ye kadar geriliyordu. Üç şey eklendi:
+
+| Genişlik | Ne olur |
+|---|---|
+| < 600 pt | Tek sütun, kenardan kenara, alt menü — bütün iPhone'lar |
+| 600–899 pt | Sütun 600 pt'de ortalanır, alt menü kalır — iPad mini, katlanabilir açıkken |
+| ≥ 900 pt | Ortalanmış sütun + **yan menü** — iPad 13" portre, bütün iPad'ler yatay |
+
+Karar cihaz adına değil **gelen genişliğe** göre veriliyor: iPadOS 26
+pencereleri serbestçe boyutlandırıyor ve katlanabilir telefon açılıp
+kapandığında genişlik çalışma anında değişiyor.
+
+`test/presentation/device_sizes_test.dart` uygulamayı on cihaz boyutunda
+açıp taşma (`RenderFlex overflowed`) olmadığını doğruluyor — iPhone 16e'den
+iPad 13" yataya, iPhone Duo'nun açık ve kapalı hâlleri dâhil.
+
+> Testlerin metni gerçekçi ölçmesi için `test/flutter_test_config.dart`
+> uygulamanın kendi yazı tiplerini yüklüyor. Yüklenmezse `flutter test` her
+> karakteri aynı genişlikte kutu olarak çizen yedek yazı tipini kullanıyor ve
+> cihazda rahat sığan başlıklar için "96 piksel taştı" diyor.
 
 ---
 

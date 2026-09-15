@@ -12,6 +12,7 @@ import '../../../localization/app_localizations.dart';
 import '../../../core/navigation/navigation_service.dart';
 import '../../../domain/models/daily_log.dart';
 import '../calendar/view_models/calendar_view_model.dart';
+import '../../design_system/app_layout.dart';
 
 class LogEntryScreen extends StatefulWidget {
   const LogEntryScreen({super.key});
@@ -67,86 +68,88 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
 
     return Scaffold(
       appBar: const LogEntryAppBar(),
-      body: Stack(
-        children: [
-          // Scrollable Content
-          SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.only(bottom: 100),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const LogEntryHeader(),
-                FlowIntensitySection(
-                  initialValue: _flowIntensity,
-                  onChanged: (value) {
-                    _flowIntensity = value;
-                  },
-                ),
-                _buildDivider(isDark, theme),
-                SymptomsSection(
-                  initialSymptoms: _symptoms,
-                  onChanged: (value) {
-                    _symptoms = value;
-                  },
-                ),
-                _buildDivider(isDark, theme),
-                MoodSection(
-                  initialMoods: _moods,
-                  onChanged: (value) {
-                    _moods = value;
-                  },
-                ),
-                _buildDivider(isDark, theme),
-                NotesSection(controller: _notesController),
-              ],
+      body: AppContentWidth(
+        child: Stack(
+          children: [
+            // Scrollable Content
+            SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.only(bottom: 100),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const LogEntryHeader(),
+                  FlowIntensitySection(
+                    initialValue: _flowIntensity,
+                    onChanged: (value) {
+                      _flowIntensity = value;
+                    },
+                  ),
+                  _buildDivider(isDark, theme),
+                  SymptomsSection(
+                    initialSymptoms: _symptoms,
+                    onChanged: (value) {
+                      _symptoms = value;
+                    },
+                  ),
+                  _buildDivider(isDark, theme),
+                  MoodSection(
+                    initialMoods: _moods,
+                    onChanged: (value) {
+                      _moods = value;
+                    },
+                  ),
+                  _buildDivider(isDark, theme),
+                  NotesSection(controller: _notesController),
+                ],
+              ),
             ),
-          ),
 
-          // Fixed Bottom Action Bar
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: EdgeInsets.only(
-                left: 24,
-                right: 24,
-                top: 16,
-                bottom: 16 + MediaQuery.of(context).padding.bottom,
-              ),
-              decoration: BoxDecoration(
-                color: context.tokens.surface.withAlpha(229),
-                border: Border(
-                  top: BorderSide(color: context.tokens.surfaceAlt, width: 1),
+            // Fixed Bottom Action Bar
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: EdgeInsets.only(
+                  left: 24,
+                  right: 24,
+                  top: 16,
+                  bottom: 16 + MediaQuery.of(context).padding.bottom,
                 ),
-              ),
-              child: SizedBox(
-                height: 48,
-                child: ElevatedButton.icon(
-                  onPressed: _saveLog,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 4,
-                    shadowColor: theme.colorScheme.primary.withAlpha(102),
+                decoration: BoxDecoration(
+                  color: context.tokens.surface.withAlpha(229),
+                  border: Border(
+                    top: BorderSide(color: context.tokens.surfaceAlt, width: 1),
                   ),
-                  icon: const Icon(Icons.check, size: 20),
-                  label: Text(
-                    context.tr('log_save_button'),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                ),
+                child: SizedBox(
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    onPressed: _saveLog,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 4,
+                      shadowColor: theme.colorScheme.primary.withAlpha(102),
+                    ),
+                    icon: const Icon(Icons.check, size: 20),
+                    label: Text(
+                      context.tr('log_save_button'),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

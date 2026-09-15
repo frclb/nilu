@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../data/repositories/notification_settings_repository.dart';
 import '../../domain/models/notification_settings.dart';
 import '../../localization/app_localizations.dart';
+import '../../design_system/app_layout.dart';
 
 class PartnerNotificationSettingsScreen extends StatefulWidget {
   const PartnerNotificationSettingsScreen({super.key});
@@ -114,184 +115,194 @@ class _PartnerNotificationSettingsScreenState
           ),
         ),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 24.0,
-                ),
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildHeader(context, primaryColor, textMutedColor),
-                    const SizedBox(height: 24),
-                    _buildReminderItem(
-                      context,
-                      icon: Icons.water_drop_outlined,
-                      title: context.tr('partner_notif_period_start'),
-                      subtitle: context.tr('partner_notif_period_start_desc'),
-                      dropdownLabel: context.tr(
-                        'partner_notif_how_long_before',
+      body: AppContentWidth(
+        child: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 24.0,
+                  ),
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildHeader(context, primaryColor, textMutedColor),
+                      const SizedBox(height: 24),
+                      _buildReminderItem(
+                        context,
+                        icon: Icons.water_drop_outlined,
+                        title: context.tr('partner_notif_period_start'),
+                        subtitle: context.tr('partner_notif_period_start_desc'),
+                        dropdownLabel: context.tr(
+                          'partner_notif_how_long_before',
+                        ),
+                        switchValue: _periodStartEnabled,
+                        onSwitchChanged: (val) =>
+                            setState(() => _periodStartEnabled = val),
+                        dropdownValue: _periodStartValue,
+                        dropdownItems: [
+                          DropdownMenuItem(
+                            value: '1',
+                            child: Text(
+                              context.tr('partner_notif_1_day_before'),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: '2',
+                            child: Text(
+                              context.tr('partner_notif_2_days_before'),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: '3',
+                            child: Text(
+                              context.tr('partner_notif_3_days_before'),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: '7',
+                            child: Text(
+                              context.tr('partner_notif_1_week_before'),
+                            ),
+                          ),
+                        ],
+                        onDropdownChanged: (val) =>
+                            setState(() => _periodStartValue = val!),
+                        cardBgColor: cardBgColor,
+                        borderColor: borderColor,
+                        primaryColor: primaryColor,
+                        textMainColor: textMainColor,
+                        textMutedColor: textMutedColor,
+                        bgColor: bgColor,
                       ),
-                      switchValue: _periodStartEnabled,
-                      onSwitchChanged: (val) =>
-                          setState(() => _periodStartEnabled = val),
-                      dropdownValue: _periodStartValue,
-                      dropdownItems: [
-                        DropdownMenuItem(
-                          value: '1',
-                          child: Text(context.tr('partner_notif_1_day_before')),
+                      const SizedBox(height: 24),
+                      _buildReminderItem(
+                        context,
+                        icon: Icons
+                            .local_florist_outlined, // Flower icon approximation
+                        title: context.tr('partner_notif_ovulation'),
+                        subtitle: context.tr('partner_notif_ovulation_desc'),
+                        dropdownLabel: context.tr(
+                          'partner_notif_how_long_before',
                         ),
-                        DropdownMenuItem(
-                          value: '2',
-                          child: Text(
-                            context.tr('partner_notif_2_days_before'),
+                        switchValue: _ovulationEnabled,
+                        onSwitchChanged: (val) =>
+                            setState(() => _ovulationEnabled = val),
+                        dropdownValue: _ovulationValue,
+                        dropdownItems: [
+                          DropdownMenuItem(
+                            value: '0',
+                            child: Text(context.tr('partner_notif_same_day')),
                           ),
-                        ),
-                        DropdownMenuItem(
-                          value: '3',
-                          child: Text(
-                            context.tr('partner_notif_3_days_before'),
+                          DropdownMenuItem(
+                            value: '1',
+                            child: Text(
+                              context.tr('partner_notif_1_day_before'),
+                            ),
                           ),
-                        ),
-                        DropdownMenuItem(
-                          value: '7',
-                          child: Text(
-                            context.tr('partner_notif_1_week_before'),
+                          DropdownMenuItem(
+                            value: '2',
+                            child: Text(
+                              context.tr('partner_notif_2_days_before'),
+                            ),
                           ),
-                        ),
-                      ],
-                      onDropdownChanged: (val) =>
-                          setState(() => _periodStartValue = val!),
-                      cardBgColor: cardBgColor,
-                      borderColor: borderColor,
-                      primaryColor: primaryColor,
-                      textMainColor: textMainColor,
-                      textMutedColor: textMutedColor,
-                      bgColor: bgColor,
-                    ),
-                    const SizedBox(height: 24),
-                    _buildReminderItem(
-                      context,
-                      icon: Icons
-                          .local_florist_outlined, // Flower icon approximation
-                      title: context.tr('partner_notif_ovulation'),
-                      subtitle: context.tr('partner_notif_ovulation_desc'),
-                      dropdownLabel: context.tr(
-                        'partner_notif_how_long_before',
+                        ],
+                        onDropdownChanged: (val) =>
+                            setState(() => _ovulationValue = val!),
+                        cardBgColor: cardBgColor,
+                        borderColor: borderColor,
+                        primaryColor: primaryColor,
+                        textMainColor: textMainColor,
+                        textMutedColor: textMutedColor,
+                        bgColor: bgColor,
                       ),
-                      switchValue: _ovulationEnabled,
-                      onSwitchChanged: (val) =>
-                          setState(() => _ovulationEnabled = val),
-                      dropdownValue: _ovulationValue,
-                      dropdownItems: [
-                        DropdownMenuItem(
-                          value: '0',
-                          child: Text(context.tr('partner_notif_same_day')),
-                        ),
-                        DropdownMenuItem(
-                          value: '1',
-                          child: Text(context.tr('partner_notif_1_day_before')),
-                        ),
-                        DropdownMenuItem(
-                          value: '2',
-                          child: Text(
-                            context.tr('partner_notif_2_days_before'),
+                      const SizedBox(height: 24),
+                      _buildReminderItem(
+                        context,
+                        icon: Icons.favorite_border,
+                        title: context.tr('partner_notif_symptoms'),
+                        subtitle: context.tr('partner_notif_symptoms_desc'),
+                        dropdownLabel: context.tr('partner_notif_frequency'),
+                        switchValue: _symptomsEnabled,
+                        onSwitchChanged: (val) =>
+                            setState(() => _symptomsEnabled = val),
+                        dropdownValue: _symptomsValue,
+                        dropdownItems: [
+                          DropdownMenuItem(
+                            value: '1',
+                            child: Text(context.tr('partner_notif_instantly')),
                           ),
-                        ),
-                      ],
-                      onDropdownChanged: (val) =>
-                          setState(() => _ovulationValue = val!),
-                      cardBgColor: cardBgColor,
-                      borderColor: borderColor,
-                      primaryColor: primaryColor,
-                      textMainColor: textMainColor,
-                      textMutedColor: textMutedColor,
-                      bgColor: bgColor,
-                    ),
-                    const SizedBox(height: 24),
-                    _buildReminderItem(
-                      context,
-                      icon: Icons.favorite_border,
-                      title: context.tr('partner_notif_symptoms'),
-                      subtitle: context.tr('partner_notif_symptoms_desc'),
-                      dropdownLabel: context.tr('partner_notif_frequency'),
-                      switchValue: _symptomsEnabled,
-                      onSwitchChanged: (val) =>
-                          setState(() => _symptomsEnabled = val),
-                      dropdownValue: _symptomsValue,
-                      dropdownItems: [
-                        DropdownMenuItem(
-                          value: '1',
-                          child: Text(context.tr('partner_notif_instantly')),
-                        ),
-                        DropdownMenuItem(
-                          value: '2',
-                          child: Text(
-                            context.tr('partner_notif_daily_summary'),
+                          DropdownMenuItem(
+                            value: '2',
+                            child: Text(
+                              context.tr('partner_notif_daily_summary'),
+                            ),
                           ),
-                        ),
-                        DropdownMenuItem(
-                          value: '3',
-                          child: Text(
-                            context.tr('partner_notif_weekly_summary'),
+                          DropdownMenuItem(
+                            value: '3',
+                            child: Text(
+                              context.tr('partner_notif_weekly_summary'),
+                            ),
                           ),
+                        ],
+                        onDropdownChanged: (val) =>
+                            setState(() => _symptomsValue = val!),
+                        cardBgColor: cardBgColor,
+                        borderColor: borderColor,
+                        primaryColor: primaryColor,
+                        textMainColor: textMainColor,
+                        textMutedColor: textMutedColor,
+                        bgColor: bgColor,
+                      ),
+                      const SizedBox(height: 24),
+                      _buildReminderItem(
+                        context,
+                        icon: Icons.lightbulb_outline,
+                        title: context.tr('partner_notif_daily_support'),
+                        subtitle: context.tr(
+                          'partner_notif_daily_support_desc',
                         ),
-                      ],
-                      onDropdownChanged: (val) =>
-                          setState(() => _symptomsValue = val!),
-                      cardBgColor: cardBgColor,
-                      borderColor: borderColor,
-                      primaryColor: primaryColor,
-                      textMainColor: textMainColor,
-                      textMutedColor: textMutedColor,
-                      bgColor: bgColor,
-                    ),
-                    const SizedBox(height: 24),
-                    _buildReminderItem(
-                      context,
-                      icon: Icons.lightbulb_outline,
-                      title: context.tr('partner_notif_daily_support'),
-                      subtitle: context.tr('partner_notif_daily_support_desc'),
-                      dropdownLabel: context.tr('partner_notif_reminder_time'),
-                      switchValue: _dailySupportEnabled,
-                      onSwitchChanged: (val) =>
-                          setState(() => _dailySupportEnabled = val),
-                      dropdownValue: _dailySupportValue,
-                      dropdownItems: [
-                        DropdownMenuItem(
-                          value: '0900',
-                          child: Text(context.tr('partner_notif_morning')),
+                        dropdownLabel: context.tr(
+                          'partner_notif_reminder_time',
                         ),
-                        DropdownMenuItem(
-                          value: '1200',
-                          child: Text(context.tr('partner_notif_noon')),
-                        ),
-                        DropdownMenuItem(
-                          value: '1900',
-                          child: Text(context.tr('partner_notif_evening')),
-                        ),
-                      ],
-                      onDropdownChanged: (val) =>
-                          setState(() => _dailySupportValue = val!),
-                      cardBgColor: cardBgColor,
-                      borderColor: borderColor,
-                      primaryColor: primaryColor,
-                      textMainColor: textMainColor,
-                      textMutedColor: textMutedColor,
-                      bgColor: bgColor,
-                    ),
-                    const SizedBox(height: 32),
-                  ],
+                        switchValue: _dailySupportEnabled,
+                        onSwitchChanged: (val) =>
+                            setState(() => _dailySupportEnabled = val),
+                        dropdownValue: _dailySupportValue,
+                        dropdownItems: [
+                          DropdownMenuItem(
+                            value: '0900',
+                            child: Text(context.tr('partner_notif_morning')),
+                          ),
+                          DropdownMenuItem(
+                            value: '1200',
+                            child: Text(context.tr('partner_notif_noon')),
+                          ),
+                          DropdownMenuItem(
+                            value: '1900',
+                            child: Text(context.tr('partner_notif_evening')),
+                          ),
+                        ],
+                        onDropdownChanged: (val) =>
+                            setState(() => _dailySupportValue = val!),
+                        cardBgColor: cardBgColor,
+                        borderColor: borderColor,
+                        primaryColor: primaryColor,
+                        textMainColor: textMainColor,
+                        textMutedColor: textMutedColor,
+                        bgColor: bgColor,
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            _buildBottomAction(context, primaryColor, bgColor),
-          ],
+              _buildBottomAction(context, primaryColor, bgColor),
+            ],
+          ),
         ),
       ),
     );

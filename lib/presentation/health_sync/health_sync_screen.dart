@@ -7,6 +7,7 @@ import '../../design_system/app_tokens.dart';
 import '../../domain/services/health_import.dart';
 import '../../localization/app_localizations.dart';
 import '../calendar/view_models/calendar_view_model.dart';
+import '../../design_system/app_layout.dart';
 
 /// Apple Sağlık / Health Connect eşitlemesi.
 ///
@@ -103,65 +104,67 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('health_sync_title'))),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: t.brandTint,
-              borderRadius: BorderRadius.circular(AppRadius.lg),
+      body: AppContentWidth(
+        child: ListView(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: t.brandTint,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+              ),
+              child: Icon(
+                Icons.favorite_outline,
+                size: 34,
+                color: theme.colorScheme.primary,
+              ),
             ),
-            child: Icon(
-              Icons.favorite_outline,
-              size: 34,
-              color: theme.colorScheme.primary,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            context.tr('health_sync_desc'),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: t.textMuted,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xl),
-
-          _Bullet(text: context.tr('health_sync_point_watch')),
-          _Bullet(text: context.tr('health_sync_point_merge')),
-          _Bullet(text: context.tr('health_sync_point_local')),
-
-          const SizedBox(height: AppSpacing.xxl),
-
-          if (!_available)
-            Text(
-              context.tr('health_unavailable'),
-              style: theme.textTheme.bodyMedium?.copyWith(color: t.textMuted),
-            )
-          else
-            FilledButton.icon(
-              onPressed: _busy ? null : _import,
-              icon: _busy
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.download_outlined),
-              label: Text(context.tr('health_import_button')),
-            ),
-
-          if (_result != null) ...[
             const SizedBox(height: AppSpacing.lg),
             Text(
-              _result!,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium,
+              context.tr('health_sync_desc'),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: t.textMuted,
+                height: 1.5,
+              ),
             ),
+            const SizedBox(height: AppSpacing.xl),
+
+            _Bullet(text: context.tr('health_sync_point_watch')),
+            _Bullet(text: context.tr('health_sync_point_merge')),
+            _Bullet(text: context.tr('health_sync_point_local')),
+
+            const SizedBox(height: AppSpacing.xxl),
+
+            if (!_available)
+              Text(
+                context.tr('health_unavailable'),
+                style: theme.textTheme.bodyMedium?.copyWith(color: t.textMuted),
+              )
+            else
+              FilledButton.icon(
+                onPressed: _busy ? null : _import,
+                icon: _busy
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.download_outlined),
+                label: Text(context.tr('health_import_button')),
+              ),
+
+            if (_result != null) ...[
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                _result!,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium,
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

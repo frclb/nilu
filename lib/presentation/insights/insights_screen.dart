@@ -4,6 +4,7 @@ import 'widgets/insights_app_bar.dart';
 import 'widgets/cycle_alert_card.dart';
 import 'widgets/cycle_trend_card.dart';
 import 'widgets/symptom_analysis_card.dart';
+import '../../design_system/app_layout.dart';
 
 class InsightsScreen extends StatelessWidget {
   const InsightsScreen({super.key});
@@ -13,22 +14,24 @@ class InsightsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: context.tokens.background,
       appBar: const InsightsAppBar(),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.only(
-          left: 16,
-          right: 16,
-          top: 24,
-          bottom: 100,
-        ),
-        child: Column(
-          children: const [
-            // Uyarı varsa en üstte; yoksa hiç çizilmiyor.
-            CycleAlertCard(),
-            CycleTrendCard(),
-            SizedBox(height: 24),
-            SymptomAnalysisCard(),
-          ],
+      body: AppContentWidth(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 24,
+            bottom: 100,
+          ),
+          child: Column(
+            children: const [
+              // Uyarı varsa en üstte; yoksa hiç çizilmiyor.
+              CycleAlertCard(),
+              CycleTrendCard(),
+              SizedBox(height: 24),
+              SymptomAnalysisCard(),
+            ],
+          ),
         ),
       ),
     );

@@ -10,6 +10,7 @@ import '../../domain/services/assistant/assistant_parser.dart';
 import '../../localization/app_localizations.dart';
 import '../../localization/date_names.dart';
 import '../calendar/view_models/calendar_view_model.dart';
+import '../../design_system/app_layout.dart';
 
 /// Kullanıcının kendi verisine soru sorduğu ekran.
 ///
@@ -106,57 +107,59 @@ class _AssistantScreenState extends State<AssistantScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('assistant_title'))),
-      body: Column(
-        children: [
-          Expanded(
-            child: _turns.isEmpty
-                ? _Intro(onPick: _ask)
-                : ListView.builder(
-                    reverse: true,
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    itemCount: _turns.length,
-                    itemBuilder: (context, index) {
-                      final turn = _turns[index];
-                      return _TurnView(
-                        question: turn.question,
-                        answer: _render(turn.answer),
-                        needsData: turn.answer.needsData,
-                      );
-                    },
-                  ),
-          ),
-          Container(
-            padding: EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              AppSpacing.md,
-              AppSpacing.lg,
-              MediaQuery.of(context).padding.bottom + AppSpacing.md,
+      body: AppContentWidth(
+        child: Column(
+          children: [
+            Expanded(
+              child: _turns.isEmpty
+                  ? _Intro(onPick: _ask)
+                  : ListView.builder(
+                      reverse: true,
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      itemCount: _turns.length,
+                      itemBuilder: (context, index) {
+                        final turn = _turns[index];
+                        return _TurnView(
+                          question: turn.question,
+                          answer: _render(turn.answer),
+                          needsData: turn.answer.needsData,
+                        );
+                      },
+                    ),
             ),
-            decoration: BoxDecoration(
-              color: t.surface,
-              border: Border(top: BorderSide(color: t.border)),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    textInputAction: TextInputAction.send,
-                    onSubmitted: _ask,
-                    decoration: InputDecoration(
-                      hintText: context.tr('assistant_hint'),
+            Container(
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.md,
+                AppSpacing.lg,
+                MediaQuery.of(context).padding.bottom + AppSpacing.md,
+              ),
+              decoration: BoxDecoration(
+                color: t.surface,
+                border: Border(top: BorderSide(color: t.border)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: _ask,
+                      decoration: InputDecoration(
+                        hintText: context.tr('assistant_hint'),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                IconButton.filled(
-                  onPressed: () => _ask(_controller.text),
-                  icon: const Icon(Icons.arrow_upward),
-                ),
-              ],
+                  const SizedBox(width: AppSpacing.sm),
+                  IconButton.filled(
+                    onPressed: () => _ask(_controller.text),
+                    icon: const Icon(Icons.arrow_upward),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

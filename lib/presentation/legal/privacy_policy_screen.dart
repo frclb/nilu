@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../design_system/app_tokens.dart';
 import '../../localization/app_localizations.dart';
+import '../../design_system/app_layout.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -29,54 +30,56 @@ class PrivacyPolicyScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.tr('privacy_policy_last_updated'),
-              style: TextStyle(color: mutedColor, fontSize: 13),
-            ),
-            const SizedBox(height: 24),
-            _buildSection(
-              context,
-              textColor,
-              mutedColor,
-              title: context.tr('privacy_policy_section1_title'),
-              content: context.tr('privacy_policy_section1_content'),
-            ),
-            _buildSection(
-              context,
-              textColor,
-              mutedColor,
-              title: context.tr('privacy_policy_section2_title'),
-              content: context.tr('privacy_policy_section2_content'),
-            ),
-            _buildSection(
-              context,
-              textColor,
-              mutedColor,
-              title: context.tr('privacy_policy_section3_title'),
-              content: context.tr('privacy_policy_section3_content'),
-            ),
-            _buildSection(
-              context,
-              textColor,
-              mutedColor,
-              title: context.tr('privacy_policy_section4_title'),
-              content: context.tr('privacy_policy_section4_content'),
-            ),
-            _buildSection(
-              context,
-              textColor,
-              mutedColor,
-              title: context.tr('privacy_policy_section5_title'),
-              content: context.tr('privacy_policy_section5_content'),
-            ),
-            const SizedBox(height: 32),
-          ],
+      body: AppContentWidth(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                context.tr('privacy_policy_last_updated'),
+                style: TextStyle(color: mutedColor, fontSize: 13),
+              ),
+              const SizedBox(height: 24),
+              _buildSection(
+                context,
+                textColor,
+                mutedColor,
+                title: context.tr('privacy_policy_section1_title'),
+                content: context.tr('privacy_policy_section1_content'),
+              ),
+              _buildSection(
+                context,
+                textColor,
+                mutedColor,
+                title: context.tr('privacy_policy_section2_title'),
+                content: context.tr('privacy_policy_section2_content'),
+              ),
+              _buildSection(
+                context,
+                textColor,
+                mutedColor,
+                title: context.tr('privacy_policy_section3_title'),
+                content: context.tr('privacy_policy_section3_content'),
+              ),
+              _buildSection(
+                context,
+                textColor,
+                mutedColor,
+                title: context.tr('privacy_policy_section4_title'),
+                content: context.tr('privacy_policy_section4_content'),
+              ),
+              _buildSection(
+                context,
+                textColor,
+                mutedColor,
+                title: context.tr('privacy_policy_section5_title'),
+                content: context.tr('privacy_policy_section5_content'),
+              ),
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );

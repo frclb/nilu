@@ -4,6 +4,7 @@ import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
+import '../../design_system/app_layout.dart';
 
 class PartnerSupportScreen extends StatefulWidget {
   const PartnerSupportScreen({super.key});
@@ -95,72 +96,77 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
         ],
       ),
       extendBodyBehindAppBar: true,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-          physics: const BouncingScrollPhysics(),
-          child: AnimatedBuilder(
-            animation: _animController,
-            builder: (context, child) {
-              return Opacity(
-                opacity: _fadeAnimation.value,
-                child: FractionalTranslation(
-                  translation: _slideAnimation.value,
-                  child: child,
-                ),
-              );
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildContextHeader(
-                  context,
-                  primaryColor,
-                  textMainColor,
-                  textMutedColor,
-                ),
-                const SizedBox(height: 32),
-                _buildProgressSummary(
-                  context,
-                  isDark,
-                  primaryColor,
-                  surfaceColor,
-                  textMainColor,
-                  textMutedColor,
-                  borderColor,
-                ),
-                const SizedBox(height: 32),
-                _buildPhysicalSupportSection(
-                  context,
-                  isDark,
-                  primaryColor,
-                  surfaceColor,
-                  textMainColor,
-                  textMutedColor,
-                  borderColor,
-                ),
-                const SizedBox(height: 32),
-                _buildEmotionalSupportSection(
-                  context,
-                  isDark,
-                  primaryColor,
-                  surfaceColor,
-                  textMainColor,
-                  textMutedColor,
-                  borderColor,
-                ),
-                const SizedBox(height: 32),
-                _buildKnowledgeCorner(
-                  context,
-                  isDark,
-                  primaryColor,
-                  surfaceColor,
-                  textMainColor,
-                  textMutedColor,
-                  borderColor,
-                ),
-                const SizedBox(height: 48), // Bottom padding
-              ],
+      body: AppContentWidth(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 16.0,
+            ),
+            physics: const BouncingScrollPhysics(),
+            child: AnimatedBuilder(
+              animation: _animController,
+              builder: (context, child) {
+                return Opacity(
+                  opacity: _fadeAnimation.value,
+                  child: FractionalTranslation(
+                    translation: _slideAnimation.value,
+                    child: child,
+                  ),
+                );
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildContextHeader(
+                    context,
+                    primaryColor,
+                    textMainColor,
+                    textMutedColor,
+                  ),
+                  const SizedBox(height: 32),
+                  _buildProgressSummary(
+                    context,
+                    isDark,
+                    primaryColor,
+                    surfaceColor,
+                    textMainColor,
+                    textMutedColor,
+                    borderColor,
+                  ),
+                  const SizedBox(height: 32),
+                  _buildPhysicalSupportSection(
+                    context,
+                    isDark,
+                    primaryColor,
+                    surfaceColor,
+                    textMainColor,
+                    textMutedColor,
+                    borderColor,
+                  ),
+                  const SizedBox(height: 32),
+                  _buildEmotionalSupportSection(
+                    context,
+                    isDark,
+                    primaryColor,
+                    surfaceColor,
+                    textMainColor,
+                    textMutedColor,
+                    borderColor,
+                  ),
+                  const SizedBox(height: 32),
+                  _buildKnowledgeCorner(
+                    context,
+                    isDark,
+                    primaryColor,
+                    surfaceColor,
+                    textMainColor,
+                    textMutedColor,
+                    borderColor,
+                  ),
+                  const SizedBox(height: 48), // Bottom padding
+                ],
+              ),
             ),
           ),
         ),

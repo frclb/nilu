@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../data/repositories/cycle_settings_repository.dart';
 import '../../presentation/calendar/view_models/calendar_view_model.dart';
 import '../../localization/app_localizations.dart';
+import '../../design_system/app_layout.dart';
 
 class CycleSettingsScreen extends StatefulWidget {
   const CycleSettingsScreen({super.key});
@@ -84,138 +85,142 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _buildSliderSetting(
-                  context,
-                  context.tr('cycle_settings_length'),
-                  '$_cycleLength Gün',
-                  _cycleLength.toDouble(),
-                  min: 21,
-                  max: 35,
-                  onChanged: (val) {
-                    setState(() {
-                      _cycleLength = val.toInt();
-                    });
-                  },
-                  isDark: isDark,
-                ),
-                const SizedBox(height: 16),
-                _buildSliderSetting(
-                  context,
-                  context.tr('cycle_settings_period'),
-                  '$_periodLength Gün',
-                  _periodLength.toDouble(),
-                  min: 2,
-                  max: 10,
-                  onChanged: (val) {
-                    setState(() {
-                      _periodLength = val.toInt();
-                    });
-                  },
-                  isDark: isDark,
-                ),
-                const SizedBox(height: 16),
-
-                // Hormonal doğum kontrolü.
-                //
-                // Bu yöntemler çoğunlukla yumurtlamayı baskılar. Bayrak
-                // açıkken tahmin katmanı yumurtlama ve doğurganlık penceresi
-                // **hiç üretmiyor**; öncesinde hap kullanan bir kullanıcıya
-                // da yumurtlama günü gösteriliyordu.
-                Container(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
-                  decoration: BoxDecoration(
-                    color: context.tokens.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: context.tokens.border),
+      body: AppContentWidth(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  _buildSliderSetting(
+                    context,
+                    context.tr('cycle_settings_length'),
+                    '$_cycleLength Gün',
+                    _cycleLength.toDouble(),
+                    min: 21,
+                    max: 35,
+                    onChanged: (val) {
+                      setState(() {
+                        _cycleLength = val.toInt();
+                      });
+                    },
+                    isDark: isDark,
                   ),
-                  child: SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    value: _hormonalContraception,
-                    onChanged: (v) =>
-                        setState(() => _hormonalContraception = v),
-                    activeThumbColor: Theme.of(context).colorScheme.primary,
-                    title: Text(
-                      context.tr('cycle_settings_contraception'),
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: context.tokens.text,
-                      ),
+                  const SizedBox(height: 16),
+                  _buildSliderSetting(
+                    context,
+                    context.tr('cycle_settings_period'),
+                    '$_periodLength Gün',
+                    _periodLength.toDouble(),
+                    min: 2,
+                    max: 10,
+                    onChanged: (val) {
+                      setState(() {
+                        _periodLength = val.toInt();
+                      });
+                    },
+                    isDark: isDark,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Hormonal doğum kontrolü.
+                  //
+                  // Bu yöntemler çoğunlukla yumurtlamayı baskılar. Bayrak
+                  // açıkken tahmin katmanı yumurtlama ve doğurganlık penceresi
+                  // **hiç üretmiyor**; öncesinde hap kullanan bir kullanıcıya
+                  // da yumurtlama günü gösteriliyordu.
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
+                    decoration: BoxDecoration(
+                      color: context.tokens.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: context.tokens.border),
                     ),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        context.tr('cycle_settings_contraception_desc'),
+                    child: SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      value: _hormonalContraception,
+                      onChanged: (v) =>
+                          setState(() => _hormonalContraception = v),
+                      activeThumbColor: Theme.of(context).colorScheme.primary,
+                      title: Text(
+                        context.tr('cycle_settings_contraception'),
                         style: TextStyle(
-                          fontSize: 12,
-                          height: 1.5,
-                          color: context.tokens.textMuted,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: context.tokens.text,
                         ),
                       ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Bilgi notu
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: context.tokens.brandTint,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark
-                          ? AppScrim.frost(25)
-                          : Theme.of(context).colorScheme.primary.withAlpha(38),
-                    ),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.info_outline,
-                        size: 18,
-                        color: isDark
-                            ? context.tokens.textFaint
-                            : Theme.of(context).colorScheme.primary,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          context.tr('cycle_settings_note'),
+                          context.tr('cycle_settings_contraception_desc'),
                           style: TextStyle(
                             fontSize: 12,
+                            height: 1.5,
                             color: context.tokens.textMuted,
-                            height: 1.4,
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                ElevatedButton(
-                  onPressed: _saveSettings,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Text(
-                    context.tr('save'),
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  const SizedBox(height: 16),
+
+                  // Bilgi notu
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: context.tokens.brandTint,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isDark
+                            ? AppScrim.frost(25)
+                            : Theme.of(
+                                context,
+                              ).colorScheme.primary.withAlpha(38),
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          size: 18,
+                          color: isDark
+                              ? context.tokens.textFaint
+                              : Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            context.tr('cycle_settings_note'),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: context.tokens.textMuted,
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
+                  const SizedBox(height: 32),
+                  ElevatedButton(
+                    onPressed: _saveSettings,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      context.tr('save'),
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+      ),
     );
   }
 

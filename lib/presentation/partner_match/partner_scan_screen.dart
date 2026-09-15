@@ -10,6 +10,7 @@ import '../../../domain/services/partner_code.dart';
 import '../../../domain/view_models/user_view_model.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
+import '../../design_system/app_layout.dart';
 
 /// Kamera kullanılamadığında gösterilen ekran.
 ///
@@ -361,48 +362,50 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
         ),
       ),
       extendBodyBehindAppBar: true,
-      body: Stack(
-        children: [
-          MobileScanner(
-            controller: _scannerController,
-            onDetect: _onDetect,
-            // Paketin kendi hata ekranı İngilizce sabit metin gösteriyor
-            // ("Scanning is not supported on this device"). Kullanıcı kamera
-            // iznini reddettiğinde de bu ekran çıkıyor, yani gerçek cihazda
-            // ulaşılabilir bir durum.
-            errorBuilder: (context, error) => _ScanUnavailable(error: error),
-          ),
-          // Scanner overlay
-          Positioned.fill(
-            child: Container(
-              decoration: ShapeDecoration(
-                shape: _ScannerOverlayShape(
-                  borderColor: Theme.of(context).primaryColor,
-                  borderRadius: 12,
-                  borderLength: 40,
-                  borderWidth: 6,
-                  cutOutSize: MediaQuery.of(context).size.width * 0.70,
+      body: AppContentWidth(
+        child: Stack(
+          children: [
+            MobileScanner(
+              controller: _scannerController,
+              onDetect: _onDetect,
+              // Paketin kendi hata ekranı İngilizce sabit metin gösteriyor
+              // ("Scanning is not supported on this device"). Kullanıcı kamera
+              // iznini reddettiğinde de bu ekran çıkıyor, yani gerçek cihazda
+              // ulaşılabilir bir durum.
+              errorBuilder: (context, error) => _ScanUnavailable(error: error),
+            ),
+            // Scanner overlay
+            Positioned.fill(
+              child: Container(
+                decoration: ShapeDecoration(
+                  shape: _ScannerOverlayShape(
+                    borderColor: Theme.of(context).primaryColor,
+                    borderRadius: 12,
+                    borderLength: 40,
+                    borderWidth: 6,
+                    cutOutSize: MediaQuery.of(context).size.width * 0.70,
+                  ),
                 ),
               ),
             ),
-          ),
 
-          // Helper text at bottom
-          Positioned(
-            bottom: MediaQuery.of(context).padding.bottom + 40,
-            left: 20,
-            right: 20,
-            child: Text(
-              context.tr('partner_scan_helper'),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppScrim.inkMuted,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+            // Helper text at bottom
+            Positioned(
+              bottom: MediaQuery.of(context).padding.bottom + 40,
+              left: 20,
+              right: 20,
+              child: Text(
+                context.tr('partner_scan_helper'),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppScrim.inkMuted,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

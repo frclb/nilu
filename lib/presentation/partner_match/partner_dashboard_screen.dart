@@ -11,6 +11,7 @@ import '../../localization/relative_time.dart';
 import '../../domain/view_models/partner_view_model.dart';
 import '../../domain/view_models/user_view_model.dart';
 import '../../domain/services/partner_suggestion_engine.dart';
+import '../../design_system/app_layout.dart';
 
 class PartnerDashboardScreen extends StatefulWidget {
   const PartnerDashboardScreen({super.key});
@@ -89,7 +90,9 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
     if (!vm.isLoaded) {
       return Scaffold(
         backgroundColor: bgColor,
-        body: Center(child: CircularProgressIndicator(color: primaryColor)),
+        body: AppContentWidth(
+          child: Center(child: CircularProgressIndicator(color: primaryColor)),
+        ),
       );
     }
 

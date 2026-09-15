@@ -4,6 +4,7 @@ import '../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
 import 'package:go_router/go_router.dart';
+import '../../design_system/app_layout.dart';
 
 class OnboardingWelcomeScreen extends StatefulWidget {
   const OnboardingWelcomeScreen({super.key});
@@ -83,169 +84,173 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
 
     return Scaffold(
       backgroundColor: bgColor,
-      body: Stack(
-        children: [
-          // Background Gradient decoration
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: MediaQuery.of(context).size.height * 0.6,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    theme.colorScheme.primary.withAlpha(12),
-                    Colors.transparent,
-                  ],
-                ),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(48),
-                  bottomRight: Radius.circular(48),
+      body: AppContentWidth(
+        child: Stack(
+          children: [
+            // Background Gradient decoration
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: MediaQuery.of(context).size.height * 0.6,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      theme.colorScheme.primary.withAlpha(12),
+                      Colors.transparent,
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(48),
+                    bottomRight: Radius.circular(48),
+                  ),
                 ),
               ),
             ),
-          ),
 
-          SafeArea(
-            child: Column(
-              children: [
-                // Top Action Bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: _completeOnboarding,
-                        style: TextButton.styleFrom(
-                          foregroundColor: textColor.withAlpha(153),
-                        ),
-                        child: Text(
-                          context.tr('onboarding_skip'),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+            SafeArea(
+              child: Column(
+                children: [
+                  // Top Action Bar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: _completeOnboarding,
+                          style: TextButton.styleFrom(
+                            foregroundColor: textColor.withAlpha(153),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: PageView.builder(
-                    controller: _pageController,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _currentPage = index;
-                      });
-                    },
-                    itemCount: 4,
-                    itemBuilder: (context, index) => pages[index],
-                  ),
-                ),
-
-                // Bottom Area
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.only(
-                    left: 24,
-                    right: 24,
-                    top: 16,
-                    bottom: 24,
-                  ),
-                  decoration: BoxDecoration(color: bgColor.withAlpha(204)),
-                  child: Column(
-                    children: [
-                      // Dots Indicator (6 dots)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(4, (index) {
-                          final isActive = index == _currentPage;
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            width: isActive ? 24 : 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: isActive
-                                  ? theme.colorScheme.primary
-                                  : theme.colorScheme.primary.withAlpha(
-                                      (isDark ? 0.4 : 0.2 * 255).toInt(),
-                                    ),
+                          child: Text(
+                            context.tr('onboarding_skip'),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
                             ),
-                          );
-                        }),
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // CTA Button
-                      ElevatedButton(
-                        onPressed: _nextPage,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.colorScheme.primary,
-                          foregroundColor: Theme.of(
-                            context,
-                          ).colorScheme.onPrimary,
-                          minimumSize: const Size(double.infinity, 56),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
                           ),
-                          elevation: 8,
-                          shadowColor: theme.colorScheme.primary.withAlpha(76),
                         ),
-                        child: Row(
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentPage = index;
+                        });
+                      },
+                      itemCount: 4,
+                      itemBuilder: (context, index) => pages[index],
+                    ),
+                  ),
+
+                  // Bottom Area
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.only(
+                      left: 24,
+                      right: 24,
+                      top: 16,
+                      bottom: 24,
+                    ),
+                    decoration: BoxDecoration(color: bgColor.withAlpha(204)),
+                    child: Column(
+                      children: [
+                        // Dots Indicator (6 dots)
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              context.tr('onboarding_continue'),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                          children: List.generate(4, (index) {
+                            final isActive = index == _currentPage;
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: isActive ? 24 : 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: isActive
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.primary.withAlpha(
+                                        (isDark ? 0.4 : 0.2 * 255).toInt(),
+                                      ),
                               ),
+                            );
+                          }),
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        // CTA Button
+                        ElevatedButton(
+                          onPressed: _nextPage,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.colorScheme.primary,
+                            foregroundColor: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary,
+                            minimumSize: const Size(double.infinity, 56),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            const SizedBox(width: 8),
-                            const Icon(Icons.arrow_forward, size: 20),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      OutlinedButton(
-                        onPressed: () {
-                          context.pushNamed(RouteNames.partnerScan);
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: theme.colorScheme.primary,
-                          minimumSize: const Size(double.infinity, 56),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            elevation: 8,
+                            shadowColor: theme.colorScheme.primary.withAlpha(
+                              76,
+                            ),
                           ),
-                          side: BorderSide(color: theme.colorScheme.primary),
-                        ),
-                        child: Text(
-                          context.tr('onboarding_partner_login'),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                context.tr('onboarding_continue'),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward, size: 20),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        OutlinedButton(
+                          onPressed: () {
+                            context.pushNamed(RouteNames.partnerScan);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: theme.colorScheme.primary,
+                            minimumSize: const Size(double.infinity, 56),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            side: BorderSide(color: theme.colorScheme.primary),
+                          ),
+                          child: Text(
+                            context.tr('onboarding_partner_login'),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

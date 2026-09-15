@@ -5,6 +5,7 @@ import '../../domain/models/article.dart';
 import '../../domain/services/heavy_bleeding_check.dart';
 import '../../localization/app_localizations.dart';
 import '../health_library/article_screen.dart';
+import '../../design_system/app_layout.dart';
 
 /// Yoğun kanama kendini değerlendirme aracı.
 ///
@@ -36,86 +37,88 @@ class _HeavyBleedingScreenState extends State<HeavyBleedingScreen> {
         elevation: 0,
         title: Text(context.tr('bleeding_check_title')),
       ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-          children: [
-            Text(
-              context.tr('bleeding_check_intro'),
-              style: theme.textTheme.labelLarge?.copyWith(
-                fontSize: 14,
-                height: 1.6,
-                color: t.textMuted,
+      body: AppContentWidth(
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+            children: [
+              Text(
+                context.tr('bleeding_check_intro'),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontSize: 14,
+                  height: 1.6,
+                  color: t.textMuted,
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            for (final sign in HeavyBleedingCheck.allSigns)
-              _SignTile(
-                label: context.tr(HeavyBleedingResult.signKey(sign)),
-                selected: _selected.contains(sign),
-                onChanged: (v) => setState(() {
-                  if (v) {
-                    _selected.add(sign);
-                  } else {
-                    _selected.remove(sign);
-                  }
-                }),
-              ),
+              for (final sign in HeavyBleedingCheck.allSigns)
+                _SignTile(
+                  label: context.tr(HeavyBleedingResult.signKey(sign)),
+                  selected: _selected.contains(sign),
+                  onChanged: (v) => setState(() {
+                    if (v) {
+                      _selected.add(sign);
+                    } else {
+                      _selected.remove(sign);
+                    }
+                  }),
+                ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            if (result.shouldSeeClinician) ...[
-              _Callout(
-                icon: Icons.medical_information_outlined,
-                title: context.tr('bleeding_check_result_title'),
-                body: context.tr('bleeding_check_result_body'),
-                color: theme.colorScheme.primary,
-              ),
-              if (result.suggestsIronCheck) ...[
-                const SizedBox(height: 12),
+              if (result.shouldSeeClinician) ...[
                 _Callout(
-                  icon: Icons.bloodtype_outlined,
-                  title: context.tr('bleeding_check_iron_title'),
-                  body: context.tr('bleeding_check_iron_body'),
-                  color: t.warning,
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => ArticleScreen(
-                        article: ArticleCatalog.all.firstWhere(
-                          (a) => a.titleKey == 'library_article_iron',
+                  icon: Icons.medical_information_outlined,
+                  title: context.tr('bleeding_check_result_title'),
+                  body: context.tr('bleeding_check_result_body'),
+                  color: theme.colorScheme.primary,
+                ),
+                if (result.suggestsIronCheck) ...[
+                  const SizedBox(height: 12),
+                  _Callout(
+                    icon: Icons.bloodtype_outlined,
+                    title: context.tr('bleeding_check_iron_title'),
+                    body: context.tr('bleeding_check_iron_body'),
+                    color: t.warning,
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => ArticleScreen(
+                          article: ArticleCatalog.all.firstWhere(
+                            (a) => a.titleKey == 'library_article_iron',
+                          ),
                         ),
                       ),
                     ),
                   ),
+                ],
+              ] else
+                _Callout(
+                  icon: Icons.info_outline,
+                  title: context.tr('bleeding_check_none_title'),
+                  body: context.tr('bleeding_check_none_body'),
+                  color: t.textMuted,
                 ),
-              ],
-            ] else
-              _Callout(
-                icon: Icons.info_outline,
-                title: context.tr('bleeding_check_none_title'),
-                body: context.tr('bleeding_check_none_body'),
-                color: t.textMuted,
-              ),
 
-            const SizedBox(height: 20),
-            Text(
-              context.tr('article_disclaimer'),
-              style: theme.textTheme.labelLarge?.copyWith(
-                fontSize: 12,
-                height: 1.55,
-                color: t.textFaint,
+              const SizedBox(height: 20),
+              Text(
+                context.tr('article_disclaimer'),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontSize: 12,
+                  height: 1.55,
+                  color: t.textFaint,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'NHS — Heavy periods',
-              style: theme.textTheme.labelLarge?.copyWith(
-                fontSize: 12,
-                color: t.textFaint,
+              const SizedBox(height: 8),
+              Text(
+                'NHS — Heavy periods',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontSize: 12,
+                  color: t.textFaint,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
