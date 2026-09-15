@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -62,6 +63,10 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUp(() {
+    // Şifreli depo da sahteleniyor: gerçek kanal testte yanıt vermiyor,
+    // takvim sonsuza kadar "yükleniyor" kalıyor ve ızgarası hiç ölçülmüyordu.
+    // Takvim hücrelerinin dar telefonlarda taştığı bu yüzden görülmemişti.
+    FlutterSecureStorage.setMockInitialValues({});
     SharedPreferences.setMockInitialValues({'onboarding_complete': true});
   });
 
