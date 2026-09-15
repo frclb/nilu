@@ -15,6 +15,9 @@ import 'package:period_tracker/main.dart';
 import 'package:period_tracker/presentation/home/widgets/custom_bottom_nav.dart';
 import 'package:period_tracker/presentation/home/widgets/cycle_masthead.dart';
 import 'package:period_tracker/presentation/log_entry/log_entry_screen.dart';
+import 'package:period_tracker/presentation/partner_match/partner_share_settings_screen.dart';
+import 'package:period_tracker/presentation/session/session_screen.dart';
+import 'package:period_tracker/presentation/yoga/yoga_detail_screen.dart';
 import 'package:period_tracker/presentation/home/widgets/side_nav_rail.dart';
 
 /// Uygulamayı sattığımız her cihaz boyutunda açar.
@@ -204,6 +207,54 @@ void main() {
           tester.takeException(),
           isNull,
           reason: '$key ekranında düzen hatası var',
+        );
+      });
+    }
+  });
+
+  group('egzersiz akışı taşmadan açılır', () {
+    // Ana ekrandaki öneri kartından iki adım içeride: yoga detayı ve
+    // oturum ekranı. İkisi de hiçbir taramaya girmiyordu. Oturum ekranında
+    // geri sayım halkası ve iki eylem düğmesi var; dar ekranda sığması
+    // kendiliğinden garanti değil.
+    for (final device in [phones.first, phones[3], tablets[4]]) {
+      testWidgets('$device', (tester) async {
+        await openAt(tester, device);
+
+        Future<void> tapLabel(String key) async {
+          final item = find.text(_dictionary[key] as String);
+          expect(item, findsWidgets, reason: '$device: $key bulunamadı');
+          await tester.ensureVisible(item.first);
+          await tester.pump();
+          await tester.tap(item.first);
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 500));
+        }
+
+        // Ana ekran → yoga detayı
+        await tapLabel('home_start_button');
+        expect(
+          find.byType(YogaDetailScreen),
+          findsOneWidget,
+          reason: '$device: yoga detayı açılmadı — iddia boşa gider',
+        );
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: '$device: yoga detayında düzen hatası var',
+        );
+
+        // Yoga detayı → oturum
+        await tapLabel('exercise_start');
+        expect(
+          find.byType(SessionScreen),
+          findsOneWidget,
+          reason: '$device: oturum ekranı açılmadı — iddia boşa gider',
+        );
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: '$device: oturum ekranında düzen hatası var',
         );
       });
     }
@@ -413,6 +464,60 @@ void main() {
 
       // Sahibin metniyle izin kutusu partnere hiç açılmamalı.
       expect(find.byType(AlertDialog), findsNothing);
+    });
+
+    for (final device in [phones.first, phones[3], tablets.last]) {
+      testWidgets('$device bütün partner sekmeleri', (tester) async {
+        await openAt(tester, device);
+
+        // Partner listesi İçgörüler dalını atlıyor; hedefler oradan
+        // geliyor, burada ayrıca yazılmıyor.
+        for (final destination in navDestinations(isPartner: true).skip(1)) {
+          final tab = find.byIcon(destination.icon);
+          expect(
+            tab,
+            findsWidgets,
+            reason: '$device: ${destination.labelKey} sekmesi bulunamadı',
+          );
+
+          await tester.tap(tab.first);
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 500));
+
+          expect(
+            tester.takeException(),
+            isNull,
+            reason:
+                '$device: ${destination.labelKey} sekmesinde düzen hatası var',
+          );
+        }
+      });
+    }
+
+    testWidgets('paylaşım ayarları taşmadan açılır', (tester) async {
+      await openAt(tester, phones.first);
+
+      // Partner panosunun sağ üstündeki dişli.
+      final gear = find.descendant(
+        of: find.byType(AppBar),
+        matching: find.byIcon(Icons.settings_outlined),
+      );
+      expect(gear, findsOneWidget, reason: 'panoda dişli bulunamadı');
+
+      await tester.tap(gear);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(
+        find.byType(PartnerShareSettingsScreen),
+        findsOneWidget,
+        reason: 'paylaşım ayarları açılmadı — iddia boşa gider',
+      );
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: 'paylaşım ayarlarında düzen hatası var',
+      );
     });
 
     testWidgets('profilde cihazın kendi verisine dayanan ayarlar yok', (
