@@ -23,6 +23,20 @@ bool startsCalendarRow(DateTime date) => date.weekday == DateTime.monday;
 /// [date] satırın **son** hücresinde mi?
 bool endsCalendarRow(DateTime date) => date.weekday == DateTime.sunday;
 
+/// Gün hücresinin içeriği: daire + boşluk + gösterge.
+///
+/// Hücre yüksekliği eskiden genişlikten türetiliyordu (`childAspectRatio:
+/// 1.0`). Takvim kartının iç genişliği 7 × 47 = 329 pt'nin altına düşünce
+/// hücre içeriğinden kısa kalıyor ve her hafta satırında sarı taşma şeridi
+/// çıkıyordu: iPhone 16e'de (390 pt ekran → 46.3 pt hücre) 0.7 pt, daha dar
+/// yerlerde daha fazla. iPhone 17 Pro'da (402 pt) hücre 48 pt olduğu için
+/// görünmüyordu — cihaza göre değişen bir hata.
+const double _dayCircleSize = 36;
+const double _dayCircleToDots = 3;
+const double _dayDotsSize = 8;
+const double _dayTileContentHeight =
+    _dayCircleSize + _dayCircleToDots + _dayDotsSize;
+
 class CalendarGrid extends StatelessWidget {
   const CalendarGrid({super.key});
 
@@ -162,40 +176,53 @@ class CalendarGrid extends StatelessWidget {
             const SizedBox(height: 8),
 
             // Takvim Izgarası
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: totalItems,
-              // Hücre içeriği 47px (36 daire + 3 boşluk + 8 nokta). 0.85 oranı
-              // hücreyi 62px yapıyor, boşa giden 15px × 6 satır yüzünden eylem
-              // düğmeleri ekranın altında kalıyordu.
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 7,
-                mainAxisSpacing: 2,
-                crossAxisSpacing: 0,
-                childAspectRatio: 1.0,
-              ),
-              itemBuilder: (context, index) {
-                final DateTime date;
-                bool isFaded = false;
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // Hücre kare olsun ama içeriğinden kısa olmasın. Oran tek
+                // başına genişliğe bağlı olduğu için dar ekranda hücreyi
+                // içeriğin altına düşürüyordu (bkz. [_dayTileContentHeight]).
+                final cell = constraints.maxWidth / 7;
+                final rowHeight = cell < _dayTileContentHeight
+                    ? _dayTileContentHeight
+                    : cell;
 
-                if (index < previousMonthFill) {
-                  isFaded = true;
-                  date = firstDayOfMonth.subtract(
-                    Duration(days: previousMonthFill - index),
-                  );
-                } else if (index < previousMonthFill + daysInMonth) {
-                  date = DateTime(year, month, index - previousMonthFill + 1);
-                } else {
-                  isFaded = true;
-                  date = DateTime(year, month, daysInMonth).add(
-                    Duration(
-                      days: index - (previousMonthFill + daysInMonth) + 1,
-                    ),
-                  );
-                }
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: totalItems,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 7,
+                    mainAxisSpacing: 2,
+                    crossAxisSpacing: 0,
+                    mainAxisExtent: rowHeight,
+                  ),
+                  itemBuilder: (context, index) {
+                    final DateTime date;
+                    bool isFaded = false;
 
-                return _DayTile(date: date, isFaded: isFaded);
+                    if (index < previousMonthFill) {
+                      isFaded = true;
+                      date = firstDayOfMonth.subtract(
+                        Duration(days: previousMonthFill - index),
+                      );
+                    } else if (index < previousMonthFill + daysInMonth) {
+                      date = DateTime(
+                        year,
+                        month,
+                        index - previousMonthFill + 1,
+                      );
+                    } else {
+                      isFaded = true;
+                      date = DateTime(year, month, daysInMonth).add(
+                        Duration(
+                          days: index - (previousMonthFill + daysInMonth) + 1,
+                        ),
+                      );
+                    }
+
+                    return _DayTile(date: date, isFaded: isFaded);
+                  },
+                );
               },
             ),
 
@@ -397,7 +424,7 @@ class _DayTile extends StatelessWidget {
           // bottom: 14) konumlanıyordu; hücre yüksekliği değiştiğinde
           // daireyle hizası kayıyordu.
           SizedBox(
-            height: 36,
+            height: _dayCircleSize,
             // Bant hücrenin iki ucuna kadar uzanabilmeli. Genişlik
             // verilmezse Stack yalnızca daire kadar (36px) geniş oluyor ve
             // ardışık günler arasında boşluk kalıyor.
@@ -505,11 +532,11 @@ class _DayTile extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 3),
+          const SizedBox(height: _dayCircleToDots),
 
           // Alt gösterge noktaları
           SizedBox(
-            height: 8,
+            height: _dayDotsSize,
             child: _buildBottomIndicator(
               isOvulation: isOvulation,
               isFertile: isFertile,
