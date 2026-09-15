@@ -37,6 +37,8 @@ void main() {
     double ratio, {
     required double topInset,
     required double bottomInset,
+    String locale = 'en',
+    double textScale = 1,
   }) async {
     SharedPreferences.setMockInitialValues({});
     tester.view.physicalSize = pixels;
@@ -67,7 +69,13 @@ void main() {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [Locale('en')],
+          locale: Locale(locale),
+          supportedLocales: [Locale(locale)],
+          builder: (context, child) => MediaQuery.withClampedTextScaling(
+            minScaleFactor: textScale,
+            maxScaleFactor: textScale,
+            child: child!,
+          ),
           home: const OnboardingWelcomeScreen(),
         ),
       );
@@ -76,9 +84,17 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  /// İlk slaytın açıklaması.
-  Finder description(Map<String, dynamic> d) =>
-      find.text(d['onboarding_welcome_desc'] as String);
+  /// Dört slaytın açıklama anahtarları, sırasıyla.
+  const descriptionKeys = [
+    'onboarding_welcome_desc',
+    'onboarding_page2_desc',
+    'onboarding_page3_desc',
+    'onboarding_page4_desc',
+  ];
+
+  Map<String, dynamic> dictionaryFor(String locale) =>
+      jsonDecode(File('lib/localization/$locale.json').readAsStringSync())
+          as Map<String, dynamic>;
 
   // (fiziksel boyut, ölçek, üst inset, alt inset) — insetler pt.
   const devices = <String, (Size, double, double, double)>{
@@ -90,33 +106,93 @@ void main() {
     'iPad Pro 13" yatay': (Size(2752, 2064), 2, 24, 20),
   };
 
-  group('açıklama metni ekranda kalır', () {
+  /// Açık olan slaytın açıklamasının sayfanın görünür alanında kaldığını
+  /// doğrular.
+  ///
+  /// Sınır ekranın kendisi değil **sayfanın görünür alanı**: slayt `PageView`
+  /// içinde ve içeriği kayabiliyor. Metin ekran koordinatlarının içinde kalıp
+  /// yine de kırpılabiliyor — gerçek cihazda tam bu oldu, ekran sınırına
+  /// bakan bir iddia fark etmemişti.
+  void expectDescriptionVisible(
+    WidgetTester tester,
+    String text,
+    String context_,
+  ) {
+    final finder = find.text(text);
+    expect(finder, findsOneWidget, reason: '$context_: açıklama çizilmemiş');
+
+    final viewport = tester.getRect(find.byType(PageView));
+    final rect = tester.getRect(finder);
+
+    expect(
+      rect.bottom,
+      lessThanOrEqualTo(viewport.bottom),
+      reason: '$context_: açıklama sayfanın altından kırpılıyor',
+    );
+    expect(
+      rect.top,
+      greaterThanOrEqualTo(viewport.top),
+      reason: '$context_: açıklama sayfanın üstünden kırpılıyor',
+    );
+  }
+
+  group('ilk slayt her cihazda okunur', () {
     devices.forEach((name, spec) {
       testWidgets(name, (tester) async {
         final (pixels, ratio, top, bottom) = spec;
         await open(tester, pixels, ratio, topInset: top, bottomInset: bottom);
 
-        final finder = description(dictionary);
-        expect(finder, findsOneWidget, reason: '$name: açıklama çizilmemiş');
-
-        // Sınır ekranın kendisi değil **sayfanın görünür alanı**: slayt
-        // `PageView` içinde ve içeriği kayabiliyor. Metin ekran
-        // koordinatlarının içinde kalıp yine de kırpılabiliyor — gerçek
-        // cihazda tam bu oldu, ekran sınırına bakan bir iddia fark etmedi.
-        final viewport = tester.getRect(find.byType(PageView));
-        final rect = tester.getRect(finder);
-
-        expect(
-          rect.bottom,
-          lessThanOrEqualTo(viewport.bottom),
-          reason: '$name: açıklama sayfanın altından kırpılıyor',
-        );
-        expect(
-          rect.top,
-          greaterThanOrEqualTo(viewport.top),
-          reason: '$name: açıklama sayfanın üstünden kırpılıyor',
+        expectDescriptionVisible(
+          tester,
+          dictionary[descriptionKeys.first] as String,
+          name,
         );
       });
+    });
+  });
+
+  group('dört slaytın hepsi kısa telefonlarda okunur', () {
+    // Sınırlayıcı durum: en az dikey yer + en uzun metin. Metinler dile ve
+    // slayta göre değişiyor (Almanca 4. slaytın başlığı üç satıra çıkıyor),
+    // yalnızca ilk slayta ya da tek dile bakmak yeterli değil.
+    const shortDevices = <String, (Size, double, double, double)>{
+      'iPhone 16e': (Size(1170, 2532), 3, 47, 34),
+      'iPhone Duo (kapalı)': (Size(1398, 2034), 3, 59, 34),
+    };
+
+    shortDevices.forEach((device, spec) {
+      for (final locale in ['tr', 'en', 'de', 'es', 'fr', 'pt']) {
+        testWidgets('$device — $locale', (tester) async {
+          final d = dictionaryFor(locale);
+          final (pixels, ratio, top, bottom) = spec;
+
+          await open(
+            tester,
+            pixels,
+            ratio,
+            topInset: top,
+            bottomInset: bottom,
+            locale: locale,
+          );
+
+          // Bir kez açılıp sırayla ilerleniyor. Her slayt için yeniden
+          // `pumpWidget` çağırmak işe yaramıyor: Flutter eleman ağacını
+          // yeniden kullandığı için `PageController` durumu korunuyor ve
+          // kaydırmalar birikiyor.
+          for (var slide = 0; slide < descriptionKeys.length; slide++) {
+            expectDescriptionVisible(
+              tester,
+              d[descriptionKeys[slide]] as String,
+              '$device $locale slayt ${slide + 1}',
+            );
+
+            if (slide < descriptionKeys.length - 1) {
+              await tester.drag(find.byType(PageView), const Offset(-400, 0));
+              await tester.pumpAndSettle();
+            }
+          }
+        });
+      }
     });
   });
 
@@ -151,5 +227,30 @@ void main() {
             'çizim geniş ekranda doğal boyutunda kalırsa sayfa boş görünüyor',
       );
     });
+  });
+
+  group('büyük yazı ölçeğinde taşma yok', () {
+    // Uygulama yazı ölçeğini 1.5'te sınırlıyor (`main.dart`). Kaydırma
+    // görünümünün varlık sebebi bu: çizim `Flexible` ile küçülüyor, yine de
+    // yetmezse sayfa kayıyor. Sarı taşma şeridi hiçbir durumda çıkmamalı.
+    for (final locale in ['tr', 'de']) {
+      testWidgets('iPhone 16e — $locale, 1.5x', (tester) async {
+        await open(
+          tester,
+          const Size(1170, 2532),
+          3,
+          topInset: 47,
+          bottomInset: 34,
+          locale: locale,
+          textScale: 1.5,
+        );
+
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: '$locale: 1.5x yazı ölçeğinde düzen taşıyor',
+        );
+      });
+    }
   });
 }

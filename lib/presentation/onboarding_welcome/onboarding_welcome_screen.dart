@@ -34,14 +34,25 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
   /// geniş ekranda ise doğal boyutunda kalıp sayfayı boş bırakıyordu.
   static const double _heroRatio = 0.45;
   static const double _heroRatioWide = 0.55;
-  static const double _heroMin = 120;
+  static const double _heroRatioShort = 0.38;
+  static const double _heroMin = 100;
   static const double _heroMax = 620;
 
-  /// Üstteki simge rozetinin görünmesi için gereken en az sayfa yüksekliği.
+  /// Bu yüksekliğin altındaki sayfa "kısa" sayılır.
   ///
-  /// Rozet kahraman çizimdeki simgenin aynısını gösteriyor — süs. Kısa
-  /// ekranda 104 pt (rozet + boşluk) metne yer açmaktan daha değerli değil.
-  static const double _badgeMinPageHeight = 420;
+  /// Katlanabilir telefon kapalıyken sayfa alanı ~311 pt kalıyor; normal bir
+  /// telefonda ~477. Kısa sayfada üç şey birden değişiyor: süs rozet
+  /// gizleniyor (kahraman çizimdeki simgenin aynısını gösteriyordu), çizim
+  /// daha az yer kaplıyor ve başlık küçülüyor.
+  ///
+  /// Üçü birden gerekti: Almanca 4. slaytın başlığı ("Lade deine Partnerin
+  /// oder deinen Partner ein") 32 punto ile üç satıra çıkıp 96 pt yiyor ve
+  /// açıklamayı sayfanın dışına itiyordu.
+  static const double _shortPageHeight = 420;
+
+  /// Başlık punto (normal / kısa sayfa).
+  static const double _titleSize = 32;
+  static const double _titleSizeShort = 26;
 
   final PageController _pageController = PageController();
   int _currentPage = 0;
@@ -320,194 +331,218 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
       builder: (context, constraints) {
         final wide = constraints.maxWidth >= AppLayout.compactMax;
 
-        final heroMaxHeight =
-            (constraints.maxHeight * (wide ? _heroRatioWide : _heroRatio))
-                .clamp(_heroMin, _heroMax);
-        final showBadge = constraints.maxHeight >= _badgeMinPageHeight;
+        final short = constraints.maxHeight < _shortPageHeight;
+        final ratio = wide
+            ? _heroRatioWide
+            : (short ? _heroRatioShort : _heroRatio);
+        final heroMaxHeight = (constraints.maxHeight * ratio).clamp(
+          _heroMin,
+          _heroMax,
+        );
+        final showBadge = !short;
 
+        // `Flexible` sınırlı bir dikey alan istiyor; kaydırma görünümü
+        // sınırsız veriyor. Sayfa alanı kadar sabit bir kutu veriliyor ve
+        // taşma ihtimaline karşı dışı yine kaydırılabilir kalıyor.
         return SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Top Icon — kısa ekranda gizli, bkz.
-                  // [_badgeMinPageHeight].
-                  if (showBadge) ...[
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: context.tokens.surface,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: theme.colorScheme.primary.withAlpha(25),
-                          width: 1,
+            child: SizedBox(
+              height: constraints.maxHeight,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 8,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Top Icon — kısa ekranda gizli, bkz.
+                    // [_badgeMinPageHeight].
+                    if (showBadge) ...[
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: context.tokens.surface,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: theme.colorScheme.primary.withAlpha(25),
+                            width: 1,
+                          ),
+                          boxShadow: isDark
+                              ? []
+                              : [
+                                  BoxShadow(
+                                    color: AppScrim.veil(26),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                         ),
-                        boxShadow: isDark
-                            ? []
-                            : [
-                                BoxShadow(
-                                  color: AppScrim.veil(26),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
+                        child: Icon(
+                          topIcon,
+                          size: 48,
+                          color: theme.colorScheme.primary,
+                        ),
                       ),
-                      child: Icon(
-                        topIcon,
-                        size: 48,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
+                      const SizedBox(height: 24),
+                    ],
 
-                  // Hero illustration area
-                  //
-                  // Yükseklik sınırlı, içerik `FittedBox` ile küçülüyor: yazı
-                  // büyüdüğünde çizim ezilmek yerine orantılı olarak küçülüyor.
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: heroMaxHeight,
-                      minHeight: _heroMin,
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(24),
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            theme.colorScheme.primary.withAlpha(20),
-                            theme.colorScheme.primary.withAlpha(5),
-                          ],
+                    // Hero illustration area
+                    //
+                    // Yükseklik sınırlı, içerik `FittedBox` ile küçülüyor: yazı
+                    // büyüdüğünde çizim ezilmek yerine orantılı olarak küçülüyor.
+                    // `Flexible`: çizim metinden **artan** yeri alıyor.
+                    //
+                    // Sabit bir yükseklik dile göre çöküyordu. Almanca 4.
+                    // slaytın başlığı ("Lade deine Partnerin oder deinen
+                    // Partner ein") 32 puntoda üç satıra, 144 pt'ye çıkıyor;
+                    // sabit bir çizim ona yer bırakmayıp açıklamayı sayfanın
+                    // dışına itiyordu. Fransızca 4. ve Portekizce 3. slaytta
+                    // da aynısı oluyordu.
+                    //
+                    // `Flexible` + `FittedBox` birlikte: yer daralınca önce
+                    // kutu küçülüyor, sonra içindeki çizim orantılı olarak.
+                    // Metin hiçbir zaman sıkıştırılmıyor.
+                    Flexible(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxHeight: heroMaxHeight,
+                          minHeight: _heroMin,
                         ),
-                        border: Border.all(
-                          color: theme.colorScheme.primary.withAlpha(25),
-                        ),
-                      ),
-                      child: FittedBox(
-                        // Geniş ekranda `contain`: çizim yer varken büyüyüp
-                        // kutuyu dolduruyor. Dar ekranda `scaleDown` kalıyor —
-                        // `contain` orada da kutuyu doldurduğu için kahraman
-                        // alanı 260'tan 300 pt'ye çıkıyor ve açıklama metnini
-                        // ekranın dışına itiyordu.
-                        fit: wide ? BoxFit.contain : BoxFit.scaleDown,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Decorative circles
-                            Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Container(
-                                  width: 160,
-                                  height: 160,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: theme.colorScheme.primary.withAlpha(
-                                      12,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  width: 120,
-                                  height: 120,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: theme.colorScheme.primary.withAlpha(
-                                      20,
-                                    ),
-                                  ),
-                                ),
-                                Icon(
-                                  topIcon,
-                                  size: 64,
-                                  color: theme.colorScheme.primary.withAlpha(
-                                    153,
-                                  ),
-                                ),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(24),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                theme.colorScheme.primary.withAlpha(20),
+                                theme.colorScheme.primary.withAlpha(5),
                               ],
                             ),
-                            const SizedBox(height: 24),
-                            Icon(
-                              Icons.water_drop,
-                              size: 32,
-                              color: theme.colorScheme.primary.withAlpha(102),
+                            border: Border.all(
+                              color: theme.colorScheme.primary.withAlpha(25),
                             ),
-                            const SizedBox(height: 8),
-                            Row(
+                          ),
+                          child: FittedBox(
+                            // Geniş ekranda `contain`: çizim yer varken büyüyüp
+                            // kutuyu dolduruyor. Dar ekranda `scaleDown` kalıyor —
+                            // `contain` orada da kutuyu doldurduğu için kahraman
+                            // alanı 260'tan 300 pt'ye çıkıyor ve açıklama metnini
+                            // ekranın dışına itiyordu.
+                            fit: wide ? BoxFit.contain : BoxFit.scaleDown,
+                            child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
+                                // Decorative circles
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Container(
+                                      width: 160,
+                                      height: 160,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: theme.colorScheme.primary
+                                            .withAlpha(12),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 120,
+                                      height: 120,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: theme.colorScheme.primary
+                                            .withAlpha(20),
+                                      ),
+                                    ),
+                                    Icon(
+                                      topIcon,
+                                      size: 64,
+                                      color: theme.colorScheme.primary
+                                          .withAlpha(153),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 24),
                                 Icon(
-                                  Icons.local_florist,
-                                  size: 24,
+                                  Icons.water_drop,
+                                  size: 32,
                                   color: theme.colorScheme.primary.withAlpha(
-                                    76,
+                                    102,
                                   ),
                                 ),
-                                const SizedBox(width: 16),
-                                Icon(
-                                  Icons.sunny,
-                                  size: 24,
-                                  color: theme.colorScheme.primary.withAlpha(
-                                    76,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Icon(
-                                  Icons.nights_stay,
-                                  size: 24,
-                                  color: theme.colorScheme.primary.withAlpha(
-                                    76,
-                                  ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.local_florist,
+                                      size: 24,
+                                      color: theme.colorScheme.primary
+                                          .withAlpha(76),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Icon(
+                                      Icons.sunny,
+                                      size: 24,
+                                      color: theme.colorScheme.primary
+                                          .withAlpha(76),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Icon(
+                                      Icons.nights_stay,
+                                      size: 24,
+                                      color: theme.colorScheme.primary
+                                          .withAlpha(76),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 24),
 
-                  // Text Content
-                  //
-                  // Kahraman çizim sayfa kadar geniş olabiliyor ama metin
-                  // okunur kalmalı: 760 pt'lik bir açıklama satırı gözün
-                  // satır başını bulmasını zorlaştırıyor.
-                  AppContentWidth(
-                    maxWidth: _textMaxWidth,
-                    child: Column(
-                      children: [
-                        Text(
-                          title,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.primary,
-                            letterSpacing: -0.5,
+                    // Text Content
+                    //
+                    // Kahraman çizim sayfa kadar geniş olabiliyor ama metin
+                    // okunur kalmalı: 760 pt'lik bir açıklama satırı gözün
+                    // satır başını bulmasını zorlaştırıyor.
+                    AppContentWidth(
+                      maxWidth: _textMaxWidth,
+                      child: Column(
+                        children: [
+                          Text(
+                            title,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: short ? _titleSizeShort : _titleSize,
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.primary,
+                              letterSpacing: -0.5,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          description,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: textColor.withAlpha(204),
-                            height: 1.5,
+                          const SizedBox(height: 12),
+                          Text(
+                            description,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: textColor.withAlpha(204),
+                              height: 1.5,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
