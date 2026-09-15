@@ -126,6 +126,17 @@ class PartnerViewModel extends ChangeNotifier {
             _isLoaded = true;
             notifyListeners();
           },
+          // Akış hiç veri vermeden kapanabiliyor: Firebase yapılandırılmamışsa
+          // `intimacyStatusStream` boş bir akış döndürüyor — ne `onData` ne
+          // `onError` çalışıyor. Bu ele alınmayınca `_isLoaded` hiç `true`
+          // olmuyor ve partner panosu sonsuza kadar dönen bir çarkta
+          // kalıyordu. Uygulama Firebase'siz de çalışacak biçimde
+          // tasarlandığı için bu, yapılandırma eklenene kadar partner
+          // modunun tek ekranının hiç açılmaması demekti.
+          onDone: () {
+            _isLoaded = true;
+            notifyListeners();
+          },
         );
   }
 

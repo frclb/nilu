@@ -123,20 +123,22 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
           ),
         ],
       ),
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: _buildBody(
-          context,
-          vm,
-          isDark,
-          bgColor,
-          surfaceColor,
-          primaryColor,
-          warmAccent,
-          textMainColor,
-          textMutedColor,
-          borderColor,
-          warmBg,
+      body: AppContentWidth(
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: _buildBody(
+            context,
+            vm,
+            isDark,
+            bgColor,
+            surfaceColor,
+            primaryColor,
+            warmAccent,
+            textMainColor,
+            textMutedColor,
+            borderColor,
+            warmBg,
+          ),
         ),
       ),
     );

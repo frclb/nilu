@@ -316,6 +316,44 @@ void main() {
     });
   });
 
+  group('partner modu', () {
+    setUp(() {
+      SharedPreferences.setMockInitialValues({
+        'onboarding_complete': true,
+        'isPartner': true,
+        'hasPartner': true,
+        'partnerId': 'test-partner-uid',
+      });
+    });
+
+    testWidgets('partner sekmeleri gösterilir', (tester) async {
+      await openAt(tester, tablets.last);
+
+      // Partner listesi İçgörüler dalını atlar: dört sekme.
+      expect(find.byType(SideNavRail), findsOneWidget);
+      expect(navDestinations(isPartner: true).length, 4);
+    });
+
+    testWidgets('partner panosu çarkta asılı kalmaz', (tester) async {
+      // Firebase yapılandırılmamışken akış hiç veri vermeden kapanıyor.
+      // `onDone` ele alınmasaydı pano sonsuza kadar dönerdi.
+      await openAt(tester, tablets[4]);
+
+      expect(
+        find.byType(CircularProgressIndicator),
+        findsNothing,
+        reason: 'pano yükleme durumunda takılı kalmamalı',
+      );
+    });
+
+    testWidgets('partnere kendi regl hatırlatıcısı sorulmaz', (tester) async {
+      await openAt(tester, tablets[4]);
+
+      // Sahibin metniyle izin kutusu partnere hiç açılmamalı.
+      expect(find.byType(AlertDialog), findsNothing);
+    });
+  });
+
   group('düzen sınıfı eşikleri', () {
     test('bütün telefonlar compact', () {
       for (final device in phones) {

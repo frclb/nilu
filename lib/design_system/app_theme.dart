@@ -4,6 +4,7 @@ import 'app_flavor.dart';
 import 'app_palette.dart';
 import 'app_snack.dart';
 import 'app_tokens.dart';
+import 'app_layout.dart';
 
 /// Uygulama teması.
 ///
@@ -128,6 +129,18 @@ class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: t.surface,
         surfaceTintColor: Colors.transparent,
+        // Flutter diyaloğa azami genişlik vermiyor: 40 pt kenar boşluğu
+        // dışında ekranı dolduruyor. Telefonda sorun değil ama iPad'de iki
+        // satırlık bir soru 950 pt'ye yayılıyor ve düğmeler metinden yüzlerce
+        // piksel uzağa düşüyordu.
+        //
+        // `minWidth` de yazılmak zorunda: `constraints` verildiğinde Flutter'ın
+        // kendi 280 pt'lik asgarisi devre dışı kalıyor ve kısa bir diyalog
+        // içeriğine göre 88 pt'ye büzülüyor.
+        constraints: const BoxConstraints(
+          minWidth: 280,
+          maxWidth: AppLayout.contentMaxWidth,
+        ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
         ),

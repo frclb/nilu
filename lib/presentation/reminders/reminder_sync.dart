@@ -170,8 +170,18 @@ class _ReminderSyncState extends State<ReminderSync> {
       (vm) => vm.onboardingComplete,
     );
 
+    // Partner modunda hiç çalışmıyor. Buradaki plan `CalendarViewModel`'den,
+    // yani **cihazın kendi** döngü verisinden üretiliyor; partnerin öyle bir
+    // verisi yok. Kapı yalnızca onboarding'e bakarken partner:
+    //   * sahibin metniyle ("Reglinin yaklaştığını…") bildirim izni
+    //     isteniyordu — kendi regli hakkında sanıyordu,
+    //   * ve kendi boş takvimine göre hatırlatıcı planlanıyordu.
+    // Partnerin gerçek bildirimleri ayrı yoldan geliyor (Partner → Bildirim
+    // Ayarları, push).
+    final isPartner = context.select<UserViewModel, bool>((vm) => vm.isPartner);
+
     // Yükleme sürerken tahminler henüz boş; o hâli planlamak anlamsız.
-    if (onboarded && !viewModel.isLoading) {
+    if (onboarded && !isPartner && !viewModel.isLoading) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _sync(viewModel);
       });
