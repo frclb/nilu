@@ -2,5 +2,6 @@
    Info.plist icindekiler yalnizca yedek; cihaz dili buradan okur. */
 
 "NSCameraUsageDescription" = "Se usa la cámara para escanear el código QR de tu pareja. No se guarda ninguna imagen de la cámara.";
-"NSPhotoLibraryUsageDescription" = "Se accede a tus fotos para que puedas elegir una imagen de código QR guardada.";
 "NSFaceIDUsageDescription" = "Face ID se usa para que solo tú puedas acceder a tus datos de salud cuando el bloqueo está activo.";
+"NSHealthShareUsageDescription" = "Tus datos de periodo, sueño y frecuencia cardiaca se leen de la app Salud para mejorar las predicciones.";
+"NSHealthUpdateUsageDescription" = "Los días de periodo que marques aquí también se escriben en la app Salud, si lo permites.";

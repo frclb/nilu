@@ -47,12 +47,42 @@ class _NotificationSettingsScreenState
   /// Eskiden yalnızca tercih kaydediliyordu; hiçbir bildirim planlanmadığı
   /// için kullanıcı hatırlatıcıyı açsa da bildirim almıyordu.
   Future<void> _update(GeneralNotificationSettings next) async {
+    final previous = _settings;
     setState(() => _settings = next);
     await _repository.saveGeneralSettings(next);
-    await _reschedule(next);
+
+    final applied = await _reschedule(next);
+    if (!applied) {
+      // İzin verilmedi: anahtar açık kalırsa kullanıcı hatırlatıcıların
+      // kurulduğunu sanıyor ama hiçbir bildirim gelmiyor. Eski hâline
+      // döndürülüyor ve kayıt da geri alınıyor.
+      if (!mounted) return;
+      setState(() => _settings = previous);
+      await _repository.saveGeneralSettings(previous);
+    }
   }
 
-  Future<void> _reschedule(GeneralNotificationSettings settings) async {
+  /// Planı uygular. İzin alınamadıysa ya da planlama başarısız olduysa
+  /// `false` döner.
+  ///
+  /// Hata da reddedilme gibi ele alınıyor: kullanıcı açısından ikisi de
+  /// "hatırlatıcı kurulmadı" demek. Yakalanmazsa anahtar açık kalıyor ve
+  /// kayıtlı kalıyordu — bildirim gelmediği hâlde ayar "açık" görünüyordu.
+  Future<bool> _reschedule(GeneralNotificationSettings settings) async {
+    try {
+      return await _applyPlan(settings);
+    } catch (e) {
+      debugPrint('Reminder scheduling failed: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.tr('notif_permission_denied'))),
+        );
+      }
+      return false;
+    }
+  }
+
+  Future<bool> _applyPlan(GeneralNotificationSettings settings) async {
     final cycleInfo = context.read<CalendarViewModel>().cycleInfo;
     final localize = context.tr;
 
@@ -66,11 +96,11 @@ class _NotificationSettingsScreenState
     if (wantsReminders) {
       final granted = await scheduler.requestPermission();
       if (!granted) {
-        if (!mounted) return;
+        if (!mounted) return false;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(localize('notif_permission_denied'))),
         );
-        return;
+        return false;
       }
     }
 
@@ -81,6 +111,7 @@ class _NotificationSettingsScreenState
     );
 
     await scheduler.apply(plan, localize: localize);
+    return true;
   }
 
   @override

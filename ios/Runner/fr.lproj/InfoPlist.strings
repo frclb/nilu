@@ -2,5 +2,6 @@
    Info.plist icindekiler yalnizca yedek; cihaz dili buradan okur. */
 
 "NSCameraUsageDescription" = "L’appareil photo sert à scanner le code QR de ta partenaire. Aucune image n’est conservée.";
-"NSPhotoLibraryUsageDescription" = "L’accès à tes photos te permet de choisir une image de code QR enregistrée.";
 "NSFaceIDUsageDescription" = "Face ID garantit que toi seule accèdes à tes données de santé lorsque le verrouillage est actif.";
+"NSHealthShareUsageDescription" = "Tes données de règles, de sommeil et de fréquence cardiaque sont lues depuis l’app Santé pour affiner les prévisions.";
+"NSHealthUpdateUsageDescription" = "Les jours de règles que tu notes ici sont aussi écrits dans l’app Santé, si tu l’autorises.";

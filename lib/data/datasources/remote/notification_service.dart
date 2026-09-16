@@ -11,19 +11,27 @@ class NotificationService {
   FirebaseMessaging get _fcm => FirebaseMessaging.instance;
   FirebaseFirestore get _firestore => FirebaseFirestore.instance;
 
+  /// Push için jeton kaydeder.
+  ///
+  /// **İzin istemez.** iOS'ta yerel bildirimler ve FCM aynı sistem iznini
+  /// kullanıyor ve sistem istemi bir kez gösteriliyor. Burada
+  /// `requestPermission` çağrılırsa o istem uygulama açılışında, hiçbir
+  /// gerekçe gösterilmeden çıkıyor: `ReminderSync` içindeki "neden
+  /// gerekiyor" kutusu devreye girmeden karar alınmış oluyor ve iOS kararı
+  /// bir daha sormuyor.
+  ///
+  /// Bu bugüne kadar görünmedi çünkü Firebase yapılandırılmamış; yapılandırma
+  /// dosyası eklendiği gün ortaya çıkardı.
+  ///
+  /// İzin zaten verilmişse jeton kaydediliyor; verilmemişse hiçbir şey
+  /// yapılmıyor — kullanıcı gerekçeli akışta izin verdikten sonraki açılışta
+  /// kaydediliyor.
   Future<void> initialize(String userId) async {
     if (!FirebaseConfig.isAvailable) return;
     try {
-      // İzin iste
-      NotificationSettings settings = await _fcm.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+      final settings = await _fcm.getNotificationSettings();
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        debugPrint('User granted notification permission');
-
         // Token al
         String? token = await _fcm.getToken();
         if (token != null) {
@@ -35,7 +43,9 @@ class NotificationService {
           _saveTokenToFirestore(userId, newToken);
         });
       } else {
-        debugPrint('User declined or has not accepted permission');
+        debugPrint(
+          'Notification permission not granted yet; FCM token not registered',
+        );
       }
     } catch (e) {
       debugPrint("Notification initialize error: $e");
