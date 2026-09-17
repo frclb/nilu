@@ -44,8 +44,11 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
   // Saklanan değerler kanonik kodlardır; etiketler lokalizasyondan gelir.
   static const List<String> _availableSymptoms = LogVocabulary.symptoms;
 
-  // Akış yoğunluğunda 'none' bu ekranda gösterilmez (regl işaretliyken açılır).
-  static const List<String> _flowIntensities = ['light', 'medium', 'heavy'];
+  // Regl kademeleri sözlükten geliyor: 'none' ve 'spotting' burada
+  // gösterilmez, çünkü ikisi de regl günü değil. Listeyi burada yeniden
+  // yazmak, lekelenme eklenirken bu ekranın atlanmasına yol açmıştı.
+  static const List<String> _flowIntensities =
+      LogVocabulary.periodFlowIntensities;
 
   static const Map<String, String> _moodEmojis = {
     'happy': '😊',
@@ -95,13 +98,18 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
     String? painLevel,
     bool clearPain = false,
     bool? painLimitedActivity,
+    // Lekelenme anahtarı kapatılabilmeli; `flowIntensity: null` tek başına
+    // "dokunma" anlamına geliyor.
+    bool clearFlow = false,
   }) {
     setState(() {
       _currentLog = DailyLog(
         date: widget.date,
         symptoms: symptoms ?? _currentLog.symptoms,
         notes: _notesController.text,
-        flowIntensity: flowIntensity ?? _currentLog.flowIntensity,
+        flowIntensity: clearFlow
+            ? null
+            : (flowIntensity ?? _currentLog.flowIntensity),
         moods: moods ?? _currentLog.moods,
         sexualActivity: sexualActivity ?? _currentLog.sexualActivity,
         painLevel: clearPain ? null : (painLevel ?? _currentLog.painLevel),
@@ -251,6 +259,27 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                       },
                     ),
                   ),
+
+                  // Regl olmayan günlerde lekelenme. Ara kanama tam da
+                  // geçmişe dönük girilen bulgu: kişi genelde ertesi gün
+                  // fark ediyor. Yalnızca bugünü kaydeden "+" ekranında
+                  // kalsaydı hiç yazılamazdı.
+                  if (!isPeriod)
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        context.tr('log_flow_spotting'),
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: Text(context.tr('day_detail_spotting_hint')),
+                      value:
+                          _currentLog.flowIntensity == LogVocabulary.spotting,
+                      activeThumbColor: context.tokens.flow,
+                      onChanged: (selected) => _updateCurrentLog(
+                        flowIntensity: selected ? LogVocabulary.spotting : null,
+                        clearFlow: !selected,
+                      ),
+                    ),
 
                   if (isPeriod) ...[
                     const SizedBox(height: 8),

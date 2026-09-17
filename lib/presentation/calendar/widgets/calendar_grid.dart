@@ -8,6 +8,7 @@ import '../../../domain/models/daily_log.dart';
 
 import 'package:provider/provider.dart';
 import '../view_models/calendar_view_model.dart';
+import '../../../domain/models/log_vocabulary.dart';
 
 /// Ayın ızgarası ve açıklama satırı.
 ///
@@ -250,6 +251,15 @@ class CalendarGrid extends StatelessWidget {
                     context.tokens.flowSoft,
                     context.tr('calendar_legend_predicted'),
                   ),
+                  // Lekelenme kanama ama regl değil: rengi regl rengiyle
+                  // aynı, biçimi halka. Dolu nokta doğurganlık işaretiyle
+                  // karışırdı.
+                  _buildLegendItem(
+                    context,
+                    context.tokens.flow,
+                    context.tr('calendar_legend_spotting'),
+                    outlined: true,
+                  ),
                   // Hormonal doğum kontrolünde takvimde doğurganlık ve
                   // yumurtlama işareti çizilmiyor; açıklama satırında da
                   // görünmemeli, yoksa var olmayan renkleri tarif ediyor.
@@ -280,7 +290,16 @@ class CalendarGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildLegendItem(BuildContext context, Color color, String label) {
+  /// [outlined] işareti içi boş bir halka olarak çizer.
+  ///
+  /// Takvimde lekelenme halka; açıklama da halka göstermeli. Dolu nokta
+  /// çizseydik açıklama ile takvim yine farklı şeyler söylerdi.
+  Widget _buildLegendItem(
+    BuildContext context,
+    Color color,
+    String label, {
+    bool outlined = false,
+  }) {
     final theme = Theme.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -289,13 +308,16 @@ class CalendarGrid extends StatelessWidget {
           width: 8,
           height: 8,
           decoration: BoxDecoration(
-            color: color,
+            color: outlined ? Colors.transparent : color,
             shape: BoxShape.circle,
             // Doğurganlık tonu bilerek soluk — hücrede zemine serilen tülü
             // temsil ediyor. Açık temada beyaz yüzeye karşı 1.46:1 kalıyor,
             // yani nokta olarak seçilmiyordu. Saç teli inceliğinde bir
             // çerçeve, dolgunun açıklığından bağımsız olarak sınırı veriyor.
-            border: Border.all(color: context.tokens.border),
+            border: Border.all(
+              color: outlined ? color : context.tokens.border,
+              width: outlined ? 1.5 : 1,
+            ),
           ),
         ),
         const SizedBox(width: 4),
@@ -343,6 +365,11 @@ class _DayTile extends StatelessWidget {
         dailyLog.moods.isNotEmpty ||
         dailyLog.flowIntensity != null ||
         (dailyLog.notes != null && dailyLog.notes!.isNotEmpty);
+
+    // Lekelenme günü: kanama var ama regl değil. Regl gününde ayrıca
+    // gösterilmiyor — orada zaten bandın kendisi kanamayı anlatıyor.
+    final isSpotting =
+        !isPeriod && dailyLog.flowIntensity == LogVocabulary.spotting;
 
     final isToday = DateUtils.isSameDay(date, DateTime.now());
 
@@ -541,6 +568,7 @@ class _DayTile extends StatelessWidget {
               isOvulation: isOvulation,
               isFertile: isFertile,
               isPeriod: isPeriod,
+              isSpotting: isSpotting,
               hasLog: hasLog,
               isFaded: isFaded,
               theme: theme,
@@ -670,6 +698,7 @@ class _DayTile extends StatelessWidget {
     required bool isOvulation,
     required bool isFertile,
     required bool isPeriod,
+    required bool isSpotting,
     required bool hasLog,
     required bool isFaded,
     required ThemeData theme,
@@ -690,8 +719,18 @@ class _DayTile extends StatelessWidget {
       dots.add(_dot(t.flow, 5));
     }
 
-    // Log noktası (yumurtlama/doğurganlık varsa ek olarak)
-    if (hasLog && !isPeriod) {
+    // Lekelenme halkası. Regl rengiyle aynı ton — kanama olduğunu söylüyor;
+    // içi boş biçim ise regl gününden ayırıyor. Dolu bir nokta doğurganlık
+    // işaretiyle karışırdı, o da aynı rengi kullanıyor.
+    if (isSpotting) {
+      dots.add(_ring(t.flow, 6));
+    }
+
+    // Log noktası (yumurtlama/doğurganlık varsa ek olarak).
+    //
+    // Lekelenme zaten kendi halkasını çizdiği için burada tekrar edilmiyor;
+    // yoksa aynı gün iki gri nokta görünüyordu.
+    if (hasLog && !isPeriod && !isSpotting) {
       dots.add(_dot(t.textFaint, 4));
     }
 
@@ -709,6 +748,18 @@ class _DayTile extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    );
+  }
+
+  /// İçi boş işaret.
+  Widget _ring(Color color, double size) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: color, width: 1.5),
+      ),
     );
   }
 }

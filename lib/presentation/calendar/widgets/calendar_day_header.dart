@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../localization/date_names.dart';
 import '../view_models/calendar_view_model.dart';
+import '../../../domain/models/log_vocabulary.dart';
 import 'day_detail_bottom_sheet.dart';
 
 /// Seçili günün kimliği, durumu ve o güne uygulanan eylemler.
@@ -30,6 +31,9 @@ class CalendarDayHeader extends StatelessWidget {
     final status = _DayStatus.resolve(
       context,
       isPeriod: isPeriod,
+      isSpotting:
+          viewModel.getDailyLogForDate(selectedDate).flowIntensity ==
+          LogVocabulary.spotting,
       isOvulation: viewModel.cycleInfo.isOvulationDay(selectedDate),
       isFertile: viewModel.cycleInfo.isFertile(selectedDate),
       isPredicted: viewModel.isPredictedPeriodDay(selectedDate),
@@ -237,6 +241,7 @@ class _DayStatus {
   static _DayStatus resolve(
     BuildContext context, {
     required bool isPeriod,
+    required bool isSpotting,
     required bool isOvulation,
     required bool isFertile,
     required bool isPredicted,
@@ -246,6 +251,17 @@ class _DayStatus {
         context.tr('calendar_status_period'),
         context.tokens.flow,
         Icons.water_drop,
+      );
+    }
+    // Kaydedilmiş kanama, tahmin edilen yumurtlama ve doğurgan günün
+    // önünde geliyor: biri kullanıcının gerçekten yazdığı bir bulgu,
+    // diğerleri hesaplanmış birer öngörü. "Normal gün" demek, az önce
+    // lekelenme kaydeden kişiye kaydın kaybolduğunu düşündürüyordu.
+    if (isSpotting) {
+      return _DayStatus(
+        context.tr('log_flow_spotting'),
+        context.tokens.flow,
+        Icons.circle_outlined,
       );
     }
     if (isOvulation) {
