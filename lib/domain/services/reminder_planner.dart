@@ -63,11 +63,22 @@ class ReminderPlanner {
   static String signature({
     required CycleInfo cycleInfo,
     required GeneralNotificationSettings settings,
+    required DateTime now,
   }) {
     String d(DateTime? value) =>
         value == null ? '-' : '${value.year}-${value.month}-${value.day}';
 
     return [
+      // Gecikme imzaya giriyor.
+      //
+      // İmza yalnızca tahmin edilen tarihleri içeriyordu ve o tarihler
+      // günler geçtikçe değişmiyor. Kullanıcı gecikmeye düştüğünde imza
+      // aynı kaldığı için plan yenilenmiyor, daha önce yazılmış yanlış
+      // bildirimler öylece duruyordu.
+      //
+      // Gün sayısı değil yalnızca "gecikmiş mi": her gün değişen bir değer
+      // koysaydık plan her açılışta baştan yazılırdı.
+      cycleInfo.daysLateAt(now) > 0,
       settings.periodReminders,
       settings.fertileWindow,
       settings.dailyLogs,
@@ -86,7 +97,16 @@ class ReminderPlanner {
   }) {
     final reminders = <ScheduledReminder>[];
 
-    if (settings.periodReminders) {
+    // Beklenen gün geçtiyse tahmin zinciri güvenilirliğini yitiriyor:
+    // tamamı kaçırılmış bir başlangıca dayanıyor. Ekranda bunu boş bir
+    // liste olarak göstermek yetiyordu; burada bedeli daha ağır, çünkü
+    // kullanıcı gelmemiş bir döngünün penceresi için "Doğurganlık
+    // pencerene giriyorsun" bildirimi alıyordu.
+    //
+    // Günlük kayıt hatırlatıcısı tahmine dayanmıyor, o susturulmuyor.
+    final overdue = cycleInfo.daysLateAt(now) > 0;
+
+    if (settings.periodReminders && !overdue) {
       final starts = _periodStarts(cycleInfo);
       for (var i = 0; i < starts.length; i++) {
         final when = _at(
@@ -107,7 +127,7 @@ class ReminderPlanner {
       }
     }
 
-    if (settings.fertileWindow) {
+    if (settings.fertileWindow && !overdue) {
       final windows = _fertileStarts(cycleInfo);
       for (var i = 0; i < windows.length; i++) {
         final when = _at(windows[i], morningHour);
@@ -146,21 +166,39 @@ class ReminderPlanner {
     final next = info.predictedNextPeriod;
     if (next == null) return const [];
 
-    return [
+    // `predictedNextPeriod` ile `futurePredictions[0]` aynı tarih: ikisi de
+    // `lastStart + döngüUzunluğu`. Tekilleştirilmediği için plana iki ayrı
+    // kimlikle aynı an giriyordu ve kullanıcı sabah dokuzda birbirinin
+    // kopyası iki "Reglin yaklaşıyor" bildirimi alıyordu. Üstelik kopya,
+    // [maxCycles] penceresinden bir yer yediği için en uzaktaki döngü hiç
+    // planlanmıyordu.
+    return _distinctDays([
       next,
       ...info.futurePredictions.map((p) => p.startDate),
-    ].take(maxCycles).toList();
+    ]).take(maxCycles).toList();
   }
 
   /// Tahmin edilen doğurganlık penceresi başlangıçları.
   static List<DateTime> _fertileStarts(CycleInfo info) {
     final current = info.fertileWindowStart;
-    return [
+    return _distinctDays([
       ?current,
       ...info.futurePredictions
           .map((p) => p.fertileStart)
           .whereType<DateTime>(),
-    ].take(maxCycles).toList();
+    ]).take(maxCycles).toList();
+  }
+
+  /// Aynı güne düşen tarihleri teke indirir, sırayı korur.
+  static List<DateTime> _distinctDays(List<DateTime> dates) {
+    final seen = <String>{};
+    final result = <DateTime>[];
+    for (final date in dates) {
+      if (seen.add('${date.year}-${date.month}-${date.day}')) {
+        result.add(date);
+      }
+    }
+    return result;
   }
 
   /// Günün belirli saatine sabitler.

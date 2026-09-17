@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:period_tracker/data/repositories/cycle_settings_repository.dart';
 import 'package:period_tracker/data/repositories/notification_settings_repository.dart';
 import 'package:period_tracker/design_system/app_flavor.dart';
 import 'package:period_tracker/design_system/app_theme.dart';
@@ -30,7 +31,7 @@ void main() {
       jsonDecode(File('lib/localization/en.json').readAsStringSync())
           as Map<String, dynamic>;
 
-  Future<void> open(WidgetTester tester) async {
+  Future<void> open(WidgetTester tester, {bool hormonal = false}) async {
     FlutterSecureStorage.setMockInitialValues({});
     SharedPreferences.setMockInitialValues({});
 
@@ -40,6 +41,12 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     await tester.runAsync(() async {
+      // Ayar `SecureStore`'da tutuluyor; `SharedPreferences` mock'u buraya
+      // ulaşmıyor. Görünümün beslendiği yerden yazmak gerekiyor.
+      if (hormonal) {
+        await CycleSettingsRepository().setHormonalContraception(true);
+      }
+
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light(AppFlavor.plum),
@@ -96,6 +103,35 @@ void main() {
       switchValue(tester, 'notif_daily_logs'),
       isFalse,
       reason: 'izin alınamadan anahtar açık kalmamalı',
+    );
+  });
+
+  testWidgets('doğurganlık izlenmiyorsa anahtar gösterilmiyor', (
+    tester,
+  ) async {
+    // Hormonal doğum kontrolünde doğurganlık verisi kaynakta hiç
+    // üretilmiyor; anahtar açılsa bile hiçbir bildirim planlanamaz.
+    // Çalışmayan bir düğme bırakmak, kullanıcıya bildirimin gelmemesini
+    // arıza gibi gösterirdi.
+    await open(tester, hormonal: true);
+
+    expect(
+      find.text(dictionary['notif_fertile_window'] as String),
+      findsNothing,
+    );
+    expect(
+      find.text(dictionary['notif_period_reminders'] as String),
+      findsOneWidget,
+      reason: 'diğer anahtarlar yerinde kalmalı',
+    );
+  });
+
+  testWidgets('doğurganlık izleniyorsa anahtar duruyor', (tester) async {
+    await open(tester);
+
+    expect(
+      find.text(dictionary['notif_fertile_window'] as String),
+      findsOneWidget,
     );
   });
 

@@ -66,6 +66,7 @@ class _ReminderSyncState extends State<ReminderSync> {
       final signature = ReminderPlanner.signature(
         cycleInfo: viewModel.cycleInfo,
         settings: settings,
+        now: DateTime.now(),
       );
       if (signature == _applied) return;
 

@@ -283,8 +283,8 @@ void main() {
         fertileStart: DateTime(2026, 3, 12),
       );
       expect(
-        ReminderPlanner.signature(cycleInfo: info, settings: on),
-        ReminderPlanner.signature(cycleInfo: info, settings: on),
+        ReminderPlanner.signature(cycleInfo: info, settings: on, now: now),
+        ReminderPlanner.signature(cycleInfo: info, settings: on, now: now),
       );
     });
 
@@ -295,11 +295,13 @@ void main() {
         ReminderPlanner.signature(
           cycleInfo: cycle(nextPeriod: DateTime(2026, 4, 1)),
           settings: on,
+          now: now,
         ),
         isNot(
           ReminderPlanner.signature(
             cycleInfo: cycle(nextPeriod: DateTime(2026, 3, 25)),
             settings: on,
+            now: now,
           ),
         ),
       );
@@ -310,11 +312,13 @@ void main() {
         ReminderPlanner.signature(
           cycleInfo: cycle(fertileStart: DateTime(2026, 3, 12)),
           settings: on,
+          now: now,
         ),
         isNot(
           ReminderPlanner.signature(
             cycleInfo: cycle(fertileStart: DateTime(2026, 3, 15)),
             settings: on,
+            now: now,
           ),
         ),
       );
@@ -322,13 +326,14 @@ void main() {
 
     test('ileri tahminler değişince imza değişir', () {
       expect(
-        ReminderPlanner.signature(cycleInfo: cycle(), settings: on),
+        ReminderPlanner.signature(cycleInfo: cycle(), settings: on, now: now),
         isNot(
           ReminderPlanner.signature(
             cycleInfo: cycle(
               future: [PredictedCycle(startDate: DateTime(2026, 5, 1))],
             ),
             settings: on,
+            now: now,
           ),
         ),
       );
@@ -337,11 +342,12 @@ void main() {
     test('ayar değişince imza değişir', () {
       final info = cycle(nextPeriod: DateTime(2026, 4, 1));
       expect(
-        ReminderPlanner.signature(cycleInfo: info, settings: on),
+        ReminderPlanner.signature(cycleInfo: info, settings: on, now: now),
         isNot(
           ReminderPlanner.signature(
             cycleInfo: info,
             settings: on.copyWith(periodReminders: false),
+            now: now,
           ),
         ),
       );
@@ -354,10 +360,12 @@ void main() {
         ReminderPlanner.signature(
           cycleInfo: cycle(nextPeriod: DateTime(2026, 4, 1, 3)),
           settings: on,
+          now: now,
         ),
         ReminderPlanner.signature(
           cycleInfo: cycle(nextPeriod: DateTime(2026, 4, 1, 22)),
           settings: on,
+          now: now,
         ),
       );
     });

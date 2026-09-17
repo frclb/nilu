@@ -118,6 +118,16 @@ class _NotificationSettingsScreenState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Hormonal doğum kontrolünde doğurganlık verisi kaynakta hiç
+    // üretilmiyor, dolayısıyla o hatırlatıcı hiçbir zaman planlanamaz.
+    // Anahtarı yine de göstermek, açıldığında hiçbir şey olmayan bir
+    // düğme bırakırdı — kullanıcı bildirimin gelmemesini bir arıza
+    // sanır. Kayıtlı değer korunuyor: ayar kapatılınca anahtar eski
+    // hâliyle geri geliyor.
+    final tracksFertility = context.select<CalendarViewModel, bool>(
+      (vm) => vm.cycleInfo.fertilityTracked,
+    );
+
     return Scaffold(
       backgroundColor: context.tokens.background,
       appBar: AppBar(
@@ -162,14 +172,15 @@ class _NotificationSettingsScreenState
                           Icons.water_drop_outlined,
                           true,
                         ),
-                        _buildSwitchTile(
-                          context.tr('notif_fertile_window'),
-                          _settings.fertileWindow,
-                          (val) =>
-                              _update(_settings.copyWith(fertileWindow: val)),
-                          Icons.child_care,
-                          true,
-                        ),
+                        if (tracksFertility)
+                          _buildSwitchTile(
+                            context.tr('notif_fertile_window'),
+                            _settings.fertileWindow,
+                            (val) =>
+                                _update(_settings.copyWith(fertileWindow: val)),
+                            Icons.child_care,
+                            true,
+                          ),
                         _buildSwitchTile(
                           context.tr('notif_daily_logs'),
                           _settings.dailyLogs,
