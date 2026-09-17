@@ -25,12 +25,23 @@ class _FlowIntensitySectionState extends State<FlowIntensitySection> {
   // etiketler lokalizasyondan çözülür.
   static const List<String> _values = LogVocabulary.flowIntensities;
 
-  static const List<IconData> _icons = [
-    Icons.block,
-    Icons.opacity,
-    Icons.water_drop,
-    Icons.waves,
-  ];
+  /// Kutunun en az genişliği.
+  ///
+  /// Sabit genişlik denendi ve dile takıldı: Almanca "Schmierblutung" 100
+  /// pt'ye sığmayıp iki satıra bölünüyordu. Artık kutu **etiketine göre**
+  /// boyutlanıyor, bu yalnızca kısa etiketlerin ("Yok") iğne gibi
+  /// kalmaması için bir alt sınır.
+  static const double _chipMinWidth = 88;
+
+  /// Kod → simge. Liste yerine eşleme: iki paralel liste tutulduğunda
+  /// sözlüğe bir kademe eklemek simgeleri sessizce kaydırıyordu.
+  static const Map<String, IconData> _icons = {
+    'none': Icons.block,
+    LogVocabulary.spotting: Icons.circle,
+    'light': Icons.opacity,
+    'medium': Icons.water_drop,
+    'heavy': Icons.waves,
+  };
 
   @override
   void initState() {
@@ -48,7 +59,7 @@ class _FlowIntensitySectionState extends State<FlowIntensitySection> {
     final options = List.generate(
       _values.length,
       (i) => {
-        'icon': _icons[i],
+        'icon': _icons[_values[i]] ?? Icons.help_outline,
         'label': context.tr(LogVocabulary.flowKey(_values[i])),
       },
     );
@@ -76,60 +87,69 @@ class _FlowIntensitySectionState extends State<FlowIntensitySection> {
             ],
           ),
           const SizedBox(height: 16),
-          Row(
+          // `Row` + `Expanded` değil `Wrap`.
+          //
+          // Eşit bölünen beş kutuda dar bir telefonda etiket başına ~35 pt
+          // kalıyor ve "Lekelenme" üç satıra bölünüyordu. `Wrap` kutuyu
+          // etiketine göre boyutlandırıp sığmayanı alt satıra indiriyor:
+          // hiçbir seçenek kırpılmıyor ve hepsi görünür kalıyor — yatay
+          // kaydırmada olduğu gibi gizlenmiyor.
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
             children: List.generate(options.length, (index) {
               final isSelected = _selectedIndex == index;
-              return Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    right: index < options.length - 1 ? 12 : 0,
-                  ),
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                      widget.onChanged(index == 0 ? null : _values[index]);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
+              return ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: _chipMinWidth),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                    // 'none' = kayıt yok. İndeks yerine kodun kendisine
+                    // bakılıyor: sözlüğe bir kademe eklendiğinde indeks
+                    // tabanlı kontrol sessizce yanlış seçeneği boşaltır.
+                    final code = _values[index];
+                    widget.onChanged(code == 'none' ? null : code);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? (isDark
+                                ? AppScrim.frost(25)
+                                : theme.colorScheme.primary.withAlpha(12))
+                          : theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
                         color: isSelected
-                            ? (isDark
-                                  ? AppScrim.frost(25)
-                                  : theme.colorScheme.primary.withAlpha(12))
-                            : theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
+                            ? (Theme.of(context).colorScheme.primary)
+                            : (context.tokens.border),
+                        width: 2,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(
+                          options[index]['icon'] as IconData,
                           color: isSelected
                               ? (Theme.of(context).colorScheme.primary)
-                              : (context.tokens.border),
-                          width: 2,
+                              : theme.textTheme.labelLarge?.color?.withAlpha(
+                                  127,
+                                ),
                         ),
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(
-                            options[index]['icon'] as IconData,
+                        const SizedBox(height: 8),
+                        Text(
+                          options[index]['label'] as String,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                             color: isSelected
                                 ? (Theme.of(context).colorScheme.primary)
-                                : theme.textTheme.labelLarge?.color?.withAlpha(
-                                    127,
-                                  ),
+                                : theme.textTheme.labelLarge?.color,
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            options[index]['label'] as String,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: isSelected
-                                  ? (Theme.of(context).colorScheme.primary)
-                                  : theme.textTheme.labelLarge?.color,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

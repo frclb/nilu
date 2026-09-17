@@ -37,12 +37,43 @@ class LogVocabulary {
     'tired',
   ];
 
+  /// Lekelenme kodu.
+  ///
+  /// Regl değil: kanama var ama döngü başlatmıyor. Regl dışı (ara) kanama
+  /// NHS ve ACOG'un "hekime danış" dediği ayrı bir bulgu. Regl günü
+  /// sayılırsa iki şey birden bozulur — döngü uzunluğu yanlış hesaplanır ve
+  /// kısa döngü uyarısı haksız yere tetiklenebilir.
+  static const String spotting = 'spotting';
+
+  /// Akış yoğunluğu kademeleri, artan sırayla.
+  ///
+  /// Ekranda soldan sağa bu sırayla çiziliyor.
   static const List<String> flowIntensities = [
     'none',
+    spotting,
     'light',
     'medium',
     'heavy',
   ];
+
+  /// Regl günü sayılan kademeler.
+  static const List<String> periodFlowIntensities = [
+    'light',
+    'medium',
+    'heavy',
+  ];
+
+  /// [code] bir regl gününü başlatır mı?
+  ///
+  /// Kayıt ekranı "akış girildiyse kanama var demektir" deyip **herhangi**
+  /// bir değerde dönemi başlatıyordu: "Yok" seçen kullanıcı da regl
+  /// başlatıyordu.
+  static bool startsPeriod(String? code) =>
+      code != null && periodFlowIntensities.contains(code);
+
+  /// [code] kanama bildiriyor mu? Lekelenme dâhil.
+  static bool isBleeding(String? code) =>
+      startsPeriod(code) || code == spotting;
 
   /// Ağrı şiddeti. Sayısal bir ölçek yerine üç kademe: kullanıcıdan 0–10
   /// arası bir sayı istemek kaydı zorlaştırıyor ve kişiden kişiye

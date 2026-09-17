@@ -13,6 +13,7 @@ import '../../../core/navigation/navigation_service.dart';
 import '../../../domain/models/daily_log.dart';
 import '../calendar/view_models/calendar_view_model.dart';
 import '../../design_system/app_layout.dart';
+import '../../domain/models/log_vocabulary.dart';
 
 class LogEntryScreen extends StatefulWidget {
   const LogEntryScreen({super.key});
@@ -48,10 +49,14 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
 
     await viewModel.updateDailyLog(log);
 
-    // Akış yoğunluğu girildiyse kanama var demektir: dönemi başlat. Tek
-    // günlük kapalı bir kayıt açsaydık ertesi gün ana ekran yine "Reglim
-    // başladı" derdi.
-    if (_flowIntensity != null && !viewModel.isPeriodDay(today)) {
+    // Yalnızca **regl kademesindeki** akış dönemi başlatır. Tek günlük
+    // kapalı bir kayıt açsaydık ertesi gün ana ekran yine "Reglim başladı"
+    // derdi.
+    //
+    // Önceden koşul `_flowIntensity != null` idi: "Yok" seçen kullanıcı da
+    // regl başlatıyordu, lekelenme de regl sayılacaktı.
+    if (LogVocabulary.startsPeriod(_flowIntensity) &&
+        !viewModel.isPeriodDay(today)) {
       await viewModel.startPeriodToday();
     }
 
