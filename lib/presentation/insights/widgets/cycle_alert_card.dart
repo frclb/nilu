@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../design_system/app_tokens.dart';
+import '../../../domain/models/daily_log.dart';
+import '../../../domain/models/period_log.dart';
 import '../../../domain/services/cycle_alert.dart';
 import '../../../domain/services/insights_service.dart';
 import '../../../localization/app_localizations.dart';
@@ -21,8 +23,23 @@ class CycleAlertCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final logs = context.select<CalendarViewModel, List>((v) => v.periodLogs);
-    final points = InsightsService.cycleLengths(List.from(logs));
-    final alerts = CycleAlertService.evaluate(points);
+    final daily = context.select<CalendarViewModel, List>((v) => v.dailyLogs);
+    final periods = List<PeriodLog>.from(logs);
+    final points = InsightsService.cycleLengths(periods);
+    final dailyLogs = List<DailyLog>.from(daily);
+    final alerts = CycleAlertService.evaluate(
+      points,
+      dailyLogs: dailyLogs,
+      periodLogs: periods,
+    );
+
+    // Ara kanama metni kaç kez olduğunu söylüyor: "birkaç kez" demek yerine
+    // kullanıcının kendi kaydını göstermek hem doğrulanabilir hem de
+    // hekime giderken söyleyeceği sayı.
+    final episodes = CycleAlertService.intermenstrualEpisodes(
+      dailyLogs: dailyLogs,
+      periodLogs: periods,
+    ).length;
 
     if (alerts.isEmpty) return const SizedBox.shrink();
 
@@ -65,7 +82,10 @@ class CycleAlertCard extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              context.tr(CycleAlertService.bodyKey(alert)),
+              context.tr(
+                CycleAlertService.bodyKey(alert),
+                params: {'count': '$episodes'},
+              ),
               style: theme.textTheme.labelLarge?.copyWith(
                 fontSize: 13,
                 height: 1.55,

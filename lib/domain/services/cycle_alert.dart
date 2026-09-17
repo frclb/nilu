@@ -1,3 +1,8 @@
+import 'package:flutter/material.dart' show DateUtils;
+
+import '../models/daily_log.dart';
+import '../models/log_vocabulary.dart';
+import '../models/period_log.dart';
 import 'insights_service.dart';
 
 /// Kullanıcıya gösterilmeye değer döngü uyarıları.
@@ -22,6 +27,14 @@ enum CycleAlert {
   ///
   /// NHS "aniden değiştiyse" hekime danışılmasını öneriyor.
   highlyVariable,
+
+  /// Regl dönemlerinin dışında tekrarlayan kanama.
+  ///
+  /// NHS ve ACOG'un ayrıca sorduğu bulgu bu: reglin dışında kanama.
+  /// Çoğu zaman iyi huylu bir sebebi var (yumurtlama kanaması, yeni bir
+  /// doğum kontrol yöntemine alışma) ama tekrar ediyorsa hekimin bilmek
+  /// istediği şeylerden biri.
+  recurrentIntermenstrualBleeding,
 }
 
 /// Döngü uzunluklarından uyarı üretir.
@@ -46,12 +59,42 @@ class CycleAlertService {
   /// kaydeden kullanıcıya sağlık uyarısı göstermek hem yanlış hem ürkütücü.
   static const int minObservations = 3;
 
+  /// Reglin kenarındaki lekelenmeyi "ara kanama" saymamak için bırakılan
+  /// pay (dönemin öncesi ve sonrası, gün).
+  ///
+  /// Reglin hemen öncesinde ya da sonrasında birkaç damla görmek olağan;
+  /// onu ara kanama diye işaretlemek yersiz bir uyarı üretirdi.
+  static const int perimenstrualBufferDays = 2;
+
+  /// Uyarı için gereken en az ayrı kanama atağı sayısı.
+  ///
+  /// Tek bir ara kanama uyarı sebebi değil: yumurtlama sırasında görülen
+  /// tek seferlik lekelenme yaygın ve iyi huylu. Uyarının anlamı
+  /// "tekrarlıyor" — o yüzden iki ayrı atak aranıyor.
+  static const int minBleedingEpisodes = 2;
+
   /// [points] gözlenmiş döngü uzunlukları (en yeniden eskiye ya da tersi;
   /// sıra önemli değil).
-  static Set<CycleAlert> evaluate(List<CycleLengthPoint> points) {
-    if (points.length < minObservations) return const {};
-
+  ///
+  /// [dailyLogs] ve [periodLogs] verilirse ara kanama da değerlendirilir.
+  /// Döngü uyarılarından farklı olarak bu bulgu az sayıda döngüde de
+  /// anlamlı, o yüzden [minObservations] eşiğine tabi değil.
+  static Set<CycleAlert> evaluate(
+    List<CycleLengthPoint> points, {
+    List<DailyLog> dailyLogs = const [],
+    List<PeriodLog> periodLogs = const [],
+  }) {
     final alerts = <CycleAlert>{};
+
+    if (intermenstrualEpisodes(
+          dailyLogs: dailyLogs,
+          periodLogs: periodLogs,
+        ).length >=
+        minBleedingEpisodes) {
+      alerts.add(CycleAlert.recurrentIntermenstrualBleeding);
+    }
+
+    if (points.length < minObservations) return alerts;
     final lengths = points.map((p) => p.lengthInDays).toList();
 
     // "Düzenli olarak" — tek bir kısa döngü uyarı sebebi değil; hepsi
@@ -75,11 +118,68 @@ class CycleAlertService {
     CycleAlert.consistentlyShort => 'alert_short_title',
     CycleAlert.consistentlyLong => 'alert_long_title',
     CycleAlert.highlyVariable => 'alert_variable_title',
+    CycleAlert.recurrentIntermenstrualBleeding => 'alert_spotting_title',
   };
 
   static String bodyKey(CycleAlert alert) => switch (alert) {
     CycleAlert.consistentlyShort => 'alert_short_body',
     CycleAlert.consistentlyLong => 'alert_long_body',
     CycleAlert.highlyVariable => 'alert_variable_body',
+    CycleAlert.recurrentIntermenstrualBleeding => 'alert_spotting_body',
   };
+
+  /// Regl dönemlerinin dışında kalan kanama atakları (her atağın ilk günü).
+  ///
+  /// Arka arkaya gelen günler tek atak sayılıyor: iki gün süren bir
+  /// lekelenme, iki ayrı olay değil.
+  static List<DateTime> intermenstrualEpisodes({
+    required List<DailyLog> dailyLogs,
+    required List<PeriodLog> periodLogs,
+  }) {
+    // Hiç regl kaydı yoksa hangi kanamanın "ara"da kaldığı bilinemez.
+    // Böyle bir veriyle uyarı üretmek tahminden ibaret olurdu.
+    if (periodLogs.isEmpty) return const [];
+
+    final days =
+        dailyLogs
+            .where((l) => LogVocabulary.isBleeding(l.flowIntensity))
+            .map((l) => DateUtils.dateOnly(l.date))
+            .where((d) => !_nearPeriod(d, periodLogs))
+            .toSet()
+            .toList()
+          ..sort();
+
+    final episodes = <DateTime>[];
+    for (var i = 0; i < days.length; i++) {
+      final previous = i == 0 ? null : days[i - 1];
+      if (previous == null || days[i].difference(previous).inDays > 1) {
+        episodes.add(days[i]);
+      }
+    }
+    return episodes;
+  }
+
+  /// [day] bir reglin içinde ya da kenarında mı?
+  static bool _nearPeriod(DateTime day, List<PeriodLog> periods) {
+    for (final period in periods) {
+      final start = DateUtils.dateOnly(period.startDate);
+      // Devam eden dönemin bitişi bilinmiyor; modeldeki varsayılan süre
+      // kullanılıyor. Fazla kısa tahmin etmek reglin son günlerini "ara
+      // kanama" diye işaretlerdi — yani hata payı bu yönde bırakılıyor.
+      final end = DateUtils.dateOnly(
+        period.endDate ??
+            period.startDate.add(
+              const Duration(days: PeriodLog.defaultOngoingLength - 1),
+            ),
+      );
+
+      final from = start.subtract(
+        const Duration(days: perimenstrualBufferDays),
+      );
+      final to = end.add(const Duration(days: perimenstrualBufferDays));
+
+      if (!day.isBefore(from) && !day.isAfter(to)) return true;
+    }
+    return false;
+  }
 }

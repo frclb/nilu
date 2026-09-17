@@ -87,6 +87,11 @@ class DataExportService {
       if (clinical.painLimitedDays > 0) {
         line('export_clinical_limited', {'n': '${clinical.painLimitedDays}'});
       }
+      if (clinical.intermenstrualBleedingEpisodes > 0) {
+        line('export_clinical_spotting', {
+          'n': '${clinical.intermenstrualBleedingEpisodes}',
+        });
+      }
       if (clinical.topSymptoms.isNotEmpty) {
         final names = clinical.topSymptoms
             .map(

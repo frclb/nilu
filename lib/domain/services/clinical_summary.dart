@@ -45,6 +45,12 @@ class ClinicalSummary {
   /// Akışın "yoğun" işaretlendiği gün sayısı.
   final int heavyFlowDays;
 
+  /// Regl dönemlerinin dışında kalan kanama atağı sayısı.
+  ///
+  /// Hekimin "regl aranda kanaman oluyor mu, kaç kez?" sorusunun cevabı.
+  /// Arka arkaya gelen günler tek atak sayılıyor.
+  final int intermenstrualBleedingEpisodes;
+
   /// En sık kaydedilen belirtiler (en çoktan aza, en fazla üç tane).
   final List<SymptomFrequency> topSymptoms;
 
@@ -59,6 +65,7 @@ class ClinicalSummary {
     required this.severePainDays,
     required this.painLimitedDays,
     required this.heavyFlowDays,
+    required this.intermenstrualBleedingEpisodes,
     required this.topSymptoms,
     this.averageCycleDays,
     this.shortestCycleDays,
@@ -79,6 +86,10 @@ class ClinicalSummary {
     int cycleLimit = 12,
   }) {
     final cycles = InsightsService.cycleLengths(periodLogs, limit: cycleLimit);
+    final bleedingEpisodes = CycleAlertService.intermenstrualEpisodes(
+      dailyLogs: dailyLogs,
+      periodLogs: periodLogs,
+    );
     final lengths = cycles.map((c) => c.lengthInDays).toList()..sort();
 
     // Yalnızca tamamlanmış dönemler: devam eden bir dönemin gerçek uzunluğu
@@ -96,7 +107,11 @@ class ClinicalSummary {
       shortestCycleDays: lengths.isEmpty ? null : lengths.first,
       longestCycleDays: lengths.isEmpty ? null : lengths.last,
       variationDays: InsightsService.variation(cycles),
-      alerts: CycleAlertService.evaluate(cycles),
+      alerts: CycleAlertService.evaluate(
+        cycles,
+        dailyLogs: dailyLogs,
+        periodLogs: periodLogs,
+      ),
       averagePeriodDays: periodDays.isEmpty
           ? null
           : (periodDays.reduce((a, b) => a + b) / periodDays.length).round(),
@@ -105,6 +120,7 @@ class ClinicalSummary {
       severePainDays: dailyLogs.where((l) => l.painLevel == 'severe').length,
       painLimitedDays: dailyLogs.where((l) => l.painLimitedActivity).length,
       heavyFlowDays: dailyLogs.where((l) => l.flowIntensity == 'heavy').length,
+      intermenstrualBleedingEpisodes: bleedingEpisodes.length,
       topSymptoms: InsightsService.symptomFrequencies(
         dailyLogs,
       ).take(3).toList(),
