@@ -47,6 +47,23 @@ class CycleAgenda {
     int limit = 3,
   }) {
     final today = DateTime(now.year, now.month, now.day);
+
+    // Beklenen gün geçtiyse hiçbir tahmin sunulmuyor.
+    //
+    // Geciken regl listeden düşüyordu (geçmişte kalan olaylar elenir) ve
+    // yerine zincirin **bir sonraki** döngüsü geçiyordu: ekranın üstü
+    // "5 gün gecikti" derken hemen altı "Regl bekleniyor — 23 gün"
+    // diyordu.
+    //
+    // Doğurganlık penceresi daha da ağır: gecikmede listelenen pencere
+    // henüz başlamamış bir döngüye ait. Korunma farkındalığı için bakan
+    // birine olmayan bir tarihi vermek, boş liste bırakmaktan kötü.
+    //
+    // Zincirin tamamı kaçırılmış bir başlangıca dayanıyor; aritmetik
+    // ilerlemeye devam ediyor ama tahmin sayılamaz. Regl kaydedilince
+    // liste kendiliğinden geri geliyor.
+    if (info.daysLateAt(now) > 0) return const [];
+
     final entries = <AgendaEntry>[];
 
     // Aynı olay iki kaynaktan gelebiliyor: `predictedNextPeriod` çoğu zaman
