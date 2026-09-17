@@ -817,6 +817,7 @@
   "home_label_next_period": "Nächste Periode",
   "home_label_cycle": "Zyklus",
   "home_headline_period_day": "Tag {n}",
+  "home_headline_period_finished": "Dauerte {n} Tage",
   "home_headline_days_left": "in {n} Tagen",
   "home_headline_period_today": "Beginnt heute",
   "home_headline_cycle_day": "Zyklustag {n}",

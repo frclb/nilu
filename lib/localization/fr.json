@@ -817,6 +817,7 @@
   "home_label_next_period": "Prochaines règles",
   "home_label_cycle": "Cycle",
   "home_headline_period_day": "Jour {n}",
+  "home_headline_period_finished": "A duré {n} jours",
   "home_headline_days_left": "dans {n} jours",
   "home_headline_period_today": "Commencent aujourd'hui",
   "home_headline_cycle_day": "Jour de cycle {n}",

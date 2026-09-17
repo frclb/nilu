@@ -817,6 +817,7 @@
   "home_label_next_period": "Próxima regla",
   "home_label_cycle": "Ciclo",
   "home_headline_period_day": "Día {n}",
+  "home_headline_period_finished": "Duró {n} días",
   "home_headline_days_left": "en {n} días",
   "home_headline_period_today": "Empieza hoy",
   "home_headline_cycle_day": "Día del ciclo {n}",

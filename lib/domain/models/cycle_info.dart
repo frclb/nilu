@@ -50,6 +50,15 @@ class CycleInfo {
   /// süresi.
   final int? currentPeriodLength;
 
+  /// Bu döngüdeki dönemin kapatıldığı gün; devam ediyorsa null.
+  ///
+  /// Neden ayrı bir alan: "Reglim bitti" bugünü kayıttan silmiyor, son gün
+  /// olarak işaretliyor. Dolayısıyla faz o gün hâlâ menstrüasyon ve
+  /// devam eden bir dönemle **birebir aynı** görünüyordu. Ana ekran aynı
+  /// anda hem "Reglin bugün bitti" hem "REGL · 3. gün" yazıyordu; fazı
+  /// okuyan hiçbir yüzey ikisini ayırt edemiyordu.
+  final DateTime? currentPeriodEnd;
+
   CycleInfo({
     this.averageCycleLength = 28,
     this.averagePeriodLength = 5,
@@ -61,7 +70,21 @@ class CycleInfo {
     this.futurePredictions = const [],
     this.fertilityTracked = true,
     this.currentPeriodLength,
+    this.currentPeriodEnd,
   });
+
+  /// Dönem bugün mü kapatıldı?
+  ///
+  /// Kıyası burada yapıyoruz: aynı karşılaştırmayı her ekranda tekrarlamak,
+  /// birinin gün normalizasyonunu atlamasına açık kapı bırakırdı.
+  bool get periodEndedToday {
+    final end = currentPeriodEnd;
+    if (end == null) return false;
+    final now = DateTime.now();
+    return DateTime(end.year, end.month, end.day).isAtSameMomentAs(
+      DateTime(now.year, now.month, now.day),
+    );
+  }
 
   /// Bugünkü döngü gününü hesaplar.
   int? get currentCycleDay {

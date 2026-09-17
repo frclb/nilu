@@ -817,6 +817,7 @@
   "home_label_next_period": "Regl'e",
   "home_label_cycle": "Döngü",
   "home_headline_period_day": "{n}. gün",
+  "home_headline_period_finished": "{n} gün sürdü",
   "home_headline_days_left": "{n} gün var",
   "home_headline_period_today": "Bugün başlıyor",
   "home_headline_cycle_day": "Döngü günü {n}",

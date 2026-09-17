@@ -90,7 +90,15 @@ class CycleMasthead extends StatelessWidget {
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      _headline(context, phase, day, daysUntil, daysLate),
+                      _headline(
+                        context,
+                        phase,
+                        day,
+                        daysUntil,
+                        daysLate,
+                        finishedToday: info.periodEndedToday,
+                        periodLength: info.currentPeriodLength,
+                      ),
                       textAlign: TextAlign.center,
                       style: theme.textTheme.displayLarge?.copyWith(
                         fontSize: 34,
@@ -147,10 +155,22 @@ String _headline(
   CyclePhase phase,
   int? day,
   int? daysUntil,
-  int daysLate,
-) {
+  int daysLate, {
+  required bool finishedToday,
+  int? periodLength,
+}) {
   if (day == null) return context.tr('home_headline_no_data');
   if (phase == CyclePhase.menstruation) {
+    // "Reglim bitti" bugünü kayıttan silmiyor, son gün olarak işaretliyor;
+    // faz o yüzden hâlâ menstrüasyon. Ama sayfanın en büyük yazısı
+    // "3. gün" deyince kullanıcı hâlâ regl gününde olduğunu okuyor ve
+    // hemen altındaki "Reglin bugün bitti" ile çelişiyordu.
+    if (finishedToday) {
+      return context.tr(
+        'home_headline_period_finished',
+        params: {'n': '${periodLength ?? day}'},
+      );
+    }
     return context.tr('home_headline_period_day', params: {'n': '$day'});
   }
   // Gecikme kendi cümlesini hak ediyor. `daysUntil` sıfırın altına inmediği

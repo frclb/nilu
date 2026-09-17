@@ -817,6 +817,7 @@
   "home_label_next_period": "Next period",
   "home_label_cycle": "Cycle",
   "home_headline_period_day": "Day {n}",
+  "home_headline_period_finished": "Lasted {n} days",
   "home_headline_days_left": "in {n} days",
   "home_headline_period_today": "Starts today",
   "home_headline_cycle_day": "Cycle day {n}",

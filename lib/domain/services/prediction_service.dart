@@ -84,6 +84,7 @@ class PredictionService {
     // sorusu için. İkisini karıştırdığımızda takvimde regl kısaltılınca
     // başlık ile düğme farklı şey söylüyordu.
     final currentPeriodLength = _loggedLengthOf(logs, lastStart, today: today);
+    final currentPeriodEnd = _endOf(logs, lastStart);
 
     final nextPeriod = lastStart.add(Duration(days: effectiveCycleLength));
 
@@ -141,6 +142,7 @@ class PredictionService {
       fertileWindowEnd: fertileEnd,
       futurePredictions: futurePredictions,
       currentPeriodLength: currentPeriodLength,
+      currentPeriodEnd: currentPeriodEnd,
       fertilityTracked: tracksFertility,
     );
   }
@@ -170,6 +172,23 @@ class PredictionService {
       );
       if (logStart.isAtSameMomentAs(cleanStart)) {
         return log.recordedLength(today: today);
+      }
+    }
+    return null;
+  }
+
+  /// Bu döngüdeki dönemin kapatıldığı gün; devam ediyorsa null.
+  DateTime? _endOf(List<PeriodLog> logs, DateTime start) {
+    final cleanStart = DateTime(start.year, start.month, start.day);
+    for (final log in logs) {
+      final logStart = DateTime(
+        log.startDate.year,
+        log.startDate.month,
+        log.startDate.day,
+      );
+      if (logStart.isAtSameMomentAs(cleanStart)) {
+        final end = log.endDate;
+        return end == null ? null : DateTime(end.year, end.month, end.day);
       }
     }
     return null;
