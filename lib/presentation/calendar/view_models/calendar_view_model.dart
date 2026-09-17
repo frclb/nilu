@@ -167,6 +167,17 @@ class CalendarViewModel extends ChangeNotifier {
     return PeriodAction.start;
   }
 
+  /// Bugünkü kayıt bugün mü açıldı?
+  ///
+  /// Geri alma düğmesi yalnızca bunun doğru olduğu gün gösteriliyor: dün
+  /// başlamış bir dönemde "geri al" bugünü kayıttan çıkarırdı ve bu da
+  /// geri alma değil, veriyi bozmak olurdu.
+  bool get periodStartedToday {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return _periodLogs.any((log) => log.firstDay.isAtSameMomentAs(today));
+  }
+
   /// "Reglim başladı" — bugünden itibaren devam eden bir dönem açar.
   Future<bool> startPeriodToday() async {
     final now = DateTime.now();
