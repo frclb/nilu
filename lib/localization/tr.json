@@ -41,7 +41,7 @@
   "calendar_today_summary": "BUGÜNÜN ÖZETİ",
   "calendar_daily_suggestion": "Günlük Öneri",
   "log_title": "Kayıt Ekle",
-  "log_date_example": "Bugün, 24 Ekim",
+  "log_date_today": "Bugün, {day} {month}",
   "log_subtitle": "Vücudunu dinle ve nasıl hissettiğini kaydet.",
   "log_flow_intensity": "Akış Yoğunluğu",
   "log_flow_none": "Yok",

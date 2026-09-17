@@ -41,7 +41,7 @@
   "calendar_today_summary": "TODAY'S SUMMARY",
   "calendar_daily_suggestion": "Daily Suggestion",
   "log_title": "Add Log",
-  "log_date_example": "Today, Oct 24",
+  "log_date_today": "Today, {month} {day}",
   "log_subtitle": "Listen to your body and log how you feel.",
   "log_flow_intensity": "Flow Intensity",
   "log_flow_none": "None",

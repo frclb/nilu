@@ -41,7 +41,7 @@
   "calendar_today_summary": "RESUMO DE HOJE",
   "calendar_daily_suggestion": "Sugestão do dia",
   "log_title": "Adicionar registro",
-  "log_date_example": "Hoje, 24 de out.",
+  "log_date_today": "Hoje, {day} de {month}",
   "log_subtitle": "Ouça seu corpo e anote como você se sente.",
   "log_flow_intensity": "Intensidade do fluxo",
   "log_flow_none": "Nenhum",

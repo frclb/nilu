@@ -41,7 +41,7 @@
   "calendar_today_summary": "ZUSAMMENFASSUNG HEUTE",
   "calendar_daily_suggestion": "Tagesempfehlung",
   "log_title": "Eintrag hinzufügen",
-  "log_date_example": "Heute, 24. Okt.",
+  "log_date_today": "Heute, {day}. {month}",
   "log_subtitle": "Höre auf deinen Körper und halte fest, wie du dich fühlst.",
   "log_flow_intensity": "Blutungsstärke",
   "log_flow_none": "Keine",

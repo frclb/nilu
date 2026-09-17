@@ -41,7 +41,7 @@
   "calendar_today_summary": "RÉSUMÉ DU JOUR",
   "calendar_daily_suggestion": "Suggestion du jour",
   "log_title": "Ajouter une entrée",
-  "log_date_example": "Aujourd'hui, 24 oct.",
+  "log_date_today": "Aujourd'hui, {day} {month}",
   "log_subtitle": "Écoute ton corps et note comment tu te sens.",
   "log_flow_intensity": "Intensité du flux",
   "log_flow_none": "Aucun",
