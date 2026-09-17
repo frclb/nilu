@@ -1,5 +1,6 @@
 import '../models/daily_log.dart';
 import '../models/period_log.dart';
+import '../models/log_vocabulary.dart';
 import 'clinical_summary.dart';
 import 'cycle_alert.dart';
 import 'insights_service.dart';
@@ -86,6 +87,30 @@ class DataExportService {
       }
       if (clinical.painLimitedDays > 0) {
         line('export_clinical_limited', {'n': '${clinical.painLimitedDays}'});
+      }
+      // Ağrının yeri ve bağlamı. Muayenede sorulan ayrıntı bu; hekimin
+      // önünde kullanıcının kendi sayıları dursun.
+      if (clinical.painLocationDays.isNotEmpty) {
+        line('export_clinical_pain_where', {
+          'list': clinical.painLocationDays
+              .map(
+                (f) =>
+                    '${translate(LogVocabulary.painLocationKey(f.code))} '
+                    '(${f.dayCount})',
+              )
+              .join(', '),
+        });
+      }
+      if (clinical.painContextDays.isNotEmpty) {
+        line('export_clinical_pain_when', {
+          'list': clinical.painContextDays
+              .map(
+                (f) =>
+                    '${translate(LogVocabulary.painContextKey(f.code))} '
+                    '(${f.dayCount})',
+              )
+              .join(', '),
+        });
       }
       if (clinical.intermenstrualBleedingEpisodes > 0) {
         line('export_clinical_spotting', {

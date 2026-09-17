@@ -1,5 +1,6 @@
 import '../models/daily_log.dart';
 import '../models/period_log.dart';
+import '../models/log_vocabulary.dart';
 import 'cycle_alert.dart';
 import 'insights_service.dart';
 
@@ -45,6 +46,16 @@ class ClinicalSummary {
   /// Akışın "yoğun" işaretlendiği gün sayısı.
   final int heavyFlowDays;
 
+  /// Ağrının hangi bölgede kaç gün kaydedildiği (koda göre, azalan).
+  final List<SymptomFrequency> painLocationDays;
+
+  /// Ağrının hangi durumda kaç gün kaydedildiği (koda göre, azalan).
+  ///
+  /// İlişkide ağrı, ağrılı büyük abdest ve idrar yolu ağrısı NICE'ın
+  /// endometriozisten şüphelenmek için saydığı bulgular. Muayenede
+  /// sorulan şey tam olarak bu; kullanıcının elinde kendi sayısı olsun.
+  final List<SymptomFrequency> painContextDays;
+
   /// Regl dönemlerinin dışında kalan kanama atağı sayısı.
   ///
   /// Hekimin "regl aranda kanaman oluyor mu, kaç kez?" sorusunun cevabı.
@@ -66,6 +77,8 @@ class ClinicalSummary {
     required this.painLimitedDays,
     required this.heavyFlowDays,
     required this.intermenstrualBleedingEpisodes,
+    required this.painLocationDays,
+    required this.painContextDays,
     required this.topSymptoms,
     this.averageCycleDays,
     this.shortestCycleDays,
@@ -121,6 +134,14 @@ class ClinicalSummary {
       painLimitedDays: dailyLogs.where((l) => l.painLimitedActivity).length,
       heavyFlowDays: dailyLogs.where((l) => l.flowIntensity == 'heavy').length,
       intermenstrualBleedingEpisodes: bleedingEpisodes.length,
+      painLocationDays: _countCodes(
+        dailyLogs.map((l) => l.painLocations),
+        LogVocabulary.painLocations,
+      ),
+      painContextDays: _countCodes(
+        dailyLogs.map((l) => l.painContexts),
+        LogVocabulary.painContexts,
+      ),
       topSymptoms: InsightsService.symptomFrequencies(
         dailyLogs,
       ).take(3).toList(),
@@ -135,4 +156,41 @@ class ClinicalSummary {
       log.flowIntensity != null ||
       log.painLevel != null ||
       (log.notes?.isNotEmpty ?? false);
+
+  /// Kod listelerinden gün sayısı çıkarır; hiç kaydedilmemiş kodlar düşer.
+  ///
+  /// En çok kaydedilen önce; eşitlik [order] sırasıyla çözülüyor.
+  static List<SymptomFrequency> _countCodes(
+    Iterable<List<String>> entries,
+    List<String> order,
+  ) {
+    final counts = <String, int>{};
+    var total = 0;
+    for (final codes in entries) {
+      total++;
+      for (final code in codes.toSet()) {
+        counts[code] = (counts[code] ?? 0) + 1;
+      }
+    }
+
+    return order
+        .where(counts.containsKey)
+        .map(
+          (code) => SymptomFrequency(
+            code: code,
+            dayCount: counts[code]!,
+            loggedDayCount: total,
+          ),
+        )
+        .toList()
+      // Eşit sayıdaki kodlar sözlükteki sıraya göre çözülüyor. `List.sort`
+      // Dart'ta kararlı değil; eşitliği açıkça çözmezsek aynı veri iki
+      // farklı sırada çıkabilir ve dışa aktarım hekime gösterilirken
+      // güven kırar.
+      ..sort((a, b) {
+        final byCount = b.dayCount.compareTo(a.dayCount);
+        if (byCount != 0) return byCount;
+        return order.indexOf(a.code).compareTo(order.indexOf(b.code));
+      });
+  }
 }

@@ -84,6 +84,8 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
       sexualActivity: _currentLog.sexualActivity,
       painLevel: _currentLog.painLevel,
       painLimitedActivity: _currentLog.painLimitedActivity,
+      painLocations: _currentLog.painLocations,
+      painContexts: _currentLog.painContexts,
     );
     context.read<CalendarViewModel>().updateDailyLog(updatedLog);
   }
@@ -98,6 +100,8 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
     String? painLevel,
     bool clearPain = false,
     bool? painLimitedActivity,
+    List<String>? painLocations,
+    List<String>? painContexts,
     // Lekelenme anahtarı kapatılabilmeli; `flowIntensity: null` tek başına
     // "dokunma" anlamına geliyor.
     bool clearFlow = false,
@@ -115,9 +119,47 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
         painLevel: clearPain ? null : (painLevel ?? _currentLog.painLevel),
         painLimitedActivity:
             painLimitedActivity ?? _currentLog.painLimitedActivity,
+        // Ağrı kaldırılınca yer ve bağlam da düşüyor: "ağrım yok ama
+        // ilişkide ağrıyor" diye bir kayıt kalmamalı.
+        painLocations: clearPain
+            ? const []
+            : (painLocations ?? _currentLog.painLocations),
+        painContexts: clearPain
+            ? const []
+            : (painContexts ?? _currentLog.painContexts),
       );
     });
     _save(); // Auto-save
+  }
+
+  /// Çoklu seçim çip satırı.
+  ///
+  /// Ağrı yeri ve bağlamı aynı kalıbı paylaşıyor; ikisini ayrı ayrı
+  /// yazmak, listelerden birine seçenek eklenince diğerinin unutulmasına
+  /// açık kapı bırakırdı.
+  Widget _chips({
+    required List<String> codes,
+    required List<String> selected,
+    required String Function(String) labelKey,
+    required ValueChanged<List<String>> onChanged,
+  }) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: codes.map((code) {
+        final isSelected = selected.contains(code);
+        return FilterChip(
+          label: Text(context.tr(labelKey(code))),
+          selected: isSelected,
+          onSelected: (_) {
+            final next = List<String>.from(selected);
+            isSelected ? next.remove(code) : next.add(code);
+            onChanged(next);
+          },
+          selectedColor: Theme.of(context).colorScheme.primaryContainer,
+        );
+      }).toList(),
+    );
   }
 
   void _toggleSymptom(String symptom) {
@@ -384,6 +426,41 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                         context.tr('day_detail_pain_limited'),
                         style: theme.textTheme.bodyMedium,
                       ),
+                    ),
+
+                    // Ağrının yeri ve bağlamı. Şiddet tek başına örüntü
+                    // vermiyor; hekimi yönlendiren ayrıntı bunlar.
+                    const SizedBox(height: 12),
+                    Text(
+                      context.tr('log_pain_location'),
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    _chips(
+                      codes: LogVocabulary.painLocations,
+                      selected: _currentLog.painLocations,
+                      labelKey: LogVocabulary.painLocationKey,
+                      onChanged: (v) => _updateCurrentLog(painLocations: v),
+                    ),
+
+                    const SizedBox(height: 16),
+                    Text(
+                      context.tr('log_pain_when'),
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      context.tr('log_pain_when_hint'),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: context.tokens.textMuted,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _chips(
+                      codes: LogVocabulary.painContexts,
+                      selected: _currentLog.painContexts,
+                      labelKey: LogVocabulary.painContextKey,
+                      onChanged: (v) => _updateCurrentLog(painContexts: v),
                     ),
                   ],
 

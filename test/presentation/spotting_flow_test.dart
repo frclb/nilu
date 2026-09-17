@@ -14,6 +14,7 @@ import 'package:period_tracker/domain/models/log_vocabulary.dart';
 import 'package:period_tracker/localization/app_localizations.dart';
 import 'package:period_tracker/presentation/calendar/view_models/calendar_view_model.dart';
 import 'package:period_tracker/presentation/log_entry/log_entry_screen.dart';
+import 'package:period_tracker/presentation/log_entry/widgets/flow_intensity_section.dart';
 
 /// Lekelenme kaydetmek regl başlatmamalı.
 ///
@@ -66,8 +67,15 @@ void main() {
   }
 
   /// Akış kademesini seçip kaydeder.
+  ///
+  /// Arama akış bölümüne daraltılıyor: "Hafif" ve "Orta" hem akış
+  /// yoğunluğunun hem ağrı şiddetinin kademesi. Ekranın tamamında aramak
+  /// iki sonuç bulur ve yanlış çipe dokunma riski taşır.
   Future<void> pickFlowAndSave(WidgetTester tester, String code) async {
-    final option = find.text(dictionary[LogVocabulary.flowKey(code)] as String);
+    final option = find.descendant(
+      of: find.byType(FlowIntensitySection),
+      matching: find.text(dictionary[LogVocabulary.flowKey(code)] as String),
+    );
     expect(option, findsOneWidget, reason: '$code seçeneği ekranda yok');
 
     await tester.ensureVisible(option);

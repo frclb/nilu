@@ -7,6 +7,7 @@ import 'widgets/log_entry_header.dart';
 import 'widgets/flow_intensity_section.dart';
 import 'widgets/symptoms_section.dart';
 import 'widgets/mood_section.dart';
+import 'widgets/pain_section.dart';
 import 'widgets/notes_section.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../core/navigation/navigation_service.dart';
@@ -28,6 +29,7 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
   String? _flowIntensity;
   List<String> _symptoms = [];
   List<String> _moods = [];
+  PainEntry _pain = const PainEntry();
 
   @override
   void dispose() {
@@ -45,6 +47,10 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
       symptoms: _symptoms,
       moods: _moods,
       notes: _notesController.text.isNotEmpty ? _notesController.text : null,
+      painLevel: _pain.level,
+      painLimitedActivity: _pain.limitedActivity,
+      painLocations: _pain.locations,
+      painContexts: _pain.contexts,
     );
 
     await viewModel.updateDailyLog(log);
@@ -140,6 +146,14 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
                     initialSymptoms: _symptoms,
                     onChanged: (value) {
                       _symptoms = value;
+                    },
+                  ),
+                  _buildDivider(isDark, theme),
+                  // Ağrı, semptomlardan sonra: kullanıcı "kramp"ı
+                  // işaretledikten hemen sonra şiddetini soruyoruz.
+                  PainSection(
+                    onChanged: (value) {
+                      _pain = value;
                     },
                   ),
                   _buildDivider(isDark, theme),

@@ -80,6 +80,31 @@ class LogVocabulary {
   /// karşılaştırılabilir olmuyor.
   static const List<String> painLevels = ['mild', 'moderate', 'severe'];
 
+  /// Ağrının nerede hissedildiği.
+  ///
+  /// Şiddet tek başına bir örüntü vermiyor. Hekimin sorduğu ve tanıyı
+  /// yönlendiren şey ağrının **yeri**: her ay alt karnı ağrıyan biriyle
+  /// ağrısı bele ve bacaklara vuran biri aynı tabloda değil.
+  static const List<String> painLocations = [
+    'abdomen',
+    'lower_back',
+    'pelvis',
+    'legs',
+  ];
+
+  /// Ağrının hangi durumda ortaya çıktığı.
+  ///
+  /// Üçü de NICE NG73'ün endometriozisten şüphelenmek için saydığı
+  /// bulgular: ilişkide derin ağrı, ağrılı büyük abdest ve döngüyle
+  /// ilişkili idrar yolu ağrısı. Kullanıcı çoğu zaman bunların regliyle
+  /// bağlantılı olabileceğini bilmiyor, hekim de sormadıkça duymuyor —
+  /// tanının ortalama yıllarca gecikmesinin sebeplerinden biri bu.
+  static const List<String> painContexts = [
+    'intercourse',
+    'bowel',
+    'urination',
+  ];
+
   static const List<String> sexualActivities = [
     'none',
     'protected',
@@ -91,6 +116,8 @@ class LogVocabulary {
   static String symptomKey(String code) => 'log_symptom_$code';
 
   static String painLevelKey(String code) => 'log_pain_$code';
+  static String painLocationKey(String code) => 'log_pain_loc_$code';
+  static String painContextKey(String code) => 'log_pain_when_$code';
   static String moodKey(String code) => 'log_mood_$code';
   static String flowKey(String code) => 'log_flow_$code';
   static String sexualActivityKey(String code) => 'log_sex_$code';

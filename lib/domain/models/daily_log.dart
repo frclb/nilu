@@ -30,6 +30,17 @@ class DailyLog {
   /// belirtiyor.
   final bool painLimitedActivity;
 
+  /// Ağrının nerede hissedildiği (bkz. `LogVocabulary.painLocations`).
+  final List<String> painLocations;
+
+  /// Ağrının hangi durumda ortaya çıktığı (bkz.
+  /// `LogVocabulary.painContexts`).
+  ///
+  /// İlişkide ağrı, ağrılı büyük abdest ve idrar yolu ağrısı NICE'ın
+  /// endometriozisten şüphelenmek için saydığı bulgular. Şiddet alanı
+  /// bunların hiçbirini yakalamıyordu.
+  final List<String> painContexts;
+
   DailyLog({
     required this.date,
     this.symptoms = const [],
@@ -39,6 +50,8 @@ class DailyLog {
     this.sexualActivity,
     this.painLevel,
     this.painLimitedActivity = false,
+    this.painLocations = const [],
+    this.painContexts = const [],
   });
 
   Map<String, dynamic> toMap() {
@@ -51,6 +64,8 @@ class DailyLog {
       'sexualActivity': sexualActivity,
       'painLevel': painLevel,
       'painLimitedActivity': painLimitedActivity,
+      'painLocations': painLocations,
+      'painContexts': painContexts,
     };
   }
 
@@ -82,6 +97,14 @@ class DailyLog {
             ),
       // Eski kayıtlarda bu alan yok; varsayılan false.
       painLimitedActivity: map['painLimitedActivity'] as bool? ?? false,
+      painLocations: LogVocabulary.normalizeAll(
+        List<String>.from(map['painLocations'] ?? []),
+        LogVocabulary.painLocations,
+      ),
+      painContexts: LogVocabulary.normalizeAll(
+        List<String>.from(map['painContexts'] ?? []),
+        LogVocabulary.painContexts,
+      ),
       sexualActivity: rawSexualActivity == null
           ? null
           : LogVocabulary.normalize(
