@@ -186,14 +186,6 @@ class _NotificationSettingsScreenState
                           _settings.dailyLogs,
                           (val) => _update(_settings.copyWith(dailyLogs: val)),
                           Icons.edit_note,
-                          true,
-                        ),
-                        _buildSwitchTile(
-                          context.tr('notif_partner_updates'),
-                          _settings.partnerUpdates,
-                          (val) =>
-                              _update(_settings.copyWith(partnerUpdates: val)),
-                          Icons.group_outlined,
                           false,
                         ),
                       ],

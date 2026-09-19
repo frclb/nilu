@@ -122,26 +122,6 @@ class ProfileSettingsScreen extends StatelessWidget {
               if (!context.watch<UserViewModel>().isPartner)
                 const SizedBox(height: 24),
 
-              // Partner-Specific Settings (Only for Partner users)
-              if (context.watch<UserViewModel>().isPartner)
-                SettingsGroup(
-                  title: context.tr('profile_partner_settings'),
-                  items: [
-                    SettingsItem(
-                      title: context.tr('profile_notification_settings'),
-                      icon: Icons.notifications_active_outlined,
-                      iconColor: Theme.of(context).colorScheme.primary,
-                      iconBgColor: context.tokens.brandTint,
-                      onTap: () {
-                        context.pushNamed(
-                          RouteNames.partnerNotificationSettings,
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              if (context.watch<UserViewModel>().isPartner)
-                const SizedBox(height: 24),
 
               // Group 3: Security & Support
               SettingsGroup(

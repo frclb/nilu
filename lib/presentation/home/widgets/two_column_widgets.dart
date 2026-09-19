@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../core/navigation/navigation_service.dart';
 import '../../../core/navigation/route_names.dart';
+import '../../../domain/view_models/user_view_model.dart';
 import '../../calendar/view_models/calendar_view_model.dart';
 import '../../../domain/models/log_vocabulary.dart';
 import '../../../localization/relative_time.dart';
@@ -16,6 +17,16 @@ class TwoColumnWidgets extends StatelessWidget {
     final theme = Theme.of(context);
     final viewModel = context.watch<CalendarViewModel>();
     final lastLog = viewModel.getLastDailyLog();
+
+    // Kart eskiden koşulsuzdu: partner hiç bağlı değilken bile
+    // "Bilgilendirildi — hassas dönemde olduğunuzu biliyor" yazıyordu.
+    // Kullanıcıya, kimsenin bilmediği bir şeyi birinin bildiğini söylemek
+    // davranışını da değiştirebilir: "zaten biliyor" diye anlatmaktan
+    // vazgeçebilir. Üstelik döngü verisi partnere hiç gitmiyor; giden tek
+    // şey kullanıcının kendi seçip gönderdiği yakınlık durumu.
+    final hasPartner = context.select<UserViewModel, bool>(
+      (vm) => vm.hasPartner,
+    );
 
     // Son log bilgilerini belirle
     String lastLogDate = context.tr('home_today');
@@ -100,7 +111,9 @@ class TwoColumnWidgets extends StatelessWidget {
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
-                                Icons.person_add_alt_1,
+                                hasPartner
+                                    ? Icons.favorite
+                                    : Icons.person_add_alt_1,
                                 size: 16,
                                 color: theme.colorScheme.primary,
                               ),
@@ -119,7 +132,11 @@ class TwoColumnWidgets extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          context.tr('home_partner_notified'),
+                          context.tr(
+                            hasPartner
+                                ? 'home_partner_connected'
+                                : 'profile_partner_connect',
+                          ),
                           style: theme.textTheme.displayLarge?.copyWith(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
@@ -127,7 +144,11 @@ class TwoColumnWidgets extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          context.tr('home_partner_desc'),
+                          context.tr(
+                            hasPartner
+                                ? 'home_partner_connected_desc'
+                                : 'home_partner_connect_desc',
+                          ),
                           style: theme.textTheme.labelLarge?.copyWith(
                             fontSize: 10,
                             height: 1.3,

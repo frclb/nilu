@@ -158,7 +158,6 @@ void main() {
           periodReminders: false,
           fertileWindow: false,
           dailyLogs: true,
-          partnerUpdates: false,
         ),
       );
 
@@ -167,19 +166,5 @@ void main() {
       expect(s.dailyLogs, isTrue);
     });
 
-    test('partner ayarları gidiş-dönüşte korunur', () async {
-      await repo.savePartnerSettings(
-        const PartnerNotificationSettings(
-          ovulationEnabled: true,
-          periodStartValue: '3',
-          dailySupportValue: '1900',
-        ),
-      );
-
-      final s = await repo.getPartnerSettings();
-      expect(s.ovulationEnabled, isTrue);
-      expect(s.periodStartValue, '3');
-      expect(s.dailySupportValue, '1900');
-    });
   });
 }

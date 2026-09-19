@@ -15,66 +15,75 @@ void main() {
   group('ShareSettingsRepository', () {
     const repo = ShareSettingsRepository();
 
-    test('kayıt yokken varsayılanları döner', () async {
-      final settings = await repo.load();
-      expect(settings.phaseInfo, isTrue);
-      expect(settings.symptomDetails, isTrue);
-      expect(settings.mood, isFalse);
-      expect(settings.predictions, isTrue);
+    test('kayıt yokken varsayılan açık', () async {
+      expect((await repo.load()).intimacyStatus, isTrue);
     });
 
-    test('kaydedilen ayarlar geri okunur', () async {
-      // Kullanıcı semptom paylaşımını kapatıyor.
-      await repo.save(
-        const ShareSettings(
-          phaseInfo: true,
-          symptomDetails: false,
-          mood: true,
-          predictions: false,
-        ),
-      );
-
-      final loaded = await repo.load();
-      expect(
-        loaded.symptomDetails,
-        isFalse,
-        reason: 'kapatılan alan kapalı kalmalı',
-      );
-      expect(loaded.mood, isTrue);
-      expect(loaded.predictions, isFalse);
-    });
-
-    test('ekrandan çıkıp dönünce ayar korunur', () async {
+    test('kapatılan ayar kapalı kalır', () async {
       await repo.save(ShareSettings.none);
 
       // Yeni bir repository örneği = ekranın yeniden açılması.
       const freshRepo = ShareSettingsRepository();
       final loaded = await freshRepo.load();
 
+      expect(loaded.intimacyStatus, isFalse);
       expect(loaded.sharesAnything, isFalse);
     });
 
-    test('sharesAnything en az bir alan açıkken true olur', () {
-      expect(ShareSettings.none.sharesAnything, isFalse);
-      expect(
-        const ShareSettings(
-          phaseInfo: false,
-          symptomDetails: false,
-          mood: true,
-          predictions: false,
-        ).sharesAnything,
-        isTrue,
-      );
+    group('eski dört anahtardan göç', () {
+      // Eskiden faz/semptom/ruh hali/tahmin diye dört anahtar vardı ve
+      // hiçbiri tek başına bir şey kontrol etmiyordu; paylaşımı durduran
+      // şey dördünün birden kapalı olmasıydı. Yeni tek anahtar o toplamı
+      // devralıyor.
+
+      Future<bool> migrate(Map<String, Object> stored) async {
+        SharedPreferences.resetStatic();
+        SharedPreferences.setMockInitialValues(stored);
+        return (await const ShareSettingsRepository().load()).intimacyStatus;
+      }
+
+      test('dördü de kapalıysa kapalı kalıyor', () async {
+        // Asıl önemli hâl: paylaşımı bilerek durdurmuş kullanıcının
+        // ayarı sessizce geri açılmamalı.
+        expect(
+          await migrate({
+            ShareSettingsRepository.legacyPhaseInfoKey: false,
+            ShareSettingsRepository.legacySymptomDetailsKey: false,
+            ShareSettingsRepository.legacyMoodKey: false,
+            ShareSettingsRepository.legacyPredictionsKey: false,
+          }),
+          isFalse,
+        );
+      });
+
+      test('biri bile açıksa açık geliyor', () async {
+        expect(
+          await migrate({
+            ShareSettingsRepository.legacyPhaseInfoKey: false,
+            ShareSettingsRepository.legacySymptomDetailsKey: false,
+            ShareSettingsRepository.legacyMoodKey: true,
+            ShareSettingsRepository.legacyPredictionsKey: false,
+          }),
+          isTrue,
+        );
+      });
+
+      test('yeni anahtar varsa eskiler okunmuyor', () async {
+        expect(
+          await migrate({
+            ShareSettingsRepository.intimacyKey: false,
+            ShareSettingsRepository.legacyPhaseInfoKey: true,
+          }),
+          isFalse,
+        );
+      });
     });
 
-    test('copyWith yalnızca verilen alanı değiştirir', () {
-      const base = ShareSettings();
-      final next = base.copyWith(mood: true);
-
-      expect(next.mood, isTrue);
-      expect(next.phaseInfo, base.phaseInfo);
-      expect(next.symptomDetails, base.symptomDetails);
-      expect(next.predictions, base.predictions);
+    test('copyWith değeri değiştirir', () {
+      expect(
+        const ShareSettings().copyWith(intimacyStatus: false).sharesAnything,
+        isFalse,
+      );
     });
   });
 

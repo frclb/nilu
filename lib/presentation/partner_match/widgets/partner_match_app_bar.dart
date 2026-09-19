@@ -54,17 +54,6 @@ class PartnerMatchAppBar extends StatelessWidget
                 children: [
                   IconButton(
                     onPressed: () {
-                      context.pushNamed(RouteNames.partnerImportantDays);
-                    },
-                    icon: Icon(Icons.notifications_none, color: textColor),
-                    style: IconButton.styleFrom(
-                      hoverColor: isDark
-                          ? AppScrim.frost(26)
-                          : AppScrim.veil(13),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
                       context.pushNamed(RouteNames.partnerShareSettings);
                     },
                     icon: Icon(Icons.settings, color: textColor),

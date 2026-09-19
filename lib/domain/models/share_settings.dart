@@ -1,53 +1,36 @@
-/// Partnerle hangi verilerin paylaşılacağını belirleyen tercihler.
+/// Partnerle neyin paylaşılacağını belirleyen tercih.
 ///
-/// Bu bir **gizlilik kontrolüdür**: kullanıcı kapattığı bir alanın partnerine
-/// gitmediğinden emin olabilmelidir. Bu yüzden hem kalıcı olarak saklanır hem
-/// de paylaşım anında [IntimacyShareService] tarafından uygulanır.
+/// Eskiden dört ayrı anahtar vardı: faz bilgisi, semptom detayları, ruh
+/// hali ve tahminler. Hiçbiri bir şey kontrol etmiyordu — partnere giden
+/// tek veri yakınlık durumu (istek + sevgi ihtiyaçları) ve o da dördünden
+/// hiçbiri değil. Dördü birden kapatıldığında paylaşım tümden duruyordu,
+/// yani anahtarların **toplamı** çalışıyor ama etiketleri yanlış şeyi
+/// anlatıyordu.
+///
+/// Gizlilik ekranının kontrol etmediği bir şeyi kontrol ediyormuş gibi
+/// göstermesi, güvenli yönde bile olsa yanlış: "faz bilgisi paylaşılıyor"
+/// yazısını okuyan kullanıcı paylaştığını sanıyordu, "semptom detaylarını"
+/// kapatan da hiç başlamamış bir akışı durdurduğunu.
 class ShareSettings {
-  final bool phaseInfo;
-  final bool symptomDetails;
-  final bool mood;
-  final bool predictions;
+  /// Yakınlık durumu partnerle paylaşılsın mı?
+  ///
+  /// Uygulamanın partnere gönderdiği tek veri bu.
+  final bool intimacyStatus;
 
-  const ShareSettings({
-    this.phaseInfo = true,
-    this.symptomDetails = true,
-    this.mood = false,
-    this.predictions = true,
-  });
+  const ShareSettings({this.intimacyStatus = true});
 
   /// Hiçbir şeyin paylaşılmadığı ayar.
-  static const ShareSettings none = ShareSettings(
-    phaseInfo: false,
-    symptomDetails: false,
-    mood: false,
-    predictions: false,
-  );
+  static const ShareSettings none = ShareSettings(intimacyStatus: false);
 
-  bool get sharesAnything => phaseInfo || symptomDetails || mood || predictions;
+  bool get sharesAnything => intimacyStatus;
 
-  ShareSettings copyWith({
-    bool? phaseInfo,
-    bool? symptomDetails,
-    bool? mood,
-    bool? predictions,
-  }) {
-    return ShareSettings(
-      phaseInfo: phaseInfo ?? this.phaseInfo,
-      symptomDetails: symptomDetails ?? this.symptomDetails,
-      mood: mood ?? this.mood,
-      predictions: predictions ?? this.predictions,
-    );
-  }
+  ShareSettings copyWith({bool? intimacyStatus}) =>
+      ShareSettings(intimacyStatus: intimacyStatus ?? this.intimacyStatus);
 
   @override
   bool operator ==(Object other) =>
-      other is ShareSettings &&
-      other.phaseInfo == phaseInfo &&
-      other.symptomDetails == symptomDetails &&
-      other.mood == mood &&
-      other.predictions == predictions;
+      other is ShareSettings && other.intimacyStatus == intimacyStatus;
 
   @override
-  int get hashCode => Object.hash(phaseInfo, symptomDetails, mood, predictions);
+  int get hashCode => intimacyStatus.hashCode;
 }

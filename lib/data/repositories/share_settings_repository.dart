@@ -2,16 +2,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../domain/models/share_settings.dart';
 
-/// Partner paylaşım tercihlerini saklayan repository.
+/// Partner paylaşım tercihini saklayan repository.
 ///
 /// Bu ekrandaki anahtarlar eskiden yalnızca `setState` ile çalışıyordu:
-/// kullanıcı "Semptom Detayları"nı kapatıyor, ekrandan çıkınca ayar geri
-/// geliyordu ve veri paylaşılmaya devam ediyordu.
+/// kullanıcı kapatıyor, ekrandan çıkınca ayar geri geliyordu.
 class ShareSettingsRepository {
-  static const String phaseInfoKey = 'share_phase_info';
-  static const String symptomDetailsKey = 'share_symptom_details';
-  static const String moodKey = 'share_mood';
-  static const String predictionsKey = 'share_predictions';
+  static const String intimacyKey = 'share_intimacy_status';
+
+  /// Eski dört anahtar. Yalnızca göç için okunuyor.
+  static const String legacyPhaseInfoKey = 'share_phase_info';
+  static const String legacySymptomDetailsKey = 'share_symptom_details';
+  static const String legacyMoodKey = 'share_mood';
+  static const String legacyPredictionsKey = 'share_predictions';
 
   const ShareSettingsRepository();
 
@@ -19,20 +21,26 @@ class ShareSettingsRepository {
     final prefs = await SharedPreferences.getInstance();
     const defaults = ShareSettings();
 
-    return ShareSettings(
-      phaseInfo: prefs.getBool(phaseInfoKey) ?? defaults.phaseInfo,
-      symptomDetails:
-          prefs.getBool(symptomDetailsKey) ?? defaults.symptomDetails,
-      mood: prefs.getBool(moodKey) ?? defaults.mood,
-      predictions: prefs.getBool(predictionsKey) ?? defaults.predictions,
-    );
+    final stored = prefs.getBool(intimacyKey);
+    if (stored != null) return ShareSettings(intimacyStatus: stored);
+
+    // Göç: eski dört anahtarın **hiçbiri** tek başına bir şey kontrol
+    // etmiyordu; paylaşımı durduran şey dördünün birden kapalı olmasıydı.
+    // O yüzden yeni tek anahtar da o toplamı devralıyor — dördünü kapatmış
+    // bir kullanıcının paylaşımı sessizce geri açılmamalı.
+    final legacy = [
+      legacyPhaseInfoKey,
+      legacySymptomDetailsKey,
+      legacyMoodKey,
+      legacyPredictionsKey,
+    ].map(prefs.getBool).toList();
+
+    if (legacy.every((value) => value == null)) return defaults;
+    return ShareSettings(intimacyStatus: legacy.any((value) => value == true));
   }
 
   Future<void> save(ShareSettings settings) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(phaseInfoKey, settings.phaseInfo);
-    await prefs.setBool(symptomDetailsKey, settings.symptomDetails);
-    await prefs.setBool(moodKey, settings.mood);
-    await prefs.setBool(predictionsKey, settings.predictions);
+    await prefs.setBool(intimacyKey, settings.intimacyStatus);
   }
 }

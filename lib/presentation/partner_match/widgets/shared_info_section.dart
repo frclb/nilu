@@ -31,11 +31,18 @@ class SharedInfoSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
+        // Yalnızca gerçekten giden iki şey listeleniyor.
+        //
+        // Eskiden burada "Döngü Fazı — güncel döngü aşamanızı ve tahmini
+        // tarihleri görür" ve "Ruh Hali Özeti" yazıyordu. İkisi de partnere
+        // hiç gitmiyor. Kullanıcı bağlanma kararını tam bu ekranda veriyor;
+        // vermediği bir izni verdiğini sanarak vermesi, gizlilik açısından
+        // en kötü hâl.
         _buildInfoItem(
           context,
-          Icons.water_drop,
-          context.tr('partner_match_phase'),
-          context.tr('partner_match_phase_desc'),
+          Icons.favorite_border,
+          context.tr('partner_match_intimacy'),
+          context.tr('partner_match_intimacy_desc'),
           isDark,
           theme,
         ),
@@ -45,15 +52,6 @@ class SharedInfoSection extends StatelessWidget {
           Icons.lightbulb,
           context.tr('partner_match_tips'),
           context.tr('partner_match_tips_desc'),
-          isDark,
-          theme,
-        ),
-        const SizedBox(height: 12),
-        _buildInfoItem(
-          context,
-          Icons.sentiment_satisfied_alt,
-          context.tr('partner_match_mood'),
-          context.tr('partner_match_mood_desc'),
           isDark,
           theme,
         ),

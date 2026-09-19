@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
+import '../../../data/repositories/share_settings_repository.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
+import '../../../domain/models/share_settings.dart';
 import '../../../../localization/app_localizations.dart';
 
+/// Eşleşme ekranındaki gizlilik kontrolü.
+///
+/// Buradaki iki anahtar yalnızca `setState` ile çalışıyordu: hiçbir yere
+/// yazılmıyor, hiçbir şeyi etkilemiyorlardı. "Veri Paylaşımına İzin Ver"i
+/// kapatan kullanıcı paylaşımı durdurduğunu sanıyor ama hiçbir şeye
+/// dokunmuyordu — kontrol etmeyen bir gizlilik denetimi, olmayandan kötü.
+///
+/// Ana anahtar artık gerçek ayara bağlı. "Detaylı semptomları gizle"
+/// kaldırıldı: partnere semptom hiç gitmiyor, gizlenecek bir şey yok.
 class PrivacyControlSection extends StatefulWidget {
   const PrivacyControlSection({super.key});
 
@@ -11,15 +22,37 @@ class PrivacyControlSection extends StatefulWidget {
 }
 
 class _PrivacyControlSectionState extends State<PrivacyControlSection> {
-  bool _masterToggle = true;
-  bool _detailToggle = false;
+  static const _repository = ShareSettingsRepository();
+
+  ShareSettings _settings = const ShareSettings();
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final settings = await _repository.load();
+    if (!mounted) return;
+    setState(() {
+      _settings = settings;
+      _loaded = true;
+    });
+  }
+
+  Future<void> _update(bool value) async {
+    final next = _settings.copyWith(intimacyStatus: value);
+    setState(() => _settings = next);
+    await _repository.save(next);
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     final headerColor = context.tokens.text;
-    final dividerColor = context.tokens.surfaceAlt;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,56 +100,14 @@ class _PrivacyControlSectionState extends State<PrivacyControlSection> {
                   ),
                   const SizedBox(width: 16),
                   Switch(
-                    value: _masterToggle,
-                    onChanged: (val) {
-                      setState(() {
-                        _masterToggle = val;
-                      });
-                    },
+                    value: _settings.intimacyStatus,
+                    onChanged: _loaded ? _update : null,
                     activeThumbColor: context.tokens.surface,
                     activeTrackColor: theme.colorScheme.primary,
                   ),
                 ],
               ),
 
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child: Divider(color: dividerColor, height: 1),
-              ),
-
-              // Granular Toggle
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.visibility_off,
-                        size: 18,
-                        color: context.tokens.textFaint,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        context.tr('partner_match_hide_symptoms'),
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: context.tokens.textMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Switch(
-                    value: _detailToggle,
-                    onChanged: (val) {
-                      setState(() {
-                        _detailToggle = val;
-                      });
-                    },
-                    activeThumbColor: context.tokens.surface,
-                    activeTrackColor: theme.colorScheme.primary,
-                  ),
-                ],
-              ),
             ],
           ),
         ),

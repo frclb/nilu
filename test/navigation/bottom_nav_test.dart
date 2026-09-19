@@ -43,17 +43,21 @@ void main() {
   });
 
   group('partner modu', () {
-    test('dört sekme gösterilir', () {
-      expect(navDestinations(isPartner: true).length, 4);
+    test('üç sekme gösterilir', () {
+      expect(navDestinations(isPartner: true).length, 3);
     });
 
-    test('İçgörüler dalı atlanır', () {
-      // Partnerin cihazında gösterilecek kendi döngü verisi yok.
+    test('takvim ve İçgörüler dalları atlanır', () {
+      // Partnerin cihazında gösterilecek kendi döngü verisi yok, takip
+      // edilen kişininki de partnere hiç gitmiyor: paylaşım kanalı
+      // yalnızca yakınlık durumunu taşıyor. Takvim sekmesi bu yüzden
+      // sabit tarihler gösteren bir maket ekrana bağlıydı.
       final branches = navDestinations(
         isPartner: true,
       ).map((d) => d.branchIndex).toList();
 
-      expect(branches, [0, 1, 3, 4]);
+      expect(branches, [0, 3, 4]);
+      expect(branches, isNot(contains(1)));
       expect(branches, isNot(contains(2)));
     });
 

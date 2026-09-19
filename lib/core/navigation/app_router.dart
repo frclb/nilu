@@ -32,8 +32,6 @@ import '../../presentation/partner_match/partner_qr_gen_screen.dart';
 import '../../presentation/partner_match/partner_scan_screen.dart';
 import '../../presentation/partner_match/partner_support_screen.dart';
 import '../../presentation/partner_match/partner_share_settings_screen.dart';
-import '../../presentation/partner_match/partner_notification_settings_screen.dart';
-import '../../presentation/partner_match/partner_important_days_screen.dart';
 import '../../presentation/widgets_preview/widgets_preview_screen.dart';
 import '../../presentation/exercise/exercise_detail_screen.dart';
 import '../../presentation/recipe/recipe_detail_screen.dart';
@@ -195,12 +193,7 @@ GoRouter createAppRouter(
               GoRoute(
                 path: '/calendar',
                 name: RouteNames.calendar,
-                builder: (context, state) {
-                  final isPartner = context.watch<UserViewModel>().isPartner;
-                  return isPartner
-                      ? const PartnerImportantDaysScreen()
-                      : const CalendarScreen();
-                },
+                builder: (context, state) => const CalendarScreen(),
               ),
             ],
           ),
@@ -340,17 +333,7 @@ GoRouter createAppRouter(
         builder: (context, state) => const PartnerShareSettingsScreen(),
       ),
 
-      GoRoute(
-        path: '/partner_notification_settings',
-        name: RouteNames.partnerNotificationSettings,
-        builder: (context, state) => const PartnerNotificationSettingsScreen(),
-      ),
 
-      GoRoute(
-        path: '/partner_important_days',
-        name: RouteNames.partnerImportantDays,
-        builder: (context, state) => const PartnerImportantDaysScreen(),
-      ),
 
       GoRoute(
         path: '/personal_info',

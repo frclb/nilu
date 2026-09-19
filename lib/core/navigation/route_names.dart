@@ -23,9 +23,6 @@ class RouteNames {
   static const String partnerScan = 'partner_scan';
   static const String partnerSupport = 'partner_support';
   static const String partnerShareSettings = 'partner_share_settings';
-  static const String partnerNotificationSettings =
-      'partner_notification_settings';
-  static const String partnerImportantDays = 'partner_important_days';
   static const String widgetsPreview = 'widgets_preview';
   static const String exerciseDetail = 'exercise_detail';
   static const String recipeDetail = 'recipe_detail';

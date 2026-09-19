@@ -74,22 +74,19 @@ const List<NavDestination> _standardDestinations = [
   ),
 ];
 
-/// Partner modunda İçgörüler dalı (2) atlanır: partnerin cihazında
-/// gösterilecek kendi döngü verisi yok, takip edilen kişinin verisi ise
-/// yalnızca paylaşım ayarlarının izin verdiği kadarıyla ve partner
-/// ekranlarından görünür.
+/// Partner modunda takvim (1) ve İçgörüler (2) dalları atlanır.
+///
+/// Partnerin cihazında gösterilecek kendi döngü verisi yok. Takip edilen
+/// kişinin döngü verisi de partnere **hiç gitmiyor**: paylaşım kanalı
+/// yalnızca yakınlık durumunu taşıyor. Takvim sekmesi bu yüzden sabit
+/// tarihler gösteren bir maket ekrana bağlıydı — partnerin vücudu hakkında
+/// uydurma veri. Sekme, arkasında gerçek bir şey olmadığı için kaldırıldı.
 const List<NavDestination> _partnerDestinations = [
   NavDestination(
     branchIndex: 0,
     icon: Icons.favorite_border,
     activeIcon: Icons.favorite,
     labelKey: 'partner_nav_dashboard',
-  ),
-  NavDestination(
-    branchIndex: 1,
-    icon: Icons.calendar_month_outlined,
-    activeIcon: Icons.calendar_month,
-    labelKey: 'partner_nav_calendar',
   ),
   NavDestination(
     branchIndex: 3,

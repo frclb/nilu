@@ -442,9 +442,11 @@ void main() {
     testWidgets('partner sekmeleri gösterilir', (tester) async {
       await openAt(tester, tablets.last);
 
-      // Partner listesi İçgörüler dalını atlar: dört sekme.
+      // Partner listesi takvim ve İçgörüler dallarını atlar: üç sekme.
+      // Partnere giden döngü verisi yok; takvim sekmesi sabit tarihler
+      // gösteren bir maket ekrana bağlıydı ve kaldırıldı.
       expect(find.byType(SideNavRail), findsOneWidget);
-      expect(navDestinations(isPartner: true).length, 4);
+      expect(navDestinations(isPartner: true).length, 3);
     });
 
     testWidgets('partner panosu çarkta asılı kalmaz', (tester) async {
@@ -470,8 +472,7 @@ void main() {
       testWidgets('$device bütün partner sekmeleri', (tester) async {
         await openAt(tester, device);
 
-        // Partner listesi İçgörüler dalını atlıyor; hedefler oradan
-        // geliyor, burada ayrıca yazılmıyor.
+        // Hedefler listeden geliyor, burada ayrıca yazılmıyor.
         for (final destination in navDestinations(isPartner: true).skip(1)) {
           final tab = find.byIcon(destination.icon);
           expect(
@@ -543,9 +544,14 @@ void main() {
       expect(find.text(label('profile_notifications')), findsNothing);
       expect(find.text(label('health_sync_title')), findsNothing);
 
-      // Partnerin kendi bildirim ayarları duruyor.
-      expect(find.text(label('profile_notification_settings')), findsOneWidget);
-      // Herkese açık olanlar da duruyor.
+      // Partner bildirim ayarları da kaldırıldı: ekran yerele yazıyordu,
+      // hiçbir yere yüklenmiyordu ve gönderen bir taraf yoktu. Partnerin
+      // kurduğu hiçbir bildirim ulaşamazdı.
+      expect(
+        find.text(label('profile_notification_settings')),
+        findsNothing,
+      );
+      // Herkese açık olanlar duruyor.
       expect(find.text(label('appearance_title')), findsOneWidget);
     });
   });
