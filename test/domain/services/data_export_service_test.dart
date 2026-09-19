@@ -62,7 +62,13 @@ void main() {
       );
 
       expect(csv, contains('"yorgun, bitkin"'));
-      expect(csv.split('\n')[1].split('","').length, 7);
+      // Sütun sayısı başlıktan türetiliyor: sabit yazılsaydı her yeni
+      // sütunda bu test, asıl sınadığı şeyle ilgisiz bir sebepten
+      // düşerdi.
+      expect(
+        csv.split('\n')[1].split('","').length,
+        csv.split('\n').first.split(',').length,
+      );
     });
 
     test('nottaki tırnak ikilenir', () {

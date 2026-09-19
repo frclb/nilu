@@ -158,7 +158,7 @@ class DataExportService {
     buffer.writeln();
 
     // ── Kayıtlı günler ──
-    final logged = dailyLogs.where(_hasContent).toList()
+    final logged = dailyLogs.where((l) => l.hasContent).toList()
       ..sort((a, b) => b.date.compareTo(a.date));
 
     buffer.writeln(translate('export_section_logs'));
@@ -189,10 +189,36 @@ class DataExportService {
             '${translate('log_pain_$pain')}$limited',
           );
         }
+        // Ağrının yeri ve bağlamı: muayenede sorulan ayrıntı bu. Toplu
+        // sayıları yukarıdaki özette duruyor ama hekim çoğu zaman "hangi
+        // günlerde" diye soruyor.
+        // Klinik bölümdeki etiketlerin aynısı: belgenin iki yerinde aynı
+        // sözcükler geçsin. Ekrandaki "Ağrı nerede?" bir soru; belgede
+        // etiket gerekiyor.
+        if (log.painLocations.isNotEmpty) {
+          buffer.writeln(
+            '    ${translate('export_clinical_pain_where', params: {'list': log.painLocations.map((c) => translate('log_pain_loc_$c')).join(', ')})}',
+          );
+        }
+        if (log.painContexts.isNotEmpty) {
+          buffer.writeln(
+            '    ${translate('export_clinical_pain_when', params: {'list': log.painContexts.map((c) => translate('log_pain_when_$c')).join(', ')})}',
+          );
+        }
         if (log.moods.isNotEmpty) {
           buffer.writeln(
             '    ${translate('log_mood')}: '
             '${log.moods.map((m) => translate('log_mood_$m')).join(', ')}',
+          );
+        }
+        // Cinsel aktivite `hasContent` içinde sayılıyordu ama yazılmıyordu:
+        // yalnızca onu girmiş bir gün, belgede altı boş bir tarih olarak
+        // duruyordu.
+        final activity = log.sexualActivity;
+        if (activity != null) {
+          buffer.writeln(
+            '    ${translate('day_detail_sexual_activity')}: '
+            '${translate(LogVocabulary.sexualActivityKey(activity))}',
           );
         }
         final notes = log.notes;
@@ -231,11 +257,15 @@ class DataExportService {
       }
     }
 
+    // Ağrı sütunları akışın hemen ardında: tabloyu açan kişi kanama ve
+    // ağrıyı yan yana okuyor. Eskiden ağrı boyutu CSV'de hiç yoktu —
+    // klinik özetin üzerine kurulduğu veri, tablodan tamamen eksikti.
     final rows = <String>[
-      'date,is_period,flow,symptoms,moods,sexual_activity,notes',
+      'date,is_period,flow,pain,pain_limited,pain_locations,pain_contexts,'
+          'symptoms,moods,sexual_activity,notes',
     ];
 
-    final logged = dailyLogs.where(_hasContent).toList()
+    final logged = dailyLogs.where((l) => l.hasContent).toList()
       ..sort((a, b) => a.date.compareTo(b.date));
 
     for (final log in logged) {
@@ -245,6 +275,10 @@ class DataExportService {
           date,
           periodDays.contains(date) ? 'yes' : 'no',
           log.flowIntensity ?? '',
+          log.painLevel ?? '',
+          log.painLevel == null ? '' : (log.painLimitedActivity ? 'yes' : 'no'),
+          log.painLocations.join('; '),
+          log.painContexts.join('; '),
           log.symptoms.join('; '),
           log.moods.join('; '),
           log.sexualActivity ?? '',
@@ -260,13 +294,6 @@ class DataExportService {
     final escaped = value.replaceAll('"', '""');
     return '"$escaped"';
   }
-
-  static bool _hasContent(DailyLog log) =>
-      log.symptoms.isNotEmpty ||
-      log.moods.isNotEmpty ||
-      log.flowIntensity != null ||
-      log.sexualActivity != null ||
-      (log.notes != null && log.notes!.isNotEmpty);
 
   static DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 

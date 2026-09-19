@@ -111,7 +111,7 @@ class ClinicalSummary {
         periodLogs.map((l) => l.completedLength).whereType<int>().toList()
           ..sort();
 
-    final withContent = dailyLogs.where(_hasContent).toList()
+    final withContent = dailyLogs.where((l) => l.hasContent).toList()
       ..sort((a, b) => a.date.compareTo(b.date));
 
     return ClinicalSummary(
@@ -150,12 +150,6 @@ class ClinicalSummary {
     );
   }
 
-  static bool _hasContent(DailyLog log) =>
-      log.symptoms.isNotEmpty ||
-      log.moods.isNotEmpty ||
-      log.flowIntensity != null ||
-      log.painLevel != null ||
-      (log.notes?.isNotEmpty ?? false);
 
   /// Kod listelerinden gün sayısı çıkarır; hiç kaydedilmemiş kodlar düşer.
   ///

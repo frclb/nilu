@@ -54,6 +54,24 @@ class DailyLog {
     this.painContexts = const [],
   });
 
+  /// Bu günde kullanıcının girdiği bir şey var mı?
+  ///
+  /// Tek kaynak: dışa aktarma ile klinik özet bunu ayrı ayrı tanımlıyordu
+  /// ve tanımlar ayrışmıştı. Özet ağrıyı sayıyor, dışa aktarma saymıyordu;
+  /// sonuç, "şu tarihten şu tarihe kayıt var" deyip o günleri listelemeyen
+  /// bir belgeydi. Üstelik yalnızca ağrı girilmiş bir gün — klinik olarak
+  /// en ağır kayıt — hekime giden belgeden tamamen düşüyordu.
+  bool get hasContent =>
+      symptoms.isNotEmpty ||
+      moods.isNotEmpty ||
+      flowIntensity != null ||
+      sexualActivity != null ||
+      painLevel != null ||
+      painLimitedActivity ||
+      painLocations.isNotEmpty ||
+      painContexts.isNotEmpty ||
+      (notes?.isNotEmpty ?? false);
+
   Map<String, dynamic> toMap() {
     return {
       'date': date.toIso8601String(),
