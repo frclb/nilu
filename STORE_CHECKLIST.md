@@ -70,7 +70,8 @@ için de geçerli.
 ## 3. Görseller
 
 **App ikonu** ✅ — marka lotusu üretildi ve tüm iOS boyutlarına uygulandı
-(21 boyut, 1024 alfasız).
+(21 boyut, 1024 alfasız). Renkleri paletten geliyor; `icon_palette_test.dart`
+hem betiği palete hem de üretilmiş PNG'yi betiğe bağlıyor.
 
 İkonu değiştirmek isterseniz:
 ```bash
@@ -250,7 +251,7 @@ SDK'lara istek gitmiyor: RevenueCat anahtarsızken çağrı yapılsa süreç
 ```bash
 flutter analyze --fatal-infos && flutter test && dart run tool/check_localization.dart
 ```
-971 test geçiyor.
+975 test geçiyor.
 
 **Derleme:**
 ```bash

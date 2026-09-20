@@ -21,20 +21,21 @@ SIZE = 1024
 SS = 4  # supersampling — kenarları yumuşatmak için 4x çizip küçültüyoruz
 C = SIZE * SS
 
-# DİKKAT: bu tonlar paletten ÖNCEKİ markadan kalma. `123301b` ("Tasarım
-# sistemini yeniden kur: sıcak erik paleti") marka rengini #551B26'dan
-# plum700'e (#6B2F55) taşıdı ama bu betiğe ve üretilmiş PNG'lere hiç
-# dokunmadı. Yani ana ekrandaki ikon, uygulamanın bugünkü eriğinden biraz
-# farklı bir erik.
+# Hepsi `lib/design_system/app_palette.dart` sabitleri; `icon_palette_test.dart`
+# ikisini karşılaştırıyor.
 #
-# Düzeltmek ikonun görünüşünü değiştirir, o yüzden kendiliğinden yapılmadı.
-# Palete hizalamak için: BG_TOP/BG_BOTTOM'ı plum700'ün ton aralığına,
-# PETAL'ı plum300'e (#C79BB4) çekip
-#     python3 tool/generate_icon.py && dart run flutter_launcher_icons
-BG_TOP = (107, 34, 49)      # #6B2231
-BG_BOTTOM = (46, 13, 21)    # #2E0D15
-PETAL = (251, 207, 232)     # #FBCFE8
-PETAL_SIDE = (226, 166, 194)  # yan yapraklar için biraz koyu ton
+# Eskiden buradaki tonlar paletten ÖNCEKİ markadan kalmaydı: `123301b`
+# ("Tasarım sistemini yeniden kur: sıcak erik paleti") marka rengini
+# #551B26'dan plum700'e taşıdı ama bu betiğe hiç dokunmadı, ikon yıllarca
+# uygulamanınkinden başka bir erikte kaldı.
+#
+# Merkez yaprak bir basamak açıldı (rose200 -> rose50): yeni zemin eskisinden
+# açık olduğu için yaprakların ayrımı 38px'te kayboluyordu. Yan yaprak paletin
+# eski tona en yakın sabiti.
+BG_TOP = (0x6B, 0x2F, 0x55)     # plum700 — birincil marka
+BG_BOTTOM = (0x3E, 0x1B, 0x33)  # plum900 — degradenin dibi
+PETAL = (0xFB, 0xEE, 0xF1)      # rose50  — merkez yaprak
+PETAL_SIDE = (0xC7, 0x9B, 0xB4)  # plum300 — geri çekilen yan yapraklar
 
 
 def build():
