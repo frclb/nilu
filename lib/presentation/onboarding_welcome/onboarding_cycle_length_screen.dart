@@ -9,6 +9,8 @@ import '../../data/repositories/period_repository.dart';
 import '../../domain/services/period_service.dart';
 import '../../presentation/calendar/view_models/calendar_view_model.dart';
 import '../../localization/app_localizations.dart';
+import 'onboarding_period_length_screen.dart';
+import 'onboarding_progress.dart';
 import '../../design_system/app_layout.dart';
 
 class OnboardingCycleLengthScreen extends StatefulWidget {
@@ -34,16 +36,24 @@ class _OnboardingCycleLengthScreenState
   Future<void> _completeOnboarding() async {
     final cycleSettingsRepo = CycleSettingsRepository();
     final periodRepo = PeriodRepository();
-    const int defaultPeriodLength = 5;
+    final prefs = await SharedPreferences.getInstance();
+
+    // Regl süresi artık soruluyor. Önceden burada sabit 5 yazıyordu ve bu
+    // sayı hem kaydın açık mı kapalı mı kurulacağına karar veriyor hem de
+    // `completedLength` üzerinden ortalama regl süresi hesabına giriyordu:
+    // kullanıcının söylemediği bir değer kendi verisiymiş gibi geri
+    // okunuyordu. Soru atlanırsa yine varsayılana düşülüyor.
+    final periodLength =
+        prefs.getInt(OnboardingPeriodLengthScreen.prefsKey) ??
+        OnboardingPeriodLengthScreen.defaultDays;
 
     // 1. Döngü ayarlarını kaydet (ilk kurulum)
     await cycleSettingsRepo.saveInitialSettings(
       cycleLength: _selectedDays,
-      periodLength: defaultPeriodLength,
+      periodLength: periodLength,
     );
 
     // 2. Onboarding'de seçilen son regl tarihini oku
-    final prefs = await SharedPreferences.getInstance();
     final lastPeriodDateStr = prefs.getString('onboarding_last_period_date');
 
     if (lastPeriodDateStr != null) {
@@ -59,7 +69,7 @@ class _OnboardingCycleLengthScreenState
         // kuralı takvimdeki gün işaretlemeyle aynı olmak zorunda.
         final periodLog = PeriodService().recordFromStart(
           startDate,
-          expectedLength: defaultPeriodLength,
+          expectedLength: periodLength,
         );
         await periodRepo.savePeriodLogs([periodLog]);
       }
@@ -67,6 +77,7 @@ class _OnboardingCycleLengthScreenState
       // Geçici veriyi temizle
       await prefs.remove('onboarding_last_period_date');
     }
+    await prefs.remove(OnboardingPeriodLengthScreen.prefsKey);
 
     if (!mounted) return;
 
@@ -157,8 +168,8 @@ class _OnboardingCycleLengthScreenState
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(6, (index) {
-                    final isActive = index == 5; // 6th dot is active
+                  children: List.generate(onboardingStepCount, (index) {
+                    final isActive = index == 6;
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 6),
                       width: isActive ? 24 : 10,
@@ -168,7 +179,7 @@ class _OnboardingCycleLengthScreenState
                         color: isActive
                             ? (Theme.of(context).colorScheme.primary)
                             : primaryColor.withAlpha(
-                                (isDark ? 0.4 : 0.2 * 255).toInt(),
+                                onboardingIdleDotAlpha(isDark),
                               ),
                       ),
                     );
@@ -219,7 +230,7 @@ class _OnboardingCycleLengthScreenState
                               height: 64,
                               decoration: BoxDecoration(
                                 color: primaryColor.withAlpha(
-                                  (isDark ? 0.2 : 0.1 * 255).toInt(),
+                                  onboardingHighlightAlpha(isDark),
                                 ),
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.symmetric(
@@ -263,7 +274,12 @@ class _OnboardingCycleLengthScreenState
                                             ? primaryColor
                                             : textSecondaryColor.withAlpha(127),
                                       ),
-                                      child: Text('${index + 21} Gün'),
+                                      child: Text(
+                                        context.tr(
+                                          'onb_days_count',
+                                          params: {'n': '${index + 21}'},
+                                        ),
+                                      ),
                                     ),
                                   );
                                 },

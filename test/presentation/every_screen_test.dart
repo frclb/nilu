@@ -31,6 +31,7 @@ import 'package:period_tracker/presentation/profile/notification_settings_screen
 import 'package:period_tracker/presentation/profile/personal_info_screen.dart';
 import 'package:period_tracker/presentation/profile/privacy_security_screen.dart';
 import 'package:period_tracker/presentation/widgets_preview/widgets_preview_screen.dart';
+import 'package:period_tracker/presentation/onboarding_welcome/onboarding_period_length_screen.dart';
 
 /// Her ekran çiziliyor mu?
 ///
@@ -93,6 +94,7 @@ void main() {
     'heavy_bleeding': const HeavyBleedingScreen(),
     'partner_support': const PartnerSupportScreen(),
     'widgets_preview': const WidgetsPreviewScreen(),
+    'onboarding_period_length': const OnboardingPeriodLengthScreen(),
   };
 
   for (final entry in screens.entries) {

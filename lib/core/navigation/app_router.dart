@@ -12,6 +12,7 @@ import '../../presentation/partner_match/partner_dashboard_screen.dart';
 import '../../presentation/splash/splash_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_welcome_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_last_period_screen.dart';
+import '../../presentation/onboarding_welcome/onboarding_period_length_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_cycle_length_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_success_screen.dart';
 import '../../presentation/home/home_screen.dart';
@@ -48,6 +49,7 @@ const Set<String> preOnboardingPaths = {
   '/splash',
   '/onboarding',
   '/onboarding_last_period',
+  '/onboarding_period_length',
   '/onboarding_cycle_length',
   '/onboarding_success',
   '/partner_scan',
@@ -152,6 +154,11 @@ GoRouter createAppRouter(
         path: '/onboarding_last_period',
         name: RouteNames.onboardingLastPeriod,
         builder: (context, state) => const OnboardingLastPeriodScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding_period_length',
+        name: RouteNames.onboardingPeriodLength,
+        builder: (context, state) => const OnboardingPeriodLengthScreen(),
       ),
       GoRoute(
         path: '/onboarding_cycle_length',

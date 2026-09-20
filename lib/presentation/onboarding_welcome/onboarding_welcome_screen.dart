@@ -5,6 +5,7 @@ import '../../../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
 import 'package:go_router/go_router.dart';
 import '../../design_system/app_layout.dart';
+import 'onboarding_progress.dart';
 
 class OnboardingWelcomeScreen extends StatefulWidget {
   const OnboardingWelcomeScreen({super.key});
@@ -233,7 +234,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                                   color: isActive
                                       ? theme.colorScheme.primary
                                       : theme.colorScheme.primary.withAlpha(
-                                          (isDark ? 0.4 : 0.2 * 255).toInt(),
+                                          onboardingIdleDotAlpha(isDark),
                                         ),
                                 ),
                               );

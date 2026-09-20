@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/navigation/route_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../localization/app_localizations.dart';
+import 'onboarding_progress.dart';
 import '../../localization/date_names.dart';
 import '../../design_system/app_layout.dart';
 
@@ -85,7 +86,7 @@ class _OnboardingLastPeriodScreenState
               );
 
               if (context.mounted) {
-                context.goNamed(RouteNames.onboardingCycleLength);
+                context.goNamed(RouteNames.onboardingPeriodLength);
               }
             },
             style: ElevatedButton.styleFrom(
@@ -139,8 +140,8 @@ class _OnboardingLastPeriodScreenState
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(6, (index) {
-                    final isActive = index == 4; // 5th dot is active
+                  children: List.generate(onboardingStepCount, (index) {
+                    final isActive = index == 4;
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 6),
                       width: isActive ? 24 : 10,
@@ -150,7 +151,7 @@ class _OnboardingLastPeriodScreenState
                         color: isActive
                             ? (Theme.of(context).colorScheme.primary)
                             : primaryColor.withAlpha(
-                                (isDark ? 0.4 : 0.2 * 255).toInt(),
+                                onboardingIdleDotAlpha(isDark),
                               ),
                       ),
                     );
