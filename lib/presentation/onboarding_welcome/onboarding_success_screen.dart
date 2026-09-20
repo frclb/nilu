@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/app_info.dart';
 import '../../design_system/app_scrim.dart';
 import '../../design_system/app_tokens.dart';
-import '../../design_system/content_illustration.dart';
+import '../../design_system/brand_lotus.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../localization/app_localizations.dart';
@@ -152,11 +152,18 @@ class OnboardingSuccessScreen extends StatelessWidget {
                                               ),
                                             ),
                                           ),
-                                          // Karşılama illüstrasyonu uygulama içinde çiziliyor: onboarding'in
-                                          // son adımı ağ bağlantısına bağlı olmamalı.
-                                          const ContentIllustration(
-                                            seed: 'onboarding_success',
-                                            icon: Icons.local_florist,
+                                          // Onboarding markanın lotusuyla
+                                          // açılıyor; aynı çiçekle kapanmalı.
+                                          // Burada `Icons.local_florist`
+                                          // vardı — Material'in genel çiçeği,
+                                          // markanınkinden başka bir şekil.
+                                          Center(
+                                            child: FractionallySizedBox(
+                                              widthFactor: 0.42,
+                                              child: BrandLotus(
+                                                color: primaryColor,
+                                              ),
+                                            ),
                                           ),
                                         ],
                                       ),

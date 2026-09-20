@@ -251,7 +251,7 @@ SDK'lara istek gitmiyor: RevenueCat anahtarsızken çağrı yapılsa süreç
 ```bash
 flutter analyze --fatal-infos && flutter test && dart run tool/check_localization.dart
 ```
-1009 test geçiyor.
+1010 test geçiyor.
 
 **Derleme:**
 ```bash

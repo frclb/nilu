@@ -33,12 +33,23 @@ class BrandLotus extends StatelessWidget {
   final double sideOpacity;
 
   @override
-  Widget build(BuildContext context) => CustomPaint(
-    painter: _LotusPainter(
-      color: color,
-      sideColor: sideColor ?? color.withValues(alpha: sideOpacity),
-    ),
-  );
+  Widget build(BuildContext context) {
+    final bounds = _lotusBounds();
+    // `CustomPaint`'in doğal boyutu yok: yalnızca genişliği sınırlı bir yere
+    // konduğunda sıfır yükseklikle çizilip **görünmez** oluyordu (başarı
+    // ekranında tam bu oldu, dairenin içi boş kaldı). `AspectRatio` çiçeğin
+    // kendi oranını veriyor, böylece tek boyut yetiyor.
+    return AspectRatio(
+      aspectRatio: bounds.width / bounds.height,
+      child: CustomPaint(
+        size: Size.infinite,
+        painter: _LotusPainter(
+          color: color,
+          sideColor: sideColor ?? color.withValues(alpha: sideOpacity),
+        ),
+      ),
+    );
+  }
 }
 
 /// Yaprağın kontrol noktaları (matematik koordinatları: taban orijinde,

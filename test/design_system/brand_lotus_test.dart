@@ -22,6 +22,46 @@ void main() {
   const reference =
       'ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png';
 
+  testWidgets('yalnızca genişlik verildiğinde de çiziliyor', (tester) async {
+    // `CustomPaint`'in doğal boyutu yok. Çiçek yalnızca genişliği sınırlı bir
+    // yere konduğunda sıfır yükseklikte çizilip görünmez oluyordu — onboarding
+    // başarı ekranında dairenin içi bomboş kaldı ve hiçbir hata çıkmadı.
+    final key = GlobalKey();
+    await tester.pumpWidget(
+      Center(
+        child: RepaintBoundary(
+          key: key,
+          child: const SizedBox(
+            width: 200,
+            // Yükseklik bilerek verilmiyor: kritik durum bu.
+            child: BrandLotus(color: Color(0xFF000000)),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    late int painted;
+    late Size size;
+    await tester.runAsync(() async {
+      final boundary =
+          key.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      size = boundary.size;
+      final image = await boundary.toImage(pixelRatio: 1);
+      final data = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+      final bytes = data!.buffer.asUint8List();
+      painted = 0;
+      for (var i = 3; i < bytes.length; i += 4) {
+        if (bytes[i] > 40) painted++;
+      }
+    });
+
+    expect(size.height, greaterThan(0),
+        reason: 'Çiçek yüksekliksiz kaldı: kutusuna sığmıyor.');
+    expect(painted, greaterThan(1000),
+        reason: 'Çiçek hiç çizilmedi ($painted piksel).');
+  });
+
   testWidgets('Dart çizimi üretilmiş görselle örtüşüyor', (tester) async {
     final key = GlobalKey();
 
