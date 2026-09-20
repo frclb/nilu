@@ -1,5 +1,9 @@
-# Launch Screen Assets
+# Açılış ekranı görselleri
 
-You can customize the launch screen with your own desired assets by replacing the image files in this directory.
+Bu klasördeki PNG'ler ve `Contents.json` **üretiliyor** — elle düzenlemeyin:
 
-You can also do it by opening your Flutter project's Xcode project with `open ios/Runner.xcworkspace`, selecting `Runner/Assets.xcassets` in the Project Navigator and dropping in the desired images.
+    python3 tool/generate_launch_image.py
+
+Lotusun şekli `tool/lotus.py` içinde, uygulama ikonuyla ortak. Renkler
+`lib/design_system/app_palette.dart` ile aynı olmak zorunda;
+`test/launch_screen_test.dart` ikisini karşılaştırıyor.

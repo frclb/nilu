@@ -83,6 +83,22 @@ Kendi tasarımınızı kullanacaksanız `assets/icon/app_icon.png` dosyasını
 > `android/` yokken komut AndroidManifest.xml arayıp çöküyor ve iOS
 > ikonlarına hiç sıra gelmiyordu.
 
+**Açılış ekranı** ✅ — marka lotusu, uygulamanın kendi zemini üzerinde.
+
+```bash
+python3 tool/generate_launch_image.py
+```
+
+> Flutter'ın şablonu iki yer tutucu bırakmıştı: görsel 1×1 saydam bir PNG'ydi
+> (Xcode her derlemede *"Launch image is set to the default placeholder icon"*
+> diye uyarıyordu) ve zemin storyboard'a **sabit beyaz** yazılmıştı — karanlık
+> modda uygulama önce beyaz patlayıp sonra koyuya geçiyordu. Zemin artık
+> varlık kataloğundan geliyor ve açık/koyu varyantları var.
+>
+> Lotusun şekli `tool/lotus.py` içinde, ikonla ortak. Renkler paletle aynı
+> olmak zorunda; `test/design_system/launch_screen_test.dart` ikisini
+> karşılaştırıyor.
+
 **Ekran görüntüleri** ⬜ — App Store Connect formunda sizden isteniyor.
 
 Uygulama hem iPhone hem iPad'i hedefliyor, dolayısıyla App Store Connect
@@ -234,7 +250,7 @@ SDK'lara istek gitmiyor: RevenueCat anahtarsızken çağrı yapılsa süreç
 ```bash
 flutter analyze --fatal-infos && flutter test && dart run tool/check_localization.dart
 ```
-966 test geçiyor.
+971 test geçiyor.
 
 **Derleme:**
 ```bash
