@@ -14,12 +14,10 @@ void main() {
   const languages = ['tr', 'en', 'de', 'es', 'fr', 'pt'];
 
   /// Ekranda çizilen bölüm sayısı.
-  final sectionCount = int.parse(
+  int sectionCount(String screen) => int.parse(
     RegExp(r'_sectionCount = (\d+)')
         .firstMatch(
-          File(
-            'lib/presentation/legal/privacy_policy_screen.dart',
-          ).readAsStringSync(),
+          File('lib/presentation/legal/$screen.dart').readAsStringSync(),
         )!
         .group(1)!,
   );
@@ -28,23 +26,32 @@ void main() {
       jsonDecode(File('lib/localization/$lang.json').readAsStringSync())
           as Map<String, dynamic>;
 
+  /// Hukuki ekranlar: dosya adı → anahtar öneki.
+  const screens = {
+    'privacy_policy_screen': 'privacy_policy_section',
+    'terms_of_service_screen': 'terms_section',
+  };
+
   group('ekran ile sözlük uyuşuyor', () {
     test('çizilen her bölümün metni var', () {
       // Ekran döngüyle çiziyor: eksik bir anahtar, kullanıcıya bölüm
       // başlığı yerine çıplak anahtar adı gösterirdi.
-      for (final lang in languages) {
-        final keys = dictionary(lang).keys;
-        for (var i = 1; i <= sectionCount; i++) {
-          expect(
-            keys,
-            contains('privacy_policy_section${i}_title'),
-            reason: '$lang: $i. bölümün başlığı yok',
-          );
-          expect(
-            keys,
-            contains('privacy_policy_section${i}_content'),
-            reason: '$lang: $i. bölümün metni yok',
-          );
+      for (final entry in screens.entries) {
+        final count = sectionCount(entry.key);
+        for (final lang in languages) {
+          final keys = dictionary(lang).keys;
+          for (var i = 1; i <= count; i++) {
+            expect(
+              keys,
+              contains('${entry.value}${i}_title'),
+              reason: '$lang · ${entry.key}: $i. bölümün başlığı yok',
+            );
+            expect(
+              keys,
+              contains('${entry.value}${i}_content'),
+              reason: '$lang · ${entry.key}: $i. bölümün metni yok',
+            );
+          }
         }
       }
     });
@@ -52,12 +59,15 @@ void main() {
     test('çizilmeyen bölüm sözlükte kalmıyor', () {
       // Ekrandan düşmüş ama sözlükte duran bir bölüm, kimsenin okumadığı
       // bir söz olurdu.
-      for (final lang in languages) {
-        expect(
-          dictionary(lang).keys,
-          isNot(contains('privacy_policy_section${sectionCount + 1}_title')),
-          reason: '$lang: ekranda olmayan bölüm sözlükte duruyor',
-        );
+      for (final entry in screens.entries) {
+        final beyond = sectionCount(entry.key) + 1;
+        for (final lang in languages) {
+          expect(
+            dictionary(lang).keys,
+            isNot(contains('${entry.value}${beyond}_title')),
+            reason: '$lang · ${entry.key}: ekranda olmayan bölüm sözlükte',
+          );
+        }
       }
     });
   });

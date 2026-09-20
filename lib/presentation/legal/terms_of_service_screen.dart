@@ -62,7 +62,7 @@ class TermsOfServiceScreen extends StatelessWidget {
 
   /// Şartlardaki bölüm sayısı. Sözlükteki `terms_sectionN_*` anahtarlarıyla
   /// uyuşması testle doğrulanıyor.
-  static const int _sectionCount = 4;
+  static const int _sectionCount = 12;
 
   Widget _buildSection(
     BuildContext context,

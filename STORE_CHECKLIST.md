@@ -161,6 +161,17 @@ profil, loglar ve yakınlık dokümanı da siliniyor, ardından kimliğin kendis
 kaldırılıyor. (Önceden yalnızca cihazdaki veri siliniyordu — bağlı partner
 hesap silindikten sonra da veriyi okuyabiliyordu.)
 
+### Şartlardaki hukuk seçimi ⬜ — **engelleyici**
+Kullanım şartlarının 12. bölümü üç yer tutucu içeriyor ve bunlar bir
+**karar**, doldurulacak boşluk değil:
+
+- `[UYGULANACAK HUKUK]` — hangi ülkenin hukuku?
+- `[YETKİLİ MAHKEME VE İCRA DAİRELERİ]` — uyuşmazlıklar nerede görülecek?
+- `[E-POSTA ADRESİ]` — politikadakiyle aynı adres olmalı.
+
+Bu seçim şirketin nerede kurulu olduğuna ve kullanıcıların nerede olduğuna
+bağlı; bir avukata sorulması gereken kısım burası.
+
 ### Politikadaki iki boşluk ⬜ — **engelleyici**
 Politikanın 9. bölümü iki yer tutucu içeriyor ve bunlar sizden başkası
 tarafından doldurulamaz:
