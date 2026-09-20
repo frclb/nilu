@@ -32,6 +32,37 @@ bool endsCalendarRow(DateTime date) => date.weekday == DateTime.sunday;
 /// çıkıyordu: iPhone 16e'de (390 pt ekran → 46.3 pt hücre) 0.7 pt, daha dar
 /// yerlerde daha fazla. iPhone 17 Pro'da (402 pt) hücre 48 pt olduğu için
 /// görünmüyordu — cihaza göre değişen bir hata.
+/// Bandın hücre kenarına aktığı uçta sönme payı (hücre genişliğinin oranı).
+///
+/// Dönem hafta sınırını aşarken kullanılıyor: bant kenara kadar gidip
+/// tamamen saydamlaşıyor, böylece "kopmuş" değil "devam ediyor" okunuyor.
+const double _continuesFade = 0.45;
+
+/// İki gün birleşirken oluşan dikişteki alfa ve sönme payı.
+///
+/// Yan yana iki hücrenin bandı aynı noktada bitip başlıyordu. Tam opak iki
+/// dikdörtgen kenar kenara gelince aradaki sınır cihaz pikseline denk
+/// gelmiyor ve zemin ince bir çizgi hâlinde sızıyordu — ölçüldü: bandın
+/// `(178, 74, 102)` rengi dikişte `(197, 118, 139)`'a açılıyordu, tek piksel
+/// genişliğinde keskin bir çizgi.
+///
+/// Dikişteki renk, bandın rengi ile onun "geri çekilen" tonu arasında bu
+/// oranda karıştırılıyor. `flowSoft` açık temada `flow`'dan açık, koyu
+/// temada koyu — yani iki temada da zemine doğru çekiliyor.
+///
+/// Karışım **opak**: saydamlık kullanılsaydı bindirme yerinde iki kat
+/// boyanıp koyu bir çizgi çıkardı. Opak aynı renk üst üste gelince hiçbir
+/// iz bırakmıyor.
+const double _seamBlend = 0.42;
+
+/// Düz uçların komşuya doğru taşma payı (pt).
+///
+/// İki kabın kenarı aynı noktada bitiyordu. Her kenar ayrı ayrı kenar
+/// yumuşatmadan geçtiği için sınır pikselini ikisi de yarım kaplıyor ve
+/// arada zemin kalıyordu — ölçüldü: dikiş pikseli %26 zemin. Yarım puntoluk
+/// bindirme bunu kapatıyor.
+const double _seamOverlap = 0.5;
+
 const double _dayCircleSize = 36;
 const double _dayCircleToDots = 3;
 const double _dayDotsSize = 8;
@@ -465,6 +496,9 @@ class _DayTile extends StatelessWidget {
                   24.0,
                 );
                 return Stack(
+                  // Bandın yarım puntoluk bindirmesi hücrenin dışına taşıyor;
+                  // varsayılan kırpma onu geri kesip dikişi geri getiriyordu.
+                  clipBehavior: Clip.none,
                   alignment: Alignment.center,
                   children: [
                     if (isPeriod &&
@@ -474,11 +508,17 @@ class _DayTile extends StatelessWidget {
                             periodContinuesRight))
                       _buildConnector(
                         color: context.tokens.flow,
+                        seamColor: Color.lerp(
+                          context.tokens.flow,
+                          context.tokens.flowSoft,
+                          _seamBlend,
+                        )!,
                         openLeft: hasPeriodBefore,
                         openRight: hasPeriodAfter,
                         continuesLeft: periodContinuesLeft,
                         continuesRight: periodContinuesRight,
                         inset: inset,
+                        cellWidth: constraints.maxWidth,
                       ),
 
                     if (isPredicted &&
@@ -497,11 +537,21 @@ class _DayTile extends StatelessWidget {
                         color: context.tokens.flowSoft.withAlpha(
                           isDark ? 100 : 90,
                         ),
+                        // Tahmin bandında dikiş sönmesi yok. Bant saydam
+                        // olduğu için bindirilemiyor (üst üste gelen iki tül
+                        // koyu bir çizgi bırakır), sönme bindirmesiz
+                        // uygulanınca da dikiş çizgisi gradyanın içinde daha
+                        // çok göze çarpıyor. Zaten o kadar açık ki çizgi
+                        // parlaklıkta ~8 birim fark ediyor.
+                        seamColor: context.tokens.flowSoft.withAlpha(
+                          isDark ? 100 : 90,
+                        ),
                         openLeft: hasPredictedBefore,
                         openRight: hasPredictedAfter,
                         continuesLeft: predictedContinuesLeft,
                         continuesRight: predictedContinuesRight,
                         inset: inset,
+                        cellWidth: constraints.maxWidth,
                       ),
 
                     AnimatedContainer(
@@ -601,35 +651,71 @@ class _DayTile extends StatelessWidget {
   /// ötesine aktığını anlatıyor.
   Widget _buildConnector({
     required Color color,
+    required Color seamColor,
     required bool openLeft,
     required bool openRight,
     required bool continuesLeft,
     required bool continuesRight,
     required double inset,
+    required double cellWidth,
   }) {
     final flatLeft = openLeft || continuesLeft;
     final flatRight = openRight || continuesRight;
-    final fades = continuesLeft || continuesRight;
+
+    // Bandın genişliği: kapalı uçlar daireden başlıyor, düz uçlar hücre
+    // kenarına dayanıyor.
+    final width =
+        cellWidth - (flatLeft ? 0 : inset) - (flatRight ? 0 : inset);
+
+    // Dikişteki sönme **tam olarak iki daire arasındaki boşluğa** oturmalı.
+    // Daha geniş olursa sönme dairenin altında başlar: daire tam opak
+    // olduğu için kenarında sert bir basamak çıkıyor (ölçüldü: iki pikselde
+    // 98'den 134'e). Boşluk hücrenin `inset` kadarı.
+    final seamFade = width <= 0 ? 0.0 : (inset / width).clamp(0.0, 0.45);
+
+    // Her uç kendi profilini taşıyor: `(kenardaki renk, sönme payı)`.
+    (Color, double)? profile(bool open, bool continues) {
+      if (continues) return (color.withAlpha(0), _continuesFade);
+      if (open && seamFade > 0) return (seamColor, seamFade);
+      return null; // kapalı uç: yuvarlak kapak, sönme yok
+    }
+
+    final left = profile(openLeft, continuesLeft);
+    final right = profile(openRight, continuesRight);
+
+    final colors = <Color>[];
+    final stops = <double>[];
+    if (left != null) {
+      colors.addAll([left.$1, color]);
+      stops.addAll([0.0, left.$2]);
+    } else {
+      colors.add(color);
+      stops.add(0.0);
+    }
+    if (right != null) {
+      colors.addAll([color, right.$1]);
+      stops.addAll([1 - right.$2, 1.0]);
+    } else {
+      colors.add(color);
+      stops.add(1.0);
+    }
+
+    // Bindirme yalnızca dikiş rengi **opak** olduğunda güvenli: saydam bir
+    // bant üst üste gelince iki kat boyanır ve açık çizginin yerini koyu bir
+    // çizgi alır. Tahmin bandı tül olduğu için taşmıyor — zaten o kadar
+    // açık ki dikişi görünmüyor.
+    final overlaps = seamColor.a >= 1;
 
     return Positioned(
-      left: flatLeft ? 0 : inset,
-      right: flatRight ? 0 : inset,
+      // Açık uçlar komşuya yarım punto taşıyor: kenarların aynı noktada
+      // bitmesi araya zemin sızdırıyordu.
+      left: (openLeft && overlaps) ? -_seamOverlap : (flatLeft ? 0 : inset),
+      right: (openRight && overlaps) ? -_seamOverlap : (flatRight ? 0 : inset),
       top: 0,
       bottom: 0,
       child: Container(
         decoration: BoxDecoration(
-          color: fades ? null : color,
-          gradient: fades
-              ? LinearGradient(
-                  colors: [
-                    continuesLeft ? color.withAlpha(0) : color,
-                    color,
-                    color,
-                    continuesRight ? color.withAlpha(0) : color,
-                  ],
-                  stops: const [0.0, 0.45, 0.55, 1.0],
-                )
-              : null,
+          gradient: LinearGradient(colors: colors, stops: stops),
           borderRadius: BorderRadius.horizontal(
             left: flatLeft ? Radius.zero : const Radius.circular(20),
             right: flatRight ? Radius.zero : const Radius.circular(20),
