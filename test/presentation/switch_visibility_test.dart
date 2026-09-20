@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -21,6 +23,63 @@ import 'package:period_tracker/presentation/profile/cycle_settings_screen.dart';
 /// bir şey yok.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  group('anahtar renkleri tek kaynaktan', () {
+    // Beş ekran temanın anahtar renklerini eziyordu. Biri topuzu rayla
+    // aynı renge boyayıp görünmez kılmıştı; app lock kehribar renkteydi
+    // (koruma açmak uyarı değil); ikisi de temanın aynısını tekrar
+    // yazıyordu. Ezmeye izin verildiği sürece bir sonraki ekran da kendi
+    // tonunu seçer.
+    final sources = Directory('lib/presentation')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.dart'));
+
+    /// Yorum satırları atılmış kaynak.
+    ///
+    /// Kuralı anlatan yorumun kuralı ihlal ediyormuş gibi görünmesi,
+    /// testin kendi belgesini yakalaması demek olurdu.
+    String code(File file) => file
+        .readAsLinesSync()
+        .where((line) => !line.trimLeft().startsWith('//'))
+        .join('\n');
+
+    test('ekranlar anahtar rengini ezmiyor', () {
+      const overrides = [
+        'activeThumbColor:',
+        'activeTrackColor:',
+        'inactiveThumbColor:',
+        'inactiveTrackColor:',
+      ];
+
+      final offenders = <String>[];
+      for (final file in sources) {
+        final text = code(file);
+        for (final override in overrides) {
+          if (text.contains(override)) {
+            offenders.add('${file.path} · $override');
+          }
+        }
+      }
+
+      expect(
+        offenders,
+        isEmpty,
+        reason: 'tema eziliyor:\n${offenders.join('\n')}',
+      );
+    });
+
+    test('tek anahtar biçimi kullanılıyor', () {
+      // `CupertinoSwitch` Material temasını hiç görmüyor: aynı uygulamada
+      // iki ayrı anahtar biçimi ve iki ayrı renk kaynağı demekti.
+      final offenders = sources
+          .where((f) => code(f).contains('CupertinoSwitch('))
+          .map((f) => f.path)
+          .toList();
+
+      expect(offenders, isEmpty, reason: 'Cupertino anahtar: $offenders');
+    });
+  });
 
   for (final flavor in AppFlavor.values) {
     for (final brightness in [Brightness.light, Brightness.dark]) {

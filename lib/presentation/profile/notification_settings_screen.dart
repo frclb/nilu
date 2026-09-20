@@ -229,10 +229,6 @@ class _NotificationSettingsScreenState
         ),
         value: value,
         onChanged: onChanged,
-        activeThumbColor: Theme.of(context).colorScheme.primary,
-        activeTrackColor: Theme.of(context).colorScheme.primary.withAlpha(127),
-        inactiveThumbColor: context.tokens.surface,
-        inactiveTrackColor: context.tokens.border,
       ),
     );
   }

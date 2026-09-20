@@ -286,7 +286,6 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                     ),
                     trailing: Switch(
                       value: isPeriod,
-                      activeThumbColor: context.tokens.flow,
                       onChanged: (_) async {
                         final success = await viewModel.togglePeriodDay(
                           widget.date,
@@ -316,7 +315,6 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                       subtitle: Text(context.tr('day_detail_spotting_hint')),
                       value:
                           _currentLog.flowIntensity == LogVocabulary.spotting,
-                      activeThumbColor: context.tokens.flow,
                       onChanged: (selected) => _updateCurrentLog(
                         flowIntensity: selected ? LogVocabulary.spotting : null,
                         clearFlow: !selected,

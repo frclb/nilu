@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import '../../design_system/app_scrim.dart';
 import 'package:flutter/material.dart';
 import '../../design_system/content_illustration.dart';
@@ -346,12 +345,11 @@ class _PartnerShareSettingsScreenState
               ],
             ),
           ),
-          // iOS Style Switch
-          CupertinoSwitch(
-            value: value,
-            activeTrackColor: primaryColor,
-            onChanged: onChanged,
-          ),
+          // Material `Switch`: uygulamanın geri kalanı bunu kullanıyor ve
+          // anahtar renkleri temada tek yerde tanımlı. `CupertinoSwitch`
+          // o temayı hiç görmüyordu — aynı uygulamada iki ayrı anahtar
+          // biçimi ve iki ayrı renk kaynağı demekti.
+          Switch(value: value, onChanged: onChanged),
         ],
       ),
     );

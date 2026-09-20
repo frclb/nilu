@@ -50,7 +50,6 @@ class _PrivacyControlSectionState extends State<PrivacyControlSection> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
 
     final headerColor = context.tokens.text;
 
@@ -102,8 +101,6 @@ class _PrivacyControlSectionState extends State<PrivacyControlSection> {
                   Switch(
                     value: _settings.intimacyStatus,
                     onChanged: _loaded ? _update : null,
-                    activeThumbColor: context.tokens.surface,
-                    activeTrackColor: theme.colorScheme.primary,
                   ),
                 ],
               ),
@@ -114,15 +111,33 @@ class _PrivacyControlSectionState extends State<PrivacyControlSection> {
 
         const SizedBox(height: 16),
 
-        // Security Note
+        // Güvenlik notu.
+        //
+        // Metin `Flexible` içinde: satır esnek değilken uzun bir açıklama
+        // ekranın sağından taşıyordu. Kısa bir cümleyle çalışıyor gibi
+        // görünen bu düzen, metin uzadığı anda kırılıyor — ve çeviriler
+        // her dilde farklı uzunlukta.
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.lock, size: 14, color: context.tokens.textFaint),
-            const SizedBox(width: 4),
-            Text(
-              context.tr('partner_match_encryption_notice'),
-              style: TextStyle(fontSize: 12, color: context.tokens.textFaint),
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Icon(
+                Icons.lock,
+                size: 14,
+                color: context.tokens.textFaint,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                context.tr('partner_match_encryption_notice'),
+                style: TextStyle(
+                  fontSize: 12,
+                  height: 1.4,
+                  color: context.tokens.textFaint,
+                ),
+              ),
             ),
           ],
         ),

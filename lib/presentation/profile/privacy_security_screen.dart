@@ -298,12 +298,6 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
         ),
         value: value,
         onChanged: onChanged,
-        activeThumbColor: context.tokens.warning,
-        activeTrackColor: context.tokens.warning.withAlpha(127),
-        inactiveThumbColor: context.tokens.surface,
-        inactiveTrackColor: isDark
-            ? context.tokens.surfaceAlt
-            : context.tokens.border,
       ),
     );
   }

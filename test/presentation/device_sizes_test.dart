@@ -2,11 +2,16 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:period_tracker/design_system/app_card.dart';
+import 'package:period_tracker/design_system/app_flavor.dart';
+import 'package:period_tracker/design_system/app_theme.dart';
+import 'package:period_tracker/localization/app_localizations.dart';
 import 'package:period_tracker/design_system/app_layout.dart';
 import 'package:period_tracker/presentation/health_library/widgets/health_library_article_list.dart';
 import 'package:period_tracker/domain/view_models/user_view_model.dart';
@@ -15,6 +20,7 @@ import 'package:period_tracker/main.dart';
 import 'package:period_tracker/presentation/home/widgets/custom_bottom_nav.dart';
 import 'package:period_tracker/presentation/home/widgets/cycle_masthead.dart';
 import 'package:period_tracker/presentation/log_entry/log_entry_screen.dart';
+import 'package:period_tracker/presentation/partner_match/partner_match_screen.dart';
 import 'package:period_tracker/presentation/partner_match/partner_share_settings_screen.dart';
 import 'package:period_tracker/presentation/session/session_screen.dart';
 import 'package:period_tracker/presentation/yoga/yoga_detail_screen.dart';
@@ -521,6 +527,59 @@ void main() {
       );
     });
 
+    // Sahibin eşleşme ekranı. Taramada yoktu ve bir taşma orada
+    // yakalanmadan durdu: gizlilik notunun metni uzatılınca satır esnek
+    // olmadığı için ekranın sağından 86 piksel taşıyordu. Kullanıcı
+    // bağlanma kararını bu ekranda veriyor.
+    //
+    // Ekran doğrudan çiziliyor: ana ekrandan gezinerek ulaşmak, kartın
+    // yerine ve kaydırmaya bağlı olduğu için kırılgan.
+    for (final device in [...phones, tablets.last]) {
+      testWidgets('$device eşleşme ekranı taşmadan açılır', (tester) async {
+        FlutterSecureStorage.setMockInitialValues({});
+        SharedPreferences.setMockInitialValues({});
+
+        tester.view.physicalSize = device.pixels;
+        tester.view.devicePixelRatio = device.ratio;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        await tester.runAsync(() async {
+          await tester.pumpWidget(
+            MaterialApp(
+              theme: AppTheme.light(AppFlavor.plum),
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              locale: const Locale('tr'),
+              supportedLocales: const [Locale('tr')],
+              home: ChangeNotifierProvider(
+                create: (_) => UserViewModel(),
+                child: const PartnerMatchScreen(),
+              ),
+            ),
+          );
+          await Future<void>.delayed(const Duration(milliseconds: 400));
+        });
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        expect(
+          find.byType(PartnerMatchScreen),
+          findsOneWidget,
+          reason: 'ekran çizilmedi — iddia boşa gider',
+        );
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: '$device: eşleşme ekranında düzen hatası',
+        );
+      });
+    }
+
     testWidgets('profilde cihazın kendi verisine dayanan ayarlar yok', (
       tester,
     ) async {
@@ -547,10 +606,7 @@ void main() {
       // Partner bildirim ayarları da kaldırıldı: ekran yerele yazıyordu,
       // hiçbir yere yüklenmiyordu ve gönderen bir taraf yoktu. Partnerin
       // kurduğu hiçbir bildirim ulaşamazdı.
-      expect(
-        find.text(label('profile_notification_settings')),
-        findsNothing,
-      );
+      expect(find.text(label('profile_notification_settings')), findsNothing);
       // Herkese açık olanlar duruyor.
       expect(find.text(label('appearance_title')), findsOneWidget);
     });
