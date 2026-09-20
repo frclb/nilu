@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../design_system/app_theme.dart';
 import '../../design_system/app_tokens.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -9,10 +10,12 @@ import 'package:share_plus/share_plus.dart';
 import '../../core/navigation/route_names.dart';
 import '../../data/repositories/privacy_settings_repository.dart';
 import '../../domain/services/app_lock_service.dart';
+import '../../domain/services/backup_import_service.dart';
 import '../../domain/services/data_export_service.dart';
 import '../../domain/services/premium_gate.dart';
 import '../../domain/view_models/subscription_view_model.dart';
 import '../../domain/view_models/user_view_model.dart';
+import '../calendar/view_models/calendar_view_model.dart';
 import '../../localization/app_localizations.dart';
 import '../../design_system/app_layout.dart';
 
@@ -250,6 +253,15 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                     context.tr('privacy_export'),
                     Icons.file_download_outlined,
                     isDark,
+                    onTap: () => _showExportDataDialog(context, isDark),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildActionTile(
+                    context,
+                    context.tr('privacy_import'),
+                    Icons.file_upload_outlined,
+                    isDark,
+                    onTap: () => _showImportDialog(context),
                   ),
                   const SizedBox(height: 16),
                   _buildActionTile(
@@ -258,6 +270,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                     Icons.person_remove_outlined,
                     isDark,
                     isDestructive: true,
+                    onTap: () => _showDeleteAccountDialog(context, isDark),
                   ),
                 ],
               ),
@@ -307,6 +320,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     String title,
     IconData icon,
     bool isDark, {
+    required VoidCallback onTap,
     bool isDestructive = false,
   }) {
     final color = isDestructive ? context.tokens.danger : context.tokens.text;
@@ -332,11 +346,108 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
           size: 20,
           color: context.tokens.textFaint,
         ),
-        onTap: () => isDestructive
-            ? _showDeleteAccountDialog(context, isDark)
-            : _showExportDataDialog(context, isDark),
+        onTap: onTap,
       ),
     );
+  }
+
+  /// Yedeği geri yükleme akışı.
+  ///
+  /// Önce ne olacağı anlatılıyor: kullanıcı "geri yükleme" deyince çoğu
+  /// uygulamada cihazdaki veri silinir, burada silinmiyor. Bunu söylemeden
+  /// dosya seçtirmek, olmayan bir riski varmış gibi hissettirir.
+  void _showImportDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(ctx.tr('privacy_import')),
+        content: Text(
+          ctx.tr('privacy_import_desc'),
+          style: TextStyle(color: ctx.tokens.textMuted),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              ctx.tr('cancel'),
+              style: TextStyle(color: ctx.tokens.textMuted),
+            ),
+          ),
+          ElevatedButton(
+            style: AppTheme.dialogAction(),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _pickAndImport();
+            },
+            child: Text(ctx.tr('privacy_import_confirm')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickAndImport() async {
+    // Metinler `await`ten **önce** okunuyor: sonrasında `context` bir async
+    // boşluğun ötesinde kalıyor.
+    final messenger = ScaffoldMessenger.of(context);
+    final viewModel = context.read<CalendarViewModel>();
+    String message(String key, {Map<String, String>? params}) =>
+        context.tr(key, params: params);
+
+    final failureText = {
+      ImportFailure.unreadable: message('privacy_import_unreadable'),
+      ImportFailure.wrongFormat: message('privacy_import_wrong_format'),
+      ImportFailure.empty: message('privacy_import_empty'),
+    };
+    final genericFailure = message('privacy_import_failed');
+
+    try {
+      // Yedek `.json`; iOS belge seçicisinde yalnızca o türü göstermek
+      // kullanıcıyı yanlış dosyadan koruyor.
+      final file = await openFile(
+        acceptedTypeGroups: const [
+          XTypeGroup(
+            label: 'JSON',
+            extensions: ['json'],
+            uniformTypeIdentifiers: ['public.json'],
+          ),
+        ],
+      );
+      if (file == null) return; // Kullanıcı vazgeçti.
+
+      final report = await _repository.importDataFromJson(
+        await file.readAsString(),
+      );
+
+      if (!report.succeeded) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(failureText[report.failure] ?? genericFailure),
+          ),
+        );
+        return;
+      }
+
+      // Bellekteki veri artık bayat: yenilenmezse kullanıcı geri
+      // yüklediği kayıtları ancak uygulamayı kapatıp açınca görürdü.
+      await viewModel.refreshData();
+
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            report.totalAdded == 0
+                ? message('privacy_import_nothing_new')
+                : message(
+                    'privacy_import_done',
+                    params: {'n': '${report.totalAdded}'},
+                  ),
+          ),
+        ),
+      );
+    } catch (e) {
+      debugPrint('Import failed: $e');
+      messenger.showSnackBar(SnackBar(content: Text(genericFailure)));
+    }
   }
 
   void _showExportDataDialog(BuildContext context, bool isDark) {

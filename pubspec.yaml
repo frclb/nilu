@@ -57,6 +57,9 @@ dependencies:
   local_auth: ^2.3.0
   # Veri dışa aktarma: dosya olarak paylaş. Sağlık verisi panoya konmamalı.
   share_plus: ^13.3.0
+  # Yedeği geri yüklemek için dosya seçimi. flutter.dev tarafından
+  # sürdürülüyor; iOS'ta sistem belge seçicisini açıyor.
+  file_selector: ^1.0.3
   path_provider: ^2.1.5
   health: ^13.3.2
   home_widget: ^0.9.3

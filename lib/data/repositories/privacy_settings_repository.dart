@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../domain/models/daily_log.dart';
 import '../../domain/models/period_log.dart';
+import '../../domain/services/backup_import_service.dart';
 import '../local/secure_store.dart';
 import 'period_repository.dart';
 
@@ -69,6 +70,30 @@ class PrivacySettingsRepository {
       'periodLogs': periodLogs.map((l) => l.toMap()).toList(),
       'dailyLogs': dailyLogs.map((l) => l.toMap()).toList(),
     });
+  }
+
+  /// JSON yedeğini mevcut veriyle birleştirip kaydeder.
+  ///
+  /// Birleştirme kuralları [BackupImportService] içinde ve saf: cihazdaki
+  /// kayıt her zaman kazanıyor, içe aktarma yalnızca eksik olanı ekliyor.
+  /// Burada yalnızca okuma ve yazma var.
+  ///
+  /// Başarısız bir okumada depoya **hiç dokunulmuyor**: yarım yazılmış bir
+  /// durum, hiç yazmamaktan kötü.
+  Future<ImportReport> importDataFromJson(String json) async {
+    final result = BackupImportService.merge(
+      json: json,
+      periodLogs: await _periodRepository.getPeriodLogs(),
+      dailyLogs: await _periodRepository.getDailyLogs(),
+    );
+
+    if (!result.report.succeeded || result.report.totalAdded == 0) {
+      return result.report;
+    }
+
+    await _periodRepository.savePeriodLogs(result.periodLogs);
+    await _periodRepository.saveDailyLogs(result.dailyLogs);
+    return result.report;
   }
 
   /// Cihazdaki tüm kullanıcı verisini kalıcı olarak siler:
