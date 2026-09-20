@@ -72,7 +72,21 @@ class AssistantAnswerBuilder {
     // değişiyordu.
     final today = DateTime(now.year, now.month, now.day);
     final target = DateTime(next.year, next.month, next.day);
-    final days = target.difference(today).inDays.clamp(0, 1 << 31);
+    final days = target.difference(today).inDays;
+
+    // Gecikme kendi cümlesini hak ediyor.
+    //
+    // Fark sıfıra kırpılıyordu: gecikmenin her gününde "bugün başlıyor"
+    // deniyordu. Kırk gün gecikmiş birine bunu söylemek yalnızca yanlış
+    // değil, endişe verici bir durumu görmezden gelmek. Ana ekran aynı
+    // anda "40 gün gecikti" diyordu; çarkta düzeltilen bu hata asistana
+    // taşınmamıştı.
+    if (days < 0) {
+      return AssistantAnswer(
+        'assistant_late',
+        params: {'days': '${-days}', 'date': _format(next)},
+      );
+    }
 
     return AssistantAnswer(
       days == 0 ? 'assistant_next_period_today' : 'assistant_next_period',
@@ -92,6 +106,15 @@ class AssistantAnswerBuilder {
   }
 
   static AssistantAnswer _fertileWindow(CycleInfo info) {
+    // Hormonal doğum kontrolünde doğurganlık **bilerek** hesaplanmıyor.
+    //
+    // Bu durumda "kayıt yok" demek yanlış yönlendirme: kullanıcının
+    // verisi var ve takvimde sonsuza kadar gün işaretlese de cevap
+    // gelmeyecek. Sebebi söylemek gerekiyor.
+    if (!info.fertilityTracked) {
+      return const AssistantAnswer('assistant_fertility_off');
+    }
+
     final start = info.fertileWindowStart;
     final end = info.fertileWindowEnd;
     final ovulation = info.ovulationDay;
