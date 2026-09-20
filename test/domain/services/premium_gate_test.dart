@@ -58,8 +58,14 @@ void main() {
     });
 
     test('dışa aktarma premium gerektirir', () {
-      expect(PremiumGate.canExport(isPremium: false), isFalse);
-      expect(PremiumGate.canExport(isPremium: true), isTrue);
+      // Yedek herkese açık: makine-okunur kopya almak bir hak, ücrete
+      // bağlanamaz. Üstelik veri cihazda duruyor — yedek alamayan
+      // kullanıcı telefonunu kaybettiğinde her şeyini kaybederdi.
+      expect(PremiumGate.canExportBackup(), isTrue);
+
+      // Hekim özeti ve tablo kolaylık; onlar premium'da.
+      expect(PremiumGate.canExportReports(isPremium: false), isFalse);
+      expect(PremiumGate.canExportReports(isPremium: true), isTrue);
     });
 
     test('trend için iki döngü yeterlidir, abonelik şart değil', () {

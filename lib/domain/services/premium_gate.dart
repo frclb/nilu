@@ -38,11 +38,19 @@ class PremiumGate {
   /// reklam, uygulamanın kullanıcıya verdiği gizlilik sözüyle çelişirdi.
   static bool showsAds({required bool isPremium}) => !isPremium;
 
-  /// Veriyi dosya olarak dışa aktarma.
+  /// Geri yüklenebilir yedek (JSON) alma.
   ///
-  /// Not: "Hesabımı Sil" ve verinin kendisi her zaman kullanıcınındır;
-  /// kilitlenen yalnızca **biçimlendirilmiş dosya üretme** kolaylığı.
-  static bool canExport({required bool isPremium}) => isPremium;
+  /// Herkese açık. Verinin makine-okunur bir kopyasını almak KVKK ve
+  /// GDPR'da bir **hak**; ücrete bağlanamaz. Ayrıca veri cihazda
+  /// duruyor: yedek alamayan bir kullanıcı telefonunu kaybettiğinde
+  /// sağlık geçmişinin tamamını kaybederdi.
+  static bool canExportBackup() => true;
+
+  /// Hekime götürülebilecek özet ve tablo (TXT + CSV).
+  ///
+  /// Bunlar hak değil kolaylık: veri zaten yedekte eksiksiz duruyor,
+  /// bu dosyalar onu okunabilir ve tablolanabilir hâle getiriyor.
+  static bool canExportReports({required bool isPremium}) => isPremium;
 
   /// Trend için yeterli veri var mı (ücretsiz sınır dahil).
   static bool hasEnoughForTrend({

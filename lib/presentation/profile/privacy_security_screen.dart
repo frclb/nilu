@@ -451,13 +451,26 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
   }
 
   void _showExportDataDialog(BuildContext context, bool isDark) {
+    // Katman ekranın kendi bağlamından okunuyor, diyalogunkinden değil.
+    //
+    // Metin katmana göre değişiyor: ücretsiz kullanıcıya üretilmeyecek
+    // dosyaları saymak, olmayan bir şeyi vaat etmek olurdu. Ama diyaloğun
+    // bağlamı `Navigator`'ın altında; sağlayıcılar `MaterialApp`'in
+    // üstünde olduğu sürece çalışıyor, olmadığında sessizce patlıyor.
+    // Ekranın bağlamında böyle bir varsayım yok.
+    final withReports = PremiumGate.canExportReports(
+      isPremium: context.read<SubscriptionViewModel>().isPremium,
+    );
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(context.tr('privacy_export')),
         content: Text(
-          context.tr('privacy_export_desc'),
-          style: TextStyle(color: context.tokens.textMuted),
+          ctx.tr(
+            withReports ? 'privacy_export_desc' : 'privacy_export_desc_free',
+          ),
+          style: TextStyle(color: ctx.tokens.textMuted),
         ),
         actions: [
           TextButton(
@@ -495,18 +508,16 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
   /// Üç dosya birlikte veriliyor — okunabilir özet (muayenede telefondan
   /// okunur), CSV (tablo programı) ve tam JSON (kayıpsız yedek).
   Future<void> _exportAndShare() async {
-    // Not: verinin kendisi her zaman kullanıcınındır — "Hesabımı Sil" ve
-    // yerel kayıtlar kilitli değil. Premium olan yalnızca biçimlendirilmiş
-    // dosya üretme kolaylığı.
-    if (!PremiumGate.canExport(
+    // Yedek herkese açık, raporlar premium.
+    //
+    // Makine-okunur bir kopya almak KVKK ve GDPR'da bir hak; ücrete
+    // bağlanamaz. Üstelik veri cihazda duruyor: yedek alamayan bir
+    // kullanıcı telefonunu kaybettiğinde sağlık geçmişinin tamamını
+    // kaybederdi. Hekim özeti ve tablo ise kolaylık — veri zaten yedekte
+    // eksiksiz.
+    final withReports = PremiumGate.canExportReports(
       isPremium: context.read<SubscriptionViewModel>().isPremium,
-    )) {
-      final message = context.tr('insights_export_locked');
-      final router = GoRouter.of(context);
-      _showMessage(message);
-      router.pushNamed(RouteNames.premium);
-      return;
-    }
+    );
 
     final messenger = ScaffoldMessenger.of(context);
     final failedMessage = context.tr('privacy_export_failed');
@@ -521,16 +532,20 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
       final json = await _repository.exportDataAsJson();
       final now = DateTime.now();
 
-      final summary = DataExportService.buildSummary(
-        periodLogs: data.periodLogs,
-        dailyLogs: data.dailyLogs,
-        generatedAt: now,
-        translate: translate,
-      );
-      final csv = DataExportService.buildCsv(
-        dailyLogs: data.dailyLogs,
-        periodLogs: data.periodLogs,
-      );
+      final summary = !withReports
+          ? ''
+          : DataExportService.buildSummary(
+              periodLogs: data.periodLogs,
+              dailyLogs: data.dailyLogs,
+              generatedAt: now,
+              translate: translate,
+            );
+      final csv = !withReports
+          ? ''
+          : DataExportService.buildCsv(
+              dailyLogs: data.dailyLogs,
+              periodLogs: data.periodLogs,
+            );
 
       // Geçici dizin: paylaşım bittikten sonra sistem temizler, veri
       // cihazda kalıcı bir yerde birikmez.
@@ -540,9 +555,11 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
           '${now.day.toString().padLeft(2, '0')}';
 
       final files = <XFile>[
-        await _writeTemp(dir.path, 'dongu-ozeti-$stamp.txt', summary),
-        await _writeTemp(dir.path, 'dongu-kayitlari-$stamp.csv', csv),
         await _writeTemp(dir.path, 'dongu-yedek-$stamp.json', json),
+        if (withReports) ...[
+          await _writeTemp(dir.path, 'dongu-ozeti-$stamp.txt', summary),
+          await _writeTemp(dir.path, 'dongu-kayitlari-$stamp.csv', csv),
+        ],
       ];
 
       await SharePlus.instance.share(

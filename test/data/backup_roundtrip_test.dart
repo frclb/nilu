@@ -6,6 +6,7 @@ import 'package:period_tracker/data/repositories/period_repository.dart';
 import 'package:period_tracker/data/repositories/privacy_settings_repository.dart';
 import 'package:period_tracker/domain/models/daily_log.dart';
 import 'package:period_tracker/domain/models/period_log.dart';
+import 'package:period_tracker/domain/services/premium_gate.dart';
 
 /// Yedeğin gidiş-dönüşü.
 ///
@@ -138,6 +139,17 @@ void main() {
       reason: 'yedekte olmayan kaydım silinmiş',
     );
     expect(all, hasLength(sampleDaily.length + 1));
+  });
+
+  test('ücretsiz kullanıcı da yedek alabiliyor', () async {
+    // Gizlilik politikasının 9. bölümü taşınabilirlik hakkını vaat
+    // ediyor; KVKK ve GDPR bu hakkın ücretsiz kullanılmasını istiyor.
+    // Ayrıca veri cihazda duruyor: yedek alamayan kullanıcı telefonunu
+    // kaybettiğinde sağlık geçmişinin tamamını kaybederdi.
+    expect(PremiumGate.canExportBackup(), isTrue);
+
+    // Hekim özeti ve tablo kolaylık; onlar premium'da kalabilir.
+    expect(PremiumGate.canExportReports(isPremium: false), isFalse);
   });
 
   test('başarısız okumada depoya dokunulmuyor', () async {
