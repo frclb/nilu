@@ -71,7 +71,7 @@ void main() {
           reason: '$late gün gecikmişken "bugün başlıyor" deniyor',
         );
         expect(answer.key, 'assistant_late');
-        expect(answer.params?['days'], '$late');
+        expect(answer.params['days'], '$late');
       });
     }
 
@@ -87,7 +87,7 @@ void main() {
     test('döngü ortasında kalan gün sayılıyor', () {
       final answer = ask(AssistantIntent.nextPeriod, late: -18);
       expect(answer.key, 'assistant_next_period');
-      expect(answer.params?['days'], '18');
+      expect(answer.params['days'], '18');
     });
   });
 
@@ -118,7 +118,7 @@ void main() {
       // dilin metninde kullanılmıyordu.
       final answer = ask(AssistantIntent.currentPhase);
 
-      expect(answer.params?['phase'], isNotNull);
+      expect(answer.params['phase'], isNotNull);
       expect(
         dictionary['assistant_current_phase'] as String,
         contains('{phase}'),
