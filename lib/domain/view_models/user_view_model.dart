@@ -3,12 +3,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../../data/datasources/remote/firebase_auth_datasource.dart';
 import '../../data/datasources/remote/firestore_datasource.dart';
+import '../../data/repositories/pairing_repository.dart';
 import '../../data/datasources/remote/notification_service.dart';
 import '../services/subscription_service.dart';
 
 class UserViewModel extends ChangeNotifier {
   final FirebaseAuthDataSource _authDS = FirebaseAuthDataSource();
   final FirestoreDataSource _firestoreDS = FirestoreDataSource();
+  final PairingRepository _pairing = PairingRepository();
   final NotificationService _notificationService = NotificationService();
 
   /// Durum yerel depodan okunana kadar false kalır.
@@ -225,6 +227,18 @@ class UserViewModel extends ChangeNotifier {
   Future<bool> deleteRemoteData() async {
     final uid = _myId;
     if (uid == null || uid.isEmpty) return true;
+
+    // Eşleşme kodu da iptal ediliyor. `PairingRepository.revoke()` bu akış
+    // için yazılmıştı ama hiç çağrılmıyordu: hesap silindikten sonra
+    // sunucuda jeton→uid eşlemesi duruyordu. Elinde eski QR olan biri
+    // silinmiş bir hesaba istek gönderebilir, üstelik gizlilik
+    // politikasının "tüm verileriniz kalıcı olarak kaldırılır" sözü
+    // tutulmamış olurdu.
+    try {
+      await _pairing.revoke();
+    } catch (e) {
+      debugPrint('Pairing token revoke failed: $e');
+    }
 
     await _firestoreDS.deleteUserData(uid, partnerId: _partnerId);
 
