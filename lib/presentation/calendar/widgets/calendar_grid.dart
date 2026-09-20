@@ -55,6 +55,14 @@ const double _continuesFade = 0.45;
 /// iz bırakmıyor.
 const double _seamBlend = 0.42;
 
+/// Dikişin bandın renk farkından koruduğu oran.
+///
+/// Regl bandında dikiş rengi `flow` ile `flowSoft` arası %42'de; bu, zemine
+/// olan renk farkının %87'sini koruyor. Tahmin bandı tül olduğu için oradaki
+/// karşılığı doğrudan tülün inceltilmesi — aynı oran kullanılıyor ki iki
+/// bant aynı dili konuşsun.
+const double _seamVeil = 0.87;
+
 /// Düz uçların komşuya doğru taşma payı (pt).
 ///
 /// İki kabın kenarı aynı noktada bitiyordu. Her kenar ayrı ayrı kenar
@@ -62,6 +70,29 @@ const double _seamBlend = 0.42;
 /// arada zemin kalıyordu — ölçüldü: dikiş pikseli %26 zemin. Yarım puntoluk
 /// bindirme bunu kapatıyor.
 const double _seamOverlap = 0.5;
+
+/// Tahmin bandının rengi — tül **zemine önceden karıştırılmış** hâli.
+///
+/// Bant hâlâ `flowSoft`'un ince bir katmanı gibi görünüyor ama artık opak.
+/// Fark ettiği tek yer dikiş: yarı saydam iki kap yan yana geldiğinde
+/// aralarından zemin sızıyor ve bindirilemiyorlar, çünkü üst üste gelen iki
+/// tül koyu bir çizgi bırakır. Opak renk bindirilebiliyor.
+///
+/// Görünüm değişmiyor: bandın üstündeki gün dairesi de tül ve kompozit
+/// birleşmeli — `zemin → tül bant → tül daire` ile
+/// `karışmış bant → tül daire` aynı pikseli veriyor.
+///
+/// Bandın altında başka bir şey çizilmediği için zemin kesin olarak
+/// biliniyor: bağlayıcı hücrenin `Stack`'indeki ilk çocuk, kart da
+/// [AppCard] ile `surface` boyuyor.
+Color predictedBandColor(AppTokens t, bool isDark) =>
+    Color.alphaBlend(t.flowSoft.withAlpha(isDark ? 100 : 90), t.surface);
+
+/// Tahmin bandının dikişindeki renk: aynı tül, [_seamVeil] kadar incesi.
+Color predictedSeamColor(AppTokens t, bool isDark) => Color.alphaBlend(
+  t.flowSoft.withAlpha(((isDark ? 100 : 90) * _seamVeil).round()),
+  t.surface,
+);
 
 const double _dayCircleSize = 36;
 const double _dayCircleToDots = 3;
@@ -534,18 +565,8 @@ class _DayTile extends StatelessWidget {
                         // renk farkı da yardım ediyor, koyuda hem parlaklık
                         // hem renk sıkışıyor. Kayıtlı regl tam opak (5.17:1),
                         // yani "dolu vs tül" ayrımı bu değerlerde bozulmuyor.
-                        color: context.tokens.flowSoft.withAlpha(
-                          isDark ? 100 : 90,
-                        ),
-                        // Tahmin bandında dikiş sönmesi yok. Bant saydam
-                        // olduğu için bindirilemiyor (üst üste gelen iki tül
-                        // koyu bir çizgi bırakır), sönme bindirmesiz
-                        // uygulanınca da dikiş çizgisi gradyanın içinde daha
-                        // çok göze çarpıyor. Zaten o kadar açık ki çizgi
-                        // parlaklıkta ~8 birim fark ediyor.
-                        seamColor: context.tokens.flowSoft.withAlpha(
-                          isDark ? 100 : 90,
-                        ),
+                        color: predictedBandColor(context.tokens, isDark),
+                        seamColor: predictedSeamColor(context.tokens, isDark),
                         openLeft: hasPredictedBefore,
                         openRight: hasPredictedAfter,
                         continuesLeft: predictedContinuesLeft,
@@ -629,6 +650,7 @@ class _DayTile extends StatelessWidget {
       ),
     );
   }
+
 
   /// Ardışık regl (veya tahmin) günlerini görsel olarak birleştiren bant.
   ///
