@@ -20,7 +20,22 @@
 	</array>
 	<key>com.apple.developer.healthkit</key>
 	<true/>
-	<key>com.apple.developer.healthkit.access</key>
-	<array/>
+	<!--
+	  `com.apple.developer.healthkit.access` BİLEREK yok.
+
+	  O yetki "Verifiable Health Records" için: hastane ve laboratuvarlardan
+	  gelen klinik kayıtlar (tahlil sonucu, ilaç, aşı). Apple'ın takıma ve
+	  bundle kimliğine ayrıca atamasını gerektiriyor ve imzalamayı
+	  durduruyordu:
+
+	      HealthKit Access (Verifiable Health Records) capability needs to
+	      be assigned to your team and bundle identifier by Apple
+
+	  Uygulama klinik kayıt okumuyor: regl akışı, uyku ve dinlenme nabzı
+	  (bkz. `health_datasource.dart`). Bunların hepsi normal HealthKit
+	  kapsamında ve yukarıdaki anahtarla karşılanıyor. Boş bir dizi hiçbir
+	  klinik tip istemiyordu ama varlığı özel yetki şartını tetikliyor,
+	  üstelik incelemede gereksiz soru doğuruyordu.
+	-->
 </dict>
 </plist>
