@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/navigation/route_names.dart';
 import '../../data/repositories/cycle_settings_repository.dart';
 import '../../data/repositories/period_repository.dart';
-import '../../domain/models/period_log.dart';
+import '../../domain/services/period_service.dart';
 import '../../presentation/calendar/view_models/calendar_view_model.dart';
 import '../../localization/app_localizations.dart';
 import '../../design_system/app_layout.dart';
@@ -55,11 +55,11 @@ class _OnboardingCycleLengthScreenState
           lastPeriodDate.month,
           lastPeriodDate.day,
         );
-        final endDate = startDate.add(Duration(days: defaultPeriodLength - 1));
-        final periodLog = PeriodLog(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          startDate: startDate,
-          endDate: endDate,
+        // Kaydı servis kuruyor: "beklenen süre dolmadıysa dönem sürüyor"
+        // kuralı takvimdeki gün işaretlemeyle aynı olmak zorunda.
+        final periodLog = PeriodService().recordFromStart(
+          startDate,
+          expectedLength: defaultPeriodLength,
         );
         await periodRepo.savePeriodLogs([periodLog]);
       }

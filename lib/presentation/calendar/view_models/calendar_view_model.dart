@@ -138,7 +138,12 @@ class CalendarViewModel extends ChangeNotifier {
       return false;
     }
 
-    _periodLogs = _periodService.toggleDay(_periodLogs, date, today: today);
+    _periodLogs = _periodService.toggleDay(
+      _periodLogs,
+      date,
+      today: today,
+      expectedLength: _userPeriodLength,
+    );
     await _persistPeriods();
     return true;
   }

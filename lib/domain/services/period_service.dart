@@ -86,10 +86,15 @@ class PeriodService {
   ///
   /// [today]: bugünün tarihi. Gelecekte **başlayan** bir dönem üretilmesini
   /// engellemek için gerekiyor; kullanıcı yaşamadığı bir kanamayı kaydedemez.
+  ///
+  /// [expectedLength]: kullanıcının regl süresi. Geçmiş bir gün işaretlendiğinde
+  /// dönemin hâlâ sürüyor olup olmadığına bununla karar veriliyor — bkz.
+  /// [_couldStillBeRunning].
   List<PeriodLog> toggleDay(
     List<PeriodLog> logs,
     DateTime date, {
     DateTime? today,
+    int expectedLength = PeriodLog.defaultOngoingLength,
   }) {
     final cleanDate = DateTime(date.year, date.month, date.day);
     final reference = today ?? DateTime.now();
@@ -160,26 +165,92 @@ class PeriodService {
         }
       }
 
+      final PeriodLog affected;
       if (prevPeriod != null && nextPeriod != null) {
         prevPeriod.endDate = nextPeriod.endDate;
         newList.remove(nextPeriod);
+        affected = prevPeriod;
       } else if (prevPeriod != null) {
         prevPeriod.endDate = cleanDate;
+        affected = prevPeriod;
       } else if (nextPeriod != null) {
         nextPeriod.startDate = cleanDate;
+        affected = nextPeriod;
       } else {
-        newList.add(
-          PeriodLog(
-            id: DateTime.now().millisecondsSinceEpoch.toString(),
-            startDate: cleanDate,
-            endDate: cleanDate,
-          ),
+        affected = PeriodLog(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          startDate: cleanDate,
+          endDate: cleanDate,
         );
+        newList.add(affected);
+      }
+
+      // Sonrasında başka bir dönem varsa bu blok geçmişe ait; kapalı kalır.
+      final hasLaterPeriod = newList.any(
+        (l) => !identical(l, affected) && l.firstDay.isAfter(affected.firstDay),
+      );
+      if (!hasLaterPeriod &&
+          _couldStillBeRunning(
+            affected.firstDay,
+            cleanToday,
+            expectedLength,
+          )) {
+        affected.endDate = null;
       }
     }
 
     newList.sort((a, b) => a.startDate.compareTo(b.startDate));
     return newList;
+  }
+
+  /// İşaretlenen blok bugün hâlâ sürüyor olabilir mi?
+  ///
+  /// "17'sinde başladı" demek "17'sinde başlayıp bitti" demek değil. Takvimde
+  /// geçmiş bir gün işaretlemek dönemi **kapalı** kaydediyordu: takvim bugünü
+  /// kapsamıyor, `periodEndedToday` doğru dönüyor ve ana ekran daha ilk günden
+  /// dönemi bitmiş sayıyordu. Oysa ana ekrandaki "Reglim başladı" düğmesi aynı
+  /// tarihi açık kaydediyordu — aynı olgu iki arayüzde iki farklı şey.
+  ///
+  /// Beklenen regl süresi henüz dolmadıysa kayıt açık bırakılıyor; dönem
+  /// bittiğinde kullanıcı "Reglim bitti" diyor. Süre dolmuşsa kayıt geçmişe
+  /// aittir ve kapalı kalır — aksi hâlde aylar önceki bir gün işaretlendiğinde
+  /// dönem bugüne kadar uzardı.
+  bool _couldStillBeRunning(
+    DateTime start,
+    DateTime today,
+    int expectedLength,
+  ) => !_lastPossibleDay(start, expectedLength).isBefore(today);
+
+  static DateTime _lastPossibleDay(DateTime start, int expectedLength) =>
+      start.add(Duration(days: (expectedLength < 1 ? 1 : expectedLength) - 1));
+
+  /// Kullanıcının bildirdiği bir **başlangıç tarihinden** kayıt üretir.
+  ///
+  /// Onboarding formu yalnızca "son reglin ne zaman başladı" diye soruyor.
+  /// Ekran bu cevaptan `startDate + süre - 1` diye bir bitiş uyduruyor ve
+  /// kaydı kapatıyordu: kullanıcının söylemediği bir tarih veri gibi
+  /// yazılıyor, üstelik dönem hâlâ sürüyorsa kurulumun hemen ertesinde
+  /// bitmiş görünüyordu.
+  ///
+  /// Kural [toggleDay] ile aynı olmak zorunda — ikisi de "beklenen süre
+  /// dolmadıysa dönem sürüyor" diyor. Ayrı ayrı yazılsaydı biri değişip
+  /// diğeri unutulurdu.
+  PeriodLog recordFromStart(
+    DateTime start, {
+    DateTime? today,
+    int expectedLength = PeriodLog.defaultOngoingLength,
+  }) {
+    final cleanStart = DateTime(start.year, start.month, start.day);
+    final reference = today ?? DateTime.now();
+    final cleanToday = DateTime(reference.year, reference.month, reference.day);
+
+    return PeriodLog(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      startDate: cleanStart,
+      endDate: _couldStillBeRunning(cleanStart, cleanToday, expectedLength)
+          ? null
+          : _lastPossibleDay(cleanStart, expectedLength),
+    );
   }
 
   /// Belirli bir tarihten önceki en son regl başlangıcını bulur.
