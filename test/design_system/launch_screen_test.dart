@@ -101,7 +101,7 @@ void main() {
     expect(constant('SAND_50'), _asComponents(AppPalette.sand50));
     expect(constant('NIGHT_900'), _asComponents(AppPalette.night900));
     expect(constant('PLUM_700'), _asComponents(AppPalette.plum700));
-    expect(constant('PLUM_300'), _asComponents(AppPalette.plum300));
+    expect(constant('ROSE_200'), _asComponents(AppPalette.rose200));
   });
 
   test('açılış görseli yer tutucu değil', () {

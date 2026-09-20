@@ -27,7 +27,18 @@ from lotus import lotus_polygons
 SAND_50 = (0xFB, 0xF8, 0xF5)   # AppPalette.sand50   — açık temada zemin
 NIGHT_900 = (0x15, 0x10, 0x14)  # AppPalette.night900 — koyu temada zemin
 PLUM_700 = (0x6B, 0x2F, 0x55)   # AppPalette.plum700  — açık temada marka
-PLUM_300 = (0xC7, 0x9B, 0xB4)   # AppPalette.plum300  — koyu temada marka
+ROSE_200 = (0xF0, 0xCD, 0xD5)   # AppPalette.rose200  — koyu temada işaret
+
+# Koyu temada işaret neden `plum300` değil:
+#
+# İşaretin yan yaprakları %75 saydam çiziliyor. `plum300` gece zeminine
+# karışınca #9A788C'ye düşüyor ve biraz sönük duruyordu; `rose200` aynı
+# yerde #B99EA5 veriyor — daha canlı, hâlâ pembe. Zemine karşı kontrast da
+# 7.86:1'den 12.90:1'e çıkıyor.
+#
+# `rose50` denendi ve elendi: kontrastı en yüksek (16.67:1) ama yan
+# yaprakların doygunluğu %6'ya iniyor, yani işaret gri okunuyor — markanın
+# oturması gereken anda rengini kaybediyor.
 
 # İşaretin genişliği (pt). Storyboard görseli kendi doğal boyutunda
 # ortalıyor, yani PNG'nin boyutu ekrandaki boyutudur.
@@ -63,7 +74,7 @@ def write_images(mask):
     entries = []
     for prefix, rgb, appearances in (
         ("LaunchImage", PLUM_700, None),
-        ("LaunchImageDark", PLUM_300, DARK),
+        ("LaunchImageDark", ROSE_200, DARK),
     ):
         for scale in (1, 2, 3):
             tw = WIDTH_PT * scale
