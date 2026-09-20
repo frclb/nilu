@@ -79,18 +79,27 @@ class PrivacyPolicyScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Ölçüler makale okuyucusuyla aynı (başlık 18, gövde 15): ikisi
+          // de uzun metin ekranı. Ama stiller `TextStyle` ile sıfırdan
+          // yazıldığı için başlıklar gövde yazı tipinde kalıyordu; makale
+          // başlıkları `displayLarge` yani serif. Aynı uygulamanın iki
+          // uzun metin ekranı iki farklı yazı ailesi kullanıyordu.
           Text(
             title,
-            style: TextStyle(
+            style: Theme.of(context).textTheme.displayLarge?.copyWith(
               color: textColor,
               fontSize: 18,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             content,
-            style: TextStyle(color: mutedColor, fontSize: 15, height: 1.6),
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: mutedColor,
+              fontSize: 15,
+              height: 1.7,
+            ),
           ),
         ],
       ),
