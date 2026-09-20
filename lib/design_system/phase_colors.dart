@@ -17,7 +17,7 @@ extension CyclePhaseColors on CyclePhase {
     CyclePhase.follicular => t.phaseFollicular,
     CyclePhase.ovulation => t.ovulation,
     CyclePhase.luteal => t.phaseLuteal,
-    CyclePhase.suppressed => t.textMuted,
+    CyclePhase.suppressed => t.phaseSuppressed,
     CyclePhase.unknown => t.textFaint,
   };
 

@@ -69,6 +69,15 @@ class AppTokens extends ThemeExtension<AppTokens> {
   final Color phaseFollicular;
   final Color phaseLuteal;
 
+  /// Hormonal doğum kontrolünde kanama dışındaki günler.
+  ///
+  /// Faz rengi **değil**: yumurtlama baskılandığı için foliküler/luteal
+  /// ayrımı gerçeği yansıtmaz ve uygulama onu uydurmaz. Ama nötr gri de
+  /// yanlış: gri "veri yok" demek, oysa burada durum biliniyor — sadece
+  /// evrelere ayrılmıyor. Çarkın 27 çiçeğinin 21'i koyu griye dönünce
+  /// ekran bozuk görünüyordu.
+  final Color phaseSuppressed;
+
   final Color success;
   final Color warning;
   final Color danger;
@@ -92,6 +101,7 @@ class AppTokens extends ThemeExtension<AppTokens> {
     required this.fertile,
     required this.phaseFollicular,
     required this.phaseLuteal,
+    required this.phaseSuppressed,
     required this.success,
     required this.warning,
     required this.danger,
@@ -127,6 +137,7 @@ class AppTokens extends ThemeExtension<AppTokens> {
     fertile: AppPalette.rose200,
     phaseFollicular: AppPalette.success,
     phaseLuteal: AppPalette.clay600,
+    phaseSuppressed: AppPalette.plum300,
     success: AppPalette.success,
     warning: AppPalette.warning,
     danger: AppPalette.danger,
@@ -152,6 +163,11 @@ class AppTokens extends ThemeExtension<AppTokens> {
     fertile: AppPalette.rose200,
     phaseFollicular: Color(0xFF5FB3A1),
     phaseLuteal: AppPalette.clay400,
+    // Koyu temada `plum300` regl gülünden daha **açık** kalıyordu ve
+    // hiyerarşi tersine dönüyordu: kanama günleri geri planda, baskılanmış
+    // günler önde. Aynı hüenin daha sönük tonu kullanılıyor — kanama en
+    // parlak, geri kalanı sakin.
+    phaseSuppressed: Color(0xFFA0788F),
     success: Color(0xFF5FB3A1),
     warning: Color(0xFFD9A845),
     danger: Color(0xFFD4736D),
@@ -177,6 +193,7 @@ class AppTokens extends ThemeExtension<AppTokens> {
     Color? fertile,
     Color? phaseFollicular,
     Color? phaseLuteal,
+    Color? phaseSuppressed,
     Color? success,
     Color? warning,
     Color? danger,
@@ -200,6 +217,7 @@ class AppTokens extends ThemeExtension<AppTokens> {
       fertile: fertile ?? this.fertile,
       phaseFollicular: phaseFollicular ?? this.phaseFollicular,
       phaseLuteal: phaseLuteal ?? this.phaseLuteal,
+      phaseSuppressed: phaseSuppressed ?? this.phaseSuppressed,
       success: success ?? this.success,
       warning: warning ?? this.warning,
       danger: danger ?? this.danger,
@@ -229,6 +247,7 @@ class AppTokens extends ThemeExtension<AppTokens> {
       fertile: mix(fertile, other.fertile),
       phaseFollicular: mix(phaseFollicular, other.phaseFollicular),
       phaseLuteal: mix(phaseLuteal, other.phaseLuteal),
+      phaseSuppressed: mix(phaseSuppressed, other.phaseSuppressed),
       success: mix(success, other.success),
       warning: mix(warning, other.warning),
       danger: mix(danger, other.danger),
