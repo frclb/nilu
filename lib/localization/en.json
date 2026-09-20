@@ -615,7 +615,7 @@
   "premium_feature_phase_title": "Symptom–phase analysis",
   "premium_feature_phase_desc": "See which phase of your cycle your symptoms cluster in.",
   "premium_feature_export_title": "Data export",
-  "premium_feature_export_desc": "Export your records as a readable summary, a spreadsheet and a full backup.",
+  "premium_feature_export_desc": "Export your records as a readable summary, a table and a restorable backup.",
   "premium_feature_themes_title": "Custom themes",
   "premium_feature_themes_desc": "Choose the app colour; calendar colours stay the same in every theme.",
   "premium_period_weekly": "Weekly",

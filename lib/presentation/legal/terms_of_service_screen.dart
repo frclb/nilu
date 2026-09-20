@@ -42,34 +42,16 @@ class TermsOfServiceScreen extends StatelessWidget {
                 style: TextStyle(color: mutedColor, fontSize: 13),
               ),
               const SizedBox(height: 24),
-              _buildSection(
-                context,
-                textColor,
-                mutedColor,
-                title: context.tr('terms_section1_title'),
-                content: context.tr('terms_section1_content'),
-              ),
-              _buildSection(
-                context,
-                textColor,
-                mutedColor,
-                title: context.tr('terms_section2_title'),
-                content: context.tr('terms_section2_content'),
-              ),
-              _buildSection(
-                context,
-                textColor,
-                mutedColor,
-                title: context.tr('terms_section3_title'),
-                content: context.tr('terms_section3_content'),
-              ),
-              _buildSection(
-                context,
-                textColor,
-                mutedColor,
-                title: context.tr('terms_section4_title'),
-                content: context.tr('terms_section4_content'),
-              ),
+              // Politika ekranıyla aynı kalıp: bölümler tek tek
+              // yazılmıyor, sayı tek yerde duruyor.
+              for (var i = 1; i <= _sectionCount; i++)
+                _buildSection(
+                  context,
+                  textColor,
+                  mutedColor,
+                  title: context.tr('terms_section${i}_title'),
+                  content: context.tr('terms_section${i}_content'),
+                ),
               const SizedBox(height: 32),
             ],
           ),
@@ -77,6 +59,10 @@ class TermsOfServiceScreen extends StatelessWidget {
       ),
     );
   }
+
+  /// Şartlardaki bölüm sayısı. Sözlükteki `terms_sectionN_*` anahtarlarıyla
+  /// uyuşması testle doğrulanıyor.
+  static const int _sectionCount = 4;
 
   Widget _buildSection(
     BuildContext context,
