@@ -144,7 +144,7 @@ class _OnboardingCycleLengthScreenState
                   children: [
                     IconButton(
                       icon: Icon(Icons.arrow_back, color: textColor),
-                      onPressed: () => context.pop(),
+                      onPressed: () => onboardingBack(context),
                     ),
                     TextButton(
                       onPressed: _completeOnboarding,

@@ -86,7 +86,7 @@ class _OnboardingLastPeriodScreenState
               );
 
               if (context.mounted) {
-                context.goNamed(RouteNames.onboardingPeriodLength);
+                context.pushNamed(RouteNames.onboardingPeriodLength);
               }
             },
             style: ElevatedButton.styleFrom(
@@ -128,7 +128,7 @@ class _OnboardingLastPeriodScreenState
                   children: [
                     IconButton(
                       icon: Icon(Icons.arrow_back, color: textMainColor),
-                      onPressed: () => context.pop(),
+                      onPressed: () => onboardingBack(context),
                     ),
                     const SizedBox(width: 48), // Spacer to balance back button
                   ],

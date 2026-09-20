@@ -1,9 +1,31 @@
-/// Onboarding ilerleme göstergesinin ortak değerleri.
+/// Onboarding akışının ortak parçaları: ilerleme göstergesi ve geri gidiş.
 ///
 /// Adım sayısı üç ekranda ayrı ayrı yazılıydı (`List.generate(6, ...)`).
 /// Araya bir ekran eklendiğinde üçünü birden güncellemek gerekiyordu;
 /// biri unutulsaydı kullanıcı adım sayısı değişen bir gösterge görürdü.
 library;
+
+import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../core/navigation/route_names.dart';
+
+/// Onboarding adımlarının geri düğmesi.
+///
+/// Adımlar arası geçiş `context.goNamed` ile yapılıyordu; `go` yığına
+/// eklemek yerine konumu **değiştiriyor**, dolayısıyla geri alınacak bir şey
+/// kalmıyor ve `context.pop()` hiçbir şey yapmıyordu. Üç ekranın geri
+/// düğmesi de sessizce ölüydü. Geçişler `push`'a alındı.
+///
+/// Yine de yığın boş olabilir: derin bağlantı doğrudan bir adıma düşürürse
+/// `pop()` hata fırlatır. O durumda akışın başına dönülüyor.
+void onboardingBack(BuildContext context) {
+  if (context.canPop()) {
+    context.pop();
+  } else {
+    context.goNamed(RouteNames.onboarding);
+  }
+}
 
 /// Karşılama sayfalarından sonra gelen soru ekranları dahil, toplam adım.
 const int onboardingStepCount = 7;

@@ -61,7 +61,7 @@ class _OnboardingPeriodLengthScreenState
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(OnboardingPeriodLengthScreen.prefsKey, _selectedDays);
     if (!mounted) return;
-    context.goNamed(RouteNames.onboardingCycleLength);
+    context.pushNamed(RouteNames.onboardingCycleLength);
   }
 
   /// "Bilmiyorum": varsayılana dön ve devam et. Kayıt yine yazılıyor ki
@@ -132,7 +132,7 @@ class _OnboardingPeriodLengthScreenState
                   children: [
                     IconButton(
                       icon: Icon(Icons.arrow_back, color: textColor),
-                      onPressed: () => context.pop(),
+                      onPressed: () => onboardingBack(context),
                     ),
                     TextButton(
                       onPressed: _continue,
