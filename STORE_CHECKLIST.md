@@ -161,10 +161,31 @@ profil, loglar ve yakınlık dokümanı da siliniyor, ardından kimliğin kendis
 kaldırılıyor. (Önceden yalnızca cihazdaki veri siliniyordu — bağlı partner
 hesap silindikten sonra da veriyi okuyabiliyordu.)
 
+### Politikadaki iki boşluk ⬜ — **engelleyici**
+Politikanın 9. bölümü iki yer tutucu içeriyor ve bunlar sizden başkası
+tarafından doldurulamaz:
+
+- `[E-POSTA ADRESİ]` — kullanıcı erişim, düzeltme, silme, taşınabilirlik
+  ve itiraz haklarını buradan kullanacak. Adres olmadan bu haklar fiilen
+  kullanılamaz.
+- `[ŞİRKET VEYA KİŞİ ADI, ADRES]` — veri sorumlusu kim?
+
+Altı dilde de aynı yer tutucular var (`privacy_policy_section9_content`).
+Köşeli parantezler bilerek bırakıldı: ekranda gözle görülür duruyorlar.
+
 ### Gizlilik politikası URL'si ⬜
 App Store **herkese açık bir URL** ister. Uygulama içindeki gizlilik metni
 ([privacy_policy_screen.dart](lib/presentation/legal/privacy_policy_screen.dart))
 yeterli değildir. Metni bir web sayfasına koyup URL'i mağaza formuna girin.
+Yayınlanan sürüm uygulama içindeki metinle **aynı** olmalı; ikisi ayrışırsa
+hangisinin geçerli olduğu belirsizleşir.
+
+### Gizlilik etiketleri ⬜
+Politikanın 5. ve 6. bölümleri uygulamanın gerçekte kullandığı hizmetleri
+sayıyor: Firebase, Apple ile Giriş, RevenueCat, Google AdMob. App Store
+gizlilik etiketleri bunlarla tutarlı olmalı — özellikle reklam kimliği ve
+kullanım verisi kalemleri. Partner paylaşımını "yakınlık durumu" olarak
+beyan edin; döngü verisi cihazdan çıkmıyor.
 
 ---
 

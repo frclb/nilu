@@ -42,41 +42,17 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 style: TextStyle(color: mutedColor, fontSize: 13),
               ),
               const SizedBox(height: 24),
-              _buildSection(
-                context,
-                textColor,
-                mutedColor,
-                title: context.tr('privacy_policy_section1_title'),
-                content: context.tr('privacy_policy_section1_content'),
-              ),
-              _buildSection(
-                context,
-                textColor,
-                mutedColor,
-                title: context.tr('privacy_policy_section2_title'),
-                content: context.tr('privacy_policy_section2_content'),
-              ),
-              _buildSection(
-                context,
-                textColor,
-                mutedColor,
-                title: context.tr('privacy_policy_section3_title'),
-                content: context.tr('privacy_policy_section3_content'),
-              ),
-              _buildSection(
-                context,
-                textColor,
-                mutedColor,
-                title: context.tr('privacy_policy_section4_title'),
-                content: context.tr('privacy_policy_section4_content'),
-              ),
-              _buildSection(
-                context,
-                textColor,
-                mutedColor,
-                title: context.tr('privacy_policy_section5_title'),
-                content: context.tr('privacy_policy_section5_content'),
-              ),
+              // Bölümler tek tek yazılmıyor: her yeni bölüm için altı
+              // satırlık aynı bloğu kopyalamak, ekranın sözlükten
+              // ayrışmasına açık kapı bırakıyordu.
+              for (var i = 1; i <= _sectionCount; i++)
+                _buildSection(
+                  context,
+                  textColor,
+                  mutedColor,
+                  title: context.tr('privacy_policy_section${i}_title'),
+                  content: context.tr('privacy_policy_section${i}_content'),
+                ),
               const SizedBox(height: 32),
             ],
           ),
@@ -84,6 +60,12 @@ class PrivacyPolicyScreen extends StatelessWidget {
       ),
     );
   }
+
+  /// Politikadaki bölüm sayısı.
+  ///
+  /// Sözlükte `privacy_policy_section1..N` anahtarları var; sayı burada
+  /// tek yerde duruyor ve testi bu ikisinin uyuştuğunu doğruluyor.
+  static const int _sectionCount = 10;
 
   Widget _buildSection(
     BuildContext context,
