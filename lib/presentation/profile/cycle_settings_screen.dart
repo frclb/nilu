@@ -140,7 +140,12 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                       value: _hormonalContraception,
                       onChanged: (v) =>
                           setState(() => _hormonalContraception = v),
-                      activeThumbColor: Theme.of(context).colorScheme.primary,
+                      // Renkler temadan geliyor. Burada `activeThumbColor`
+                      // rayla **aynı** renge (primary) eziliyordu: açık
+                      // hâlde topuz görünmüyor, anahtar tek parça bir
+                      // dikdörtgene dönüyordu. Açık mı kapalı mı olduğu
+                      // yalnızca renk tonundan anlaşılıyordu — konumdan
+                      // değil.
                       title: Text(
                         context.tr('cycle_settings_contraception'),
                         style: TextStyle(
