@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../design_system/app_scrim.dart';
 import '../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
 import 'package:go_router/go_router.dart';
 import '../../design_system/app_layout.dart';
 import 'onboarding_progress.dart';
+import 'widgets/onboarding_illustration.dart';
 
 class OnboardingWelcomeScreen extends StatefulWidget {
   const OnboardingWelcomeScreen({super.key});
@@ -33,9 +33,12 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
   /// durmuyor. Kısa ekranda çizim metnin yerini yiyip **açıklamayı
   /// kırpıyordu** (iPhone 16e'de ikinci satır yarısından kesiliyordu),
   /// geniş ekranda ise doğal boyutunda kalıp sayfayı boş bırakıyordu.
-  static const double _heroRatio = 0.45;
-  static const double _heroRatioWide = 0.55;
-  static const double _heroRatioShort = 0.38;
+  // Rozet kaldırıldıktan sonra sayfada ~90 pt boşaldı; çizim o yeri
+  // kullanıyor. Üst sınır: metin yine de `Flexible` sayesinde önceliği
+  // koruyor, uzun başlıklarda (Almanca 4. slayt üç satır) kutu küçülüyor.
+  static const double _heroRatio = 0.52;
+  static const double _heroRatioWide = 0.60;
+  static const double _heroRatioShort = 0.42;
   static const double _heroMin = 100;
   static const double _heroMax = 620;
 
@@ -92,7 +95,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
         context,
         theme,
         textColor,
-        Icons.spa,
+        OnboardingIllustration.brand,
         context.tr('onboarding_welcome_title'),
         context.tr('onboarding_welcome_desc'),
       ),
@@ -100,7 +103,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
         context,
         theme,
         textColor,
-        Icons.calendar_month,
+        OnboardingIllustration.calendar,
         context.tr('onboarding_page2_title'),
         context.tr('onboarding_page2_desc'),
       ),
@@ -108,7 +111,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
         context,
         theme,
         textColor,
-        Icons.edit_note,
+        OnboardingIllustration.log,
         context.tr('onboarding_page3_title'),
         context.tr('onboarding_page3_desc'),
       ),
@@ -116,7 +119,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
         context,
         theme,
         textColor,
-        Icons.favorite,
+        OnboardingIllustration.partner,
         context.tr('onboarding_page4_title'),
         context.tr('onboarding_page4_desc'),
       ),
@@ -317,12 +320,10 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
     BuildContext context,
     ThemeData theme,
     Color textColor,
-    IconData topIcon,
+    OnboardingIllustration illustration,
     String title,
     String description,
   ) {
-    final isDark = theme.brightness == Brightness.dark;
-
     // Sayfa kaydırılabilir: sığdığında ortalanıyor, sığmadığında kayıyor.
     // Önceden sabit bir sütundu ve çizim `Expanded` içindeydi — yazı boyutu
     // büyüdüğünde çizime kalan yer içeriğinden küçülüyor, ekran taşıyordu.
@@ -340,7 +341,6 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
           _heroMin,
           _heroMax,
         );
-        final showBadge = !short;
 
         // `Flexible` sınırlı bir dikey alan istiyor; kaydırma görünümü
         // sınırsız veriyor. Sayfa alanı kadar sabit bir kutu veriliyor ve
@@ -358,37 +358,6 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Top Icon — kısa ekranda gizli, bkz.
-                    // [_badgeMinPageHeight].
-                    if (showBadge) ...[
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: context.tokens.surface,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: theme.colorScheme.primary.withAlpha(25),
-                            width: 1,
-                          ),
-                          boxShadow: isDark
-                              ? []
-                              : [
-                                  BoxShadow(
-                                    color: AppScrim.veil(26),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                        ),
-                        child: Icon(
-                          topIcon,
-                          size: 48,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-
                     // Hero illustration area
                     //
                     // Yükseklik sınırlı, içerik `FittedBox` ile küçülüyor: yazı
@@ -428,81 +397,14 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                             ),
                           ),
                           child: FittedBox(
-                            // Geniş ekranda `contain`: çizim yer varken büyüyüp
-                            // kutuyu dolduruyor. Dar ekranda `scaleDown` kalıyor —
-                            // `contain` orada da kutuyu doldurduğu için kahraman
-                            // alanı 260'tan 300 pt'ye çıkıyor ve açıklama metnini
-                            // ekranın dışına itiyordu.
-                            fit: wide ? BoxFit.contain : BoxFit.scaleDown,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // Decorative circles
-                                Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Container(
-                                      width: 160,
-                                      height: 160,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: theme.colorScheme.primary
-                                            .withAlpha(12),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 120,
-                                      height: 120,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: theme.colorScheme.primary
-                                            .withAlpha(20),
-                                      ),
-                                    ),
-                                    Icon(
-                                      topIcon,
-                                      size: 64,
-                                      color: theme.colorScheme.primary
-                                          .withAlpha(153),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 24),
-                                Icon(
-                                  Icons.water_drop,
-                                  size: 32,
-                                  color: theme.colorScheme.primary.withAlpha(
-                                    102,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.local_florist,
-                                      size: 24,
-                                      color: theme.colorScheme.primary
-                                          .withAlpha(76),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Icon(
-                                      Icons.sunny,
-                                      size: 24,
-                                      color: theme.colorScheme.primary
-                                          .withAlpha(76),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Icon(
-                                      Icons.nights_stay,
-                                      size: 24,
-                                      color: theme.colorScheme.primary
-                                          .withAlpha(76),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                            // `contain`: çizim kutuyu dolduruyor. Dar ekranda
+                            // eskiden `scaleDown` kullanılıyordu çünkü rozetle
+                            // birlikte kahraman alanı 300 pt'ye çıkıp açıklamayı
+                            // ekran dışına itiyordu. Rozet kalktı, o yer boşaldı;
+                            // `scaleDown` ise çizimi doğal boyutundan büyütmediği
+                            // için kart yarı boş kalıyordu.
+                            fit: BoxFit.contain,
+                            child: illustration.build(context),
                           ),
                         ),
                       ),
