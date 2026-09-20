@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_theme.dart';
 import '../../design_system/app_tokens.dart';
 import '../../localization/app_localizations.dart';
 import '../../design_system/app_layout.dart';
@@ -86,20 +87,12 @@ class PrivacyPolicyScreen extends StatelessWidget {
           // uzun metin ekranı iki farklı yazı ailesi kullanıyordu.
           Text(
             title,
-            style: Theme.of(context).textTheme.displayLarge?.copyWith(
-              color: textColor,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: AppTheme.readingHeading(context, color: textColor),
           ),
           const SizedBox(height: 8),
           Text(
             content,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: mutedColor,
-              fontSize: 15,
-              height: 1.7,
-            ),
+            style: AppTheme.readingBody(context, color: mutedColor),
           ),
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_theme.dart';
 import '../widgets/ad_banner.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -78,19 +79,13 @@ class ArticleScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       Text(
                         context.tr(section.headingKey!),
-                        style: theme.textTheme.displayLarge?.copyWith(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AppTheme.readingHeading(context),
                       ),
                       const SizedBox(height: 10),
                     ],
                     Text(
                       context.tr(section.bodyKey),
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontSize: 15,
-                        height: 1.7,
-                      ),
+                      style: AppTheme.readingBody(context),
                     ),
                     const SizedBox(height: 16),
                   ],

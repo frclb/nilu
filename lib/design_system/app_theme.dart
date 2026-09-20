@@ -23,6 +23,33 @@ class AppTheme {
     padding: const EdgeInsets.symmetric(horizontal: 20),
   );
 
+  /// Uzun metin ekranlarının gövde yazısı.
+  ///
+  /// Gizlilik politikası, kullanım şartları ve sağlık kütüphanesi
+  /// makaleleri aynı ölçüyü paylaşıyor; üçü de ayrı ayrı yazdığı için
+  /// ayrışmaya açıktı.
+  ///
+  /// Satır aralığı 1.7 idi: 15 pt harfe 25 pt satır kutusu düşüyordu.
+  /// iOS'un kendi gövde metni 17 pt harfe ~22 pt kutu veriyor — yani
+  /// bizim metin, harfleri daha küçük olmasına rağmen daha seyrekti ve
+  /// blok bu yüzden "iri" görünüyordu. 1.5 ile kutu 23 pt'ye iniyor.
+  static TextStyle? readingBody(BuildContext context, {Color? color}) =>
+      Theme.of(
+        context,
+      ).textTheme.labelLarge?.copyWith(color: color, fontSize: 15, height: 1.5);
+
+  /// Uzun metin ekranlarının bölüm başlığı.
+  ///
+  /// `displayLarge` yani serif: makale başlıklarıyla aynı aile. Hukuki
+  /// ekranlar bunu `TextStyle` ile sıfırdan yazdığı için gövde yazı
+  /// tipinde kalıyordu.
+  static TextStyle? readingHeading(BuildContext context, {Color? color}) =>
+      Theme.of(context).textTheme.displayLarge?.copyWith(
+        color: color,
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      );
+
   const AppTheme._();
 
   static ThemeData light(AppFlavor flavor) => _build(flavor, Brightness.light);
