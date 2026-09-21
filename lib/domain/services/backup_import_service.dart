@@ -78,6 +78,18 @@ class ImportedData {
 class BackupImportService {
   const BackupImportService._();
 
+  /// Geçmişe doğru kabul edilen en uzak sınır (yıl).
+  ///
+  /// Yedek dosyası kullanıcının **elle düzenleyebileceği** tek girdi; başka
+  /// her yer seçici ve düğmelerle sınırlı. Elle yazılmış bir tarih hiçbir
+  /// yerde çökme üretmiyor ama ekranda anlamsız sayılar bırakıyor: yıl 1
+  /// tarihli bir kayıt ana ekranda "739880. gün" ve "739851 gün gecikme"
+  /// yazdırıyordu (ölçüldü). Sağlık uygulamasında uydurma bir sayı,
+  /// çökmeden daha kötü — veri gibi görünüyor.
+  ///
+  /// Elli yıl, bir insanın kendi regl geçmişinin dış sınırı.
+  static const int maxHistoryYears = 50;
+
   /// [json] yedeğini [periodLogs] ve [dailyLogs] ile birleştirir.
   ///
   /// [today] gelecek tarihli kayıtları elemek için; varsayılan bugündür.
@@ -105,6 +117,7 @@ class BackupImportService {
     }
 
     final limit = _day(today ?? DateTime.now());
+    final earliest = DateTime(limit.year - maxHistoryYears, limit.month, limit.day);
     var alreadyPresent = 0;
     var invalid = 0;
 
@@ -121,8 +134,18 @@ class BackupImportService {
 
       // Gelecekte başlayan dönem uygulamanın hiçbir yerinde üretilemiyor;
       // saati yanlış bir cihazdan gelen böyle bir kayıt tahminlerin
-      // tamamını bozardı.
-      if (_day(log.startDate).isAfter(limit)) {
+      // tamamını bozardı. Çok eski tarih de aynı şekilde: bkz.
+      // [maxHistoryYears].
+      if (!_isPlausible(log.startDate, earliest, limit)) {
+        invalid++;
+        continue;
+      }
+
+      // Bitişi başlangıcından önce olan kayıt. Uygulamanın hiçbir akışı
+      // böyle bir şey üretmiyor; geldiğinde dönem uzunluğu negatife
+      // düşüyor ve ekranda "-8 gün" gibi bir sayı çıkıyor.
+      final end = log.endDate;
+      if (end != null && _day(end).isBefore(_day(log.startDate))) {
         invalid++;
         continue;
       }
@@ -145,6 +168,12 @@ class BackupImportService {
     for (final entry in (rawDaily is List ? rawDaily : const [])) {
       final log = _readDaily(entry);
       if (log == null) {
+        invalid++;
+        continue;
+      }
+      // Günlük kayıtta hiç tarih sınırı yoktu: yıl 9999 tarihli bir kayıt
+      // takvimde ve dışa aktarmada öylece duruyordu.
+      if (!_isPlausible(log.date, earliest, limit)) {
         invalid++;
         continue;
       }
@@ -207,6 +236,12 @@ class BackupImportService {
   /// Yalnızca başlangıç tarihini karşılaştırmak yetmiyor: bir gün kayık
   /// başlayan iki kayıt üst üste binerdi ve döngü uzunluğu hesabı
   /// bozulurdu.
+  /// Tarih, bir insanın kendi geçmişi olabilecek aralıkta mı?
+  static bool _isPlausible(DateTime date, DateTime earliest, DateTime limit) {
+    final day = _day(date);
+    return !day.isAfter(limit) && !day.isBefore(earliest);
+  }
+
   static bool _overlaps(PeriodLog a, PeriodLog b) {
     final aStart = _day(a.startDate);
     final aEnd = _day(a.endDate ?? a.startDate);
