@@ -101,8 +101,8 @@ python3 tool/generate_launch_image.py
 > karşılaştırıyor.
 
 **Ekran görüntüleri** ✅ — `~/Desktop/RCApp Ekran Goruntuleri/`, dile göre
-ayrılmış: altı dilde iPhone 6.9" beşer kare, Türkçe'de ayrıca iPad 13" üç
-kare. Toplam 33 görsel, hepsi doğru boyutta ve alfasız.
+ayrılmış: altı dilin her birinde iPhone 6.9" beş, iPad 13" üç kare.
+Toplam 48 görsel, hepsi doğru boyutta ve alfasız.
 
 ```bash
 python3 tool/store_screenshots.py phone 1320 2868 tr
@@ -117,6 +117,16 @@ python3 tool/store_screenshots.py pad   2064 2752 tr
 > ```
 > ve uygulamayı yeniden başlatın — uygulamanın kendi dil ayarı yok, sistemi
 > izliyor.
+>
+> **Tablette ek bir adım var.** iPad durum çubuğu saatin yanında tarihi de
+> gösteriyor ve o tarih SpringBoard'dan geliyor; dil değişince kendiliğinden
+> güncellenmiyor. İlk denemede İngilizce ekranın üstünde "21 Eyl Pzt"
+> yazıyordu. Dili değiştirdikten sonra:
+> ```bash
+> xcrun simctl spawn <device> launchctl stop com.apple.SpringBoard
+> ```
+> ve durum çubuğu geçersiz kılmasını **yeniden** uygulayın; respring onu
+> sıfırlıyor.
 
 > Kareler tek bir yatay degradeden kesiliyor: mağazada kaydırırken zemin
 > kesintisiz akıyor. Başlıklar uygulamanın kendi yazı tipleriyle (Fraunces +
