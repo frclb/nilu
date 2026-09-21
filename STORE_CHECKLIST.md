@@ -100,13 +100,23 @@ python3 tool/generate_launch_image.py
 > olmak zorunda; `test/design_system/launch_screen_test.dart` ikisini
 > karşılaştırıyor.
 
-**Ekran görüntüleri** ✅ — set üretildi:
-`~/Desktop/RCApp Ekran Goruntuleri/` (iPhone 6.9" beş kare, iPad 13" üç kare).
+**Ekran görüntüleri** ✅ — `~/Desktop/RCApp Ekran Goruntuleri/`, dile göre
+ayrılmış: altı dilde iPhone 6.9" beşer kare, Türkçe'de ayrıca iPad 13" üç
+kare. Toplam 33 görsel, hepsi doğru boyutta ve alfasız.
 
 ```bash
-python3 tool/store_screenshots.py phone 1320 2868
-python3 tool/store_screenshots.py pad   2064 2752
+python3 tool/store_screenshots.py phone 1320 2868 tr
+python3 tool/store_screenshots.py pad   2064 2752 tr
 ```
+
+> Ham kareleri dil başına ayrı klasörden okuyor (`shots_<dil>/`). Dili
+> değiştirmek için simülatöre:
+> ```bash
+> xcrun simctl spawn <device> defaults write "Apple Global Domain" \
+>   AppleLanguages -array "de"
+> ```
+> ve uygulamayı yeniden başlatın — uygulamanın kendi dil ayarı yok, sistemi
+> izliyor.
 
 > Kareler tek bir yatay degradeden kesiliyor: mağazada kaydırırken zemin
 > kesintisiz akıyor. Başlıklar uygulamanın kendi yazı tipleriyle (Fraunces +
