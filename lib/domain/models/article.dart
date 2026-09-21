@@ -72,6 +72,15 @@ class Article {
   /// Metnin dayandığı kaynaklar. Makale sonunda listelenir.
   final List<ArticleSource> sources;
 
+  /// Makalenin sonunda tarif ekranına bağlantı çıksın mı?
+  ///
+  /// Tarif ekranı yazılmıştı ama hiçbir yerden açılmıyordu: rota tanımlıydı,
+  /// kapısı yoktu. Elde tek bir tarif olduğu için burada rota kimliği değil
+  /// bir bayrak duruyor — kütüphaneye "Tarifler" diye bir bölüm koymak
+  /// olmayan bir katalog ima ederdi. Tarif çoğaldığında bu alan kimliğe
+  /// dönüşür.
+  final bool hasRecipe;
+
   const Article({
     required this.titleKey,
     required this.tagKey,
@@ -80,6 +89,7 @@ class Article {
     required this.icon,
     required this.sections,
     required this.sources,
+    this.hasRecipe = false,
     this.isFeatured = false,
   });
 }
@@ -154,6 +164,8 @@ class ArticleCatalog {
           url: 'https://www.nhs.uk/conditions/pre-menstrual-syndrome/',
         ),
       ],
+      // Tarif magnezyum ve omega-3 üzerine; bu makalenin konusu da o.
+      hasRecipe: true,
     ),
     Article(
       titleKey: 'library_article_partner',

@@ -148,6 +148,17 @@ class ProfileSettingsScreen extends StatelessWidget {
                         context.pushNamed(RouteNames.notificationSettings);
                       },
                     ),
+                    // Ana ekran widget'ı uygulamada var ama onu tanıtan ekran
+                    // hiçbir yerden açılmıyordu: rota tanımlıydı, kapısı yoktu.
+                    SettingsItem(
+                      title: context.tr('widgets_title'),
+                      icon: Icons.widgets_outlined,
+                      iconColor: Theme.of(context).colorScheme.primary,
+                      iconBgColor: context.tokens.brandTint,
+                      onTap: () {
+                        context.pushNamed(RouteNames.widgetsPreview);
+                      },
+                    ),
                     SettingsItem(
                       title: context.tr('health_sync_title'),
                       icon: Icons.favorite_outline,

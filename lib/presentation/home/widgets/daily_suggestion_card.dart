@@ -162,7 +162,9 @@ class DailySuggestionCard extends StatelessWidget {
                         height: 48,
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            NavigationService().push(RouteNames.yogaDetail);
+                            NavigationService().push(
+                              detailRouteFor(guidance.activity),
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: theme.colorScheme.primary,
@@ -205,3 +207,19 @@ class DailySuggestionCard extends StatelessWidget {
     PhaseActivity.gentle => Icons.favorite_border,
   };
 }
+
+/// Önerinin açacağı detay ekranı.
+///
+/// Düğme, öneri ne olursa olsun yoga ekranını açıyordu: kullanıcı "Kardiyo"
+/// okuyup "Başla"ya bastığında karşısına yoga çıkıyordu. Güç ve kardiyo
+/// egzersiz ekranına, yumuşak hareket türleri yogaya gidiyor.
+///
+/// Meditasyon da yogaya gidiyor: elde ayrı bir meditasyon içeriği yok ve
+/// yoga ekranı gevşeme odaklı. Uydurma bir ekrana yönlendirmektense en
+/// yakın gerçek içerik.
+String detailRouteFor(PhaseActivity activity) => switch (activity) {
+  PhaseActivity.strength || PhaseActivity.cardio => RouteNames.exerciseDetail,
+  PhaseActivity.yinYoga ||
+  PhaseActivity.gentle ||
+  PhaseActivity.meditation => RouteNames.yogaDetail,
+};

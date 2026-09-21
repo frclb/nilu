@@ -8,6 +8,9 @@ import '../../design_system/content_illustration.dart';
 import '../../domain/models/article.dart';
 import '../../localization/app_localizations.dart';
 import '../../design_system/app_layout.dart';
+import 'package:go_router/go_router.dart';
+import '../../core/navigation/route_names.dart';
+import '../../design_system/app_card.dart';
 
 /// Bir kütüphane makalesini okur.
 ///
@@ -88,6 +91,64 @@ class ArticleScreen extends StatelessWidget {
                       style: AppTheme.readingBody(context),
                     ),
                     const SizedBox(height: 16),
+                  ],
+
+                  // Makaleyle ilgili tarif — yalnızca konusu örtüşen
+                  // makalelerde. Tarif ekranı yazılmıştı ama hiçbir yerden
+                  // açılmıyordu.
+                  if (article.hasRecipe) ...[
+                    const SizedBox(height: 8),
+                    AppCard(
+                      padding: const EdgeInsets.all(14),
+                      child: InkWell(
+                        onTap: () =>
+                            context.pushNamed(RouteNames.recipeDetail),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 42,
+                              height: 42,
+                              decoration: BoxDecoration(
+                                color: t.brandTint,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.restaurant_menu,
+                                size: 22,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    context.tr('article_try_recipe'),
+                                    style: theme.textTheme.labelLarge
+                                        ?.copyWith(
+                                          fontSize: 12,
+                                          letterSpacing: 0.5,
+                                          color: t.textMuted,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    context.tr('recipe_salmon_title'),
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.w600),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right,
+                              color: t.textFaint,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
 
                   const SizedBox(height: 16),
