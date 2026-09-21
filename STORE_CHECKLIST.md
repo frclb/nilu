@@ -100,7 +100,22 @@ python3 tool/generate_launch_image.py
 > olmak zorunda; `test/design_system/launch_screen_test.dart` ikisini
 > karşılaştırıyor.
 
-**Ekran görüntüleri** ⬜ — App Store Connect formunda sizden isteniyor.
+**Ekran görüntüleri** ✅ — set üretildi:
+`~/Desktop/RCApp Ekran Goruntuleri/` (iPhone 6.9" beş kare, iPad 13" üç kare).
+
+```bash
+python3 tool/store_screenshots.py phone 1320 2868
+python3 tool/store_screenshots.py pad   2064 2752
+```
+
+> Kareler tek bir yatay degradeden kesiliyor: mağazada kaydırırken zemin
+> kesintisiz akıyor. Başlıklar uygulamanın kendi yazı tipleriyle (Fraunces +
+> Inter). Ham kareler simülatörden, durum çubuğu 9:41'e sabitlenerek alındı.
+>
+> Kütüphane ve makale ekranlarında reklam bandı var ve gerçek AdMob
+> kimlikleri bağlanana kadar üstünde "Test mode" yazıyor. Telefonda bant ilk
+> ekranda görünmüyor; **tablette görünüyor**, o yüzden iPad setinde kütüphane
+> karesi yok.
 
 Uygulama hem iPhone hem iPad'i hedefliyor, dolayısıyla App Store Connect
 **her ikisi için de** ekran görüntüsü ister ve inceleme uygulamayı iPad'de de
