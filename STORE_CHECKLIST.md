@@ -273,6 +273,8 @@ beyan edin; döngü verisi cihazdan çıkmıyor.
 | Gerçek AdMob kimlikleri | Reklam alanının dolması | `Info.plist` → `GADApplicationIdentifier` ve [ads_datasource.dart](lib/data/datasources/ads_datasource.dart) — şu an Google'ın test kimlikleri |
 | AdMob GDPR mesajı | AEA'da reklam servisi | AdMob → Privacy & messaging → GDPR; uygulama tarafı hazır |
 
+Bu panellerin adım adım kurulumu ayrı dosyada: [SETUP_KEYS.md](SETUP_KEYS.md).
+
 Bunlar bağlanmadan uygulama **çalışır ama** partner özelliği yerel kalır,
 premium ekranı satın alma yapmaz, reklam alanı boş görünür. Yapılandırılmamış
 SDK'lara istek gitmiyor: RevenueCat anahtarsızken çağrı yapılsa süreç
