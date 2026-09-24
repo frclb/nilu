@@ -861,6 +861,7 @@
   "home_period_toggle_failed": "Bu gün işaretlenemedi.",
   "privacy_ads_notice": "Ücretsiz sürümde reklam gösterilir. Reklamlar kişiselleştirilmez: sağlık verilerin reklam için kullanılmaz, sana özel hedefleme yapılmaz. Premium'da reklam yoktur.",
   "privacy_ads_title": "Reklamlar",
+  "privacy_ads_options": "Reklam tercihlerini değiştir",
   "premium_feature_noads_title": "Reklamsız kullanım",
   "premium_feature_noads_desc": "Ücretsiz sürümdeki banner reklamlar kaldırılır."
 }

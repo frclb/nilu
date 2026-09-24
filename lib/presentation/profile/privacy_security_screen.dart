@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../core/navigation/route_names.dart';
+import '../../data/datasources/ad_consent.dart';
 import '../../data/repositories/privacy_settings_repository.dart';
 import '../../domain/services/app_lock_service.dart';
 import '../../domain/services/backup_import_service.dart';
@@ -36,6 +37,11 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
   LockCapability _capability = LockCapability.none;
   bool _isLoading = true;
 
+  /// AEA'da rızasını veren kullanıcının onu **geri alabilmesi** gerekiyor.
+  /// Girişi olmayan bir rıza kurulumu Google'ın gözünde eksik sayılıyor.
+  /// AEA dışında Google "gerekli değil" diyor ve düğme hiç çizilmiyor.
+  bool _adPrivacyOptions = false;
+
   @override
   void initState() {
     super.initState();
@@ -51,6 +57,13 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
       _capability = capability;
       _isLoading = false;
     });
+
+    // Rıza sorgusu ağa çıkıyor. Ekranın açılması ona bağlanmıyor — kilit
+    // ayarları uzaktaki bir yanıtı beklemek zorunda değil. Düğme varsa
+    // sonradan beliriyor.
+    final adOptions = await AdConsent.privacyOptionsRequired();
+    if (!mounted) return;
+    setState(() => _adPrivacyOptions = adOptions);
   }
 
   /// Kilidi açıp kapatır.
@@ -240,6 +253,28 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                                   color: context.tokens.textMuted,
                                 ),
                               ),
+                              if (_adPrivacyOptions)
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: TextButton(
+                                    onPressed: AdConsent.showPrivacyOptions,
+                                    style: TextButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                      ),
+                                      minimumSize: const Size(0, 44),
+                                      visualDensity: VisualDensity.standard,
+                                    ),
+                                    child: Text(
+                                      context.tr('privacy_ads_options'),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
                         ),

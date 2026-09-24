@@ -861,6 +861,7 @@
   "home_period_toggle_failed": "Não foi possível marcar este dia.",
   "privacy_ads_notice": "A versão gratuita mostra anúncios. Não são personalizados: os teus dados de saúde nunca são usados para publicidade e não és segmentada. O Premium não tem anúncios.",
   "privacy_ads_title": "Anúncios",
+  "privacy_ads_options": "Alterar preferências de anúncios",
   "premium_feature_noads_title": "Sem anúncios",
   "premium_feature_noads_desc": "Remove os banners da versão gratuita."
 }

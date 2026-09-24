@@ -271,6 +271,7 @@ beyan edin; döngü verisi cihazdan çıkmıyor.
 | Firestore kuralları | Veri güvenliği | `firebase deploy --only firestore:rules` |
 | RevenueCat API anahtarı | Premium satın alma | [subscription_service.dart](lib/domain/services/subscription_service.dart) — şu an `appl_api_key_placeholder` |
 | Gerçek AdMob kimlikleri | Reklam alanının dolması | `Info.plist` → `GADApplicationIdentifier` ve [ads_datasource.dart](lib/data/datasources/ads_datasource.dart) — şu an Google'ın test kimlikleri |
+| AdMob GDPR mesajı | AEA'da reklam servisi | AdMob → Privacy & messaging → GDPR; uygulama tarafı hazır |
 
 Bunlar bağlanmadan uygulama **çalışır ama** partner özelliği yerel kalır,
 premium ekranı satın alma yapmaz, reklam alanı boş görünür. Yapılandırılmamış
@@ -343,6 +344,28 @@ kimliği (IDFA) kullanılmıyor, ATT izni istenmiyor ve `NSPrivacyTracking`
 Karşılığı gelirin düşmesi; bilinçli bir takas — uygulama kullanıcıya üç yerde
 verisinin cihazda kaldığını söylüyor, davranış verisiyle hedefli reklam bu
 sözle çelişirdi.
+
+**AB rıza formu (UMP)** ✅ — [ad_consent.dart](lib/data/datasources/ad_consent.dart).
+
+Google, 16 Ocak 2024'ten beri AEA ve Birleşik Krallık trafiğinde sertifikalı
+bir rıza platformu (CMP) şart koşuyor. Bu **kişiselleştirilmemiş reklamlar
+için de** geçerli: reklam hedeflenmese bile cihazda okuma/yazma yapılıyor ve
+ePrivacy bunu rızaya bağlıyor. Formsuz, o trafikte reklam servisi kısıtlanır —
+uygulama de/es/fr/pt ile yayınlandığı için bu altı pazarın dördü demek.
+
+Google'ın kendi CMP'si (UMP) `google_mobile_ads` paketiyle geliyor, ek
+bağımlılık yok. Kurulum iki parça:
+
+1. **AdMob konsolunda** mesajın oluşturulması: Privacy & messaging → GDPR.
+   Uygulama seçilir, yayınlanacak diller işaretlenir, gizlilik politikası
+   bağlantısı girilir. Form orada tanımlanmazsa uygulama tarafı bir şey
+   gösteremez.
+2. **Uygulamada** zaten hazır: rıza reklamın çıktığı ilk ekranda soruluyor
+   (açılışta değil — onboarding'in ortasında Google formu çıkmasın diye).
+   Rıza alınamazsa reklam **istenmiyor**.
+
+Rızanın geri alınabilmesi de zorunlu: Gizlilik ve Güvenlik ekranında "Reklam
+tercihlerini değiştir" düğmesi, yalnızca Google "gerekli" dediğinde çiziliyor.
 
 **`SKAdNetworkItems`** ✅ — `Info.plist` içinde 50 reklam ağı kimliği.
 Bunlar olmadan kişiselleştirilmemiş reklamlarda bile yükleme atfı çalışmaz ve

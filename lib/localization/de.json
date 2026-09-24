@@ -861,6 +861,7 @@
   "home_period_toggle_failed": "Dieser Tag konnte nicht markiert werden.",
   "privacy_ads_notice": "Die kostenlose Version zeigt Werbung. Sie ist nicht personalisiert: Deine Gesundheitsdaten werden nie für Werbung genutzt, und du wirst nicht gezielt angesprochen. Premium ist werbefrei.",
   "privacy_ads_title": "Werbung",
+  "privacy_ads_options": "Werbeeinstellungen ändern",
   "premium_feature_noads_title": "Ohne Werbung",
   "premium_feature_noads_desc": "Entfernt die Banner der kostenlosen Version."
 }

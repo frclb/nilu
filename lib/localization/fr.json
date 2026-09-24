@@ -861,6 +861,7 @@
   "home_period_toggle_failed": "Ce jour n'a pas pu être marqué.",
   "privacy_ads_notice": "La version gratuite affiche des publicités. Elles ne sont pas personnalisées : tes données de santé ne servent jamais à la publicité et tu n'es pas ciblée. Premium est sans publicité.",
   "privacy_ads_title": "Publicités",
+  "privacy_ads_options": "Modifier les préférences publicitaires",
   "premium_feature_noads_title": "Sans publicité",
   "premium_feature_noads_desc": "Supprime les bannières de la version gratuite."
 }

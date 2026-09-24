@@ -861,6 +861,7 @@
   "home_period_toggle_failed": "This day could not be marked.",
   "privacy_ads_notice": "The free version shows ads. They are not personalised: your health data is never used for advertising and you are not targeted. Premium has no ads.",
   "privacy_ads_title": "Ads",
+  "privacy_ads_options": "Change ad preferences",
   "premium_feature_noads_title": "No ads",
   "premium_feature_noads_desc": "Removes the banner ads shown in the free version."
 }
