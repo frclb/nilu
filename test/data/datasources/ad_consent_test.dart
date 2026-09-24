@@ -54,16 +54,23 @@ void main() {
     AdConsent.resetForTest(port);
 
     expect(await AdConsent.resolve(mayShowForm: true), isTrue);
-    expect(port.forms, 0, reason: 'rıza gerekmiyorken kullanıcıya bir şey çıkmamalı');
+    expect(
+      port.forms,
+      0,
+      reason: 'rıza gerekmiyorken kullanıcıya bir şey çıkmamalı',
+    );
   });
 
-  test('rıza gerekirken form gösterilmeye izin yoksa reklam istenmez', () async {
-    final port = _FakePort();
-    AdConsent.resetForTest(port);
+  test(
+    'rıza gerekirken form gösterilmeye izin yoksa reklam istenmez',
+    () async {
+      final port = _FakePort();
+      AdConsent.resetForTest(port);
 
-    expect(await AdConsent.resolve(mayShowForm: false), isFalse);
-    expect(port.forms, 0);
-  });
+      expect(await AdConsent.resolve(mayShowForm: false), isFalse);
+      expect(port.forms, 0);
+    },
+  );
 
   test('form gösterilir ve kabul edilirse reklam istenebilir', () async {
     final port = _FakePort(canRequestAfterForm: true);
@@ -92,19 +99,22 @@ void main() {
     expect(port.updates, 1);
   });
 
-  test('tazeleme başarısızsa önbelleğe alınmaz, sonraki çağrı yeniden dener', () async {
-    final port = _FakePort(updateSucceeds: false, canRequestBeforeForm: true);
-    AdConsent.resetForTest(port);
+  test(
+    'tazeleme başarısızsa önbelleğe alınmaz, sonraki çağrı yeniden dener',
+    () async {
+      final port = _FakePort(updateSucceeds: false, canRequestBeforeForm: true);
+      AdConsent.resetForTest(port);
 
-    await AdConsent.resolve(mayShowForm: false);
-    await AdConsent.resolve(mayShowForm: false);
+      await AdConsent.resolve(mayShowForm: false);
+      await AdConsent.resolve(mayShowForm: false);
 
-    expect(
-      port.updates,
-      2,
-      reason: 'çevrimdışı açılan oturum, ağ gelince yeniden denemeli',
-    );
-  });
+      expect(
+        port.updates,
+        2,
+        reason: 'çevrimdışı açılan oturum, ağ gelince yeniden denemeli',
+      );
+    },
+  );
 
   test('eşzamanlı çağrılar tek tazeleme yapar', () async {
     final port = _FakePort(canRequestBeforeForm: true);

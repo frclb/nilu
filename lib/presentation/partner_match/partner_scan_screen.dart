@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../domain/services/partner_code.dart';
 import '../../../domain/view_models/user_view_model.dart';
+import '../../core/platform/app_settings_link.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
 import '../../design_system/app_layout.dart';
@@ -52,6 +53,17 @@ class _ScanUnavailable extends StatelessWidget {
                   height: 1.5,
                 ),
               ),
+              // Kamera izni uygulamanın kendi ayar sayfasında duruyor, yani
+              // düğme tam doğru yere açılıyor. Kamera **yoksa** düğme yok:
+              // ayarlarda düzeltilecek bir şey de yok.
+              if (denied && AppSettingsLink.isSupported) ...[
+                const SizedBox(height: 20),
+                FilledButton.icon(
+                  onPressed: AppSettingsLink.open,
+                  icon: const Icon(Icons.settings_outlined, size: 18),
+                  label: Text(context.tr('open_settings')),
+                ),
+              ],
             ],
           ),
         ),
