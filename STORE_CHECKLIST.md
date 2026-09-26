@@ -289,14 +289,16 @@ SDK'lara istek gitmiyor: RevenueCat anahtarsızken çağrı yapılsa süreç
 ```bash
 flutter analyze --fatal-infos && flutter test && dart run tool/check_localization.dart
 ```
-1032 test geçiyor.
+1049 test geçiyor.
 
 **Derleme:**
 ```bash
 flutter build ipa --release
 ```
-Çıkan `build/ios/ipa/*.ipa` dosyasını Transporter ile veya `xcrun altool` ile
-App Store Connect'e yükleyin.
+
+Derlemeden incelemeye kadar bütün adımlar — derleme numarası, yükleme yolları,
+TestFlight, sürüm sayfasında doldurulacak alanlar ve bu uygulamada en olası
+ret sebepleri — ayrı dosyada: [SUBMIT.md](SUBMIT.md).
 
 ---
 
