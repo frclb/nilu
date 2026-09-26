@@ -185,6 +185,29 @@ kodda sabit fiyat yok. Desteklenen süreler: haftalık, aylık, 2 aylık, 3 ayl�
 rozetini anlamlı kılıyor; ekran bu oranı kendisi hesaplıyor
 (`subscription_pricing.dart`).
 
+### Kararlaştırılan fiyatlar (Türkiye)
+
+| Plan | Fiyat | Aylığa düşen | Ekrandaki rozet |
+|---|---|---|---|
+| Aylık | **99,99 TL** | 99,99 TL | — |
+| Yıllık | **599,99 TL** | 50,00 TL | %50 daha uygun |
+
+Yıllık, aylığın tam yarısına denk gelsin diye seçildi: rozet yuvarlak bir
+sayı gösteriyor ve "ayda 50 lira" anlatması kolay.
+
+### Diğer ülkelerin fiyatını ayrıca ver
+
+Apple bir para biriminde fiyat verip gerisini **otomatik çevirebiliyor**.
+Burada yapma: 99,99 TL yaklaşık 2,5 avro. Uygulama de/es/fr/pt ile
+yayınlanıyor ve o pazarlarda benzer uygulamalar aylık 5–10 avro bandında.
+Otomatik çeviri Avrupa'yı üçte bir fiyata satmak olur.
+
+Tersi de geçerli: taban fiyatı avro verip Türkiye'ye çevirtmek buradaki
+fiyatı erişilemez yapar.
+
+Doğrusu: Türkiye için yukarıdaki fiyatlar, diğer bölgeler için ayrı bir
+taban. App Store Connect fiyat tablosunda bölge bölge düzenlenebiliyor.
+
 Her ürün için:
 
 - Product ID (ör. `rc_premium_monthly`, `rc_premium_annual`) — sonradan
