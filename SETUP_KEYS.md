@@ -38,15 +38,67 @@ Birbirine bağlılar, atlama:
 
 ## 1. Apple Developer Program
 
-[developer.apple.com/programs](https://developer.apple.com/programs/) → yıllık
-99 USD.
+Yıllık **99 USD**. Karar verildi: **bireysel** hesap, Hürkan Çelebi.
 
-Bireysel mi şirket mi: şirket hesabı **D-U-N-S numarası** istiyor ve alınması
-haftalar sürebiliyor. Bireysel hesapta uygulamanın altında kendi adın görünür.
-Sonradan şirkete geçiş mümkün ama uygulamanın devri ayrı bir iş — baştan doğru
-seçmek kolay.
+### Başlamadan önce
 
-Onay genelde 24–48 saat. Kimlik doğrulaması istenebilir.
+| Gereken | Not |
+|---|---|
+| Apple hesabı (Apple ID) | **İki faktörlü doğrulama açık olmalı** — kapalıysa kayıt başlamıyor |
+| Resmî kimlik | Kimlik kartı ya da pasaport. Addaki Türkçe karakterler birebir eşleşmeli |
+| Kredi kartı | Yıllık ücret için, otomatik yenilemeli |
+| 18 yaş | |
+
+**Apple ID seçimini ciddiye al.** O hesap "Account Holder" oluyor ve
+sonradan değiştirmek zahmetli. Kaybedebileceğin bir alan adına bağlı iş
+e-postası kullanma; alan adı elden çıkarsa hesaba erişimin de gider.
+
+### Kayıt — telefondan yapmak daha hızlı
+
+Apple bireysel kayıtta kimlik doğrulamasını **Apple Developer** uygulamasına
+taşıdı. Cihazdaki kamerayla kimliği okuyor, çoğu ülkede web'den kayıttan
+belirgin biçimde hızlı.
+
+1. App Store'dan **Apple Developer** uygulamasını kur
+2. Kullanacağın Apple ID ile giriş yap
+3. Account → **Enroll**
+4. Varlık tipi: **Individual / Sole Proprietor**
+5. Kimliği okut (kimlik + selfie)
+6. Ad ve adresi kimlikteki gibi onayla
+7. Ödemeyi yap
+
+Web yolu da duruyor:
+[developer.apple.com/programs/enroll](https://developer.apple.com/programs/enroll/).
+Apple bu akışı zaman zaman değiştiriyor; ekranda farklı bir şey görürsen ona uy.
+
+Onay genelde 24–48 saat. Apple ek belge isteyebiliyor.
+
+### Onaydan sonra — abonelik için ayrı bir kapı var
+
+Üyelik gelir gelmez uygulama yüklenebiliyor ama **satış yapılamıyor**.
+App Store Connect → Business bölümünde şunlar tamamlanmalı:
+
+- **Paid Applications Agreement** imzası
+- **Banka hesabı** (ödemelerin geleceği yer)
+- **Vergi formu** — Türkiye'deki bireysel geliştirici için **W-8BEN**
+
+Bunlar tamamlanmadan abonelik ürünleri "Waiting for Agreement" durumunda
+kalıyor ve uygulamaya hiç görünmüyor. Sık atlanan ve premium'u tamamen
+bloke eden adım bu.
+
+### Bireysel seçmenin iki sonucu
+
+- Mağazada **satıcı adı olarak yasal adın** görünüyor. Marka adı yazılamıyor;
+  onun için şahıs şirketi + D-U-N-S ile Organization kaydı gerekiyor.
+- Gizlilik politikasındaki veri sorumlusu da aynı kişi olmalı — yazıldı:
+  `Hürkan Çelebi, Bağcılar/İstanbul, Türkiye`.
+
+Sonradan şirkete geçiş Apple tarafında **dönüştürme** değil; yeni hesap açıp
+uygulamayı devretmek (App Transfer) gerekiyor ve devrin koşulları var.
+
+### Üyelik bitmesin
+
+Ücret otomatik yenileniyor. Yenilenmezse uygulamalar mağazadan kalkıyor.
 
 **Üyelik gelene kadar IPA dışa aktarılamıyor:** `No signing certificate "iOS
 Distribution" found`. Arşiv alınabiliyor, dışa aktarım alınamıyor.
