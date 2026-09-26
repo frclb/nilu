@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/navigation/route_names.dart';
+import '../../design_system/brand_lotus.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/services/premium_gate.dart';
 import '../../domain/services/subscription_pricing.dart';
@@ -154,10 +155,7 @@ class _OfferStateState extends State<_OfferState> {
               AppSpacing.xl,
             ),
             children: [
-              Text(
-                context.tr('premium_subtitle'),
-                style: theme.textTheme.displaySmall?.copyWith(fontSize: 24),
-              ),
+              const _Hero(),
               const SizedBox(height: AppSpacing.xl),
               const _FeatureList(),
               const SizedBox(height: AppSpacing.xxl),
@@ -366,13 +364,15 @@ class _PlanCard extends StatelessWidget {
                     ],
                     if (saving != null) ...[
                       const SizedBox(height: 2),
+                      // Ekrandaki en ikna edici sayı en soluk renkteydi.
                       Text(
                         context.tr(
                           'premium_saving',
                           params: {'percent': '$saving'},
                         ),
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: t.textMuted,
+                          color: t.accent,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -382,8 +382,9 @@ class _PlanCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.sm),
               Text(
                 plan.priceString,
-                style: theme.textTheme.titleMedium?.copyWith(
+                style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w700,
+                  color: selected ? primary : t.text,
                 ),
               ),
             ],
@@ -417,6 +418,66 @@ class _Badge extends StatelessWidget {
           color: Theme.of(context).colorScheme.onPrimary,
           fontWeight: FontWeight.w600,
         ),
+      ),
+    );
+  }
+}
+
+/// Paywall'ın açılış bloğu.
+///
+/// Ekran düz bir başlıkla açılıyordu: uygulamanın rengi, markası, hiçbir şeyi
+/// görünmüyordu. Satın alma ekranı ürünün en pahalı ekranı; ücretsiz sürümden
+/// farklı hissettirmesi gerekiyor.
+///
+/// Renkler temadan türetiliyor, paletten değil. Sabit plum yazmak premium
+/// tema çeşitlerini (ocean/forest/graphite) kırardı: kullanıcı ödediği temayı
+/// seçer, bu blok marka pembesinde kalırdı.
+class _Hero extends StatelessWidget {
+  const _Hero();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+    final onPrimary = theme.colorScheme.onPrimary;
+
+    // Degradenin koyu ucu birincil rengin kendisinden: hangi tema seçiliyse
+    // o rengin koyusu.
+    final hsl = HSLColor.fromColor(primary);
+    final deep = hsl.withLightness((hsl.lightness * 0.6).clamp(0.0, 1.0))
+        .toColor();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: AppSpacing.xl,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [primary, deep],
+        ),
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            width: 56,
+            child: BrandLotus(color: onPrimary, sideOpacity: 0.55),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Text(
+            context.tr('premium_subtitle'),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.displaySmall?.copyWith(
+              fontSize: 24,
+              color: onPrimary,
+              height: 1.25,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -463,7 +524,7 @@ class _FeatureList extends StatelessWidget {
       children: [
         for (final (icon, title, desc) in features) ...[
           _FeatureRow(icon: icon, titleKey: title, descKey: desc),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.md),
         ],
       ],
     );
@@ -490,15 +551,15 @@ class _FeatureRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 40,
-          height: 40,
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
             color: t.brandTint,
             borderRadius: BorderRadius.circular(AppRadius.md),
           ),
-          child: Icon(icon, size: 20, color: theme.colorScheme.primary),
+          child: Icon(icon, size: 18, color: theme.colorScheme.primary),
         ),
-        const SizedBox(width: AppSpacing.lg),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
