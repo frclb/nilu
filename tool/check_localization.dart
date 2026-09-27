@@ -67,19 +67,73 @@ void main() {
   }
 
   // ── 2. Kodda kullanılan anahtarlar ──
+  //
+  // Anahtarların hepsi kodda düz yazmıyor. Bir kısmı çalışma anında
+  // kuruluyor:
+  //
+  //     context.tr('terms_section${i}_title')
+  //     context.tr('log_mood_$code')
+  //
+  // Bunları saymayan bir denetim "866 anahtarın 483'ü kullanılıyor" diyordu
+  // ve 383 anahtar ölü sanılıyordu. Gerçek sayı 47'ydi. Yanlış yöne bakan
+  // bir rapor, rapor olmamasından kötü.
   final usagePattern = RegExp(r"""\.tr\(\s*'([a-zA-Z0-9_]+)'""");
-  final usedKeys = <String>{};
+
+  // İçinde değişken geçen anahtar dizeleri: 'log_mood_$code' gibi.
+  final dynamicPattern = RegExp(r"""'([a-z][a-zA-Z0-9_]*\$[^']*)'""");
+
+  // Anahtarın `.tr(...)` içinde geçmesi şart değil: veri modelleri anahtarı
+  // alan olarak taşıyor (`titleKey: 'article_hormones_title'`) ve çeviri
+  // başka yerde yapılıyor. Bunları saymayan denetim 252 anahtarı ölü
+  // sanıyordu.
+  final literalPattern = RegExp(r"""'([a-z][a-zA-Z0-9_]{3,})'""");
+
+  // İki ayrı küme, çünkü iki ayrı soru soruluyor:
+  //   calledKeys  -> `.tr(...)` ile çağrıldı, tanımlı OLMAK ZORUNDA
+  //   mentionedKeys -> kodda bir yerde anıldı, yani ölü DEĞİL
+  //
+  // İkisini birleştirmek denetimi bozuyor: veri modellerindeki her kısa
+  // dize ("acne", "calm") çağrılmış anahtar sanılıp "tanımsız" diye
+  // raporlanıyordu.
+  final calledKeys = <String>{};
+  final mentionedKeys = <String>{};
+  final dynamicKeyPatterns = <RegExp>[];
 
   for (final entity in Directory('lib').listSync(recursive: true)) {
     if (entity is! File || !entity.path.endsWith('.dart')) continue;
-    for (final match in usagePattern.allMatches(entity.readAsStringSync())) {
-      usedKeys.add(match.group(1)!);
+    final source = entity.readAsStringSync();
+
+    for (final match in usagePattern.allMatches(source)) {
+      calledKeys.add(match.group(1)!);
+      mentionedKeys.add(match.group(1)!);
+    }
+
+    for (final match in literalPattern.allMatches(source)) {
+      mentionedKeys.add(match.group(1)!);
+    }
+
+    for (final match in dynamicPattern.allMatches(source)) {
+      final literal = match.group(1)!;
+      final prefix = literal.split(r'$').first;
+
+      // 'p$offset' ya da 'kart$i' anahtar değil. Anahtar ad uzayları uzun
+      // ve alt çizgili olur; bu ayrım olmadan '^p.+$' her şeyi yutuyordu.
+      if (prefix.length < 6 || !prefix.contains('_')) continue;
+
+      final escaped = RegExp.escape(literal)
+          .replaceAll(RegExp(r'\\\$\\\{[^}]*\\\}'), '[A-Za-z0-9_]+')
+          .replaceAll(RegExp(r'\\\$[a-zA-Z_][a-zA-Z0-9_]*'), '[A-Za-z0-9_]+');
+      dynamicKeyPatterns.add(RegExp('^$escaped\$'));
     }
   }
 
+  bool isUsed(String key) =>
+      mentionedKeys.contains(key) ||
+      dynamicKeyPatterns.any((p) => p.hasMatch(key));
+
   // Bir anahtar en azından referans veya fallback dilde tanımlı olmalı.
   final defined = {...reference, ...fallback};
-  final undefined = usedKeys.difference(defined).toList()..sort();
+  final undefined = calledKeys.difference(defined).toList()..sort();
 
   if (undefined.isNotEmpty) {
     hasError = true;
@@ -129,6 +183,35 @@ void main() {
     }
   }
 
+  // ── 4. Hiçbir yerde kullanılmayan anahtarlar ──
+  //
+  // Hata değil uyarı: ölü anahtar uygulamayı bozmuyor, yalnızca altı dilde
+  // bakım yükü bırakıyor.
+  // Bilerek duran, kullanılmayan anahtarlar.
+  //
+  // Sürekli tekrarlayan bir uyarı öğrenilip görmezden geliniyor; gerekçesi
+  // yazılı bir istisna daha iyi.
+  const intentionallyUnused = {
+    // Partner bildirim ayarları ekranı kaldırıldı: yerele yazıyordu,
+    // hiçbir yere yüklenmiyordu ve gönderen bir taraf yoktu. Anahtar,
+    // satırın geri gelmediğini sınayan testin çıpası olarak duruyor
+    // (test/presentation/device_sizes_test.dart).
+    'profile_notification_settings',
+  };
+
+  final unused = reference
+      .where((key) => !isUsed(key) && !intentionallyUnused.contains(key))
+      .toList()..sort();
+  if (unused.isNotEmpty) {
+    stdout.writeln('WARN  ${unused.length} key(s) defined but never used:');
+    for (final key in unused.take(20)) {
+      stdout.writeln('        $key');
+    }
+    if (unused.length > 20) {
+      stdout.writeln('        … ve ${unused.length - 20} tane daha');
+    }
+  }
+
   if (hasError) {
     stderr.writeln('\nLocalization check failed.');
     exit(1);
@@ -136,6 +219,6 @@ void main() {
 
   stdout.writeln(
     '\nLocalization check passed '
-    '(${reference.length} keys, ${usedKeys.length} used in code).',
+    '(${reference.length} keys, ${unused.length} unused).',
   );
 }
