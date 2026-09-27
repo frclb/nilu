@@ -154,6 +154,28 @@ class CycleInfo {
   CyclePhase phaseForCurrentCycleDay(int cycleDay) =>
       getPhaseForDay(cycleDay, periodLength: currentPeriodLength);
 
+  /// Çelenk halkası için faz.
+  ///
+  /// Başlık ("4. gün") ve "Reglim bitti" düğmesi **kayda** bakıyor: bugüne
+  /// kadar kaç gün geçtiğine. Halka ise bir tahmin görseli — yumurtlamayı,
+  /// luteal fazı, sonraki regli hep ileriye doğru boyuyor.
+  ///
+  /// Devam eden reglin kalan günlerini boyamayıp diğer her şeyi boyamak
+  /// tutarsızdı: kullanıcı yedi gün seçtiğinde takvim yedi gün gösterirken
+  /// halka dördüncü çiçekte kesiliyordu. Aynı veriden iki farklı cevap.
+  ///
+  /// Dönem kapandıysa kayıt kesindir, o kullanılıyor: "Reglim bitti"ye
+  /// üçüncü gün basan kullanıcıya yedi çiçek göstermek olmaz.
+  CyclePhase phaseForRingDay(int cycleDay) {
+    final recorded = currentPeriodLength;
+    if (recorded == null) return getPhaseForDay(cycleDay);
+
+    final length = currentPeriodEnd != null
+        ? recorded
+        : (recorded > averagePeriodLength ? recorded : averagePeriodLength);
+    return getPhaseForDay(cycleDay, periodLength: length);
+  }
+
   /// Belirli bir döngü günü için fazı belirler.
   ///
   /// [periodLength] verilmezse geçmişin ortalaması kullanılır — tahmin edilen
