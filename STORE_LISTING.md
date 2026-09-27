@@ -37,56 +37,62 @@ Lotus · Regl Takibi
 
 **Alt başlık**
 ```
-Döngün senin telefonunda kalır
+Döngün sende kalır
 ```
 
 **Tanıtım metni**
 ```
-Regl günlerini işaretle, döngünü anla. Verilerin sunucuya değil cihazına yazılır — hesap açmadan, izlenmeden.
+Bedenini tanımak için sakin bir yer. İşaretlediğin her şey telefonunda kalıyor — hesap yok, takip yok, kimseye gitmiyor.
 ```
 
 **Açıklama**
 ```
-Döngü verilerin telefonundan çıkmıyor.
+Yazdıkların sende kalıyor. Gerçekten.
 
-Çoğu regl uygulaması işaretlediğin günleri, belirtilerini ve notlarını kendi sunucusuna taşır. Lotus taşımıyor. Hepsi cihazında, şifreli olarak duruyor. Hesap açmak zorunda değilsin.
+Regl uygulamalarının çoğu işaretlediğin günleri, belirtilerini ve notlarını kendi sunucularına taşır. Lotus taşımıyor. Hepsi telefonunda, şifreli duruyor. Hesap açman bile gerekmiyor.
 
-NELER YAPIYOR
+Çünkü bunlar senin. Kimsenin okumasına, saklamasına ya da satmasına gerek yok.
 
-• Takvim — regl günlerini işaretle, tahmini ve doğurgan dönemi gör
-• Günlük kayıt — akış, ağrı, ruh hâli, uyku, not
-• Analiz — döngü uzunluğun nasıl değişiyor, belirtilerin hangi evrede yoğunlaşıyor
-• Sağlık kütüphanesi — kaynak gösterilen yazılar; hormonlar, beslenme, PMS, psikoloji
-• Hareket — regl dönemine göre yoga akışları, esneme ve nefes egzersizleri
-• Apple Sağlık — regl kayıtlarını içeri aktar, işaretlediğin günleri geri yaz
-• Hatırlatıcılar — bildirimler cihazında hazırlanır, içerikleri hiçbir yere gönderilmez
+GÜNLÜK HAYATINDA
 
-GİZLİLİK BİR ÖZELLİK DEĞİL, KURULUŞ BİÇİMİ
+• Takvim — reglini işaretle, bir sonrakini ve doğurgan dönemini gör
+• Günlük — akış, ağrı, ruh hâli, uyku. Canın isterse iki kelime not
+• Analiz — döngün nasıl değişiyor, belirtilerin hangi evrede toplanıyor
+• Kütüphane — hormonlar, beslenme, PMS ve ruh hâli üzerine kaynak gösterilen yazılar
+• Hareket — dönemine göre yoga akışları, esneme ve nefes egzersizleri
+• Apple Sağlık — kayıtlarını içeri al, işaretlediğin günleri geri yaz
+• Hatırlatıcılar — bildirimler telefonunda hazırlanır, içerikleri hiçbir yere gitmez
 
-• Döngü verin cihazından çıkmaz
-• Reklamlar kişiselleştirilmez; reklam kimliğin kullanılmaz, izleme izni istenmez
-• Sağlık verin hiçbir koşulda reklam hedeflemesinde kullanılmaz
-• Ekran kilidi ücretsiz — Face ID ya da cihaz şifresiyle
-• Yedeğini ve verinin makine-okunur kopyasını her zaman alabilirsin, ücretsiz
-• Hesabını ve verini uygulama içinden tamamen silebilirsin
+GİZLİLİK SONRADAN EKLENMEDİ
 
-PARTNER PAYLAŞIMI — İSTERSEN
+Bir özellik listesine sıkıştırılmış bir madde değil; uygulama baştan böyle kuruldu.
 
-Partnerine yalnızca paylaşmayı seçtiğin yakınlık durumu gider. Döngü tarihlerin, belirtilerin ve notların gitmez. Erişimi istediğin an geri alabilirsin; verdiğin kod iptal edilebilir.
+• Döngü verin telefonundan çıkmıyor
+• Reklamlar kişiselleştirilmiyor. Reklam kimliğin kullanılmıyor, izleme izni istenmiyor
+• Sağlık verin hiçbir koşulda reklam için kullanılmıyor
+• Ekran kilidi ücretsiz — Face ID ya da telefonunun şifresiyle
+• Yedeğini ve verinin okunabilir bir kopyasını istediğin an alabilirsin, ücretsiz
+• Hesabını ve her şeyini uygulamadan silebilirsin
+
+İSTERSEN PARTNERİNLE
+
+Partnerine yalnızca paylaşmayı seçtiğin yakınlık durumu gider. Döngü tarihlerin, belirtilerin, notların gitmez. Fikrin değişirse erişimi geri alırsın; verdiğin kodu iptal edebilirsin.
+
+Bazı günler anlatmak zor geliyor. Bu, anlatmanın sessiz bir yolu.
 
 PREMIUM
 
 • Tüm döngü geçmişin — ücretsiz sürüm son 3 döngüyü gösterir
-• Belirti–evre analizi — belirtilerin döngünün hangi evresinde yoğunlaştığı
-• Hekime götürülebilir özet ve tablo
+• Belirti–evre analizi — belirtilerin döngünün hangi evresinde yoğunlaşıyor
+• Hekime götürebileceğin özet ve tablo
 • Özel temalar
 • Reklamsız kullanım
 
-Ekran kilidi ve yedek alma premium'da değil; ikisi de herkese açık.
+Ekran kilidi ve yedek alma premium'da değil. İkisi de herkese açık, öyle kalacak.
 
-BİLMEN GEREKEN
+BİLMEN GEREKENLER
 
-Lotus tıbbi teşhis koymaz, tedavi önermez ve doğum kontrol yöntemi değildir. Tahminler geçmiş kayıtlarından hesaplanır ve yaklaşıktır. Sağlığınla ilgili bir endişen varsa hekime danış.
+Lotus tıbbi teşhis koymaz, tedavi önermez ve bir doğum kontrol yöntemi değildir. Tahminler geçmiş kayıtlarından hesaplanır, yani yaklaşıktır. Bedeninle ilgili bir endişen varsa bir hekime danış — uygulama onun yerini tutmaz.
 ```
 
 **Anahtar kelimeler**
