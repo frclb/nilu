@@ -252,6 +252,18 @@ beyan edin; döngü verisi cihazdan çıkmıyor.
 
 ---
 
+## Mağaza metinleri ✅
+
+Ad, alt başlık, tanıtım metni, açıklama ve anahtar kelimeler altı dilde
+[STORE_LISTING.md](STORE_LISTING.md) içinde. Karakter sınırları
+`python3 tool/check_store_listing.py` ile denetleniyor.
+
+Uygulama adı için öneri **Lotus** — mevcut "Period Tracker" mağazada
+görünmez, birebir aynı adı taşıyan onlarca uygulama var. Adın müsait
+olduğunu App Store Connect'te doğrulaman gerekiyor.
+
+---
+
 ## 5. Kategori ve içerik
 
 - **Kategori:** Health & Fitness
