@@ -76,6 +76,7 @@ class PredictionService {
         averageCycleLength: effectiveCycleLength,
         averagePeriodLength: effectivePeriodLength,
         fertilityTracked: !hormonalContraception,
+        plannedPeriodLength: userPeriodLength,
       );
     }
 
@@ -142,6 +143,9 @@ class PredictionService {
       fertileWindowEnd: fertileEnd,
       futurePredictions: futurePredictions,
       currentPeriodLength: currentPeriodLength,
+      // Takvim bandı ve kayıt mantığı da bu sayıyı kullanıyor; halka
+      // ortalamaya bakınca iki yüzey aynı güne farklı cevap veriyordu.
+      plannedPeriodLength: userPeriodLength,
       currentPeriodEnd: currentPeriodEnd,
       fertilityTracked: tracksFertility,
     );

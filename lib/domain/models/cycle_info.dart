@@ -50,6 +50,20 @@ class CycleInfo {
   /// süresi.
   final int? currentPeriodLength;
 
+  /// Devam eden dönemin ne kadar süreceği beklentisi — kullanıcının ayarı.
+  ///
+  /// [averagePeriodLength]ten ayrı tutuluyor: o geçmişin ortalaması ve
+  /// **gelecek** döngülerin tahmini için doğru olan. Bu ise şu an süren
+  /// dönem için.
+  ///
+  /// Ayrı olmak zorunda, çünkü takvimin bandı (`isExpectedContinuation`) ve
+  /// kaydın açık kalıp kalmayacağına karar veren mantık (`toggleDay`,
+  /// `recordFromStart`) zaten kullanıcının ayarını kullanıyor. Halka
+  /// ortalamayı kullanınca aynı gün takvimde regl, çelenkte foliküler
+  /// görünüyordu: kullanıcı yedi gün ayarlamışken geçmişi üç günlükse
+  /// halka üçte kesiliyordu.
+  final int plannedPeriodLength;
+
   /// Bu döngüdeki dönemin kapatıldığı gün; devam ediyorsa null.
   ///
   /// Neden ayrı bir alan: "Reglim bitti" bugünü kayıttan silmiyor, son gün
@@ -71,7 +85,8 @@ class CycleInfo {
     this.fertilityTracked = true,
     this.currentPeriodLength,
     this.currentPeriodEnd,
-  });
+    int? plannedPeriodLength,
+  }) : plannedPeriodLength = plannedPeriodLength ?? averagePeriodLength;
 
   /// Dönem bugün mü kapatıldı?
   ///
@@ -172,7 +187,7 @@ class CycleInfo {
 
     final length = currentPeriodEnd != null
         ? recorded
-        : (recorded > averagePeriodLength ? recorded : averagePeriodLength);
+        : (recorded > plannedPeriodLength ? recorded : plannedPeriodLength);
     return getPhaseForDay(cycleDay, periodLength: length);
   }
 
