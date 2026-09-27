@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'design_system/app_theme.dart';
 import 'localization/app_localizations.dart';
+import 'localization/supported_locales.dart';
 import 'core/navigation/app_router.dart';
 import 'domain/view_models/theme_view_model.dart';
 import 'data/datasources/ads_datasource.dart';
@@ -158,14 +159,7 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
             darkTheme: AppTheme.dark(flavor),
             themeMode: ThemeMode.system,
             debugShowCheckedModeBanner: false,
-            supportedLocales: const [
-              Locale('tr', ''),
-              Locale('en', ''),
-              Locale('de', ''),
-              Locale('fr', ''),
-              Locale('es', ''),
-              Locale('pt', ''),
-            ],
+            supportedLocales: appSupportedLocales,
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,

@@ -7,9 +7,9 @@
 ///
 /// Değiştirirken birlikte güncellenmesi gerekenler:
 /// * `ios/Runner/Info.plist` → `CFBundleDisplayName`, `CFBundleName`
-/// * App Store listeleme adı
+/// * App Store listeleme adı — [STORE_LISTING.md] içinde, dil başına ayrı
 class AppInfo {
   const AppInfo._();
 
-  static const String displayName = 'Period Tracker';
+  static const String displayName = 'Nilu';
 }
