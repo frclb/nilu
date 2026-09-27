@@ -37,6 +37,18 @@ Kullanıcı izleyecekse simülatör panelini `attach` ile **derlemeden önce** a
 Aynı anda birden fazla simülatör boot etme: bu oturumda üç cihaz açıkken
 süreçler SIGTERM alıp kapandı.
 
+### `uninstall` yapma
+
+`install` üzerine kuruyor ve bu **her şey için yeterli** — `Info.plist`
+değişiklikleri dahil. Uygulama adı değiştiğinde ana ekrandaki etiketin
+tazelenmesi için kaldırıp kurmak gerektiğini sanıp öyle yaptım; gerekmiyordu
+ve simülatördeki bütün veri gitti, onboarding'den yeniden geçmek gerekti.
+
+Ölçtüm: ad `NiluDeney` yapılıp yalnızca `install` çalıştırıldığında ana
+ekrandaki etiket hemen değişti; geri alındığında veri de yerinde durdu.
+
+`uninstall` yalnızca gerçekten sıfır durumdan başlamak istendiğinde.
+
 ## Ekran görüntüsü: `simctl` kullan
 
 Panelin kendi `screenshot` eylemi bu projede sık sık `captureFailed` veriyor.
@@ -85,7 +97,8 @@ sistem istemini açar ve iOS onu **bir kez** gösterir.
 Analiz 220, Kütüphane 306, Profil 392. Simge y≈873, etiket y≈900.
 
 **Lokalizasyon JSON'ları varlık (asset).** `lib/localization/*.json`
-değiştirdiysen yeniden derlemeden görmezsin.
+değiştirdiysen yeniden derlemeden görmezsin. `Info.plist` için de aynısı:
+`flutter build` olmadan `install` eski paketi kurar.
 
 ## `debugPrint` çıktısını okumak
 
