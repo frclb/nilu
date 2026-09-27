@@ -34,7 +34,7 @@ gelen açıklama o pazarın aradığı kelime oluyor:
 
 | Dil | Ad |
 |---|---|
-| Türkçe | Nilu · Regl Takibi |
+| Türkçe | Nilu · Regl & Adet Takvimi |
 | English | Nilu · Period Tracker |
 | Deutsch | Nilu · Zyklus-Tracker |
 | Español | Nilu · Ciclo Menstrual |
@@ -48,10 +48,21 @@ Ama **ad, alt başlık ve anahtar kelimeler üçü de dizinleniyor** — aynı
 kelimeyi ikisine birden yazmak yer israfı. Bu yüzden anahtar kelime
 listelerinde adda geçen sözcükler yok.
 
+Türkçe ad üç arama terimini birden taşıyor: **regl**, **adet**, **takvim**.
+İkisi eşanlamlı ve yan yana biraz SEO kokuyor, ama ad alanı Apple'ın en
+ağır dizinlediği yer ve tanınmayan bir markada keşfedilebilirlik metnin
+zarafetinden önce geliyor. Bu kategoride standart bir kalıp.
+
+Karşılığında anahtar kelimelerde yer açıldı: regl, adet ve takvim oradan
+çıktı, yerlerine **takip** ve **ağrı** girdi.
+
 Hangi terimin daha çok arandığını ölçemiyorum. Bedava bir sinyal var:
-App Store'un arama kutusuna "regl" ve "adet" yazıp otomatik tamamlamaya
-bak — öneriler popülerliğe göre sıralı geliyor. Sıralama beklediğinden
-farklıysa addaki kelimeyi değiştirmek tek satır.
+App Store'un arama kutusuna "regl", "adet", "takvim", "takip" yazıp
+otomatik tamamlamaya bak — öneriler popülerliğe göre sıralı geliyor.
+Sıralama beklediğinden farklıysa addaki kelimeyi değiştirmek tek satır.
+
+Aynı mantık diğer beş dilde de uygulanabilir; her pazarın hangi eşanlamlı
+çifti aradığına oradaki otomatik tamamlamaya bakarak karar vermek gerekiyor.
 
 ---
 
@@ -59,7 +70,7 @@ farklıysa addaki kelimeyi değiştirmek tek satır.
 
 **Ad**
 ```
-Nilu · Regl Takibi
+Nilu · Regl & Adet Takvimi
 ```
 
 **Alt başlık**
@@ -124,7 +135,7 @@ Nilu tıbbi teşhis koymaz, tedavi önermez ve bir doğum kontrol yöntemi deği
 
 **Anahtar kelimeler**
 ```
-adet,döngü,takvim,ovulasyon,yumurtlama,doğurganlık,pms,semptom,kadın,periyot,gizlilik,günlük
+takip,döngü,ovulasyon,yumurtlama,doğurganlık,pms,semptom,kadın,periyot,gizlilik,günlük,ağrı
 ```
 
 ---
