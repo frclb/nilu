@@ -208,6 +208,33 @@ fiyatı erişilemez yapar.
 Doğrusu: Türkiye için yukarıdaki fiyatlar, diğer bölgeler için ayrı bir
 taban. App Store Connect fiyat tablosunda bölge bölge düzenlenebiliyor.
 
+### Avrupa için öneri (henüz karara bağlanmadı)
+
+| Plan | Fiyat | Aylığa düşen | Rozet |
+|---|---|---|---|
+| Aylık | 3,99 € | 3,99 € | — |
+| Yıllık | 23,99 € | 2,00 € | %50 daha uygun |
+
+Türkiye ile aynı yapı: yıllık, aylığın tam yarısı. Rozet iki pazarda da
+aynı sayıyı gösteriyor.
+
+Daha yukarısını denemek istersen 4,99 € / 29,99 € de tam %50 veriyor ve
+indirim kampanyası için yer bırakıyor. Yeni ve bilinmeyen bir uygulamada
+3,99 daha kolay dönüşür.
+
+**Gösterilen fiyat cebe girmiyor.** 3,99 €'nun içinde KDV var (Apple
+tahsil edip kendi ödüyor) ve üstüne komisyon geliyor:
+
+| | Komisyon %15 | Komisyon %30 |
+|---|---|---|
+| 3,99 € | 2,83 € | 2,33 € |
+| 4,99 € | 3,53 € | 2,91 € |
+
+**App Store Small Business Program'a başvur.** Yıllık geliri 1 milyon
+doların altındaki geliştiricilerde komisyon %30 yerine %15. Başvuru
+ücretsiz ama **kendiliğinden olmuyor**; başvurmazsan %30 ödersin. Tablodaki
+fark aynı satışta yaklaşık %20 daha fazla gelir demek.
+
 Her ürün için:
 
 - Product ID (ör. `rc_premium_monthly`, `rc_premium_annual`) — sonradan
