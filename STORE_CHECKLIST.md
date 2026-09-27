@@ -258,9 +258,10 @@ Ad, alt başlık, tanıtım metni, açıklama ve anahtar kelimeler altı dilde
 [STORE_LISTING.md](STORE_LISTING.md) içinde. Karakter sınırları
 `python3 tool/check_store_listing.py` ile denetleniyor.
 
-Uygulama adı için öneri **Lotus** — mevcut "Period Tracker" mağazada
-görünmez, birebir aynı adı taşıyan onlarca uygulama var. Adın müsait
-olduğunu App Store Connect'te doğrulaman gerekiyor.
+Uygulama adı **Nilu** olarak kararlaştırıldı — mevcut "Period Tracker"
+mağazada görünmez, birebir aynı adı taşıyan onlarca uygulama var. İki iş
+kaldı: adın müsait olduğunu App Store Connect'te doğrulamak ve cihazda
+görünen adı (`CFBundleDisplayName`) güncellemek.
 
 ---
 

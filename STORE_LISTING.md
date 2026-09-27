@@ -9,22 +9,49 @@ Sınırlar `tool/check_store_listing.py` ile denetleniyor.
 
 ---
 
-## Uygulama adı hakkında
+## Uygulama adı
 
-Şu an uygulamanın adı **"Period Tracker"**. Mağazada bu ad görünmez olur:
-birebir aynı adı taşıyan onlarca uygulama var ve arama sonuçlarında hiçbir
-ayırt ediciliği yok.
+**Nilu.**
 
-Öneri: **Lotus** — marka işareti zaten nilüfer, palet de ona göre kurulu.
-Altı dilin hepsinde okunabilen bir kelime.
+Nilüfer'den geliyor; o da Farsça *nilūfar*'a, Sanskritçe "mavi lotus"a
+dayanıyor. Marka işareti zaten nilüfer — ad ile ikon aynı kökten.
 
-> **Önce müsaitliğini kontrol et.** App Store'da ad benzersiz olmak zorunda
-> ve ilk kullanan üzerine kilitleniyor. "Lotus" alınmışsa yedekler:
-> *Lotus Cycle*, *Lume*, *Ayça*. Adı App Store Connect'te uygulama kaydı
-> açarken giriyorsun ve sonradan değiştirmek yeni sürüm gerektiriyor.
+Dört harf, özel karakter yok, altı dilin hepsinde yazılıp okunabiliyor.
 
-Ad her dilde ayrı girilebiliyor; marka kısmı sabit kalsın, açıklayıcı
-kısım çevrilsin.
+> **Müsaitliğini App Store Connect'te doğrula.** Ad benzersiz olmak zorunda
+> ve ilk kullanan üzerine kilitleniyor. Alınmışsa yedekler: *Nila*, *Ayla*,
+> *Neva*.
+
+Uygulamanın ana ekranda görünen adı (`CFBundleDisplayName`) hâlâ
+"Period Tracker" — karar kesinleşince o da değişmeli. Mağaza adı ile
+cihazdaki ad birebir aynı olmak zorunda değil ama birbirinden uzak
+düşmemeli.
+
+### Ada eklenen açıklama dilden dile değişir
+
+App Store adı **her dil için ayrı** giriliyor. Marka kısmı sabit, arkasına
+gelen açıklama o pazarın aradığı kelime oluyor:
+
+| Dil | Ad |
+|---|---|
+| Türkçe | Nilu · Regl Takibi |
+| English | Nilu · Period Tracker |
+| Deutsch | Nilu · Zyklus-Tracker |
+| Español | Nilu · Ciclo Menstrual |
+| Français | Nilu · Suivi de Règles |
+| Português | Nilu · Ciclo Menstrual |
+
+Açıklama eklemenin sebebi arama: Apple ad alanını dizinliyor ve kimsenin
+bilmediği bir markada "Nilu" tek başına hiçbir sonuçta çıkmaz.
+
+Ama **ad, alt başlık ve anahtar kelimeler üçü de dizinleniyor** — aynı
+kelimeyi ikisine birden yazmak yer israfı. Bu yüzden anahtar kelime
+listelerinde adda geçen sözcükler yok.
+
+Hangi terimin daha çok arandığını ölçemiyorum. Bedava bir sinyal var:
+App Store'un arama kutusuna "regl" ve "adet" yazıp otomatik tamamlamaya
+bak — öneriler popülerliğe göre sıralı geliyor. Sıralama beklediğinden
+farklıysa addaki kelimeyi değiştirmek tek satır.
 
 ---
 
@@ -32,7 +59,7 @@ kısım çevrilsin.
 
 **Ad**
 ```
-Lotus · Regl Takibi
+Nilu · Regl Takibi
 ```
 
 **Alt başlık**
@@ -49,7 +76,7 @@ Bedenini tanımak için sakin bir yer. İşaretlediğin her şey telefonunda kal
 ```
 Yazdıkların sende kalıyor. Gerçekten.
 
-Regl uygulamalarının çoğu işaretlediğin günleri, belirtilerini ve notlarını kendi sunucularına taşır. Lotus taşımıyor. Hepsi telefonunda, şifreli duruyor. Hesap açman bile gerekmiyor.
+Regl uygulamalarının çoğu işaretlediğin günleri, belirtilerini ve notlarını kendi sunucularına taşır. Nilu taşımıyor. Hepsi telefonunda, şifreli duruyor. Hesap açman bile gerekmiyor.
 
 Çünkü bunlar senin. Kimsenin okumasına, saklamasına ya da satmasına gerek yok.
 
@@ -92,7 +119,7 @@ Ekran kilidi ve yedek alma premium'da değil. İkisi de herkese açık, öyle ka
 
 BİLMEN GEREKENLER
 
-Lotus tıbbi teşhis koymaz, tedavi önermez ve bir doğum kontrol yöntemi değildir. Tahminler geçmiş kayıtlarından hesaplanır, yani yaklaşıktır. Bedeninle ilgili bir endişen varsa bir hekime danış — uygulama onun yerini tutmaz.
+Nilu tıbbi teşhis koymaz, tedavi önermez ve bir doğum kontrol yöntemi değildir. Tahminler geçmiş kayıtlarından hesaplanır, yani yaklaşıktır. Bedeninle ilgili bir endişen varsa bir hekime danış — uygulama onun yerini tutmaz.
 ```
 
 **Anahtar kelimeler**
@@ -106,7 +133,7 @@ adet,döngü,takvim,ovulasyon,yumurtlama,doğurganlık,pms,semptom,kadın,periyo
 
 **Name**
 ```
-Lotus · Period Tracker
+Nilu · Period Tracker
 ```
 
 **Subtitle**
@@ -123,7 +150,7 @@ Log your period, understand your cycle. Your data is written to your device, not
 ```
 Your cycle data never leaves your phone.
 
-Most period apps move the days you log, your symptoms and your notes to their own servers. Lotus doesn't. It all stays on your device, encrypted. You don't need an account.
+Most period apps move the days you log, your symptoms and your notes to their own servers. Nilu doesn't. It all stays on your device, encrypted. You don't need an account.
 
 WHAT IT DOES
 
@@ -160,7 +187,7 @@ App lock and backups are not behind the paywall. Both are free for everyone.
 
 WHAT YOU SHOULD KNOW
 
-Lotus does not diagnose, does not prescribe treatment, and is not a contraceptive method. Predictions are calculated from your past entries and are approximate. If you're worried about your health, talk to a doctor.
+Nilu does not diagnose, does not prescribe treatment, and is not a contraceptive method. Predictions are calculated from your past entries and are approximate. If you're worried about your health, talk to a doctor.
 ```
 
 **Keywords**
@@ -174,7 +201,7 @@ menstrual,ovulation,fertility,pms,symptom,calendar,privacy,women,diary,mood,cram
 
 **Name**
 ```
-Lotus · Zyklus-Tracker
+Nilu · Zyklus-Tracker
 ```
 
 **Untertitel**
@@ -191,7 +218,7 @@ Periode eintragen, Zyklus verstehen. Deine Daten liegen auf deinem Gerät, nicht
 ```
 Deine Zyklusdaten verlassen dein Telefon nicht.
 
-Die meisten Perioden-Apps übertragen deine eingetragenen Tage, Symptome und Notizen auf eigene Server. Lotus nicht. Alles bleibt verschlüsselt auf deinem Gerät. Ein Konto brauchst du nicht.
+Die meisten Perioden-Apps übertragen deine eingetragenen Tage, Symptome und Notizen auf eigene Server. Nilu nicht. Alles bleibt verschlüsselt auf deinem Gerät. Ein Konto brauchst du nicht.
 
 WAS DIE APP KANN
 
@@ -228,7 +255,7 @@ App-Sperre und Backup stehen nicht hinter der Bezahlschranke. Beides ist für al
 
 WAS DU WISSEN SOLLTEST
 
-Lotus stellt keine Diagnose, empfiehlt keine Behandlung und ist kein Verhütungsmittel. Vorhersagen werden aus deinen früheren Einträgen berechnet und sind ungefähr. Bei gesundheitlichen Sorgen wende dich an eine Ärztin oder einen Arzt.
+Nilu stellt keine Diagnose, empfiehlt keine Behandlung und ist kein Verhütungsmittel. Vorhersagen werden aus deinen früheren Einträgen berechnet und sind ungefähr. Bei gesundheitlichen Sorgen wende dich an eine Ärztin oder einen Arzt.
 ```
 
 **Keywords**
@@ -242,7 +269,7 @@ periode,menstruation,eisprung,fruchtbar,pms,symptome,kalender,datenschutz,frau,t
 
 **Nombre**
 ```
-Lotus · Ciclo Menstrual
+Nilu · Ciclo Menstrual
 ```
 
 **Subtítulo**
@@ -259,7 +286,7 @@ Registra tu regla y entiende tu ciclo. Tus datos se guardan en tu dispositivo, n
 ```
 Los datos de tu ciclo no salen de tu teléfono.
 
-La mayoría de las apps de regla llevan los días que registras, tus síntomas y tus notas a sus propios servidores. Lotus no. Todo se queda cifrado en tu dispositivo. No necesitas crear una cuenta.
+La mayoría de las apps de regla llevan los días que registras, tus síntomas y tus notas a sus propios servidores. Nilu no. Todo se queda cifrado en tu dispositivo. No necesitas crear una cuenta.
 
 QUÉ HACE
 
@@ -296,7 +323,7 @@ El bloqueo de la app y las copias de seguridad no están detrás del muro de pag
 
 LO QUE DEBES SABER
 
-Lotus no diagnostica, no recomienda tratamientos y no es un método anticonceptivo. Las previsiones se calculan a partir de tus registros anteriores y son aproximadas. Si te preocupa tu salud, consulta a un profesional médico.
+Nilu no diagnostica, no recomienda tratamientos y no es un método anticonceptivo. Las previsiones se calculan a partir de tus registros anteriores y son aproximadas. Si te preocupa tu salud, consulta a un profesional médico.
 ```
 
 **Palabras clave**
@@ -310,7 +337,7 @@ regla,ovulacion,fertilidad,sintomas,calendario,mujer,periodo,privacidad,salud,di
 
 **Nom**
 ```
-Lotus · Suivi de Règles
+Nilu · Suivi de Règles
 ```
 
 **Sous-titre**
@@ -327,7 +354,7 @@ Note tes règles, comprends ton cycle. Tes données sont écrites sur ton appare
 ```
 Les données de ton cycle ne quittent pas ton téléphone.
 
-La plupart des applis de règles envoient les jours que tu notes, tes symptômes et tes notes sur leurs propres serveurs. Lotus non. Tout reste chiffré sur ton appareil. Aucun compte n'est nécessaire.
+La plupart des applis de règles envoient les jours que tu notes, tes symptômes et tes notes sur leurs propres serveurs. Nilu non. Tout reste chiffré sur ton appareil. Aucun compte n'est nécessaire.
 
 CE QU'ELLE FAIT
 
@@ -364,7 +391,7 @@ Le verrouillage et les sauvegardes ne sont pas derrière le paywall. Les deux so
 
 CE QU'IL FAUT SAVOIR
 
-Lotus ne pose pas de diagnostic, ne prescrit aucun traitement et n'est pas un moyen de contraception. Les prévisions sont calculées à partir de tes saisies passées et restent approximatives. En cas d'inquiétude, consulte un médecin.
+Nilu ne pose pas de diagnostic, ne prescrit aucun traitement et n'est pas un moyen de contraception. Les prévisions sont calculées à partir de tes saisies passées et restent approximatives. En cas d'inquiétude, consulte un médecin.
 ```
 
 **Mots-clés**
@@ -378,7 +405,7 @@ menstruel,ovulation,fertilite,spm,symptomes,calendrier,femme,confidentialite,jou
 
 **Nome**
 ```
-Lotus · Ciclo Menstrual
+Nilu · Ciclo Menstrual
 ```
 
 **Subtítulo**
@@ -395,7 +422,7 @@ Regista a menstruação e entende o teu ciclo. Os dados ficam no teu dispositivo
 ```
 Os dados do teu ciclo não saem do telemóvel.
 
-A maioria das apps de menstruação leva os dias que registas, os sintomas e as notas para os seus próprios servidores. A Lotus não. Fica tudo cifrado no teu dispositivo. Não precisas de criar conta.
+A maioria das apps de menstruação leva os dias que registas, os sintomas e as notas para os seus próprios servidores. Nilu não. Fica tudo cifrado no teu dispositivo. Não precisas de criar conta.
 
 O QUE FAZ
 
@@ -432,7 +459,7 @@ O bloqueio da app e as cópias de segurança não estão atrás da barreira de p
 
 O QUE DEVES SABER
 
-A Lotus não diagnostica, não receita tratamentos e não é um método contracetivo. As previsões são calculadas a partir dos teus registos anteriores e são aproximadas. Se estiveres preocupada com a tua saúde, fala com um médico.
+Nilu não diagnostica, não receita tratamentos e não é um método contracetivo. As previsões são calculadas a partir dos teus registos anteriores e são aproximadas. Se estiveres preocupada com a tua saúde, fala com um médico.
 ```
 
 **Palavras-chave**
