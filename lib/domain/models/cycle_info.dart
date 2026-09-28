@@ -102,16 +102,22 @@ class CycleInfo {
   }
 
   /// Bugünkü döngü gününü hesaplar.
-  int? get currentCycleDay {
-    if (lastPeriodStart == null) return null;
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final start = DateTime(
-      lastPeriodStart!.year,
-      lastPeriodStart!.month,
-      lastPeriodStart!.day,
-    );
-    final diff = today.difference(start).inDays + 1;
+  int? get currentCycleDay => cycleDayOn(DateTime.now());
+
+  /// [reference] gününde döngünün kaçıncı günündeyiz?
+  ///
+  /// Saat dışarıdan verilebiliyor. Önceden getter doğrudan `DateTime.now()`
+  /// okuyordu ve modelin geri kalanı enjekte edilen `today`ye göre
+  /// hesaplanıyordu: test bir tarih sabitlese bile bu getter gerçek günü
+  /// okuyor, ikisi ayrı günlere denk geldiğinde üretimde imkânsız bir
+  /// durum çıkıyordu. Gece yarısını geçince yeşil bir test kırmızıya
+  /// dönüyordu — sebebi kodda değil takvimdeydi.
+  int? cycleDayOn(DateTime reference) {
+    final start = lastPeriodStart;
+    if (start == null) return null;
+    final today = DateTime(reference.year, reference.month, reference.day);
+    final clean = DateTime(start.year, start.month, start.day);
+    final diff = today.difference(clean).inDays + 1;
     if (diff < 1) return null;
     return diff;
   }

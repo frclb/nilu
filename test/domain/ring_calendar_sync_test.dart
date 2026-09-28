@@ -175,7 +175,9 @@ void main() {
           userPeriodLength: 7,
           today: bugun,
         );
-        final gun = info.currentCycleDay;
+        // Saat enjekte ediliyor: `currentCycleDay` gerçek günü okusaydı
+        // gece yarısından sonra test kendi kurduğu senaryodan kopardı.
+        final gun = info.cycleDayOn(bugun);
         if (gun == null) return;
         expect(
           info.phaseForRingDay(gun),
