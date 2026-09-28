@@ -102,6 +102,31 @@ class Article {
 class ArticleCatalog {
   const ArticleCatalog._();
 
+  /// Öne çıkan makale; yoksa null.
+  ///
+  /// Kütüphane ekranı bunu `firstWhere` ile arıyordu ve hiçbir makale
+  /// öne çıkarılmamışsa `StateError` fırlatıyordu — içerik düzenlemesi
+  /// ekranı kırmızı hataya çeviriyordu. Varlığı `article_catalog_test`
+  /// ile de sabitlendi; bu yalnızca ikinci savunma hattı.
+  static Article? get featured {
+    for (final article in all) {
+      if (article.isFeatured) return article;
+    }
+    return null;
+  }
+
+  /// Başlık anahtarıyla makale; yoksa null.
+  ///
+  /// Ekranlar belirli makalelere anahtarla bağlanıyor (ör. kanama
+  /// değerlendirmesinden demir eksikliği yazısına). Anahtar değişirse
+  /// bağlantı sessizce kaybolmalı, uygulama çökmemeli.
+  static Article? byKey(String titleKey) {
+    for (final article in all) {
+      if (article.titleKey == titleKey) return article;
+    }
+    return null;
+  }
+
   static const List<Article> all = [
     Article(
       titleKey: 'library_article_hormones',

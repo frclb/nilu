@@ -29,6 +29,7 @@ class _HeavyBleedingScreenState extends State<HeavyBleedingScreen> {
     final t = context.tokens;
     final theme = Theme.of(context);
     final result = HeavyBleedingCheck.evaluate(_selected);
+    final demir = ArticleCatalog.byKey('library_article_iron');
 
     return Scaffold(
       backgroundColor: t.background,
@@ -74,7 +75,10 @@ class _HeavyBleedingScreenState extends State<HeavyBleedingScreen> {
                   body: context.tr('bleeding_check_result_body'),
                   color: theme.colorScheme.primary,
                 ),
-                if (result.suggestsIronCheck) ...[
+                // Demir yazısı katalogdan anahtarla bulunuyor. Anahtar
+                // değişirse bağlantı sessizce kaybolmalı — eskiden
+                // `firstWhere` fırlatıyor, ekran çöküyordu.
+                if (result.suggestsIronCheck && demir != null) ...[
                   const SizedBox(height: 12),
                   _Callout(
                     icon: Icons.bloodtype_outlined,
@@ -83,11 +87,7 @@ class _HeavyBleedingScreenState extends State<HeavyBleedingScreen> {
                     color: t.warning,
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
-                        builder: (_) => ArticleScreen(
-                          article: ArticleCatalog.all.firstWhere(
-                            (a) => a.titleKey == 'library_article_iron',
-                          ),
-                        ),
+                        builder: (_) => ArticleScreen(article: demir),
                       ),
                     ),
                   ),

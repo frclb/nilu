@@ -46,7 +46,14 @@ class _HealthLibraryScreenState extends State<HealthLibraryScreen> {
 
     // Öne çıkan makale yalnızca süzgeç uygulanmamışken gösterilir; aksi hâlde
     // sonuç listesinin dışında kalıp kafa karıştırırdı.
-    final showFeatured = _query.isEmpty && _category == ArticleCategory.popular;
+    // Hiçbir makale öne çıkarılmamışsa bölüm tamamen atlanıyor. Eskiden
+    // `firstWhere` ile aranıyordu ve o durumda ekran `StateError` ile
+    // kırmızıya dönüyordu.
+    final featured = ArticleCatalog.featured;
+    final showFeatured =
+        featured != null &&
+        _query.isEmpty &&
+        _category == ArticleCategory.popular;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -70,9 +77,7 @@ class _HealthLibraryScreenState extends State<HealthLibraryScreen> {
                 onSelected: (category) => setState(() => _category = category),
               ),
               if (showFeatured)
-                HealthLibraryFeaturedArticle(
-                  article: ArticleCatalog.all.firstWhere((a) => a.isFeatured),
-                ),
+                HealthLibraryFeaturedArticle(article: featured),
               HealthLibraryArticleList(
                 articles: showFeatured
                     ? results.where((a) => !a.isFeatured).toList()

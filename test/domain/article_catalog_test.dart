@@ -91,4 +91,32 @@ void main() {
       }
     });
   });
+
+  group('ekranların dayandığı varsayımlar', () {
+    // Kütüphane ekranı öne çıkan makaleyi gösteriyor. Hiç yoksa bölüm
+    // atlanıyor (artık çökmüyor) ama ekran da eksik kalır; birden çoksa
+    // hangisinin çıkacağı sıraya bağlı olur.
+    test('tam olarak bir makale öne çıkarılmış', () {
+      final one = ArticleCatalog.all.where((a) => a.isFeatured).toList();
+      expect(one.length, 1, reason: 'öne çıkan makale sayısı 1 olmalı');
+      expect(ArticleCatalog.featured, isNotNull);
+    });
+
+    // Kanama değerlendirmesi demir eksikliği yazısına anahtarla bağlanıyor.
+    // Anahtar değişirse bağlantı sessizce kaybolur; burada yakalanmalı.
+    test('ekranların anahtarla bağlandığı makaleler duruyor', () {
+      for (final key in ['library_article_iron']) {
+        expect(
+          ArticleCatalog.byKey(key),
+          isNotNull,
+          reason: '$key katalogdan kalkmış; ona bağlanan ekran boş kalır',
+        );
+      }
+    });
+
+    test('başlık anahtarları benzersiz', () {
+      final keys = ArticleCatalog.all.map((a) => a.titleKey).toList();
+      expect(keys.toSet().length, keys.length, reason: 'yinelenen anahtar var');
+    });
+  });
 }
