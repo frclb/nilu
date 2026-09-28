@@ -334,7 +334,11 @@ class CalendarGrid extends StatelessWidget {
                     // farklı şeyler söylüyordu.
                     _buildLegendItem(
                       context,
-                      context.tokens.fertile,
+                      // Hücredeki noktanın rengiyle aynı. Önce `fertile`
+                      // yazıyordu: o ton hücrenin zemin tülü, noktası
+                      // değil — lejant ekranda olmayan bir rengi tarif
+                      // ediyordu.
+                      Theme.of(context).colorScheme.primary,
                       context.tr('calendar_legend_fertility'),
                     ),
                     _buildLegendItem(
@@ -822,9 +826,14 @@ class _DayTile extends StatelessWidget {
     if (isOvulation) {
       dots.add(_dot(t.ovulation, 6));
     }
-    // Doğurganlık noktası
+    // Doğurganlık noktası.
+    //
+    // Marka rengi, regl rengi değil. Token geçişinde `colorScheme.primary`
+    // yerine `t.flow` yazılmıştı ve nokta regl bandıyla aynı renge
+    // düşmüştü: aynı pembe hem "kanama" hem "doğurgan" demeye başladı.
+    // Lejant da bunu söylemiyordu, üçüncü bir renk gösteriyordu.
     else if (isFertile && !isPeriod) {
-      dots.add(_dot(t.flow, 5));
+      dots.add(_dot(theme.colorScheme.primary, 5));
     }
 
     // Lekelenme halkası. Regl rengiyle aynı ton — kanama olduğunu söylüyor;

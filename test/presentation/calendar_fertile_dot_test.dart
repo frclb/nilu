@@ -9,7 +9,6 @@ import 'package:period_tracker/data/repositories/cycle_settings_repository.dart'
 import 'package:period_tracker/data/repositories/period_repository.dart';
 import 'package:period_tracker/design_system/app_flavor.dart';
 import 'package:period_tracker/design_system/app_theme.dart';
-import 'package:period_tracker/design_system/app_tokens.dart';
 import 'package:period_tracker/domain/models/period_log.dart';
 import 'package:period_tracker/localization/app_localizations.dart';
 import 'package:period_tracker/presentation/calendar/view_models/calendar_view_model.dart';
@@ -29,20 +28,19 @@ import 'package:period_tracker/presentation/calendar/widgets/calendar_grid.dart'
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  final tokens = AppTheme.light(AppFlavor.plum).extension<AppTokens>()!;
+  final marka = AppTheme.light(AppFlavor.plum).colorScheme.primary;
 
   /// Hücrenin altındaki doğurganlık noktası.
   ///
-  /// Renk `flow`, `fertile` değil — lejant `fertile` gösteriyor ama hücre
-  /// regl rengini çiziyor. Boyut da ayırt edici: lejant örnekleri 8, hücre
-  /// noktaları 5. İlk denemede `fertile` aranmıştı ve test yalnızca lejant
-  /// örneğini bulup boş yere geçiyordu.
+  /// Renk marka rengi; lejant da artık aynısını gösteriyor. Boyut ayırt
+  /// edici: lejant örnekleri 8, hücre noktaları 5 — ilk denemede yalnızca
+  /// lejant örneği bulunmuş ve test boş yere geçmişti.
   Finder dogurganlikNoktasi() => find.byWidgetPredicate((w) {
     if (w is! Container) return false;
     final d = w.decoration;
     return d is BoxDecoration &&
         d.shape == BoxShape.circle &&
-        d.color == tokens.flow &&
+        d.color == marka &&
         w.constraints?.maxWidth == 5;
   });
 
