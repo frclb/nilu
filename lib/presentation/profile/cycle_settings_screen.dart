@@ -33,8 +33,18 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
     final periodLength = await _settingsRepo.getPeriodLength();
     final contraception = await _settingsRepo.getHormonalContraception();
     setState(() {
-      _cycleLength = cycleLength;
-      _periodLength = periodLength;
+      // Sınıra kırpılıyor. `Slider` aralık dışı bir değerle çöküyor ve
+      // ekran kırmızı hataya dönüşüyor; depodaki değer yedekten gelmiş ya
+      // da eski bir sürümde yazılmış olabilir. Kullanıcının ayar ekranı,
+      // veri beklenmedik diye kapanmamalı.
+      _cycleLength = cycleLength.clamp(
+        CycleSettingsRepository.minCycleLength,
+        CycleSettingsRepository.maxCycleLength,
+      );
+      _periodLength = periodLength.clamp(
+        CycleSettingsRepository.minPeriodLength,
+        CycleSettingsRepository.maxPeriodLength,
+      );
       _hormonalContraception = contraception;
       _isLoading = false;
     });
@@ -96,8 +106,8 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                     context.tr('cycle_settings_length'),
                     '$_cycleLength Gün',
                     _cycleLength.toDouble(),
-                    min: 21,
-                    max: 35,
+                    min: CycleSettingsRepository.minCycleLength.toDouble(),
+                    max: CycleSettingsRepository.maxCycleLength.toDouble(),
                     onChanged: (val) {
                       setState(() {
                         _cycleLength = val.toInt();
@@ -111,8 +121,8 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                     context.tr('cycle_settings_period'),
                     '$_periodLength Gün',
                     _periodLength.toDouble(),
-                    min: 2,
-                    max: 10,
+                    min: CycleSettingsRepository.minPeriodLength.toDouble(),
+                    max: CycleSettingsRepository.maxPeriodLength.toDouble(),
                     onChanged: (val) {
                       setState(() {
                         _periodLength = val.toInt();

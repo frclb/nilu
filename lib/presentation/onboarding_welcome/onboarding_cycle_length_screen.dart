@@ -24,7 +24,9 @@ class OnboardingCycleLengthScreen extends StatefulWidget {
 class _OnboardingCycleLengthScreenState
     extends State<OnboardingCycleLengthScreen> {
   final FixedExtentScrollController _scrollController =
-      FixedExtentScrollController(initialItem: 6); // Default 27 (21 + 6 = 27)
+      FixedExtentScrollController(
+        initialItem: 27 - CycleSettingsRepository.minCycleLength,
+      );
   int _selectedDays = 27;
 
   @override
@@ -252,14 +254,21 @@ class _OnboardingCycleLengthScreenState
                               onSelectedItemChanged: (index) {
                                 setState(() {
                                   _selectedDays =
-                                      index + 21; // Range: 21 to 45 days
+                                      index +
+                                      CycleSettingsRepository.minCycleLength;
                                 });
                               },
                               childDelegate: ListWheelChildBuilderDelegate(
-                                childCount: 25, // 21 to 45
+                                childCount:
+                                    CycleSettingsRepository.maxCycleLength -
+                                    CycleSettingsRepository.minCycleLength +
+                                    1,
                                 builder: (context, index) {
                                   final isSelected =
-                                      index + 21 == _selectedDays;
+                                      index +
+                                          CycleSettingsRepository
+                                              .minCycleLength ==
+                                      _selectedDays;
                                   return Center(
                                     child: AnimatedDefaultTextStyle(
                                       duration: const Duration(
@@ -277,7 +286,10 @@ class _OnboardingCycleLengthScreenState
                                       child: Text(
                                         context.tr(
                                           'onb_days_count',
-                                          params: {'n': '${index + 21}'},
+                                          params: {
+                                            'n':
+                                                '${index + CycleSettingsRepository.minCycleLength}',
+                                          },
                                         ),
                                       ),
                                     ),

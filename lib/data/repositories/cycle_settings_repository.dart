@@ -14,6 +14,19 @@ class CycleSettingsRepository {
   static const int defaultCycleLength = 28;
   static const int defaultPeriodLength = 5;
 
+  /// Kullanıcının seçebileceği sınırlar.
+  ///
+  /// Tek kaynak olmak zorunda. Onboarding çarkı 21–45 arası döngü
+  /// seçtiriyordu, ayarlardaki kaydırıcı ise 21–35 kabul ediyordu: 36 gün
+  /// ya da üstünü seçen kullanıcı Döngü Ayarları'nı açtığında ekran
+  /// `Slider`'ın 'value >= min && value <= max' iddiasıyla çöküyordu.
+  /// Uzun döngü tıbben olağandışı değil (PCOS, düzensiz döngüler), yani
+  /// onboarding'in aralığı doğru olandı; kaydırıcı ona uyduruldu.
+  static const int minCycleLength = 21;
+  static const int maxCycleLength = 45;
+  static const int minPeriodLength = 2;
+  static const int maxPeriodLength = 10;
+
   final SecureStore _store;
 
   const CycleSettingsRepository({SecureStore store = const SecureStore()})
