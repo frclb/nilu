@@ -316,25 +316,29 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
       ),
       extendBodyBehindAppBar: true,
       body: AppContentWidth(
-        child: Stack(
-          children: [
-            MobileScanner(
-              controller: _scannerController,
-              onDetect: _onDetect,
-              // Paketin kendi hata ekranı İngilizce sabit metin gösteriyor
-              // ("Scanning is not supported on this device"). Kullanıcı kamera
-              // iznini reddettiğinde de bu ekran çıkıyor, yani gerçek cihazda
-              // ulaşılabilir bir durum.
-              errorBuilder: (context, error) => ScanUnavailable(error: error),
-            ),
-            // Scanner overlay
-            //
-            // Kesim alanı **gelen genişlikten** hesaplanıyor, ekranınkinden
-            // değil: geniş ekranda önizleme okunur genişlikte ortalanıyor ve
-            // ekran genişliğinin %70'i kutunun kendisinden büyük çıkıyordu.
-            Positioned.fill(
-              child: LayoutBuilder(
-                builder: (context, constraints) => Container(
+        child: MobileScanner(
+          controller: _scannerController,
+          onDetect: _onDetect,
+          // Paketin kendi hata ekranı İngilizce sabit metin gösteriyor
+          // ("Scanning is not supported on this device"). Kullanıcı kamera
+          // iznini reddettiğinde de bu ekran çıkıyor, yani gerçek cihazda
+          // ulaşılabilir bir durum.
+          errorBuilder: (context, error) => ScanUnavailable(error: error),
+          // Çerçeve ve alt ipucu `overlayBuilder`'a veriliyor; paket bunları
+          // **yalnızca önizleme görünürken** çiziyor.
+          //
+          // Önceden ikisi de `Stack`'te `MobileScanner`'ın kardeşiydi ve
+          // kamera açılamadığında da çiziliyordu: karartma katmanı hata
+          // metnini kenarlardan soluklaştırıyor, köşe parantezleri "Ayarları
+          // aç" düğmesinin üstüne biniyor, altta da "Karekod otomatik olarak
+          // taranacaktır" yazıyordu — hiçbir şeyin taranamayacağı bir ekranda.
+          overlayBuilder: (context, constraints) => Stack(
+            children: [
+              // Kesim alanı **gelen genişlikten** hesaplanıyor, ekranınkinden
+              // değil: geniş ekranda önizleme okunur genişlikte ortalanıyor ve
+              // ekran genişliğinin %70'i kutunun kendisinden büyük çıkıyordu.
+              Positioned.fill(
+                child: Container(
                   decoration: ShapeDecoration(
                     shape: _ScannerOverlayShape(
                       borderColor: Theme.of(context).primaryColor,
@@ -346,24 +350,24 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
                   ),
                 ),
               ),
-            ),
 
-            // Helper text at bottom
-            Positioned(
-              bottom: MediaQuery.of(context).padding.bottom + 40,
-              left: 20,
-              right: 20,
-              child: Text(
-                context.tr('partner_scan_helper'),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AppScrim.inkMuted,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+              // Helper text at bottom
+              Positioned(
+                bottom: MediaQuery.of(context).padding.bottom + 40,
+                left: 20,
+                right: 20,
+                child: Text(
+                  context.tr('partner_scan_helper'),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: AppScrim.inkMuted,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
