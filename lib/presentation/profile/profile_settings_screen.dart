@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../design_system/app_contrast.dart';
 import '../../design_system/app_theme.dart';
 import '../health_check/heavy_bleeding_screen.dart';
 import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../localization/app_localizations.dart';
 import '../../core/navigation/route_names.dart';
 import 'package:provider/provider.dart';
@@ -237,78 +235,6 @@ class ProfileSettingsScreen extends StatelessWidget {
                     vertical: 12,
                   ),
                   backgroundColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Clear Cache Button
-              TextButton.icon(
-                onPressed: () async {
-                  final bool? confirm = await showDialog<bool>(
-                    context: context,
-                    // Biçimler `dialogTheme`'den; burada elle beyaz/siyah ve
-                    // gri tonlar yazılıydı ve temayı takip etmiyorlardı.
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text(context.tr('clear_cache_title')),
-                        content: Text(context.tr('clear_cache_desc')),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            child: Text(context.tr('cancel')),
-                          ),
-                          ElevatedButton(
-                            onPressed: () => Navigator.of(context).pop(true),
-                            style: AppTheme.dialogAction().copyWith(
-                              backgroundColor: WidgetStatePropertyAll(
-                                context.tokens.danger,
-                              ),
-                              foregroundColor: WidgetStatePropertyAll(
-                                AppContrast.on(context.tokens.danger),
-                              ),
-                            ),
-                            child: Text(context.tr('delete')),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-
-                  if (confirm == true) {
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.clear();
-
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(context.tr('cache_cleared'))),
-                      );
-                    }
-                  }
-                },
-                icon: Icon(
-                  Icons.cleaning_services_outlined,
-                  size: 20,
-                  // Yumurtlama rengindeydi; önbellek temizlemenin döngüyle
-                  // ilgisi yok ve mor buraya anlam yüklüyordu.
-                  color: context.tokens.textMuted,
-                ),
-                label: Text(
-                  context.tr('profile_clear_cache'),
-                  style: TextStyle(
-                    color: context.tokens.textMuted,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  backgroundColor: context.tokens.surfaceAlt,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),

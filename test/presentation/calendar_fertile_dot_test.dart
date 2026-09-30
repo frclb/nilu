@@ -109,16 +109,31 @@ void main() {
       reason: 'senaryo kurulmadı: bugün doğurganlık penceresinde değil',
     );
 
-    // Izgarada doğurganlık noktası gerçekten çiziliyor mu? Çizilmiyorsa
-    // ikinci iddia boş yere geçer.
+    // Kontrol noktası: görünen ayda doğurgan **ama regl olmayan** bir gün
+    // varsa orada nokta çizilmeli. Böyle bir gün her zaman olmuyor — ay
+    // sonunda pencerenin tamamı sonraki aya kayıyor ve ızgarada hiç nokta
+    // kalmıyor. Testi takvime bağlamamak için koşullu sınanıyor; asıl
+    // iddia (bugünün hücresinde nokta yok) her hâlükârda geçerli.
+    final ayinIlki = DateTime(bugun.year, bugun.month, 1);
+    final ayinSonu = DateTime(bugun.year, bugun.month + 1, 0);
+    var kontrolGunuVar = false;
+    for (var g = ayinIlki; !g.isAfter(ayinSonu); g = g.add(const Duration(days: 1))) {
+      if (vm.cycleInfo.isFertile(g) &&
+          !vm.isPeriodDay(g) &&
+          !vm.cycleInfo.isOvulationDay(g)) {
+        kontrolGunuVar = true;
+        break;
+      }
+    }
+
     final dogurgan = dogurganlikNoktasi();
-    expect(
-      dogurgan,
-      findsWidgets,
-      reason:
-          'ızgarada hiç doğurganlık noktası yok — kontrol noktası oluşmadı, '
-          'aşağıdaki iddia boş yere geçer',
-    );
+    if (kontrolGunuVar) {
+      expect(
+        dogurgan,
+        findsWidgets,
+        reason: 'doğurgan gün var ama hiç nokta çizilmemiş',
+      );
+    }
 
     // Bugünün hücresi: sayının bulunduğu sütun, sayının hemen altı.
     final sayi = find.text('${bugun.day}');
