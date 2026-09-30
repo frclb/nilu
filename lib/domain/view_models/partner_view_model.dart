@@ -8,7 +8,12 @@ import '../services/partner_suggestion_engine.dart';
 /// Partner tarafında duygusal durum verisini tüketen ViewModel.
 /// Real-time güncelleme (Firestore Stream), geçmiş takibi ve bağlantı yönetimi sağlar.
 class PartnerViewModel extends ChangeNotifier {
-  final FirestoreDataSource _firestoreDS = FirestoreDataSource();
+  /// Testten sahte bir kaynak verilebilsin diye enjekte ediliyor; üretimde
+  /// varsayılan kalıyor (bkz. `PeriodRepository({store})` ile aynı kalıp).
+  final FirestoreDataSource _firestoreDS;
+
+  PartnerViewModel({FirestoreDataSource? firestore})
+    : _firestoreDS = firestore ?? FirestoreDataSource();
 
   // ─── State ───
   IntimacyStatus? _currentStatus;
@@ -19,6 +24,12 @@ class PartnerViewModel extends ChangeNotifier {
   List<IntimacyStatus> _historyList = [];
   bool _isLoaded = false;
   bool _hasNewUpdate = false;
+
+  /// Şu an dinlenen partner ve `init`'in hiç çağrılıp çağrılmadığı.
+  /// `ChangeNotifierProxyProvider.update` her yeniden çizimde `init`
+  /// çağırdığı için gerekiyor (aşağıya bak).
+  String? _listeningTo;
+  bool _initialized = false;
 
   // ─── Stream ───
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
@@ -52,16 +63,43 @@ class PartnerViewModel extends ChangeNotifier {
     return DateTime.now().difference(_lastUpdatedAt!).inHours >= 24;
   }
 
-  /// Partner ID verilerek ViewModel başlatılır
+  /// Partner ID verilerek ViewModel başlatılır.
+  ///
+  /// İki şey burada ters gidiyordu:
+  ///
+  /// **Haber verilmiyordu.** Eşleşmiş dalda `_isConnected` `true` yapılıp
+  /// `notifyListeners` çağrılmıyor, uyarı akıştan gelen ilk yanıta
+  /// bırakılıyordu. Firebase yapılandırılmamışken akış boş dönüp hemen
+  /// `onDone` verdiği için bu fark edilmiyordu; yapılandırıldığında
+  /// `snapshots()` ilk anlık görüntüyü ağ turundan sonra veriyor ve o ana
+  /// kadar üç geri çağrı da sessiz. Ekran `isConnected`'ı `watch` ile okuduğu
+  /// için eşleşmiş kullanıcı o süre boyunca "Henüz bir partner bağlantısı
+  /// kurulmadı" ve "Partner Davet Et" görüyordu — yani zaten bağlı olduğu
+  /// hâlde yeniden eşleşmeye davet ediliyordu.
+  ///
+  /// **Her çizimde yeniden abone olunuyordu.** `update` her yeniden çizimde
+  /// `init` çağırıyor; `_startListeningToPartner` de aboneliği kapatıp
+  /// yeniden açıyordu. Firestore her yeni dinleyiciyi okuma olarak
+  /// faturalandırıyor, üstelik ilk anlık görüntü beklemesi de baştan
+  /// başladığı için yukarıdaki yanlış mesajın süresi uzuyordu.
   void init(String? partnerId) {
-    if (partnerId != null && partnerId.isNotEmpty) {
+    final id = (partnerId != null && partnerId.isNotEmpty) ? partnerId : null;
+
+    // Durum değişmediyse ne aboneliği tazele ne dinleyicileri uyandır.
+    // `_initialized` ilk çağrının her hâlde çalışmasını sağlıyor: `id` de
+    // `_listeningTo` da baştan `null` olduğu için yoksa hiç çalışmazdı.
+    if (_initialized && id == _listeningTo) return;
+    _initialized = true;
+    _listeningTo = id;
+
+    if (id != null) {
       _isConnected = true;
-      _startListeningToPartner(partnerId);
+      _startListeningToPartner(id);
     } else {
       _isConnected = false;
       _isLoaded = true;
-      notifyListeners();
     }
+    notifyListeners();
   }
 
   /// Firestore'dan partnerin intimacy durumunu dinler

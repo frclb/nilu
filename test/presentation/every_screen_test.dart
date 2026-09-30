@@ -1,23 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:period_tracker/design_system/app_flavor.dart';
-import 'package:period_tracker/design_system/app_theme.dart';
+import 'screen_harness.dart';
+
 import 'package:period_tracker/domain/models/article.dart';
-import 'package:period_tracker/domain/view_models/intimacy_view_model.dart';
-import 'package:period_tracker/domain/view_models/partner_view_model.dart';
-import 'package:period_tracker/domain/view_models/subscription_view_model.dart';
-import 'package:period_tracker/domain/view_models/theme_view_model.dart';
-import 'package:period_tracker/domain/view_models/user_view_model.dart';
-import 'package:period_tracker/localization/app_localizations.dart';
 import 'package:period_tracker/presentation/appearance/appearance_screen.dart';
 import 'package:period_tracker/presentation/assistant/assistant_screen.dart';
-import 'package:period_tracker/presentation/calendar/view_models/calendar_view_model.dart';
 import 'package:period_tracker/presentation/health_check/heavy_bleeding_screen.dart';
 import 'package:period_tracker/presentation/health_library/article_screen.dart';
 import 'package:period_tracker/presentation/health_library/health_library_screen.dart';
@@ -32,6 +22,17 @@ import 'package:period_tracker/presentation/profile/personal_info_screen.dart';
 import 'package:period_tracker/presentation/profile/privacy_security_screen.dart';
 import 'package:period_tracker/presentation/widgets_preview/widgets_preview_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_period_length_screen.dart';
+import 'package:period_tracker/presentation/calendar/calendar_screen.dart';
+import 'package:period_tracker/presentation/exercise/exercise_detail_screen.dart';
+import 'package:period_tracker/presentation/home/home_screen.dart';
+import 'package:period_tracker/presentation/insights/insights_screen.dart';
+import 'package:period_tracker/presentation/onboarding_welcome/onboarding_success_screen.dart';
+import 'package:period_tracker/presentation/partner_match/partner_dashboard_screen.dart';
+import 'package:period_tracker/presentation/partner_match/partner_qr_gen_screen.dart';
+import 'package:period_tracker/presentation/partner_match/partner_scan_screen.dart';
+import 'package:period_tracker/presentation/profile/profile_settings_screen.dart';
+import 'package:period_tracker/presentation/recipe/recipe_detail_screen.dart';
+import 'package:period_tracker/presentation/splash/splash_screen.dart';
 
 /// Her ekran çiziliyor mu?
 ///
@@ -46,37 +47,7 @@ import 'package:period_tracker/presentation/onboarding_welcome/onboarding_period
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUpAll(() {
-    // `local_auth` ve `home_widget` platform kanalları testte yok; onlara
-    // dokunan ekranlar yükleme durumunda takılı kalıyordu.
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-          const MethodChannel('plugins.flutter.io/local_auth'),
-          (call) async => call.method == 'getAvailableBiometrics'
-              ? <String>[]
-              : false,
-        );
-  });
-
-  /// Telefon, katlanabilir ve tablet.
-  const sizes = <String, Size>{
-    'iPhone 16e': Size(390, 844),
-    'iPhone Duo (kapalı)': Size(466, 678),
-    'iPad Pro 13"': Size(1032, 1376),
-  };
-
-  /// Uygulamadaki sağlayıcı kümesinin aynısı.
-  Widget wrap(Widget screen) => MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (_) => UserViewModel()),
-      ChangeNotifierProvider(create: (_) => CalendarViewModel()),
-      ChangeNotifierProvider(create: (_) => SubscriptionViewModel()),
-      ChangeNotifierProvider(create: (_) => ThemeViewModel()),
-      ChangeNotifierProvider(create: (_) => IntimacyViewModel()),
-      ChangeNotifierProvider(create: (_) => PartnerViewModel()),
-    ],
-    child: screen,
-  );
+  setUpAll(mockMissingPlatformChannels);
 
   final screens = <String, Widget>{
     'assistant': const AssistantScreen(),
@@ -95,38 +66,26 @@ void main() {
     'partner_support': const PartnerSupportScreen(),
     'widgets_preview': const WidgetsPreviewScreen(),
     'onboarding_period_length': const OnboardingPeriodLengthScreen(),
+    'splash': const SplashScreen(),
+    'home': const HomeScreen(),
+    'calendar': const CalendarScreen(),
+    'insights': const InsightsScreen(),
+    'profile_settings': const ProfileSettingsScreen(),
+    'recipe_detail': const RecipeDetailScreen(),
+    'exercise_detail': const ExerciseDetailScreen(),
+    'onboarding_success': const OnboardingSuccessScreen(),
+    'partner_dashboard': const PartnerDashboardScreen(),
+    'partner_qr_gen': const PartnerQrGenScreen(),
+    'partner_scan': const PartnerScanScreen(),
   };
 
   for (final entry in screens.entries) {
-    for (final size in sizes.entries) {
+    for (final size in screenSizes.entries) {
       testWidgets('${entry.key} — ${size.key}', (tester) async {
         FlutterSecureStorage.setMockInitialValues({});
         SharedPreferences.setMockInitialValues({});
 
-        tester.view.physicalSize = size.value * 3;
-        tester.view.devicePixelRatio = 3;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        await tester.runAsync(() async {
-          await tester.pumpWidget(
-            MaterialApp(
-              theme: AppTheme.light(AppFlavor.plum),
-              localizationsDelegates: const [
-                AppLocalizations.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              locale: const Locale('tr'),
-              supportedLocales: const [Locale('tr')],
-              home: wrap(entry.value),
-            ),
-          );
-          await Future<void>.delayed(const Duration(milliseconds: 400));
-        });
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 300));
+        await pumpScreen(tester, entry.value, size: size.value);
 
         // Önce ekranın gerçekten çizildiği: `takeException` boş bir
         // ağaçta da null döner, yani bu doğrulama olmadan test hiçbir şey

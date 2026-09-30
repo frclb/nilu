@@ -31,7 +31,16 @@ class AppSettingsLink {
   /// gerektiriyor ve bu sürüm iOS için yayınlanıyor. Desteklenmeyen yerde
   /// düğme hiç çizilmiyor — dokunulduğunda hiçbir şey olmayan bir düğme,
   /// kullanıcıya arıza gibi görünür.
-  static bool get isSupported => !kIsWeb && Platform.isIOS;
+  static bool get isSupported =>
+      debugSupportedOverride ?? (!kIsWeb && Platform.isIOS);
+
+  /// Testte platform kararını değiştirmek için.
+  ///
+  /// Testler macOS'ta koşuyor, yani `Platform.isIOS` her zaman `false`.
+  /// Düğmenin **iOS'ta** göründüğünü doğrulayan iddia bu yüzden sınanamıyordu:
+  /// uygulamanın yayınlandığı tek platformda davranış test dışı kalıyordu.
+  @visibleForTesting
+  static bool? debugSupportedOverride;
 
   /// Test edilebilirlik için açma çağrısı ayrık tutuldu.
   @visibleForTesting
@@ -49,5 +58,8 @@ class AppSettingsLink {
   }
 
   @visibleForTesting
-  static void resetForTest() => launcher = launchUrl;
+  static void resetForTest() {
+    launcher = launchUrl;
+    debugSupportedOverride = null;
+  }
 }

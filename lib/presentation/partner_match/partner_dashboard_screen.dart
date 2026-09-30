@@ -287,8 +287,12 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
     Color textMutedColor,
     Color primaryColor,
   ) {
-    final userName =
-        context.read<UserViewModel>().partnerId ?? context.tr('partner_label');
+    // Burada `partnerId` yazıyordu ve ham bir UID kullanıcıya partnerin **adı**
+    // gibi gösteriliyordu ("k3Jd9QzLm2Xp..."), avatar harfi de onun ilk
+    // karakterinden geliyordu. Aynı hata uygulama çubuğu başlığında bulunup
+    // düzeltilmiş (yukarıya bak) ama bu blokta kalmıştı. Partnerin adı
+    // hiçbir yerde saklanmadığı için ad alanı eklenene kadar genel etiket.
+    final userName = context.tr('partner_label');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
