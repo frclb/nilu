@@ -7,6 +7,7 @@ import '../../../domain/services/prediction_service.dart';
 import '../../../data/repositories/period_repository.dart';
 import '../../../data/datasources/widget_datasource.dart';
 import '../../../data/repositories/cycle_settings_repository.dart';
+import '../../../data/repositories/pregnancy_repository.dart';
 import '../../../domain/services/widget_snapshot.dart';
 
 /// Takvim ekranının durumunu yöneten ve iş mantığını bağlayan ViewModel.
@@ -16,6 +17,7 @@ class CalendarViewModel extends ChangeNotifier {
   final PredictionService _predictionService = PredictionService();
   final CycleSettingsRepository _settingsRepo = CycleSettingsRepository();
   final WidgetDatasource _widget = const WidgetDatasource();
+  final PregnancyRepository _pregnancyRepo = const PregnancyRepository();
 
   List<PeriodLog> _periodLogs = [];
   List<DailyLog> _dailyLogs = [];
@@ -29,9 +31,25 @@ class CalendarViewModel extends ChangeNotifier {
   int _userPeriodLength = 5;
   DateTime? _settingsUpdatedAt;
   bool _hormonalContraception = false;
+  bool _pregnant = false;
 
   /// Hormonal doğum kontrolü açıkken doğurganlık tahmini gösterilmez.
   bool get hormonalContraception => _hormonalContraception;
+
+  /// Süren bir gebelik var mı?
+  bool get pregnant => _pregnant;
+
+  /// Gebelikte regl kaydı tutulmaz.
+  ///
+  /// Gebelikte kanama regl **değildir**: hekime götürülmesi gereken bir
+  /// bulgudur (T.C. Sağlık Bakanlığı Doğum Öncesi Bakım Yönetim Rehberi,
+  /// tehlike işaretleri). Regl kaydı açılırsa `lastPeriodStart` kayar ve
+  /// gebelik haftasından bütün tahminlere kadar her şey yanlışlanır — üstelik
+  /// kullanıcı bunu fark etmez, çünkü ekranda makul bir sayı durur.
+  ///
+  /// Reddetme sessiz değil: çağıran `false` alıyor ve arayüz sebebini
+  /// söyleyebiliyor.
+  bool get _canRecordPeriods => !_pregnant;
 
   List<PeriodLog> get periodLogs => _periodLogs;
   List<DailyLog> get dailyLogs => _dailyLogs;
@@ -57,6 +75,7 @@ class CalendarViewModel extends ChangeNotifier {
       _userPeriodLength = await _settingsRepo.getPeriodLength();
       _settingsUpdatedAt = await _settingsRepo.getSettingsUpdatedAt();
       _hormonalContraception = await _settingsRepo.getHormonalContraception();
+      _pregnant = (await _pregnancyRepo.getActive()) != null;
 
       _recalculate();
     } catch (e) {
@@ -123,6 +142,8 @@ class CalendarViewModel extends ChangeNotifier {
 
   /// Bir günü regl günü olarak işaretler veya kaldırır. Başarılıysa true döner.
   Future<bool> togglePeriodDay(DateTime rawDate) async {
+    if (!_canRecordPeriods) return false;
+
     // Saat bilgisi burada temizleniyor. "Bugünü işaretle" diyen bir çağrı
     // `DateTime.now()` geçirdiğinde tarih gece yarısından sonra olduğu için
     // aşağıdaki gelecek-günü koruması devreye giriyor ve işlem sessizce
@@ -185,6 +206,8 @@ class CalendarViewModel extends ChangeNotifier {
 
   /// "Reglim başladı" — bugünden itibaren devam eden bir dönem açar.
   Future<bool> startPeriodToday() async {
+    if (!_canRecordPeriods) return false;
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     _periodLogs = _periodService.startPeriod(_periodLogs, today);
@@ -194,6 +217,8 @@ class CalendarViewModel extends ChangeNotifier {
 
   /// "Reglim bitti" — dönemi bugünde kapatır; bugün kayıtta kalır.
   Future<bool> endPeriodToday() async {
+    if (!_canRecordPeriods) return false;
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     _periodLogs = _periodService.endPeriod(_periodLogs, today);
@@ -208,6 +233,8 @@ class CalendarViewModel extends ChangeNotifier {
   /// öncesine dönmeli: yeni açılan kayıt siliniyor, yeniden açılmış bir kayıt
   /// varsa eski bitiş tarihine dönüyor.
   Future<bool> undoPeriodStart() async {
+    if (!_canRecordPeriods) return false;
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     if (!isPeriodDay(today)) return false;
@@ -226,6 +253,8 @@ class CalendarViewModel extends ChangeNotifier {
   /// Dönem daha eskiyse geri alma "bitirmeyi" geri alır, yani kayıt yeniden
   /// açılır; oradaki günler gerçek veri.
   Future<bool> reopenPeriodToday() async {
+    if (!_canRecordPeriods) return false;
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
