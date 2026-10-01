@@ -66,9 +66,24 @@ class CycleRingData {
     AppTokens tokens,
   ) {
     // Beklenen uzunluğun ötesi nötr: gecikme çelengin kendisinden okunuyor.
-    final base = day > expected
+    var base = day > expected
         ? tokens.textFaint
         : info.phaseForRingDay(day).color(tokens);
+
+    // Süren reglin henüz yaşanmamış günleri daha yumuşak.
+    //
+    // Takvim bu ayrımı yapıyor: kayıtlı gün `flow` ile dolu, devamı beklenen
+    // gün ince bir tül. Çelenk ikisini de `flow` boyuyordu, yani reglinin
+    // **ilk** günündeki kullanıcıya planladığı yedi günün tamamı olmuş gibi
+    // görünüyordu — aynı veriden iki ekranda iki farklı cevap.
+    //
+    // Tülün kendisi burada işe yaramıyor: takvimde tahmin bir **zemin
+    // bandı**, çelenkte ise çiçeğin kendisi işaret. Zemine karışmış bir tül
+    // çiçeği görünmez yapardı. Aynı token ailesinden bir ton aşağısı
+    // (`flowSoft`) hem ayırt ediliyor hem de takvimle aynı dili konuşuyor.
+    if (day <= expected && info.isPredictedPeriodRingDay(day)) {
+      base = tokens.flowSoft;
+    }
 
     // Geçmiş günler soluk: bakış bugüne ve önündeki yola gitsin.
     return day < currentDay ? base.withAlpha(80) : base;

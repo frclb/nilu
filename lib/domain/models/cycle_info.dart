@@ -191,10 +191,33 @@ class CycleInfo {
     final recorded = currentPeriodLength;
     if (recorded == null) return getPhaseForDay(cycleDay);
 
-    final length = currentPeriodEnd != null
-        ? recorded
-        : (recorded > plannedPeriodLength ? recorded : plannedPeriodLength);
-    return getPhaseForDay(cycleDay, periodLength: length);
+    return getPhaseForDay(cycleDay, periodLength: _ringPeriodLength(recorded));
+  }
+
+  /// Halkanın o gün için kullandığı regl uzunluğu.
+  int _ringPeriodLength(int recorded) => currentPeriodEnd != null
+      ? recorded
+      : (recorded > plannedPeriodLength ? recorded : plannedPeriodLength);
+
+  /// Bu halka günü regl olarak çiziliyor ama **henüz yaşanmadı** mı?
+  ///
+  /// Halka süren bir reglin kalan günlerini de boyuyor (bkz.
+  /// [phaseForRingDay]) — bu doğru, çünkü halka bir tahmin görseli. Ama
+  /// takvim o günleri tül ile, yaşanmışları dolu renkle çiziyor; çelenk
+  /// ikisini de aynı renge boyadığı sürece reglinin ilk günündeki kullanıcı
+  /// planladığı yedi günün tamamını olmuş gibi görüyordu.
+  ///
+  /// Dönem kapandığında tahmin kalmıyor: kayıt kesin.
+  bool isPredictedPeriodRingDay(int cycleDay) {
+    final recorded = currentPeriodLength;
+    if (recorded == null) return false;
+
+    // Kapanmış dönem ayrıca kontrol edilmiyor: [_ringPeriodLength] o durumda
+    // zaten `recorded` döndürüyor, yani aşağıdaki iki koşul birlikte her
+    // günü eliyor. Ayrı bir `currentPeriodEnd != null` koruması yazmıştım;
+    // hiçbir testin düşüremediği ölü bir dalmış — aynı kuralın ikinci kopyası.
+    if (cycleDay <= recorded) return false;
+    return cycleDay <= _ringPeriodLength(recorded);
   }
 
   /// Belirli bir döngü günü için fazı belirler.
