@@ -47,9 +47,6 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
 
   /// Kodu yeniler. Daha önce paylaşılmış bütün QR'lar geçersiz olur.
   Future<void> _rotate() async {
-    final messenger = ScaffoldMessenger.of(context);
-    final rotated = context.tr('partner_qr_gen_rotated');
-
     setState(() => _rotating = true);
     final id = await context.read<UserViewModel>().ensureMyId();
     final token = await _pairing.rotate(id);
@@ -58,7 +55,12 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
       _token = token;
       _rotating = false;
     });
-    messenger.showSnackBar(SnackBar(content: Text(rotated)));
+    // Onay bildirimi kaldırıldı: QR ile kodun kendisi zaten gözle görülür
+    // biçimde değişiyor, bildirim ise "Eşleşme Kodunu Kopyala" düğmesinin
+    // üstüne binip (390×844'te düğme 789, bildirim 780–844) yeni kodu
+    // kopyalamayı dört saniye engelliyordu.
+    //
+    // Kopyalama bildirimi duruyor: panoya yazmanın ekranda başka bir izi yok.
   }
 
   @override

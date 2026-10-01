@@ -211,7 +211,6 @@ class CalendarDayHeader extends StatelessWidget {
     CalendarViewModel viewModel,
   ) async {
     final date = viewModel.selectedDate;
-    final wasPeriod = viewModel.isPeriodDay(date);
     final success = await viewModel.togglePeriodDay(date);
     if (!context.mounted) return;
 
@@ -220,13 +219,15 @@ class CalendarDayHeader extends StatelessWidget {
       return;
     }
 
-    AppSnack.show(
-      context,
-      context.tr(
-        wasPeriod ? 'calendar_period_unmarked' : 'calendar_period_marked',
-        params: {'date': '${date.day}/${date.month}'},
-      ),
-    );
+    // Başarıda bildirim **yok**. Bildirim, kısa ekranlarda tam o günün
+    // eylem düğmelerinin üstüne biniyordu (466×678'de düğmeler 645,
+    // bildirim 614–678) ve dört saniye boyunca dokunuşu yutuyordu — yani
+    // yanlış güne dokunan kullanıcı tam düzeltmek istediği anda
+    // "Regli kaldır"a basamıyordu.
+    //
+    // Sonuç zaten ekranda: gün rozeti değişiyor ve düğme "Regl işaretle" ile
+    // "Regli kaldır" arasında dönüyor. Hata durumundaki bildirim duruyor;
+    // orada değişen bir şey olmadığı için tek geri bildirim o.
   }
 }
 

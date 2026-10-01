@@ -49,10 +49,20 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
   /// o durumda gerekiyor.
   bool _actedThisSession = false;
 
-  Future<void> _run(
-    Future<bool> Function() action, {
-    required String confirmation,
-  }) async {
+  /// Eylemi çalıştırır.
+  ///
+  /// Başarıda bildirim **göstermiyor**. Eskiden gösteriyordu ve bildirim
+  /// "Geri al" düğmesinin üstüne biniyordu: 390×844 bir ekranda düğme
+  /// 706–726, bildirim 708–772 arasındaydı. Bildirim dört saniye durduğu
+  /// için kullanıcı yanlış dokunduğunu fark edip geri almak istediği tam
+  /// aralıkta düğme dokunuşu yutuluyordu — hiçbir geri bildirim de
+  /// olmadığından uygulama bozuk görünüyordu.
+  ///
+  /// Onay zaten ekranda: başlık değişiyor ("8 gün sürdü"), düğmenin yerini
+  /// onay simgeli durum satırı alıyor ve altında geri alma beliriyor. Geçici
+  /// bir şerit bunu tekrarlayıp üstünü örtmekten başka bir şey yapmıyordu.
+  /// Hata durumunda bildirim duruyor: orada ekranda değişen bir şey yok.
+  Future<void> _run(Future<bool> Function() action) async {
     final failed = context.tr('home_period_toggle_failed');
 
     setState(() => _busy = true);
@@ -65,11 +75,6 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
       return;
     }
     setState(() => _actedThisSession = true);
-
-    // Bildirim yalnızca ne olduğunu söylüyor. Geri alma artık düğmenin
-    // altında kalıcı duruyor; ikisini birden göstermek aynı eylemi iki
-    // yere koyup kullanıcıya hangisinin kalıcı olduğunu sordurur.
-    AppSnack.show(context, confirmation);
   }
 
   /// Geri alma eylemi.
@@ -192,15 +197,9 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
             onPressed: _busy
                 ? null
                 : () async {
-                    // Metin onay diyaloğundan **önce** okunuyor: sonrasında
-                    // `context` bir async boşluğun ötesinde kalıyor.
-                    final confirmation = context.tr('home_period_started');
                     if (!await _confirmEarlyStart(viewModel)) return;
                     if (!mounted) return;
-                    await _run(
-                      viewModel.startPeriodToday,
-                      confirmation: confirmation,
-                    );
+                    await _run(viewModel.startPeriodToday);
                   },
             icon: const Icon(Icons.water_drop_outlined, size: 20),
             label: Text(context.tr('home_period_start')),
@@ -216,10 +215,7 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
           PeriodAction.end => OutlinedButton.icon(
             onPressed: _busy
                 ? null
-                : () => _run(
-                    viewModel.endPeriodToday,
-                    confirmation: context.tr('home_period_ended'),
-                  ),
+                : () => _run(viewModel.endPeriodToday),
             icon: const Icon(Icons.stop_circle_outlined, size: 20),
             label: Text(context.tr('home_period_end')),
             style: OutlinedButton.styleFrom(

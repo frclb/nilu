@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:period_tracker/data/repositories/cycle_settings_repository.dart';
 import 'package:period_tracker/data/repositories/period_repository.dart';
 import 'package:period_tracker/data/repositories/profile_repository.dart';
 import 'package:period_tracker/localization/app_localizations.dart';
@@ -76,6 +77,16 @@ void main() {
     // İlk döngüsünü yeni girmiş kullanıcı: ortalama hesaplayacak geçmiş yok.
     _Profile('tek döngü', periods: [_log('tek', 10, 5)]),
 
+    // Geçmiş yokken döngü uzunluğu **ayardan** okunuyor. Varsayılan dışı bir
+    // uzunlukla tek kayıt: ayarın ekrana ulaştığını yalnızca bu profil
+    // sınayabiliyor — ötekilerde ortalama kayıtlardan hesaplandığı için
+    // ayar hiç kullanılmıyor.
+    _Profile(
+      'tek döngü · uzun ayar',
+      periods: [_log('uzun', 6, 5)],
+      cycleLength: 35,
+    ),
+
     // Düzenli geçmiş: beklenen durum.
     _Profile('düzenli 6 döngü', periods: _cycles([5, 28, 28, 28, 28, 28])),
 
@@ -143,9 +154,18 @@ void main() {
             FlutterSecureStorage.setMockInitialValues({});
             SharedPreferences.setMockInitialValues({
               'onboarding_complete': true,
-              'user_cycle_length': profile.cycleLength,
-              'user_period_length': profile.periodLength,
             });
+
+            // Döngü ayarları da **şifreli** depoda (bkz.
+            // `SecureStore.sensitiveKeys`). Bunları `SharedPreferences`'a
+            // yazıyordum ve uygulama oradan okumadığı için profillerin
+            // uzunlukları hiç etki etmiyordu: "düzensiz döngüler" ile
+            // "on günlük regl" profilleri aslında varsayılan ayarlarla
+            // koşuyordu.
+            await CycleSettingsRepository().saveCycleSettings(
+              cycleLength: profile.cycleLength,
+              periodLength: profile.periodLength,
+            );
 
             // Veriyi deponun ham biçimini taklit etmek yerine repository
             // üzerinden yazıyoruz: serileştirme uygulamadaki ile aynı olsun.
@@ -186,6 +206,25 @@ void main() {
             final context = tester.element(find.byWidget(widget));
 
             if (screen.key == 'home') {
+              // Geçmiş yokken döngü uzunluğu **ayardan** geliyor; birden çok
+              // kayıt varsa ortalama kayıtlardan hesaplandığı için ayarı
+              // yalnızca burada doğrulayabiliyoruz. Bu iddia olmadan
+              // profillerin `cycleLength` değeri hiçbir şeyi etkilemiyordu:
+              // ayarları okumayı tamamen bozsam da tarama yeşil kalıyordu.
+              if (profile.periods.length == 1) {
+                expect(
+                  find.text(
+                    context.tr(
+                      'home_ring_cycle_length',
+                      params: {'n': '${profile.cycleLength}'},
+                    ),
+                  ),
+                  findsOneWidget,
+                  reason:
+                      '${profile.name}: halka ${profile.cycleLength} günlük '
+                      'döngü yazmalı — ayar ekrana ulaşmıyor',
+                );
+              }
               expect(
                 find.text('Deniz'),
                 findsOneWidget,
