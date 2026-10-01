@@ -69,12 +69,14 @@ Bunu kilitlemek tıbben yanlış olur.
 
 ### 2.3 Randevu takvimi ülkeye göre değişiyor — şablon + düzenlenebilir
 
-| | İlk gebelik | Sonraki |
-|---|---|---|
-| NHS (İngiltere) | en az 10 randevu + 2 ultrason | 7 randevu |
-| ACOG (ABD) | 28. haftaya dek 4 haftada bir, 36'ya dek 2 haftada bir, sonra haftalık | aynı |
+| | İzlem sayısı |
+|---|---|
+| **T.C. Sağlık Bakanlığı** (2018) | **en az 4** izlem — riske göre artırılır |
+| NHS (İngiltere) | ilk gebelikte en az 10 + 2 ultrason; sonraki gebelikte 7 |
+| ACOG (ABD) | 28. haftaya dek 4 haftada bir, 36'ya dek 2 haftada bir, sonra haftalık (~13) |
 
-Uygulama 6 dilde çıkıyor. Tek bir ülkenin takvimini gömmek yanlış olur.
+**4 ile 13 arası fark var.** Uygulama 6 dilde çıkıyor; tek bir ülkenin
+takvimini gömmek yanlış olur. Türkiye şablonu ayrıntılı olarak §2.7'de.
 
 **Tasarım:** bölgeye göre bir **şablon** öner, her kalemi düzenlenebilir/
 silinebilir yap, "kendi randevunu ekle" bırak, şablonun kaynağını ekranda
@@ -117,6 +119,86 @@ Bu, bu tür uygulamaların en sık batırdığı yer.
   doğum sonrası ve kayıp sonrası döngünün ne zaman döneceği belirsizdir
   (emzirme varsa daha da). "Henüz tahmin edemiyorum" dürüst cevaptır.
 - Partner paylaşımı açıksa bitiş **otomatik bildirilmemeli**.
+
+### 2.7 Türkiye protokolü — Doğum Öncesi Bakım Yönetim Rehberi (2018)
+
+Rehberin tamamını okudum (48 sayfa, Halk Sağlığı Genel Müdürlüğü, Yayın
+No: 925). Türkiye şablonu şöyle:
+
+**Dört izlem, riske göre artırılır:**
+
+| İzlem | Hafta | Süre |
+|---|---|---|
+| 1. İzlem (İlk izlem) | **ilk 14 hafta** | 30 dk |
+| 2. İzlem | **18–24** | — |
+| 3. İzlem | **24–28** | — |
+| 4. İzlem | **36–38** | 20 dk |
+
+Önemli kural: *"14. gebelik haftasından sonraki gebe tespitleri, gebelik
+haftasına bakılmaksızın **İlk İzlem** olarak değerlendirilir."* Yani gebeliğini
+20. haftada işaretleyen kullanıcıya da birinci izlem kontrol listesi
+gösterilmeli. Uygulamanın bunu bilmesi gerekiyor.
+
+**Tarama pencereleri izlemlerden ayrı** — bunlar randevularla aynı güne
+düşmeyebilir, bu yüzden veri modelinde ayrı kalem olmalılar:
+
+| Tarama | Hafta |
+|---|---|
+| USG ense saydamlığı + kombine test | **11–14** |
+| Maternal serum AFP | 16–20 |
+| Üçlü/dörtlü test (kombine yapılmadıysa) | 16–20 |
+| USG fetal anomali taraması | **18–22** |
+| 75 g OGTT (ilk test negatifse) | **24–28** |
+| İndirekt Coombs tekrarı (Rh uygunsuzluğunda) → negatifse anti-D | **28** |
+
+**Birinci izlem tetkikleri:** tam idrar tahlili + idrar kültürü, tam kan
+sayımı, HBsAg (aşılı olsa dahi), kan grubu (gebe **ve eş**), sifiliz taraması,
+HIV (gebenin bilgi ve onayıyla), TSH.
+
+**Zamana bağlı destek ve aşılar** — bunlar uygulamanın en kolay ve en
+değerli hatırlatabileceği şeyler, çünkü tarihe bağlılar:
+
+| | Ne zaman |
+|---|---|
+| Folik asit 400–800 µg/gün | gebelikten **en az 1 ay önce** (yüksek riskte 4 mg/gün, 12. haftaya dek) |
+| D vitamini 1200 IU/gün | **12. haftadan** itibaren |
+| Tetanoz toksoid | **12. haftadan** itibaren |
+| Demir desteği | anemi yoksa **16. haftadan** itibaren |
+
+**Tehlike işaretleri — resmî liste (13 madde).** Bunu kendim yazmama gerek
+yok; Bakanlığın listesi var ve Türkçe pazarda kaynak olarak gösterilebilir:
+
+> şiddetli bulantı-kusma · vajinal kanama · konvülziyon · şiddetli baş ağrısı ·
+> görmede bulanıklık · ateş · günlük aktiviteleri yerine getirememe ·
+> karın ağrısı · solunum güçlüğü veya sık solunum · yüz, el ve bacaklarda
+> şişme · **bebek hareketlerinde azalma** · su gelmesi · nedeni açıklanamayan
+> cilt kaşıntısı
+
+"Bebek hareketlerinde azalma"nın bu listede olması §2.4'teki kararı
+destekliyor: Bakanlık da sayaç değil, **azalmayı bildir** diyor.
+
+**Tarihlendirme Türkiye'de de aynı:** *"Son adet tarihini bilmiyorsa veya
+şüpheli ise mevcut ultrason raporları ile gebelik yaşının belirlenmesi."*
+ACOG ile aynı yönde — EDD alanı düzenlenebilir olmalı.
+
+**Sevk ilkesi:** Gebelikte Risk Değerlendirme Formu'ndaki kriterlerden
+**birine bile "evet"** denmişse kadın hastalıkları ve doğum uzmanı bulunan
+bir kuruluşa sevk. Uygulama bu formu **uygulamamalı** — risk
+değerlendirmesi hekimin işi ve yanlış pozitif/negatif ikisi de zararlı.
+Uygulamanın yapabileceği: kullanıcıya böyle bir değerlendirmenin
+yapıldığını anlatmak ve sonucunu not olarak saklamasına izin vermek.
+
+#### Bunun ürüne üç sonucu
+
+1. **Türkiye şablonu en seyrek olan.** 4 izlem + 6 tarama penceresi. Bu,
+   uygulamanın Türkiye'de randevu hatırlatıcısı olarak **daha da değerli**
+   olduğu anlamına geliyor: aralar uzun, unutmak kolay.
+2. **İzlem ve tarama ayrı kalemler.** `AntenatalEvent` modeli bunu zaten
+   kaldırıyor (`targetWeekFrom/To`), ama şablon üretirken ikisi ayrı
+   listelenmeli.
+3. **Destek hatırlatıcıları Türkiye'de somut bir kazanç.** 12. hafta
+   (D vitamini, tetanoz) ve 16. hafta (demir) tarihe bağlı; uygulama bunları
+   zaten kurulu `ReminderScheduler` ile hatırlatabilir. Faz 1'e girmeli.
 
 ---
 
@@ -251,9 +333,14 @@ Burada hiçbir şey görünmez ama sonraki her şey buna dayanıyor.
 
 **Faz 1 — Güvenli asgari gebelik modu**
 İşaretleme + EDD (düzenlenebilir) + hafta/trimester görünümü + randevu
-listesi ve hatırlatıcıları + uyarı bulguları + bitiş akışı (tüm sonuçlar).
+listesi ve hatırlatıcıları (Türkiye şablonu: 4 izlem + 6 tarama penceresi) +
+**zamana bağlı destek hatırlatıcıları** (12. hafta D vitamini ve tetanoz,
+16. hafta demir) + uyarı bulguları (Bakanlığın 13 maddelik resmî listesi) +
+bitiş akışı (tüm sonuçlar).
 **Hiç editoryal içerik yok.** Bu hâliyle bile kullanıcıyı elde tutar,
-çünkü sorduğunuz iki şeyi (işaretleme + doktor kontrolleri) karşılıyor.
+çünkü sorduğunuz iki şeyi (işaretleme + doktor kontrolleri) karşılıyor —
+üstelik Türkiye'de izlem araları uzun olduğu için hatırlatıcı burada
+diğer ülkelerden daha çok işe yarıyor.
 
 **Faz 2 — Takip derinliği**
 Gebelik semptom sözlüğü (bulantı, mide yanması, ödem, Braxton Hicks),
@@ -299,10 +386,11 @@ ikiye katlar. Faz 1'i içeriksiz tutmanın asıl sebebi bu.
 
 ## 8. Karar bekleyenler
 
-1. **Faz 1'in randevu şablonu hangi ülkeye göre?** Türkiye öncelikliyse
-   T.C. Sağlık Bakanlığı doğum öncesi bakım izlem protokolü esas alınmalı;
-   ben NHS ve ACOG'u doğruladım, Türkiye protokolünü ayrıca doğrulamam
-   gerekir.
+1. **Faz 1'de hangi şablonlar olacak?** Türkiye protokolünü doğruladım ve
+   §2.7'ye işledim — Türkçe için hazır. Önerim Faz 1'de **yalnızca Türkiye
+   şablonu** olsun, diğer diller için "kendi randevunu ekle" ile başlansın;
+   NHS/ACOG şablonları Faz 2'de. Yanlış ülkenin takvimini göstermektense
+   boş liste göstermek daha dürüst.
 2. **Gecikme algılandığında gebelik önerilsin mi?** Değerli ama hassas.
 3. **Partner gebelikte ne görecek?** Hiçbir şey / sadece hafta / randevular?
 4. **Faz 1 yayına mı girecek, yoksa mevcut sürüm çıktıktan sonra mı?**
@@ -313,6 +401,11 @@ ikiye katlar. Faz 1'i içeriksiz tutmanın asıl sebebi bu.
 
 ## Kaynaklar
 
+- **T.C. Sağlık Bakanlığı, Halk Sağlığı Genel Müdürlüğü, *Doğum Öncesi
+  Bakım Yönetim Rehberi*, Ankara 2018 (Yayın No: 925)** — dört izlem,
+  tarama pencereleri, destek takvimi, tehlike işaretleri listesi:
+  https://www.saglikaktuel.com/d/file/dogum_oncesi_bakim_yonetim_rehberi.pdf
+  (WHO aynası: https://platform.who.int/docs/default-source/mca-documents/policy-documents/guideline/TUR-MN-21-01-GUIDELINE-2018-tur-Antenatal-Care-Management-Guidelines.pdf)
 - RCOG Green-top Guideline No. 57, *Reduced Fetal Movements* — biçimsel
   hareket sayımı önerilmiyor:
   https://obgyn.onlinelibrary.wiley.com/doi/10.1111/1471-0528.70198
