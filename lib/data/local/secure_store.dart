@@ -144,6 +144,12 @@ class SecureStore {
     'profile_name',
     'profile_email',
     'profile_birth_date',
+    // PregnancyRepository
+    //
+    // Gebelik durumu uygulamadaki en hassas veri: cihaz başkasının eline
+    // geçtiğinde ya da yedek sızdığında sonucu en ağır olan bu. Düz metin
+    // saklanamaz.
+    'pregnancies',
   ];
 
   /// Tüm hassas verileri siler (profil → "Verilerimi Sil").

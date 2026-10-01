@@ -393,9 +393,18 @@ ikiye katlar. Faz 1'i içeriksiz tutmanın asıl sebebi bu.
    boş liste göstermek daha dürüst.
 2. **Gecikme algılandığında gebelik önerilsin mi?** Değerli ama hassas.
 3. **Partner gebelikte ne görecek?** Hiçbir şey / sadece hafta / randevular?
-4. **Faz 1 yayına mı girecek, yoksa mevcut sürüm çıktıktan sonra mı?**
-   Önerim: **mevcut sürüm önce çıksın.** Uygulama yayına hazır durumda;
-   gebelik modu onu aylarca geciktirir.
+4. ~~**Faz 1 yayına mı girecek?**~~ **Karar verildi: gebelik modu ilk
+   yayına dahil.** Gerekçe: farklılaşma.
+
+   Not — gebelik modunun kendisi farklılaştırıcı değil; Flo, Clue ve Ovia'da
+   zaten var. Farkı yaratan üç şey, plandaki klinik kararlar:
+   verinin cihazda kalması, **tekme sayacı koymamamız** (RCOG + Bakanlık),
+   ve Türkiye protokolünün gerçekten uygulanması. Bunlar aceleye gelirse
+   "bir tane daha gebelik uygulaması" oluruz. O yüzden fazlar
+   birleştirilmiyor, hepsi yayın kapsamına alınıyor: Faz 1 ve 2 yayına
+   girer, Faz 3 (haftalık içerik, partner görünümü, doğum sonrası) ilk
+   güncellemeye kalır — 6 dilde 40 haftalık içerik yayını aylarca
+   geciktirir ve onsuz da ürün bütün.
 
 ---
 
