@@ -12,6 +12,7 @@ import '../../presentation/pregnancy/care_list_screen.dart';
 import '../../presentation/pregnancy/care_summary_screen.dart';
 import '../../presentation/pregnancy/danger_signs_screen.dart';
 import '../../presentation/pregnancy/end_pregnancy_screen.dart';
+import '../../presentation/pregnancy/past_pregnancies_screen.dart';
 import '../../presentation/pregnancy/postpartum_home_screen.dart';
 import '../../presentation/pregnancy/pregnancy_home_screen.dart';
 import '../../presentation/pregnancy/pregnancy_months_screen.dart';
@@ -335,6 +336,19 @@ GoRouter createAppRouter(
         path: '/pregnancy/end',
         name: RouteNames.endPregnancy,
         builder: (context, state) => const EndPregnancyScreen(),
+      ),
+      // Geçmiş gebelikler ve her birinin kaydı (randevu özetinin geçmiş
+      // kipi). Evreden bağımsız: biten gebelik her evrede açılabilmeli.
+      GoRoute(
+        path: '/pregnancy/history',
+        name: RouteNames.pastPregnancies,
+        builder: (context, state) => const PastPregnanciesScreen(),
+      ),
+      GoRoute(
+        path: '/pregnancy/history/:id',
+        name: RouteNames.pastPregnancy,
+        builder: (context, state) =>
+            CareSummaryScreen(pregnancyId: state.pathParameters['id']),
       ),
       GoRoute(
         path: '/care',

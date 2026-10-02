@@ -1040,5 +1040,16 @@
   "onb_goal_pregnancy_body": "Semanas de embarazo, controles y citas",
   "preg_setup_due_method_lmp_assumed": "Calculado a partir de tu última regla, suponiendo un ciclo de {n} días. Si tu médico te da otra fecha, introdúcela: esa es la que vale.",
   "preg_setup_good_to_know": "Conviene saber",
-  "onboarding_success_desc_pregnancy": "Tu seguimiento del embarazo está listo. Tu semana, tus controles y tus citas están en la pantalla de inicio."
+  "onboarding_success_desc_pregnancy": "Tu seguimiento del embarazo está listo. Tu semana, tus controles y tus citas están en la pantalla de inicio.",
+  "past_preg_title": "Embarazos anteriores",
+  "past_preg_list_intro": "Los registros de los embarazos que terminaron no se borran; quedan aquí.",
+  "past_preg_empty": "No tienes embarazos finalizados.",
+  "past_preg_weeks_short": "{ga} semanas",
+  "past_preg_record_title": "Registro del embarazo",
+  "past_preg_intro": "Lo que registraste durante este embarazo. En un embarazo posterior tu médico puede preguntar por los anteriores; puedes mostrárselo desde aquí. No es un diagnóstico.",
+  "past_preg_ended_with": "{outcome}: {date}",
+  "past_preg_ended": "Finalizó: {date}",
+  "past_preg_weeks_at_end": "Semanas al finalizar: {ga}",
+  "past_preg_section_symptoms": "Síntomas (todo el embarazo, número de días)",
+  "past_preg_section_daily_notes": "Notas diarias"
 }

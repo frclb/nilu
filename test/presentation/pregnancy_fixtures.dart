@@ -16,6 +16,7 @@ import 'package:period_tracker/presentation/pregnancy/care_list_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/care_summary_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/danger_signs_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/end_pregnancy_screen.dart';
+import 'package:period_tracker/presentation/pregnancy/past_pregnancies_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/pregnancy_months_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/pregnancy_setup_screen.dart';
 
@@ -147,6 +148,16 @@ List<RouteBase> pregnancyRoutes(Widget first) => [
     path: '/care/summary',
     name: RouteNames.careSummary,
     builder: (_, _) => const CareSummaryScreen(),
+  ),
+  GoRoute(
+    path: '/pregnancy/history',
+    name: RouteNames.pastPregnancies,
+    builder: (_, _) => const PastPregnanciesScreen(),
+  ),
+  GoRoute(
+    path: '/pregnancy/history/:id',
+    name: RouteNames.pastPregnancy,
+    builder: (_, s) => CareSummaryScreen(pregnancyId: s.pathParameters['id']),
   ),
   GoRoute(
     path: '/premium',

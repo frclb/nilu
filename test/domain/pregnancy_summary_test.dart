@@ -305,4 +305,82 @@ void main() {
       );
     });
   });
+
+  group('geçmiş gebelik kaydı', () {
+    // 70 gün önce düşükle biten, 9+4'te.
+    final dusuk = Pregnancy.fromLmp(
+      lmp: once(137),
+      cycleLength: 28,
+      confirmedAt: once(110),
+      id: 'g2',
+      careTemplate: 'tr',
+    ).ended(outcome: PregnancyOutcome.miscarriage, at: once(70));
+
+    PregnancySummary kayit(
+      List<DailyLog> logs, {
+      List<CareEvent> events = const [],
+    }) => PregnancySummary.past(pregnancy: dusuk, events: events, logs: logs);
+
+    test('dönem gebeliğin kendisi: öncesi, bitiş günü ve sonrası yok', () {
+      final o = kayit([
+        DailyLog(date: once(140), flowIntensity: 'heavy', notes: 'önce'),
+        DailyLog(date: once(100), flowIntensity: 'spotting', notes: 'içinde'),
+        DailyLog(date: once(90), systolic: 141, diastolic: 90),
+        DailyLog(date: once(70), flowIntensity: 'heavy', notes: 'bitiş'),
+        DailyLog(date: once(40), systolic: 150, diastolic: 100, notes: 'son'),
+      ]);
+      expect(o.past, isTrue);
+      expect(o.today, once(71), reason: 'Son gün bitişten bir önceki gün');
+      expect(o.flowDays.map((f) => (f.date, f.flow)), [
+        (once(100), 'spotting'),
+      ]);
+      expect(o.bloodPressures.map((r) => r.systolic), [141]);
+      expect(o.dailyNotes.map((n) => (n.date, n.text)), [
+        (once(100), 'içinde'),
+      ]);
+      expect(dusuk.gestationAtEnd, const GestationalAge(9, 4));
+    });
+
+    test('belirtiler son 14 gün değil bütün gebelik boyunca', () {
+      final o = kayit([
+        DailyLog(date: once(130), symptoms: const ['nausea']),
+        DailyLog(date: once(120), symptoms: const ['nausea', 'fatigue']),
+        DailyLog(date: once(75), symptoms: const ['fatigue']),
+        DailyLog(date: once(72), symptoms: const ['fatigue']),
+      ]);
+      expect(o.recentSymptoms.map((b) => (b.code, b.days)), [
+        ('fatigue', 3),
+        ('nausea', 2),
+      ]);
+    });
+
+    test('sırada bir şey yok; yapılanlar ve notlar kalıyor', () {
+      final kalemler = CareTemplates.generate(
+        dusuk,
+        CareTemplates.turkeyAntenatal,
+      );
+      final ilk = kalemler.first.copyWith(done: true, note: 'her şey yolunda');
+      final o = kayit(const [], events: [ilk, ...kalemler.skip(1)]);
+      expect(o.upcomingCare, isEmpty);
+      expect(o.doneCare.map((e) => e.id), [ilk.id]);
+      expect(o.notedCare.map((e) => e.id), [ilk.id]);
+    });
+
+    test('randevu özetinde günlük not yok', () {
+      final o = ozet([DailyLog(date: once(5), notes: 'yorgunum')]);
+      expect(o.past, isFalse);
+      expect(o.dailyNotes, isEmpty);
+    });
+
+    test('süren gebelik geçmiş kayıt olamaz', () {
+      expect(
+        () => PregnancySummary.past(
+          pregnancy: gebelik,
+          events: const [],
+          logs: const [],
+        ),
+        throwsArgumentError,
+      );
+    });
+  });
 }

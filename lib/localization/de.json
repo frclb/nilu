@@ -1040,5 +1040,16 @@
   "onb_goal_pregnancy_body": "Schwangerschaftswochen, Vorsorge und Termine",
   "preg_setup_due_method_lmp_assumed": "Berechnet aus deiner letzten Periode, ausgehend von einem {n}-Tage-Zyklus. Wenn deine Ärztin oder dein Arzt einen anderen Termin nennt, trag diesen ein — er hat Vorrang.",
   "preg_setup_good_to_know": "Gut zu wissen",
-  "onboarding_success_desc_pregnancy": "Deine Schwangerschaftsbegleitung ist bereit. Deine Woche, Vorsorge und Termine findest du auf dem Startbildschirm."
+  "onboarding_success_desc_pregnancy": "Deine Schwangerschaftsbegleitung ist bereit. Deine Woche, Vorsorge und Termine findest du auf dem Startbildschirm.",
+  "past_preg_title": "Frühere Schwangerschaften",
+  "past_preg_list_intro": "Einträge beendeter Schwangerschaften werden nicht gelöscht, sie bleiben hier.",
+  "past_preg_empty": "Du hast keine beendete Schwangerschaft.",
+  "past_preg_weeks_short": "SSW {ga}",
+  "past_preg_record_title": "Schwangerschaftsverlauf",
+  "past_preg_intro": "Was du in dieser Schwangerschaft eingetragen hast. In einer späteren Schwangerschaft fragt deine Ärztin oder dein Arzt vielleicht nach früheren; das kannst du hier zeigen. Keine Diagnose.",
+  "past_preg_ended_with": "{outcome}: {date}",
+  "past_preg_ended": "Ende: {date}",
+  "past_preg_weeks_at_end": "Schwangerschaftswoche am Ende: {ga}",
+  "past_preg_section_symptoms": "Beschwerden (ganze Schwangerschaft, Anzahl Tage)",
+  "past_preg_section_daily_notes": "Tagesnotizen"
 }

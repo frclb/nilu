@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
 import 'package:period_tracker/core/navigation/app_router.dart';
+import 'package:period_tracker/data/repositories/pregnancy_repository.dart';
 import 'package:period_tracker/domain/models/pregnancy.dart';
 import 'package:period_tracker/domain/view_models/pregnancy_view_model.dart';
 import 'package:period_tracker/domain/view_models/user_view_model.dart';
@@ -12,6 +13,8 @@ import 'package:period_tracker/presentation/insights/insights_screen.dart';
 import 'package:period_tracker/presentation/log_entry/log_entry_screen.dart';
 import 'package:period_tracker/presentation/log_entry/widgets/measurements_section.dart';
 import 'package:period_tracker/presentation/pregnancy/care_list_screen.dart';
+import 'package:period_tracker/presentation/pregnancy/care_summary_screen.dart';
+import 'package:period_tracker/presentation/pregnancy/past_pregnancies_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/postpartum_home_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/pregnancy_home_screen.dart';
 
@@ -98,6 +101,35 @@ void main() {
       );
     });
   }
+
+  testWidgets('geçmiş gebelik: profilden liste ve kayıt açılıyor', (
+    tester,
+  ) async {
+    await seedCycles();
+    final biten = Pregnancy.fromLmp(
+      lmp: daysAgo(300),
+      cycleLength: 28,
+      id: 'eski',
+    ).ended(outcome: PregnancyOutcome.miscarriage, at: daysAgo(240));
+    await const PregnancyRepository().upsert(biten);
+    final ctx = await ac(tester);
+
+    await tester.tap(find.text(ctx.tr('nav_profile')).last);
+    await settleAsync(tester);
+    final satir = find.text(ctx.tr('past_preg_title'));
+    await tester.scrollUntilVisible(satir, 300);
+    await tester.tap(satir);
+    await settleAsync(tester);
+    expect(find.byType(PastPregnanciesScreen), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('past_preg_eski')));
+    await settleAsync(tester);
+    final ekran = tester.widget<CareSummaryScreen>(
+      find.byType(CareSummaryScreen),
+    );
+    expect(ekran.pregnancyId, 'eski');
+    expect(find.text(ctx.tr('past_preg_record_title')), findsOneWidget);
+  });
 
   testWidgets('lohusalık: lohusa panosu', (tester) async {
     await seedPostpartum();

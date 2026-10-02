@@ -1040,5 +1040,16 @@
   "onb_goal_pregnancy_body": "Semaines de grossesse, contrôles et rendez-vous",
   "preg_setup_due_method_lmp_assumed": "Calculé d'après tes dernières règles, en supposant un cycle de {n} jours. Si ton médecin te donne une autre date, saisis-la : elle prime.",
   "preg_setup_good_to_know": "Bon à savoir",
-  "onboarding_success_desc_pregnancy": "Ton suivi de grossesse est prêt. Ta semaine, tes contrôles et tes rendez-vous sont sur l'écran d'accueil."
+  "onboarding_success_desc_pregnancy": "Ton suivi de grossesse est prêt. Ta semaine, tes contrôles et tes rendez-vous sont sur l'écran d'accueil.",
+  "past_preg_title": "Grossesses passées",
+  "past_preg_list_intro": "Les données des grossesses terminées ne sont pas supprimées ; elles restent ici.",
+  "past_preg_empty": "Tu n'as aucune grossesse terminée.",
+  "past_preg_weeks_short": "{ga} SA",
+  "past_preg_record_title": "Dossier de grossesse",
+  "past_preg_intro": "Ce que tu as noté pendant cette grossesse. Lors d'une grossesse ultérieure, ton médecin peut te poser des questions sur les précédentes ; tu peux lui montrer ceci. Ce n'est pas un diagnostic.",
+  "past_preg_ended_with": "{outcome} : {date}",
+  "past_preg_ended": "Fin : {date}",
+  "past_preg_weeks_at_end": "Semaines à la fin : {ga}",
+  "past_preg_section_symptoms": "Symptômes (toute la grossesse, nombre de jours)",
+  "past_preg_section_daily_notes": "Notes du jour"
 }

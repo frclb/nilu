@@ -41,6 +41,14 @@ class SymptomCount {
   const SymptomCount(this.code, this.days);
 }
 
+/// Günlük kayıttaki not.
+class DailyNote {
+  final DateTime date;
+  final String text;
+
+  const DailyNote(this.date, this.text);
+}
+
 /// Randevuya götürülecek özet — gebelik ya da lohusalık.
 ///
 /// `ClinicalSummary`'nin gebelik karşılığı: muayenede hekimin sorduğu şey
@@ -48,12 +56,21 @@ class SymptomCount {
 /// kadar değişti, son iki haftada ne şikâyet edildi, hangi kontroller
 /// yapıldı, hekime ne sorulacak.
 ///
+/// Biten bir gebeliğin kaydı da bu sınıfla hesaplanıyor
+/// ([PregnancySummary.past]).
+///
 /// Saf hesap: hiçbir sayı uydurulmuyor, kayıt yoksa liste boş kalıyor.
 /// Teşhis yok; değerler kullanıcının kendi girdileri.
 class PregnancySummary {
   final Pregnancy pregnancy;
   final LifeStage stage;
+
+  /// Dönemin son günü: süren özette bugün, geçmiş kayıtta gebeliğin son
+  /// günü.
   final DateTime today;
+
+  /// Biten bir gebeliğin kaydı mı (bkz. [PregnancySummary.past])?
+  final bool past;
 
   /// En yeniden eskiye, en çok [maxReadings] tane.
   final List<BloodPressureReading> bloodPressures;
@@ -68,7 +85,8 @@ class PregnancySummary {
   /// Gebelikte kanama, lohusalıkta lohia — en yeniden eskiye.
   final List<FlowDay> flowDays;
 
-  /// Son [symptomWindowDays] günde en sık kaydedilen belirtiler.
+  /// Son [symptomWindowDays] günde (geçmiş kayıtta bütün gebelik boyunca)
+  /// en sık kaydedilen belirtiler.
   final List<SymptomCount> recentSymptoms;
 
   final List<CareEvent> doneCare;
@@ -76,6 +94,11 @@ class PregnancySummary {
 
   /// Notu olan kalemler: "hekime soracaklarım" burada.
   final List<CareEvent> notedCare;
+
+  /// Günlük kayıtlardaki notlar, en yeniden eskiye — yalnızca geçmiş
+  /// kayıtta. Randevu özeti hekime kısa bir döküm; gebeliğin dökümünde
+  /// kullanıcının o günlere yazdıkları da var.
+  final List<DailyNote> dailyNotes;
 
   static const int maxReadings = 10;
   static const int symptomWindowDays = 14;
@@ -86,6 +109,7 @@ class PregnancySummary {
     required this.pregnancy,
     required this.stage,
     required this.today,
+    required this.past,
     required this.bloodPressures,
     required this.bloodPressureCount,
     required this.highBloodPressureCount,
@@ -96,6 +120,7 @@ class PregnancySummary {
     required this.doneCare,
     required this.upcomingCare,
     required this.notedCare,
+    required this.dailyNotes,
   });
 
   /// Lohusalıkta doğumdan bu yana geçen gün.
@@ -122,6 +147,48 @@ class PregnancySummary {
     required List<CareEvent> events,
     required List<DailyLog> logs,
     required DateTime today,
+  }) => _hesapla(
+    pregnancy: pregnancy,
+    stage: stage,
+    events: events,
+    logs: logs,
+    today: today,
+    past: false,
+  );
+
+  /// Biten bir gebeliğin kaydı (geçmiş gebelikler).
+  ///
+  /// Randevu hazırlığı değil, gebeliğin dökümü. Dönem gebeliğin başından
+  /// bittiği güne, o gün hariç: doğum günü lohusalığın ilk günü (lohia
+  /// "gebelikte kanama" değil), kayıp gününün kanaması da kaybın kendisi.
+  /// "Sıradakiler" yok; belirtiler son 14 gün değil bütün gebelik boyunca
+  /// sayılıyor; günlük notlar da var.
+  factory PregnancySummary.past({
+    required Pregnancy pregnancy,
+    required List<CareEvent> events,
+    required List<DailyLog> logs,
+  }) {
+    final bitis = pregnancy.endedAt;
+    if (bitis == null) {
+      throw ArgumentError.value(pregnancy.id, 'pregnancy', 'Gebelik sürüyor');
+    }
+    return _hesapla(
+      pregnancy: pregnancy,
+      stage: LifeStage.pregnancy,
+      events: events,
+      logs: logs,
+      today: bitis.plusDays(-1),
+      past: true,
+    );
+  }
+
+  static PregnancySummary _hesapla({
+    required Pregnancy pregnancy,
+    required LifeStage stage,
+    required List<CareEvent> events,
+    required List<DailyLog> logs,
+    required DateTime today,
+    required bool past,
   }) {
     final gun = _day(today);
     // Dönem: gebelikte gebeliğin başından, lohusalıkta doğumdan bugüne.
@@ -158,7 +225,7 @@ class PregnancySummary {
           FlowDay(_day(l.date), l.flowIntensity!),
     ];
 
-    final pencereBas = gun.plusDays(-(symptomWindowDays - 1));
+    final pencereBas = past ? bas : gun.plusDays(-(symptomWindowDays - 1));
     final sayac = <String, int>{};
     for (final l in donem) {
       if (_day(l.date).isBefore(pencereBas)) continue;
@@ -194,6 +261,7 @@ class PregnancySummary {
       pregnancy: pregnancy,
       stage: stage,
       today: gun,
+      past: past,
       bloodPressures: tansiyon.take(maxReadings).toList(),
       bloodPressureCount: tansiyon.length,
       highBloodPressureCount: tansiyon
@@ -204,13 +272,23 @@ class PregnancySummary {
       flowDays: akis,
       recentSymptoms: belirtiler.take(maxSymptoms).toList(),
       doneCare: kalemler.where((e) => e.done && donemde(e)).toList(),
-      upcomingCare: kalemler
-          .where((e) => donemde(e) && e.isPendingOn(pregnancy, gun))
-          .take(maxUpcoming)
-          .toList(),
+      // Biten gebelikte sırada bir şey yok.
+      upcomingCare: past
+          ? const []
+          : kalemler
+                .where((e) => donemde(e) && e.isPendingOn(pregnancy, gun))
+                .take(maxUpcoming)
+                .toList(),
       notedCare: kalemler
           .where((e) => (e.note?.trim().isNotEmpty ?? false))
           .toList(),
+      dailyNotes: past
+          ? [
+              for (final l in donem)
+                if (l.notes?.trim().isNotEmpty ?? false)
+                  DailyNote(_day(l.date), l.notes!.trim()),
+            ]
+          : const [],
     );
   }
 

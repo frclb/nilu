@@ -1040,5 +1040,16 @@
   "onb_goal_pregnancy_body": "Gebelik haftaları, kontroller ve randevular",
   "preg_setup_due_method_lmp_assumed": "Son adet tarihine göre, döngünün {n} gün olduğu varsayılarak hesaplandı. Hekimin farklı bir tarih verdiyse onu gir — o geçerlidir.",
   "preg_setup_good_to_know": "Bilmen gerekenler",
-  "onboarding_success_desc_pregnancy": "Gebelik takibiniz hazır. Haftanız, kontrolleriniz ve randevularınız ana ekranda."
+  "onboarding_success_desc_pregnancy": "Gebelik takibiniz hazır. Haftanız, kontrolleriniz ve randevularınız ana ekranda.",
+  "past_preg_title": "Geçmiş gebelikler",
+  "past_preg_list_intro": "Biten gebeliklerinin kayıtları silinmez, burada durur.",
+  "past_preg_empty": "Biten bir gebelik kaydın yok.",
+  "past_preg_weeks_short": "{ga}. hafta",
+  "past_preg_record_title": "Gebelik kaydı",
+  "past_preg_intro": "Bu gebelik boyunca girdiğin kayıtlar. Sonraki bir gebelikte hekimin geçmiş gebeliklerini sorabilir; buradan gösterebilirsin. Tanı koymaz.",
+  "past_preg_ended_with": "{outcome}: {date}",
+  "past_preg_ended": "Bitiş tarihi: {date}",
+  "past_preg_weeks_at_end": "Bitişte gebelik haftası: {ga}",
+  "past_preg_section_symptoms": "Belirtiler (gebelik boyunca, gün sayısı)",
+  "past_preg_section_daily_notes": "Günlük notlar"
 }

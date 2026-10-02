@@ -59,8 +59,17 @@ class PregnancyViewModel extends ChangeNotifier {
   List<CareEvent> get currentEvents {
     final g = current;
     if (g == null) return const [];
-    return CareOrder.sorted(_events.where((e) => e.pregnancyId == g.id), g);
+    return eventsOf(g);
   }
+
+  /// [p] gebeliğinin bakım kalemleri, gösterim sırasıyla.
+  List<CareEvent> eventsOf(Pregnancy p) =>
+      CareOrder.sorted(_events.where((e) => e.pregnancyId == p.id), p);
+
+  /// Biten gebelikler, en son biten önce (geçmiş gebelikler).
+  List<Pregnancy> get pastPregnancies =>
+      _pregnancies.where((p) => !p.isActive).toList()
+        ..sort((a, b) => b.endedAt!.compareTo(a.endedAt!));
 
   /// [date] gününün takvimdeki gebelik bilgisi (bkz. `PregnancyCalendar`).
   PregnancyDayInfo dayInfo(DateTime date) => PregnancyCalendar.dayInfo(

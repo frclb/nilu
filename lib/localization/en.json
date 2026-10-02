@@ -1040,5 +1040,16 @@
   "onb_goal_pregnancy_body": "Pregnancy weeks, check-ups and appointments",
   "preg_setup_due_method_lmp_assumed": "Calculated from your last period, assuming a {n}-day cycle. If your doctor gives you a different date, enter that — it takes priority.",
   "preg_setup_good_to_know": "Good to know",
-  "onboarding_success_desc_pregnancy": "Your pregnancy tracking is ready. Your week, check-ups and appointments are on the home screen."
+  "onboarding_success_desc_pregnancy": "Your pregnancy tracking is ready. Your week, check-ups and appointments are on the home screen.",
+  "past_preg_title": "Past pregnancies",
+  "past_preg_list_intro": "Records of pregnancies that have ended aren't deleted; they stay here.",
+  "past_preg_empty": "You have no ended pregnancies.",
+  "past_preg_weeks_short": "{ga} weeks",
+  "past_preg_record_title": "Pregnancy record",
+  "past_preg_intro": "What you recorded during this pregnancy. In a later pregnancy your doctor may ask about past ones; you can show them this. It is not a diagnosis.",
+  "past_preg_ended_with": "{outcome}: {date}",
+  "past_preg_ended": "Ended: {date}",
+  "past_preg_weeks_at_end": "Weeks at the end: {ga}",
+  "past_preg_section_symptoms": "Symptoms (whole pregnancy, number of days)",
+  "past_preg_section_daily_notes": "Daily notes"
 }

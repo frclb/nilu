@@ -1040,5 +1040,16 @@
   "onb_goal_pregnancy_body": "Semanas de gravidez, consultas e exames",
   "preg_setup_due_method_lmp_assumed": "Calculado com base na última menstruação, considerando um ciclo de {n} dias. Se o médico informar outra data, insira essa — ela tem prioridade.",
   "preg_setup_good_to_know": "Bom saber",
-  "onboarding_success_desc_pregnancy": "Seu acompanhamento da gravidez está pronto. Sua semana, consultas e exames estão na tela inicial."
+  "onboarding_success_desc_pregnancy": "Seu acompanhamento da gravidez está pronto. Sua semana, consultas e exames estão na tela inicial.",
+  "past_preg_title": "Gestações anteriores",
+  "past_preg_list_intro": "Os registros das gestações encerradas não são apagados; ficam aqui.",
+  "past_preg_empty": "Você não tem gestações encerradas.",
+  "past_preg_weeks_short": "{ga} semanas",
+  "past_preg_record_title": "Registro da gestação",
+  "past_preg_intro": "O que você registrou durante esta gestação. Numa próxima gestação, o médico pode perguntar sobre as anteriores; você pode mostrar isto. Não é um diagnóstico.",
+  "past_preg_ended_with": "{outcome}: {date}",
+  "past_preg_ended": "Encerrada em: {date}",
+  "past_preg_weeks_at_end": "Semanas ao final: {ga}",
+  "past_preg_section_symptoms": "Sintomas (toda a gestação, número de dias)",
+  "past_preg_section_daily_notes": "Notas diárias"
 }

@@ -22,6 +22,7 @@ import 'package:period_tracker/presentation/profile/personal_info_screen.dart';
 import 'package:period_tracker/presentation/profile/privacy_security_screen.dart';
 import 'package:period_tracker/presentation/widgets_preview/widgets_preview_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_goal_screen.dart';
+import 'package:period_tracker/presentation/pregnancy/past_pregnancies_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_period_length_screen.dart';
 import 'package:period_tracker/presentation/calendar/calendar_screen.dart';
 import 'package:period_tracker/presentation/exercise/exercise_detail_screen.dart';
@@ -67,6 +68,7 @@ void main() {
     'partner_support': const PartnerSupportScreen(),
     'widgets_preview': const WidgetsPreviewScreen(),
     'onboarding_goal': const OnboardingGoalScreen(),
+    'past_pregnancies': const PastPregnanciesScreen(),
     'onboarding_period_length': const OnboardingPeriodLengthScreen(),
     'splash': const SplashScreen(),
     'home': const HomeScreen(),

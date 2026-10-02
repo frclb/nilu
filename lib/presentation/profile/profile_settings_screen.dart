@@ -406,7 +406,18 @@ class _GebelikBolumu extends StatelessWidget {
 
     return SettingsGroup(
       title: context.tr('profile_preg_section'),
-      items: satirlar,
+      items: [
+        ...satirlar,
+        // Biten gebeliklerin kaydı her evrede açılabilmeli; yalnızca varsa.
+        if (vm.pastPregnancies.isNotEmpty)
+          SettingsItem(
+            title: context.tr('past_preg_title'),
+            icon: Icons.history,
+            iconColor: renk,
+            iconBgColor: zemin,
+            onTap: () => context.pushNamed(RouteNames.pastPregnancies),
+          ),
+      ],
     );
   }
 }
