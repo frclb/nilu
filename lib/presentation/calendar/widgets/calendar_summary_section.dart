@@ -37,6 +37,9 @@ class CalendarSummarySection extends StatelessWidget {
     final hasAnyData = hasFlow || hasMoods || hasSymptoms || hasNotes;
 
     final phase = viewModel.phaseForDate(selectedDate);
+    // Gebelik ve lohusalıkta döngü evresi yok: blok "regl günlerini
+    // işaretledikçe tahminler netleşir" diyordu, oysa o evrede tahmin yok.
+    final evreVar = viewModel.lifeStage.showsCyclePredictions;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
@@ -148,9 +151,11 @@ class CalendarSummarySection extends StatelessWidget {
                     ),
                   ),
 
-                const SizedBox(height: 20),
-                Divider(color: context.tokens.border, height: 1),
-                const SizedBox(height: 20),
+                if (hasNotes || evreVar) ...[
+                  const SizedBox(height: 20),
+                  Divider(color: context.tokens.border, height: 1),
+                  const SizedBox(height: 20),
+                ],
 
                 // Notes (gerçek veriden)
                 if (hasNotes) ...[
@@ -198,13 +203,13 @@ class CalendarSummarySection extends StatelessWidget {
                   ),
                 ],
 
-                if (hasNotes) const SizedBox(height: 20),
+                if (hasNotes && evreVar) const SizedBox(height: 20),
 
                 // Seçili günün evresine göre içerik.
                 //
                 // Burada eskiden her gün için aynı sabit öneri yazıyordu;
                 // hangi güne dokunulursa dokunulsun metin değişmiyordu.
-                _PhaseGuidanceBlock(phase: phase, isDark: isDark),
+                if (evreVar) _PhaseGuidanceBlock(phase: phase, isDark: isDark),
               ],
             ),
           ),

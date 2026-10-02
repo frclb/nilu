@@ -78,6 +78,12 @@ class CycleMasthead extends StatelessWidget {
                 currentDay: day ?? 0,
                 tokens: t,
               ),
+              // Kurulumda gebelik yolunu seçen kullanıcı döngü süresini hiç
+              // söylemedi; gebelik bitince halka varsayılan 28'i "28 günlük
+              // döngü" diye onunmuş gibi yazıyordu.
+              caption: takvim.cycleLengthKnown
+                  ? null
+                  : context.tr('home_ring_cycle_length_unknown'),
               center: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [

@@ -1051,5 +1051,6 @@
   "past_preg_ended": "Ended: {date}",
   "past_preg_weeks_at_end": "Weeks at the end: {ga}",
   "past_preg_section_symptoms": "Symptoms (whole pregnancy, number of days)",
-  "past_preg_section_daily_notes": "Daily notes"
+  "past_preg_section_daily_notes": "Daily notes",
+  "home_ring_cycle_length_unknown": "Cycle length\nnot known yet"
 }

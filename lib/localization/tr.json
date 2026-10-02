@@ -1051,5 +1051,6 @@
   "past_preg_ended": "Bitiş tarihi: {date}",
   "past_preg_weeks_at_end": "Bitişte gebelik haftası: {ga}",
   "past_preg_section_symptoms": "Belirtiler (gebelik boyunca, gün sayısı)",
-  "past_preg_section_daily_notes": "Günlük notlar"
+  "past_preg_section_daily_notes": "Günlük notlar",
+  "home_ring_cycle_length_unknown": "Döngü süren\nhenüz belli değil"
 }

@@ -224,8 +224,11 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                       ],
                       // Hormonal doğum kontrolünde doğurganlık satırı hiç
                       // gösterilmiyor: yumurtlama baskılanmışken "düşük
-                      // doğurganlık" demek uydurma bir bilgi olurdu.
-                      if (viewModel.cycleInfo.fertilityTracked) ...[
+                      // doğurganlık" demek uydurma bir bilgi olurdu. Gebelik
+                      // ve lohusalıkta da yok: gebe kullanıcıya "doğurganlık
+                      // şansı: düşük" yazıyordu.
+                      if (viewModel.lifeStage.showsCyclePredictions &&
+                          viewModel.cycleInfo.fertilityTracked) ...[
                         const SizedBox(height: 4),
                         Text(
                           _getFertilityText(context, isFertile, isOvulation),

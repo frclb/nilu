@@ -1051,5 +1051,6 @@
   "past_preg_ended": "Encerrada em: {date}",
   "past_preg_weeks_at_end": "Semanas ao final: {ga}",
   "past_preg_section_symptoms": "Sintomas (toda a gestação, número de dias)",
-  "past_preg_section_daily_notes": "Notas diárias"
+  "past_preg_section_daily_notes": "Notas diárias",
+  "home_ring_cycle_length_unknown": "Duração do ciclo\nainda desconhecida"
 }
