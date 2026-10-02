@@ -8,9 +8,14 @@ class SymptomsSection extends StatefulWidget {
   final List<String> initialSymptoms;
   final ValueChanged<List<String>> onChanged;
 
+  /// Seçilebilecek belirti kodları (evreye göre, bkz.
+  /// `LogVocabulary.symptomsFor`).
+  final List<String> codes;
+
   const SymptomsSection({
     super.key,
     this.initialSymptoms = const [],
+    this.codes = LogVocabulary.symptoms,
     required this.onChanged,
   });
 
@@ -19,33 +24,23 @@ class SymptomsSection extends StatefulWidget {
 }
 
 class _SymptomsSectionState extends State<SymptomsSection> {
-  late Set<int> _selectedIndices;
-
-  static const List<String> _symptomCodes = LogVocabulary.symptoms;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedIndices = {};
-  }
+  /// Seçili kodlar. Listede görünmeyenler de burada kalıyor: gebelikte
+  /// girilen "bulantı" döngüye dönünce listede yok ama kayıttan silinmemeli.
+  ///
+  /// Seçim **bir kez**, burada kuruluyor. Önceden her çizimde "seçim boşsa
+  /// başlangıç değerini yükle" deniyordu: ön dolu bir belirtinin seçimi
+  /// kaldırılınca bir sonraki çizimde geri geliyordu.
+  late final Set<String> _selected = {...widget.initialSymptoms};
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final codes = widget.codes;
 
     // Saklanan değerler kanonik kodlardır; etiketler lokalizasyondan gelir.
-    final symptoms = _symptomCodes
+    final symptoms = codes
         .map((code) => context.tr(LogVocabulary.symptomKey(code)))
         .toList();
-
-    // Restore initial from widget
-    if (_selectedIndices.isEmpty && widget.initialSymptoms.isNotEmpty) {
-      for (int i = 0; i < _symptomCodes.length; i++) {
-        if (widget.initialSymptoms.contains(_symptomCodes[i])) {
-          _selectedIndices.add(i);
-        }
-      }
-    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -71,19 +66,18 @@ class _SymptomsSectionState extends State<SymptomsSection> {
             spacing: 8,
             runSpacing: 8,
             children: List.generate(symptoms.length, (index) {
-              final isSelected = _selectedIndices.contains(index);
+              final code = codes[index];
+              final isSelected = _selected.contains(code);
               return GestureDetector(
                 onTap: () {
                   setState(() {
                     if (isSelected) {
-                      _selectedIndices.remove(index);
+                      _selected.remove(code);
                     } else {
-                      _selectedIndices.add(index);
+                      _selected.add(code);
                     }
                   });
-                  widget.onChanged(
-                    _selectedIndices.map((i) => _symptomCodes[i]).toList(),
-                  );
+                  widget.onChanged(_selected.toList());
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(

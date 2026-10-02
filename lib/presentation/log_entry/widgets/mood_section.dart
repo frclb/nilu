@@ -34,6 +34,8 @@ class _MoodSectionState extends State<MoodSection> {
   @override
   void initState() {
     super.initState();
+    // Bir kez: önceden her çizimde yükleniyordu (bkz. `SymptomsSection`).
+    _selectedIndex = _moodCodes.indexWhere(widget.initialMoods.contains);
   }
 
   @override
@@ -47,16 +49,6 @@ class _MoodSectionState extends State<MoodSection> {
         'label': context.tr(LogVocabulary.moodKey(_moodCodes[i])),
       },
     );
-
-    // Restore initial
-    if (_selectedIndex == -1 && widget.initialMoods.isNotEmpty) {
-      for (int i = 0; i < _moodCodes.length; i++) {
-        if (widget.initialMoods.contains(_moodCodes[i])) {
-          _selectedIndex = i;
-          break;
-        }
-      }
-    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

@@ -30,10 +30,38 @@ class LogEntryScreen extends StatefulWidget {
 class _LogEntryScreenState extends State<LogEntryScreen> {
   final TextEditingController _notesController = TextEditingController();
 
+  /// Günün mevcut kaydı. Ekran onunla açılıyor; kaydederken bu ekranda
+  /// olmayan alanlar ondan korunuyor.
+  ///
+  /// Önceden ekran boş açılıyor ve kaydedince günün kaydını bütünüyle
+  /// değiştiriyordu (`CalendarViewModel.updateDailyLog`): aynı gün takvimden
+  /// girilen cinsel aktivite ya da lekelenme, lohusa panosundan girilen
+  /// lohia, sabah girilen belirtiler — akşam yalnızca ruh hâli seçen
+  /// kullanıcının hepsi siliniyordu.
+  late final DailyLog _mevcut;
+
   String? _flowIntensity;
   List<String> _symptoms = [];
   List<String> _moods = [];
   PainEntry _pain = const PainEntry();
+
+  @override
+  void initState() {
+    super.initState();
+    _mevcut = context.read<CalendarViewModel>().getDailyLogForDate(
+      DateTime.now(),
+    );
+    _flowIntensity = _mevcut.flowIntensity;
+    _symptoms = List.of(_mevcut.symptoms);
+    _moods = List.of(_mevcut.moods);
+    _pain = PainEntry(
+      level: _mevcut.painLevel,
+      limitedActivity: _mevcut.painLimitedActivity,
+      locations: _mevcut.painLocations,
+      contexts: _mevcut.painContexts,
+    );
+    _notesController.text = _mevcut.notes ?? '';
+  }
 
   @override
   void dispose() {
@@ -55,6 +83,8 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
       painLimitedActivity: _pain.limitedActivity,
       painLocations: _pain.locations,
       painContexts: _pain.contexts,
+      // Bu ekranda sorulmuyor; günün kaydından korunuyor.
+      sexualActivity: _mevcut.sexualActivity,
     );
 
     await viewModel.updateDailyLog(log);
@@ -204,6 +234,10 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
                   // Ağrı, semptomlardan sonra: kullanıcı "kramp"ı
                   // işaretledikten hemen sonra şiddetini soruyoruz.
                   PainSection(
+                    initialLevel: _pain.level,
+                    initialLimited: _pain.limitedActivity,
+                    initialLocations: _pain.locations,
+                    initialContexts: _pain.contexts,
                     onChanged: (value) {
                       _pain = value;
                     },
