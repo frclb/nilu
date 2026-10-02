@@ -1,3 +1,5 @@
+import 'life_stage.dart';
+
 /// Günlük log alanlarının **kanonik kelime dağarcığı**.
 ///
 /// Neden var: semptom, ruh hali, akış yoğunluğu ve cinsel aktivite değerleri
@@ -26,6 +28,48 @@ class LogVocabulary {
     'appetite',
     'backache',
   ];
+
+  /// Gebeliğe özgü belirtiler (PREGNANCY_MODE.md, Faz 2).
+  ///
+  /// Ayrı liste: döngüde anlamsızlar ve listeyi kalabalıklaştırırlar.
+  /// Gebelikte genel belirtilerin önünde gösteriliyor.
+  static const List<String> pregnancySymptoms = [
+    'nausea',
+    'vomiting',
+    'heartburn',
+    'swelling',
+    'itching',
+    'braxton_hicks',
+    'constipation',
+    'frequent_urination',
+    'leg_cramps',
+  ];
+
+  /// Kayıtlarda geçerli sayılan bütün belirti kodları.
+  ///
+  /// Okurken bu listeyle süzülüyor (bkz. `DailyLog.fromMap`). Yalnızca döngü
+  /// listesiyle süzülseydi gebelikte girilen "bulantı" bir sonraki açılışta
+  /// sessizce silinirdi.
+  static const List<String> allSymptoms = [...symptoms, ...pregnancySymptoms];
+
+  /// Evrede seçilebilecek belirtiler.
+  static List<String> symptomsFor(LifeStage stage) =>
+      stage == LifeStage.pregnancy
+      ? const [...pregnancySymptoms, ...symptoms]
+      : symptoms;
+
+  /// Gebelikte tehlike işaretleri listesindeki bir maddeye karşılık gelen
+  /// belirtiler (Bakanlık Doğum Öncesi Bakım Yönetim Rehberi, 2018):
+  /// şiddetli baş ağrısı; yüz, el ve bacaklarda şişme; şiddetli bulantı ve
+  /// kusma; nedeni açıklanamayan kaşıntı. Belirtinin kendisi tehlike değil
+  /// — şiddeti ya da aniden başlaması öyle. Kayıt ekranı bu yüzden teşhis
+  /// koymuyor, yalnızca neye dikkat edileceğini söylüyor.
+  static const Set<String> pregnancyWarningSymptoms = {
+    'headache',
+    'swelling',
+    'vomiting',
+    'itching',
+  };
 
   static const List<String> moods = [
     'happy',

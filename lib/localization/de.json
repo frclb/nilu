@@ -967,5 +967,16 @@
   "profile_preg_section": "Schwangerschaft",
   "profile_preg_ttc": "Kinderwunsch",
   "profile_preg_ttc_body": "Erinnert an Folsäure und daran, wann eine ärztliche Abklärung sinnvoll ist.",
-  "home_headline_after_pregnancy": "Warten auf die erste Periode"
+  "home_headline_after_pregnancy": "Warten auf die erste Periode",
+  "log_symptom_nausea": "Übelkeit",
+  "log_symptom_vomiting": "Erbrechen",
+  "log_symptom_heartburn": "Sodbrennen",
+  "log_symptom_swelling": "Schwellungen",
+  "log_symptom_itching": "Juckreiz",
+  "log_symptom_braxton_hicks": "Übungswehen",
+  "log_symptom_constipation": "Verstopfung",
+  "log_symptom_frequent_urination": "Häufiger Harndrang",
+  "log_symptom_leg_cramps": "Wadenkrämpfe",
+  "log_preg_symptom_note": "In der Schwangerschaft sind starke Kopfschmerzen, plötzliche Schwellungen an Gesicht, Händen oder Beinen, anhaltendes Erbrechen und unerklärlicher Juckreiz Zeichen, bei denen du dich sofort ärztlich melden solltest.",
+  "danger_signs_action": "Warnzeichen ansehen"
 }

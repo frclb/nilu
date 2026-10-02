@@ -47,7 +47,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
 
     // Belirti adları kullanıcının dilinde eşleşmeli.
     final symptomLabels = {
-      for (final code in LogVocabulary.symptoms)
+      for (final code in LogVocabulary.allSymptoms)
         context.tr(LogVocabulary.symptomKey(code)): code,
     };
 

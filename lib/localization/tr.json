@@ -967,5 +967,16 @@
   "profile_preg_section": "Gebelik",
   "profile_preg_ttc": "Gebe kalmaya çalışıyorum",
   "profile_preg_ttc_body": "Folik asit ve hekime danışma zamanını hatırlatır.",
-  "home_headline_after_pregnancy": "İlk reglin bekleniyor"
+  "home_headline_after_pregnancy": "İlk reglin bekleniyor",
+  "log_symptom_nausea": "Bulantı",
+  "log_symptom_vomiting": "Kusma",
+  "log_symptom_heartburn": "Mide Yanması",
+  "log_symptom_swelling": "Ödem (Şişlik)",
+  "log_symptom_itching": "Kaşıntı",
+  "log_symptom_braxton_hicks": "Yalancı Sancı",
+  "log_symptom_constipation": "Kabızlık",
+  "log_symptom_frequent_urination": "Sık İdrara Çıkma",
+  "log_symptom_leg_cramps": "Bacak Krampı",
+  "log_preg_symptom_note": "Şiddetli baş ağrısı; yüzde, ellerde ya da bacaklarda ani şişlik; geçmeyen kusma ve nedeni açıklanamayan kaşıntı gebelikte beklemeden hekime danışılması gereken işaretlerdir.",
+  "danger_signs_action": "Tehlike işaretlerine bak"
 }

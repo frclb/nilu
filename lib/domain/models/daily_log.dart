@@ -116,7 +116,7 @@ class DailyLog {
       date: DateTime.parse(map['date']),
       symptoms: LogVocabulary.normalizeAll(
         List<String>.from(map['symptoms'] ?? []),
-        LogVocabulary.symptoms,
+        LogVocabulary.allSymptoms,
       ),
       notes: map['notes'],
       flowIntensity: rawFlow == null

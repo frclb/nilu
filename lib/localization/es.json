@@ -967,5 +967,16 @@
   "profile_preg_section": "Embarazo",
   "profile_preg_ttc": "Buscando embarazo",
   "profile_preg_ttc_body": "Te recuerda el ácido fólico y cuándo consultar al médico.",
-  "home_headline_after_pregnancy": "Esperando la primera regla"
+  "home_headline_after_pregnancy": "Esperando la primera regla",
+  "log_symptom_nausea": "Náuseas",
+  "log_symptom_vomiting": "Vómitos",
+  "log_symptom_heartburn": "Acidez",
+  "log_symptom_swelling": "Edema",
+  "log_symptom_itching": "Picor",
+  "log_symptom_braxton_hicks": "Contracciones de Braxton Hicks",
+  "log_symptom_constipation": "Estreñimiento",
+  "log_symptom_frequent_urination": "Ganas frecuentes de orinar",
+  "log_symptom_leg_cramps": "Calambres en las piernas",
+  "log_preg_symptom_note": "En el embarazo, un dolor de cabeza intenso, una hinchazón repentina de la cara, las manos o las piernas, vómitos que no paran o picor sin causa aparente son señales para consultar sin esperar.",
+  "danger_signs_action": "Ver señales de alarma"
 }

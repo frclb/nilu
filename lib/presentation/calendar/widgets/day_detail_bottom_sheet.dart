@@ -42,9 +42,6 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
   late TextEditingController _notesController;
   late DailyLog _currentLog;
 
-  // Saklanan değerler kanonik kodlardır; etiketler lokalizasyondan gelir.
-  static const List<String> _availableSymptoms = LogVocabulary.symptoms;
-
   // Regl kademeleri sözlükten geliyor: 'none' ve 'spotting' burada
   // gösterilmez, çünkü ikisi de regl günü değil. Listeyi burada yeniden
   // yazmak, lekelenme eklenirken bu ekranın atlanmasına yol açmıştı.
@@ -373,16 +370,25 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: _availableSymptoms.map((code) {
-                      final isSelected = _currentLog.symptoms.contains(code);
-                      return FilterChip(
-                        label: Text(context.tr(LogVocabulary.symptomKey(code))),
-                        selected: isSelected,
-                        onSelected: (_) => _toggleSymptom(code),
-                        selectedColor: theme.colorScheme.primaryContainer,
-                        checkmarkColor: theme.colorScheme.primary,
-                      );
-                    }).toList(),
+                    // Saklanan değerler kanonik kodlar; etiketler
+                    // lokalizasyondan. Liste evreye göre: gebelikte bulantı,
+                    // mide yanması, ödem…
+                    children: LogVocabulary.symptomsFor(viewModel.lifeStage)
+                        .map((code) {
+                          final isSelected = _currentLog.symptoms.contains(
+                            code,
+                          );
+                          return FilterChip(
+                            label: Text(
+                              context.tr(LogVocabulary.symptomKey(code)),
+                            ),
+                            selected: isSelected,
+                            onSelected: (_) => _toggleSymptom(code),
+                            selectedColor: theme.colorScheme.primaryContainer,
+                            checkmarkColor: theme.colorScheme.primary,
+                          );
+                        })
+                        .toList(),
                   ),
 
                   const SizedBox(height: 24),

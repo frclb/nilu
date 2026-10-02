@@ -967,5 +967,16 @@
   "profile_preg_section": "Grossesse",
   "profile_preg_ttc": "J'essaie de concevoir",
   "profile_preg_ttc_body": "Te rappelle l'acide folique et le moment de consulter.",
-  "home_headline_after_pregnancy": "En attente des premières règles"
+  "home_headline_after_pregnancy": "En attente des premières règles",
+  "log_symptom_nausea": "Nausées",
+  "log_symptom_vomiting": "Vomissements",
+  "log_symptom_heartburn": "Brûlures d'estomac",
+  "log_symptom_swelling": "Gonflements",
+  "log_symptom_itching": "Démangeaisons",
+  "log_symptom_braxton_hicks": "Contractions de Braxton Hicks",
+  "log_symptom_constipation": "Constipation",
+  "log_symptom_frequent_urination": "Envies fréquentes d'uriner",
+  "log_symptom_leg_cramps": "Crampes aux jambes",
+  "log_preg_symptom_note": "Pendant la grossesse, un mal de tête intense, un gonflement soudain du visage, des mains ou des jambes, des vomissements qui ne s'arrêtent pas ou des démangeaisons inexpliquées doivent te faire consulter sans attendre.",
+  "danger_signs_action": "Voir les signes d'alerte"
 }

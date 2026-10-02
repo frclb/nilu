@@ -158,6 +158,7 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final stage = context.watch<CalendarViewModel>().lifeStage;
 
     return Scaffold(
       appBar: const LogEntryAppBar(),
@@ -226,10 +227,16 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
                   _buildDivider(isDark, theme),
                   SymptomsSection(
                     initialSymptoms: _symptoms,
-                    onChanged: (value) {
-                      _symptoms = value;
-                    },
+                    codes: LogVocabulary.symptomsFor(stage),
+                    // Gebelik notu seçime göre görünüp kaybolduğu için
+                    // yeniden çiziliyor.
+                    onChanged: (value) => setState(() => _symptoms = value),
                   ),
+                  if (stage == LifeStage.pregnancy &&
+                      _symptoms.any(
+                        LogVocabulary.pregnancyWarningSymptoms.contains,
+                      ))
+                    const _GebelikBelirtiNotu(),
                   _buildDivider(isDark, theme),
                   // Ağrı, semptomlardan sonra: kullanıcı "kramp"ı
                   // işaretledikten hemen sonra şiddetini soruyoruz.
@@ -264,6 +271,61 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       child: Divider(color: context.tokens.border, height: 1),
+    );
+  }
+}
+
+/// Gebelikte tehlike listesindeki bir maddeye karşılık gelen belirti
+/// seçilince (bkz. `LogVocabulary.pregnancyWarningSymptoms`).
+///
+/// Teşhis değil: belirtinin kendisi değil şiddeti ya da aniden başlaması
+/// önemli. Not bunu söylüyor ve listeye götürüyor.
+class _GebelikBelirtiNotu extends StatelessWidget {
+  const _GebelikBelirtiNotu();
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+      child: Container(
+        key: const Key('log_preg_symptom_note'),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: t.surfaceAlt,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: t.border),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.health_and_safety_outlined, size: 20, color: t.warning),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    context.tr('log_preg_symptom_note'),
+                    style: TextStyle(fontSize: 13, height: 1.45, color: t.text),
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: const Size(0, 36),
+                    ),
+                    onPressed: () => context.pushNamed(
+                      RouteNames.dangerSigns,
+                      queryParameters: {'period': DangerPeriod.pregnancy.name},
+                    ),
+                    child: Text(context.tr('danger_signs_action')),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

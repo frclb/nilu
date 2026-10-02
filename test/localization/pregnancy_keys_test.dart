@@ -29,6 +29,7 @@ void main() {
     for (final g in CareGroup.values) 'care_group_${g.name}',
     for (final o in PregnancyOutcome.values) 'preg_outcome_${o.name}',
     for (final f in LogVocabulary.flowIntensities) LogVocabulary.flowKey(f),
+    for (final b in LogVocabulary.allSymptoms) LogVocabulary.symptomKey(b),
   };
 
   /// Gebelik klasöründe düz yazılmış anahtarlar. Widget anahtarları
