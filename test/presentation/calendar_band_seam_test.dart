@@ -34,12 +34,18 @@ void main() {
   ///
   /// Pazar satırı bitirdiği için oradan başlanamaz; testin hangi ayda
   /// koştuğuna bağlı kalmaması gerekiyor.
+  ///
+  /// Bugün de seçilmiyor: bugünün hücresi seçili gün halkasıyla çiziliyor ve
+  /// ölçülen bant o halkanın altında kalıyor. Test ayın 3'ünde, ilk gün
+  /// bugüne denk gelince kırmızıya dönüyordu.
   (DateTime, DateTime) adjacentPair() {
     final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     for (var day = 3; day <= 25; day++) {
       final date = DateTime(now.year, now.month, day);
-      if (date.weekday != DateTime.sunday) {
-        return (date, date.add(const Duration(days: 1)));
+      final next = DateTime(now.year, now.month, day + 1);
+      if (date.weekday != DateTime.sunday && date != today && next != today) {
+        return (date, next);
       }
     }
     throw StateError('uygun gün bulunamadı');

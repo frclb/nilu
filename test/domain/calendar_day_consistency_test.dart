@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:period_tracker/domain/models/calendar_day.dart';
 import 'package:period_tracker/domain/models/cycle_info.dart';
 import 'package:period_tracker/domain/models/period_log.dart';
 import 'package:period_tracker/domain/services/prediction_service.dart';
@@ -199,7 +200,7 @@ void main() {
 
       for (var i = 1; i < baslangiclar.length; i++) {
         expect(
-          baslangiclar[i].difference(baslangiclar[i - 1]).inDays,
+          baslangiclar[i].daysSince(baslangiclar[i - 1]),
           27,
           reason: 'tahmin aralığı döngü boyundan farklı',
         );

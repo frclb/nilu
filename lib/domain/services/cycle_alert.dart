@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' show DateUtils;
 
+import '../models/calendar_day.dart';
 import '../models/daily_log.dart';
 import '../models/log_vocabulary.dart';
 import '../models/period_log.dart';
@@ -161,7 +162,7 @@ class CycleAlertService {
     final episodes = <DateTime>[];
     for (var i = 0; i < days.length; i++) {
       final previous = i == 0 ? null : days[i - 1];
-      if (previous == null || days[i].difference(previous).inDays > 1) {
+      if (previous == null || days[i].daysSince(previous) > 1) {
         episodes.add(days[i]);
       }
     }
@@ -177,15 +178,11 @@ class CycleAlertService {
       // kanama" diye işaretlerdi — yani hata payı bu yönde bırakılıyor.
       final end = DateUtils.dateOnly(
         period.endDate ??
-            period.startDate.add(
-              const Duration(days: PeriodLog.defaultOngoingLength - 1),
-            ),
+            period.startDate.plusDays(PeriodLog.defaultOngoingLength - 1),
       );
 
-      final from = start.subtract(
-        const Duration(days: perimenstrualBufferDays),
-      );
-      final to = end.add(const Duration(days: perimenstrualBufferDays));
+      final from = start.plusDays(-perimenstrualBufferDays);
+      final to = end.plusDays(perimenstrualBufferDays);
 
       if (!day.isBefore(from) && !day.isAfter(to)) return true;
     }

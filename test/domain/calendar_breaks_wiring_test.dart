@@ -24,7 +24,7 @@ void main() {
 
   final bugun = DateTime.now();
   final gun = DateTime(bugun.year, bugun.month, bugun.day);
-  DateTime once(int n) => gun.subtract(Duration(days: n));
+  DateTime once(int n) => DateTime(gun.year, gun.month, gun.day - n);
 
   /// Gebelik öncesi düzenli geçmiş: SAT bugünden ~13 ay önce.
   final sat = once(400);

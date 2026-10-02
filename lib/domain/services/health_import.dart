@@ -1,3 +1,4 @@
+import '../models/calendar_day.dart';
 import '../models/period_log.dart';
 
 /// Sağlık uygulamasından gelen tek bir regl günü.
@@ -42,7 +43,7 @@ class HealthImport {
     var previous = sorted.first;
 
     for (final day in sorted.skip(1)) {
-      final gap = day.difference(previous).inDays;
+      final gap = day.daysSince(previous);
       if (gap > gapToleranceDays + 1) {
         periods.add(
           PeriodLog(id: nextId(), startDate: start, endDate: previous),

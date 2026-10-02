@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../domain/models/calendar_day.dart';
 import '../../../domain/models/period_log.dart';
 import '../../../domain/models/daily_log.dart';
 import '../../../domain/models/cycle_info.dart';
@@ -379,7 +380,7 @@ class CalendarViewModel extends ChangeNotifier {
     var degisti = false;
     for (final log in _periodLogs) {
       if (!log.isOngoing) continue;
-      final planlanan = log.firstDay.add(Duration(days: _userPeriodLength - 1));
+      final planlanan = log.firstDay.plusDays(_userPeriodLength - 1);
       log.endDate = planlanan.isAfter(today) ? today : planlanan;
       degisti = true;
     }

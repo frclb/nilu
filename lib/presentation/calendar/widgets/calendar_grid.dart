@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../design_system/app_contrast.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
+import '../../../domain/models/calendar_day.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../localization/date_names.dart';
 import '../../../domain/models/daily_log.dart';
@@ -267,8 +268,8 @@ class CalendarGrid extends StatelessWidget {
 
                     if (index < previousMonthFill) {
                       isFaded = true;
-                      date = firstDayOfMonth.subtract(
-                        Duration(days: previousMonthFill - index),
+                      date = firstDayOfMonth.plusDays(
+                        index - previousMonthFill,
                       );
                     } else if (index < previousMonthFill + daysInMonth) {
                       date = DateTime(
@@ -278,11 +279,11 @@ class CalendarGrid extends StatelessWidget {
                       );
                     } else {
                       isFaded = true;
-                      date = DateTime(year, month, daysInMonth).add(
-                        Duration(
-                          days: index - (previousMonthFill + daysInMonth) + 1,
-                        ),
-                      );
+                      date = DateTime(
+                        year,
+                        month,
+                        daysInMonth,
+                      ).plusDays(index - (previousMonthFill + daysInMonth) + 1);
                     }
 
                     return _DayTile(date: date, isFaded: isFaded);
@@ -492,12 +493,12 @@ class _DayTile extends StatelessWidget {
     final periodPrev =
         isPeriod &&
         context.select<CalendarViewModel, bool>(
-          (v) => v.isPeriodDay(date.subtract(const Duration(days: 1))),
+          (v) => v.isPeriodDay(date.plusDays(-1)),
         );
     final periodNext =
         isPeriod &&
         context.select<CalendarViewModel, bool>(
-          (v) => v.isPeriodDay(date.add(const Duration(days: 1))),
+          (v) => v.isPeriodDay(date.plusDays(1)),
         );
 
     final hasPeriodBefore = periodPrev && !rowStart;
@@ -509,13 +510,13 @@ class _DayTile extends StatelessWidget {
         isPredicted &&
         !isPeriod &&
         context.select<CalendarViewModel, bool>(
-          (v) => v.isPredictedPeriodDay(date.subtract(const Duration(days: 1))),
+          (v) => v.isPredictedPeriodDay(date.plusDays(-1)),
         );
     final predictedNext =
         isPredicted &&
         !isPeriod &&
         context.select<CalendarViewModel, bool>(
-          (v) => v.isPredictedPeriodDay(date.add(const Duration(days: 1))),
+          (v) => v.isPredictedPeriodDay(date.plusDays(1)),
         );
 
     final hasPredictedBefore = predictedPrev && !rowStart;

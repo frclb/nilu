@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:period_tracker/domain/models/calendar_day.dart';
 import 'package:period_tracker/domain/models/cycle_info.dart';
 import 'package:period_tracker/domain/models/period_log.dart';
 import 'package:period_tracker/domain/services/prediction_service.dart';
@@ -38,18 +39,12 @@ void main() {
     test('yumurtlama sonraki reglden 14 gün öncedir', () {
       final info = service.getCycleInfo(logs, userCycleLength: 28);
       expect(info.ovulationDay, DateTime(2026, 1, 15));
-      expect(
-        info.predictedNextPeriod!.difference(info.ovulationDay!).inDays,
-        14,
-      );
+      expect(info.predictedNextPeriod!.daysSince(info.ovulationDay!), 14);
     });
 
     test('14 gün kuralı 28 dışındaki döngülerde de geçerlidir', () {
       final info = service.getCycleInfo(logs, userCycleLength: 31);
-      expect(
-        info.predictedNextPeriod!.difference(info.ovulationDay!).inDays,
-        14,
-      );
+      expect(info.predictedNextPeriod!.daysSince(info.ovulationDay!), 14);
     });
 
     test('doğurganlık penceresi yumurtlama -5 / +1 gündür', () {
@@ -83,7 +78,7 @@ void main() {
       final info = service.getCycleInfo(logs, userCycleLength: 28);
       for (final p in info.futurePredictions) {
         expect(
-          p.ovulationDay!.difference(p.startDate).inDays,
+          p.ovulationDay!.daysSince(p.startDate),
           info.averageCycleLength - PredictionService.lutealPhaseDays,
         );
       }
@@ -238,7 +233,7 @@ void _chainTests() {
 
       for (var i = 0; i < baslangiclar.length - 1; i++) {
         expect(
-          baslangiclar[i + 1].difference(baslangiclar[i]).inDays,
+          baslangiclar[i + 1].daysSince(baslangiclar[i]),
           info.averageCycleLength,
           reason: '${i + 1}. ve ${i + 2}. tahmin arası',
         );
@@ -255,7 +250,7 @@ void _chainTests() {
       );
 
       for (final p in info.futurePredictions) {
-        final gun = p.ovulationDay!.difference(p.startDate).inDays;
+        final gun = p.ovulationDay!.daysSince(p.startDate);
         expect(
           gun,
           info.averageCycleLength - 14,
@@ -288,7 +283,7 @@ void _chainTests() {
 
       final son = info.futurePredictions.last.startDate;
       expect(
-        son.difference(info.lastPeriodStart!).inDays,
+        son.daysSince(info.lastPeriodStart!),
         greaterThanOrEqualTo(330),
         reason: 'en az bir yıl ileri tahmin',
       );
@@ -309,8 +304,8 @@ void _chainTests() {
 
       expect(kirli.averageCycleLength, temiz.averageCycleLength);
       expect(
-        kirli.ovulationDay!.difference(kirli.lastPeriodStart!).inDays,
-        temiz.ovulationDay!.difference(temiz.lastPeriodStart!).inDays,
+        kirli.ovulationDay!.daysSince(kirli.lastPeriodStart!),
+        temiz.ovulationDay!.daysSince(temiz.lastPeriodStart!),
       );
     });
   });

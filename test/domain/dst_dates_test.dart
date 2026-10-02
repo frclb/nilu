@@ -1,10 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:period_tracker/domain/models/calendar_day.dart';
 import 'package:period_tracker/domain/models/pregnancy.dart';
 import 'package:period_tracker/domain/services/care_templates.dart';
 import 'package:period_tracker/domain/services/pregnancy_calendar.dart';
+
+import '../dst_support.dart';
 
 /// Gebelik tarihleri yaz saatinde kaymıyor.
 ///
@@ -13,20 +13,10 @@ import 'package:period_tracker/domain/services/pregnancy_calendar.dart';
 /// 1 Mart → 1 Nisan'ı 30 gün buluyordu.
 ///
 /// Geliştirme makinesi Türkiye saatinde ve Türkiye'de yaz saati yok: bu
-/// iddialar burada kendiliğinden geçer. Bu yüzden son test aynı dosyayı yaz
-/// saati olan iki saat diliminde ayrı bir süreçte çalıştırıyor.
+/// iddialar burada kendiliğinden geçer. Asıl sınama `dst_timezones_test`
+/// ile yaz saatli saat dilimlerinde.
 void main() {
-  const altSurec = 'NILU_DST_CHILD';
-
-  test('yaz saati olan saat diliminde çalışıyor (alt süreç)', () {
-    if (Platform.environment[altSurec] == null) return;
-    // TZ uygulanmadıysa aşağıdaki iddialar hiçbir şey sınamamış olur.
-    expect(
-      DateTime(2026, 1, 15).timeZoneOffset,
-      isNot(DateTime(2026, 7, 15).timeZoneOffset),
-      reason: 'Saat dilimi ${Platform.environment['TZ']} uygulanmadı',
-    );
-  });
+  expectDstZoneInChild();
 
   group('takvim günü', () {
     test('ilkbahar ve sonbahar geçişinde gün farkı tam', () {
@@ -116,20 +106,4 @@ void main() {
       }
     });
   });
-
-  test(
-    'yaz saati olan saat dilimlerinde de (Berlin, New York)',
-    () async {
-      if (Platform.environment[altSurec] != null) return;
-      for (final tz in ['Europe/Berlin', 'America/New_York']) {
-        final r = await Process.run(
-          'flutter',
-          ['test', 'test/domain/dst_dates_test.dart'],
-          environment: {'TZ': tz, altSurec: '1'},
-        );
-        expect(r.exitCode, 0, reason: '$tz:\n${r.stdout}\n${r.stderr}');
-      }
-    },
-    timeout: const Timeout(Duration(minutes: 4)),
-  );
 }

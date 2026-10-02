@@ -1,3 +1,4 @@
+import 'calendar_day.dart';
 import 'dart:convert';
 
 /// Kullanıcının regl dönemini temsil eden model.
@@ -18,7 +19,7 @@ class PeriodLog {
   /// böylece ortalama hesapları uydurma bir sabitle sapmaz.
   int? get completedLength {
     if (isOngoing) return null;
-    return endDate!.difference(startDate).inDays + 1;
+    return endDate!.daysSince(startDate) + 1;
   }
 
   Map<String, dynamic> toMap() {
@@ -81,10 +82,10 @@ class PeriodLog {
     final last = lastRecordedDay(today: today);
     if (!cleanDate.isAfter(last)) return false;
     final days = expectedLength < 1 ? 1 : expectedLength;
-    return !cleanDate.isAfter(firstDay.add(Duration(days: days - 1)));
+    return !cleanDate.isAfter(firstDay.plusDays(days - 1));
   }
 
   /// Bugüne kadar kaç gün kayıt düşülmüş.
   int recordedLength({DateTime? today}) =>
-      lastRecordedDay(today: today).difference(firstDay).inDays + 1;
+      lastRecordedDay(today: today).daysSince(firstDay) + 1;
 }

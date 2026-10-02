@@ -164,7 +164,7 @@ void main() {
           reason: 'Pencere işaretleme gününden başlamalı',
         );
         expect(
-          ilk.windowEnd(gec)!.difference(ilk.windowStart(gec)!).inDays,
+          ilk.windowEnd(gec)!.daysSince(ilk.windowStart(gec)!),
           6,
           reason: 'Bir hafta içinde',
         );

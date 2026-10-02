@@ -1,3 +1,4 @@
+import '../models/calendar_day.dart';
 import '../models/period_log.dart';
 
 /// Regl günlerini yöneten ve logları blok (başlangıç/bitiş) olarak tutan servis.
@@ -18,7 +19,7 @@ class PeriodService {
 
     // Dün biten bir dönem varsa aslında bitmemiş: kaydı yeniden açıyoruz.
     // Yeni bir dönem açmak, aynı kanamayı iki döngü gibi gösterirdi.
-    final yesterday = cleanDate.subtract(const Duration(days: 1));
+    final yesterday = cleanDate.plusDays(-1);
     for (final log in newList) {
       final end = log.endDate;
       if (end != null &&
@@ -61,7 +62,7 @@ class PeriodService {
 
     // Bugün kayıtlı değil ama dün kayıtlıysa kanama bugün de sürdü demektir;
     // dönemi bugüne uzatıp kapatıyoruz.
-    final yesterday = cleanDate.subtract(const Duration(days: 1));
+    final yesterday = cleanDate.plusDays(-1);
     for (final log in newList) {
       if (log.containsRecorded(yesterday, today: cleanDate)) {
         log.endDate = cleanDate;
@@ -116,21 +117,21 @@ class PeriodService {
         newList.removeAt(foundIndex);
       } else if (logStart.isAtSameMomentAs(cleanDate)) {
         // Baştan kırp; dönem devam ediyorsa devam eder.
-        log.startDate = cleanDate.add(const Duration(days: 1));
+        log.startDate = cleanDate.plusDays(1);
       } else if (logEnd.isAtSameMomentAs(cleanDate)) {
         // Sondan kırp. Devam eden bir dönemde son kayıtlı gün bugündür;
         // bugünü kaldırmak dönemi dün kapatır.
-        log.endDate = cleanDate.subtract(const Duration(days: 1));
+        log.endDate = cleanDate.plusDays(-1);
       } else {
         // Ortadaki bir gün siliniyor: dönem ikiye ayrılır.
-        final secondStart = cleanDate.add(const Duration(days: 1));
+        final secondStart = cleanDate.plusDays(1);
 
         newList.removeAt(foundIndex);
         newList.add(
           PeriodLog(
             id: DateTime.now().millisecondsSinceEpoch.toString(),
             startDate: log.startDate,
-            endDate: cleanDate.subtract(const Duration(days: 1)),
+            endDate: cleanDate.plusDays(-1),
           ),
         );
 
@@ -150,8 +151,8 @@ class PeriodService {
       }
     } else {
       // Regl günü değil: ekle. Komşu dönemler varsa onlarla birleştir.
-      final nextDay = cleanDate.add(const Duration(days: 1));
-      final prevDay = cleanDate.subtract(const Duration(days: 1));
+      final nextDay = cleanDate.plusDays(1);
+      final prevDay = cleanDate.plusDays(-1);
 
       PeriodLog? prevPeriod;
       PeriodLog? nextPeriod;
@@ -222,7 +223,7 @@ class PeriodService {
   ) => !_lastPossibleDay(start, expectedLength).isBefore(today);
 
   static DateTime _lastPossibleDay(DateTime start, int expectedLength) =>
-      start.add(Duration(days: (expectedLength < 1 ? 1 : expectedLength) - 1));
+      start.plusDays((expectedLength < 1 ? 1 : expectedLength) - 1);
 
   /// Kullanıcının bildirdiği bir **başlangıç tarihinden** kayıt üretir.
   ///

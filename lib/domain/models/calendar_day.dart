@@ -5,8 +5,9 @@
 /// yapılınca yaz saati uygulanan saat dilimlerinde (Avrupa, ABD) tarih bir
 /// gün kayıyordu: Berlin'de 1 Mayıs son adet tarihinin tahmini doğumu
 /// 5 Şubat yerine 4 Şubat kaydediliyordu; 1 Mart'tan 1 Nisan'a 30 gün
-/// sayılıyordu. Türkiye'de yaz saati olmadığı için ne cihazda ne testlerde
-/// görünüyordu (bkz. `test/domain/dst_dates_test.dart`).
+/// sayılıyordu; döngü motorunda da döngü uzunluğu ve tahminler kayıyordu.
+/// Türkiye'de yaz saati olmadığı için ne cihazda ne testlerde görünüyordu
+/// (bkz. `test/domain/dst_timezones_test.dart`).
 extension CalendarDay on DateTime {
   /// [n] takvim günü sonrası (yerel gece yarısı); eksi değer öncesi.
   DateTime plusDays(int n) => DateTime(year, month, day + n);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
+import 'package:period_tracker/domain/models/calendar_day.dart';
 import 'package:period_tracker/domain/models/care_event.dart';
 import 'package:period_tracker/domain/models/pregnancy.dart';
 import 'package:period_tracker/domain/view_models/pregnancy_view_model.dart';
@@ -98,7 +99,7 @@ void main() {
       routes: pregnancyRoutes(const PregnancyHomeScreen()),
     );
     final ctx = tester.element(find.byType(PregnancyHomeScreen));
-    final kalan = g.estimatedDueDate.difference(today).inDays;
+    final kalan = g.estimatedDueDate.daysSince(today);
     expect(kalan, 280 - (24 * 7 + 2));
     expect(find.text(ctx.dueCountdown(kalan)), findsOneWidget);
   });

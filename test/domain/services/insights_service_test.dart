@@ -103,7 +103,7 @@ void main() {
     test('limit en yeni döngüleri tutar', () {
       final logs = [
         for (var i = 0; i < 10; i++)
-          _period('$i', DateTime(2026, 1, 1).add(Duration(days: i * 28))),
+          _period('$i', DateTime(2026, 1, 1 + i * 28)),
       ];
 
       final points = InsightsService.cycleLengths(
@@ -113,10 +113,7 @@ void main() {
       );
 
       expect(points.length, 3);
-      expect(
-        points.last.startDate,
-        DateTime(2026, 1, 1).add(const Duration(days: 8 * 28)),
-      );
+      expect(points.last.startDate, DateTime(2026, 1, 1 + 8 * 28));
     });
   });
 

@@ -1,3 +1,4 @@
+import '../models/calendar_day.dart';
 import '../models/life_stage.dart';
 import '../models/period_log.dart';
 import '../models/pregnancy.dart';
@@ -80,7 +81,7 @@ class CycleIntervals {
     for (var i = 0; i < starts.length - 1; i++) {
       final bas = starts[i];
       final son = starts[i + 1];
-      final uzunluk = son.difference(bas).inDays;
+      final uzunluk = son.daysSince(bas);
       if (!isPlausible(uzunluk)) continue;
       if (breaks.any((k) => k.overlaps(bas, son))) continue;
       points.add(CycleLengthPoint(startDate: bas, lengthInDays: uzunluk));

@@ -1,3 +1,4 @@
+import '../models/calendar_day.dart';
 import '../models/cycle_info.dart';
 import 'cycle_intervals.dart';
 import '../models/period_log.dart';
@@ -19,7 +20,7 @@ class PredictionService {
 
   /// [start] gününde başlayan, [cycleLength] gün süren döngünün yumurtlaması.
   static DateTime _ovulationFor(DateTime start, int cycleLength) =>
-      start.add(Duration(days: cycleLength - lutealPhaseDays));
+      start.plusDays(cycleLength - lutealPhaseDays);
 
   /// Döngü bilgisini hesaplar.
   /// [userCycleLength] ve [userPeriodLength]: Kullanıcının ayarladığı değerler
@@ -110,7 +111,7 @@ class PredictionService {
       );
     }
 
-    final nextPeriod = lastStart.add(Duration(days: effectiveCycleLength));
+    final nextPeriod = lastStart.plusDays(effectiveCycleLength);
 
     // Yumurtlama luteal faza göre hesaplanır: bir sonraki reglden 14 gün önce,
     // yani döngü başlangıcından `uzunluk - 14` gün sonra. Luteal faz kişiden
@@ -122,8 +123,8 @@ class PredictionService {
         : null;
 
     // Doğurganlık penceresi: Yumurtlama -5 gün → Yumurtlama +1 gün (tıbbi standart)
-    final fertileStart = ovulation?.subtract(const Duration(days: 5));
-    final fertileEnd = ovulation?.add(const Duration(days: 1));
+    final fertileStart = ovulation?.plusDays(-5);
+    final fertileEnd = ovulation?.plusDays(1);
 
     // İleri döngü tahminleri.
     //
@@ -140,9 +141,7 @@ class PredictionService {
     //    reglin kendi doğurganlık penceresi listede yoktu.
     final futurePredictions = <PredictedCycle>[];
     for (int i = 1; i <= forecastCycleCount; i++) {
-      final futureStart = lastStart.add(
-        Duration(days: effectiveCycleLength * i),
-      );
+      final futureStart = lastStart.plusDays(effectiveCycleLength * i);
       final futureOvulation = tracksFertility
           ? _ovulationFor(futureStart, effectiveCycleLength)
           : null;
@@ -150,8 +149,8 @@ class PredictionService {
         PredictedCycle(
           startDate: futureStart,
           ovulationDay: futureOvulation,
-          fertileStart: futureOvulation?.subtract(const Duration(days: 5)),
-          fertileEnd: futureOvulation?.add(const Duration(days: 1)),
+          fertileStart: futureOvulation?.plusDays(-5),
+          fertileEnd: futureOvulation?.plusDays(1),
         ),
       );
     }

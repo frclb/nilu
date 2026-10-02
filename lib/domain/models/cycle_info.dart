@@ -1,3 +1,5 @@
+import 'calendar_day.dart';
+
 /// Döngü fazlarını temsil eden enum.
 enum CyclePhase {
   menstruation, // Regl günleri (gün 1-5 civarı)
@@ -115,9 +117,7 @@ class CycleInfo {
   int? cycleDayOn(DateTime reference) {
     final start = lastPeriodStart;
     if (start == null) return null;
-    final today = DateTime(reference.year, reference.month, reference.day);
-    final clean = DateTime(start.year, start.month, start.day);
-    final diff = today.difference(clean).inDays + 1;
+    final diff = reference.daysSince(start) + 1;
     if (diff < 1) return null;
     return diff;
   }
@@ -125,14 +125,7 @@ class CycleInfo {
   /// Sonraki regle kaç gün kaldığını hesaplar.
   int? get daysUntilNextPeriod {
     if (predictedNextPeriod == null) return null;
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final next = DateTime(
-      predictedNextPeriod!.year,
-      predictedNextPeriod!.month,
-      predictedNextPeriod!.day,
-    );
-    final diff = next.difference(today).inDays;
+    final diff = predictedNextPeriod!.daysSince(DateTime.now());
     return diff < 0 ? 0 : diff;
   }
 
@@ -144,9 +137,7 @@ class CycleInfo {
   int daysLateAt(DateTime now) {
     final predicted = predictedNextPeriod;
     if (predicted == null) return 0;
-    final today = DateTime(now.year, now.month, now.day);
-    final due = DateTime(predicted.year, predicted.month, predicted.day);
-    final diff = today.difference(due).inDays;
+    final diff = now.daysSince(predicted);
     return diff > 0 ? diff : 0;
   }
 
@@ -327,23 +318,19 @@ class CycleInfo {
         anchor.isAtSameMomentAs(DateTime(start.year, start.month, start.day));
 
     return _AnchoredDay(
-      day: target.difference(anchor).inDays + 1,
+      day: target.daysSince(anchor) + 1,
       isCurrentCycle: isCurrent,
     );
   }
 
   bool isPredictedPeriod(DateTime date) {
     if (predictedNextPeriod == null) return false;
-    final end = predictedNextPeriod!.add(
-      Duration(days: averagePeriodLength - 1),
-    );
+    final end = predictedNextPeriod!.plusDays(averagePeriodLength - 1);
     if (_isBetween(date, predictedNextPeriod!, end)) return true;
 
     // İleri tahminleri de kontrol et
     for (final prediction in futurePredictions) {
-      final predEnd = prediction.startDate.add(
-        Duration(days: averagePeriodLength - 1),
-      );
+      final predEnd = prediction.startDate.plusDays(averagePeriodLength - 1);
       if (_isBetween(date, prediction.startDate, predEnd)) return true;
     }
 

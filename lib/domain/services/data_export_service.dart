@@ -1,3 +1,4 @@
+import '../models/calendar_day.dart';
 import '../models/daily_log.dart';
 import '../models/period_log.dart';
 import '../models/log_vocabulary.dart';
@@ -257,7 +258,7 @@ class DataExportService {
       for (
         var day = _dateOnly(log.startDate);
         !day.isAfter(_dateOnly(end));
-        day = day.add(const Duration(days: 1))
+        day = day.plusDays(1)
       ) {
         periodDays.add(_formatDate(day));
       }

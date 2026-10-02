@@ -30,7 +30,7 @@ DateTime get today {
   return DateTime(n.year, n.month, n.day);
 }
 
-DateTime daysAgo(int n) => today.subtract(Duration(days: n));
+DateTime daysAgo(int n) => DateTime(today.year, today.month, today.day - n);
 
 void resetStores({bool onboarded = true}) {
   FlutterSecureStorage.setMockInitialValues({});

@@ -1,3 +1,4 @@
+import '../models/calendar_day.dart';
 import '../models/cycle_info.dart';
 
 /// Yaklaşan bir döngü olayının türü.
@@ -74,7 +75,7 @@ class CycleAgenda {
     void add(AgendaKind kind, DateTime? date) {
       if (date == null) return;
       final clean = DateTime(date.year, date.month, date.day);
-      final days = clean.difference(today).inDays;
+      final days = clean.daysSince(today);
       if (days <= 0) return;
       if (!seen.add('${kind.name}@${clean.toIso8601String()}')) return;
       entries.add(AgendaEntry(kind: kind, date: clean, daysAway: days));

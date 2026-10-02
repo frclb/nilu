@@ -1,3 +1,4 @@
+import '../../models/calendar_day.dart';
 import '../../models/cycle_info.dart';
 import '../../models/daily_log.dart';
 import '../../models/period_log.dart';
@@ -74,7 +75,7 @@ class AssistantAnswerBuilder {
     // değişiyordu.
     final today = DateTime(now.year, now.month, now.day);
     final target = DateTime(next.year, next.month, next.day);
-    final days = target.difference(today).inDays;
+    final days = target.daysSince(today);
 
     // Gecikme kendi cümlesini hak ediyor.
     //

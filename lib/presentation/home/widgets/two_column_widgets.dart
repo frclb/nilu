@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/app_tokens.dart';
 import 'package:provider/provider.dart';
+import '../../../domain/models/calendar_day.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../core/navigation/navigation_service.dart';
 import '../../../core/navigation/route_names.dart';
@@ -44,7 +45,7 @@ class TwoColumnWidgets extends StatelessWidget {
       if (logDate.isAtSameMomentAs(today)) {
         lastLogDate = context.tr('home_today');
       } else {
-        final diff = today.difference(logDate).inDays;
+        final diff = today.daysSince(logDate);
         lastLogDate = context.relativeTime(Duration(days: diff));
       }
 

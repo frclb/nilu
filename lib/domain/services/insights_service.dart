@@ -1,3 +1,4 @@
+import '../models/calendar_day.dart';
 import '../models/cycle_info.dart';
 import '../models/daily_log.dart';
 import '../models/period_log.dart';
@@ -148,13 +149,11 @@ class InsightsService {
       // çıkıyordu; ilk trimesterin bulantısı "luteal faz belirtisi" diye
       // sayılıyordu. Gün ile döngü başı arasına kesinti giriyorsa o gün
       // hiçbir regl evresine ait değil.
-      if (breaks.any(
-        (k) => k.overlaps(start, day.add(const Duration(days: 1))),
-      )) {
+      if (breaks.any((k) => k.overlaps(start, day.plusDays(1)))) {
         continue;
       }
 
-      final cycleDay = day.difference(start).inDays + 1;
+      final cycleDay = day.daysSince(start) + 1;
       final phase = _phaseOf(cycleDay, periodLength: periodLength);
       counts[phase] = (counts[phase] ?? 0) + 1;
     }
@@ -205,7 +204,7 @@ class InsightsService {
     // Takip arası boşluktan sonraki bir güne eski bir başlangıcı
     // yakıştırmayalım: 90 günden uzak kayıt bir döngüye ait sayılmaz.
     if (found == null) return null;
-    if (day.difference(found).inDays > maxPlausibleCycleDays) return null;
+    if (day.daysSince(found) > maxPlausibleCycleDays) return null;
     return found;
   }
 

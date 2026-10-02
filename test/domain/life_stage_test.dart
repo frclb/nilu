@@ -44,7 +44,7 @@ void main() {
     test('lohusalık sınırları: 41. gün içeride, 42. gün dışarıda', () {
       // Bakanlık: lohusalık izlemi doğumu takip eden 42. güne kadar.
       // Doğum günü 0. gün sayılıyor; 42. gün döngüye dönülüyor.
-      DateTime gun(int n) => bugun.subtract(Duration(days: n));
+      DateTime gun(int n) => DateTime(bugun.year, bugun.month, bugun.day - n);
 
       expect(
         LifeStage.resolve([

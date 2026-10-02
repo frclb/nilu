@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:health/health.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../domain/models/calendar_day.dart';
 import '../../domain/models/period_log.dart';
 import '../../domain/services/health_import.dart';
 
@@ -162,11 +163,7 @@ class HealthDatasource {
       await _ensureConfigured();
       final end = log.endDate ?? log.startDate;
       var ok = true;
-      for (
-        var day = log.startDate;
-        !day.isAfter(end);
-        day = day.add(const Duration(days: 1))
-      ) {
+      for (var day = log.startDate; !day.isAfter(end); day = day.plusDays(1)) {
         final written = await _health.writeMenstruationFlow(
           flow: MenstrualFlow.medium,
           isStartOfCycle: day == log.startDate,

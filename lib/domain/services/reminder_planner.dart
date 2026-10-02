@@ -1,3 +1,4 @@
+import '../models/calendar_day.dart';
 import '../models/care_event.dart';
 import '../models/conception_intent.dart';
 import '../models/cycle_info.dart';
@@ -174,10 +175,7 @@ class ReminderPlanner {
     if (settings.periodReminders && !overdue) {
       final starts = _periodStarts(cycleInfo);
       for (var i = 0; i < starts.length; i++) {
-        final when = _at(
-          starts[i].subtract(const Duration(days: periodLeadDays)),
-          morningHour,
-        );
+        final when = _at(starts[i].plusDays(-periodLeadDays), morningHour);
         if (when.isAfter(now)) {
           reminders.add(
             ScheduledReminder(
@@ -260,7 +258,7 @@ class ReminderPlanner {
     // Folik asit: niyetin ertesi sabahı, bir kez. Bakanlık rehberi:
     // gebelikten en az 1 ay önce başlanmalı — uygulamanın bunu
     // söyleyebileceği tek an niyetin belirtildiği an.
-    final folik = _at(niyet.since.add(const Duration(days: 1)), morningHour);
+    final folik = _at(niyet.since.plusDays(1), morningHour);
     if (folik.isAfter(now)) {
       sonuc.add(
         ScheduledReminder(
@@ -319,10 +317,7 @@ class ReminderPlanner {
       final randevu = e.scheduledAt;
       if (randevu != null) {
         // Kullanıcının aldığı randevu: bir önceki akşam.
-        final when = _at(
-          randevu.subtract(const Duration(days: 1)),
-          eveningHour,
-        );
+        final when = _at(randevu.plusDays(-1), eveningHour);
         if (when.isAfter(now)) {
           adaylar.add((when: when, event: e, tomorrow: true));
         }
@@ -417,8 +412,8 @@ class ReminderPlanner {
   /// Bugünün saati geçtiyse yarına planlar.
   static DateTime _nextDailyLogTime(DateTime now) {
     final todayAt = _at(now, dailyLogHour);
-    return todayAt.isAfter(now)
-        ? todayAt
-        : todayAt.add(const Duration(days: 1));
+    // Yarın aynı saat takvim günüyle: 24 saat eklemek yaz saatine geçilen
+    // gece saati bir kaydırıyordu.
+    return todayAt.isAfter(now) ? todayAt : _at(now.plusDays(1), dailyLogHour);
   }
 }

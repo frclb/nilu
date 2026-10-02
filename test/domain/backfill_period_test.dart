@@ -19,7 +19,7 @@ import 'package:period_tracker/domain/services/prediction_service.dart';
 void main() {
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
-  DateTime daysAgo(int n) => today.subtract(Duration(days: n));
+  DateTime daysAgo(int n) => DateTime(today.year, today.month, today.day - n);
 
   const periodLength = 5;
   final service = PeriodService();

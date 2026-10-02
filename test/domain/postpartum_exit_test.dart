@@ -20,7 +20,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   final bugun = DateTime(2026, 10, 2);
-  DateTime once(int n) => bugun.subtract(Duration(days: n));
+  DateTime once(int n) => DateTime(bugun.year, bugun.month, bugun.day - n);
 
   Pregnancy dogum(int kacGunOnce) => Pregnancy.fromLmp(
     lmp: once(kacGunOnce + 275),

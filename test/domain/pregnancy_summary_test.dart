@@ -13,7 +13,7 @@ import 'package:period_tracker/domain/services/pregnancy_summary.dart';
 /// bir kanama dışarıda kalırsa en önemli bilgi kaybolur.
 void main() {
   final bugun = DateTime(2026, 10, 2);
-  DateTime once(int n) => bugun.subtract(Duration(days: n));
+  DateTime once(int n) => DateTime(bugun.year, bugun.month, bugun.day - n);
 
   // 24+2 haftalık gebelik.
   final gebelik = Pregnancy.fromLmp(
