@@ -9,6 +9,8 @@ import 'package:period_tracker/domain/view_models/user_view_model.dart';
 import 'package:period_tracker/localization/app_localizations.dart';
 import 'package:period_tracker/presentation/home/home_screen.dart';
 import 'package:period_tracker/presentation/insights/insights_screen.dart';
+import 'package:period_tracker/presentation/log_entry/log_entry_screen.dart';
+import 'package:period_tracker/presentation/log_entry/widgets/measurements_section.dart';
 import 'package:period_tracker/presentation/pregnancy/care_list_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/postpartum_home_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/pregnancy_home_screen.dart';
@@ -78,6 +80,24 @@ void main() {
     expect(find.byType(CareListScreen), findsOneWidget);
     expect(find.byType(InsightsScreen), findsNothing);
   });
+
+  for (final evre in ['gebelik', 'lohusalık']) {
+    testWidgets('$evre panosunda "+" kayıt ekranını açıyor', (tester) async {
+      // Düğme önce yalnızca döngü ana ekranındaydı: gebelik belirtileri,
+      // tansiyon ve kanama uyarısı yazılmış ama ulaşılamazdı.
+      await (evre == 'gebelik' ? seedPregnancy() : seedPostpartum());
+      await ac(tester);
+
+      await tester.tap(find.byKey(const Key('log_entry_fab')));
+      await settleAsync(tester);
+      expect(find.byType(LogEntryScreen), findsOneWidget);
+      expect(
+        find.byType(MeasurementsSection),
+        findsOneWidget,
+        reason: 'Gebelikte ve lohusalıkta ölçüm bölümü görünmeli',
+      );
+    });
+  }
 
   testWidgets('lohusalık: lohusa panosu', (tester) async {
     await seedPostpartum();

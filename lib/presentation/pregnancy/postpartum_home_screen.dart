@@ -15,6 +15,7 @@ import '../calendar/view_models/calendar_view_model.dart';
 import '../home/widgets/cycle_ring.dart';
 import '../home/widgets/cycle_ring_data.dart';
 import '../home/widgets/home_header.dart';
+import '../home/widgets/log_entry_fab.dart';
 import 'care_grouping.dart';
 import 'danger_signs_screen.dart';
 import 'pregnancy_home_screen.dart';
@@ -43,13 +44,17 @@ class PostpartumHomeScreen extends StatelessWidget {
         : LochiaTrend.evaluate(takvim.dailyLogs, birth: dogum, today: bugun);
 
     return Scaffold(
+      // Kayıt ekranına giriş: belirtiler, ölçümler, kanama (bkz. LogEntryFab).
+      floatingActionButtonLocation: const ContentEndFloatFab(),
+      floatingActionButton: const LogEntryFab(),
       body: AppContentWidth(
         child: CustomScrollView(
           slivers: [
             const SliverToBoxAdapter(child: HomeHeader()),
             if (g != null && dogum != null)
               SliverPadding(
-                padding: const EdgeInsets.only(bottom: 32),
+                // Listenin sonu düğmenin altında kalmasın.
+                padding: const EdgeInsets.only(bottom: 120),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     _GunKarti(dogum: dogum, bugun: bugun),

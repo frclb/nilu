@@ -8,8 +8,7 @@ import 'widgets/period_toggle_button.dart';
 import 'widgets/daily_suggestion_card.dart';
 import 'widgets/two_column_widgets.dart';
 import 'widgets/intimacy_section.dart';
-import '../../core/navigation/navigation_service.dart';
-import '../../core/navigation/route_names.dart';
+import 'widgets/log_entry_fab.dart';
 import '../../design_system/app_layout.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -30,17 +29,7 @@ class HomeScreen extends StatelessWidget {
       // Düğme ekranın sağ kenarına değil içerik sütununa hizalanıyor;
       // geniş ekranda aradaki boşlukta yapayalnız kalıyordu.
       floatingActionButtonLocation: const ContentEndFloatFab(),
-      floatingActionButton: showFab
-          ? FloatingActionButton(
-              heroTag: 'home_fab',
-              onPressed: () => NavigationService().push(RouteNames.logEntry),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              elevation: 4,
-              shape: const CircleBorder(),
-              child: const Icon(Icons.add, size: 32),
-            )
-          : null,
+      floatingActionButton: showFab ? const LogEntryFab() : null,
       body: AppContentWidth(
         child: RefreshIndicator(
           onRefresh: () => context.read<CalendarViewModel>().refreshData(),
