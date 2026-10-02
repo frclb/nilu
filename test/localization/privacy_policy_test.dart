@@ -133,4 +133,54 @@ void main() {
       }
     });
   });
+
+  group('saklanan veri türleri metinde anlatılıyor', () {
+    // Uygulama gebelik kaydı (sonuç dahil — düşük, sonlandırma), randevu
+    // notları ve tansiyon saklıyor. Politika yalnızca döngü verisini
+    // sayarsa kullanıcı en hassas verisinin nerede durduğunu bilemez.
+    const gebelik = {
+      'tr': 'gebelik',
+      'en': 'pregnancy',
+      'de': 'schwangerschaft',
+      'es': 'embarazo',
+      'fr': 'grossesse',
+      'pt': 'gravidez',
+    };
+    const tansiyon = {
+      'tr': 'tansiyon',
+      'en': 'blood pressure',
+      'de': 'blutdruck',
+      'es': 'tensión',
+      'fr': 'tension',
+      'pt': 'pressão',
+    };
+
+    String metin(String lang, String onek) => dictionary(lang).entries
+        .where((e) => e.key.startsWith(onek))
+        .map((e) => e.value.toString().toLowerCase())
+        .join(' ');
+
+    test('uygulama gebelik verisini şifreli depoda tutuyor', () {
+      // Aşağıdaki iddiaların dayanağı: veri gerçekten saklanıyor.
+      final depo = File('lib/data/local/secure_store.dart').readAsStringSync();
+      expect(depo, contains("'pregnancies'"));
+      expect(depo, contains("'care_events'"));
+    });
+
+    for (final lang in languages) {
+      test('$lang: politika gebelik verisini ve tansiyonu anlatıyor', () {
+        final p = metin(lang, 'privacy_policy_section1');
+        expect(p, contains(gebelik[lang]));
+        expect(p, contains(tansiyon[lang]));
+        // Partnere ve üçüncü taraflara gitmediği de yazılı.
+        expect(metin(lang, 'privacy_policy_section3'), contains(gebelik[lang]));
+        expect(metin(lang, 'privacy_policy_section5'), contains(gebelik[lang]));
+      });
+
+      test('$lang: şartlar gebelik takibinin hekim izleminin yerine '
+          'geçmediğini söylüyor', () {
+        expect(metin(lang, 'terms_section2'), contains(gebelik[lang]));
+      });
+    }
+  });
 }
