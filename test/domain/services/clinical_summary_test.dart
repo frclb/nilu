@@ -13,7 +13,11 @@ PeriodLog period(int id, DateTime start, {int? days}) => PeriodLog(
 void main() {
   group('ClinicalSummary', () {
     test('veri yoksa hiçbir sayı uydurulmaz', () {
-      final s = ClinicalSummary.build(periodLogs: [], dailyLogs: []);
+      final s = ClinicalSummary.build(
+        periodLogs: [],
+        dailyLogs: [],
+        breaks: const [],
+      );
       expect(s.hasData, isFalse);
       expect(s.observedCycles, 0);
       expect(s.averageCycleDays, isNull);
@@ -30,7 +34,11 @@ void main() {
         period(3, DateTime(2026, 2, 24), days: 4), // 26
         period(4, DateTime(2026, 3, 26), days: 6), // 30
       ];
-      final s = ClinicalSummary.build(periodLogs: logs, dailyLogs: []);
+      final s = ClinicalSummary.build(
+        periodLogs: logs,
+        dailyLogs: [],
+        breaks: const [],
+      );
       expect(s.observedCycles, 3);
       expect(s.shortestCycleDays, 26);
       expect(s.longestCycleDays, 30);
@@ -45,7 +53,11 @@ void main() {
         period(2, DateTime(2026, 1, 29), days: 6),
         period(3, DateTime(2026, 2, 26)), // devam ediyor
       ];
-      final s = ClinicalSummary.build(periodLogs: logs, dailyLogs: []);
+      final s = ClinicalSummary.build(
+        periodLogs: logs,
+        dailyLogs: [],
+        breaks: const [],
+      );
       expect(s.averagePeriodDays, 5);
       expect(s.longestPeriodDays, 6);
     });
@@ -65,7 +77,11 @@ void main() {
         ),
         DailyLog(date: DateTime(2026, 1, 4), moods: ['calm']),
       ];
-      final s = ClinicalSummary.build(periodLogs: [], dailyLogs: logs);
+      final s = ClinicalSummary.build(
+        periodLogs: [],
+        dailyLogs: logs,
+        breaks: const [],
+      );
       expect(s.painDays, 3);
       expect(s.severePainDays, 2);
       expect(s.painLimitedDays, 2);
@@ -77,7 +93,11 @@ void main() {
         DailyLog(date: DateTime(2026, 1, 2), flowIntensity: 'heavy'),
         DailyLog(date: DateTime(2026, 1, 3), flowIntensity: 'light'),
       ];
-      final s = ClinicalSummary.build(periodLogs: [], dailyLogs: logs);
+      final s = ClinicalSummary.build(
+        periodLogs: [],
+        dailyLogs: logs,
+        breaks: const [],
+      );
       expect(s.heavyFlowDays, 2);
     });
 
@@ -89,7 +109,11 @@ void main() {
             symptoms: const ['cramp', 'headache', 'bloating', 'acne'],
           ),
       ];
-      final s = ClinicalSummary.build(periodLogs: [], dailyLogs: logs);
+      final s = ClinicalSummary.build(
+        periodLogs: [],
+        dailyLogs: logs,
+        breaks: const [],
+      );
       expect(s.topSymptoms.length, 3);
     });
 
@@ -100,7 +124,11 @@ void main() {
         // İçeriği olmayan gün aralığı genişletmemeli.
         DailyLog(date: DateTime(2026, 6, 1)),
       ];
-      final s = ClinicalSummary.build(periodLogs: [], dailyLogs: logs);
+      final s = ClinicalSummary.build(
+        periodLogs: [],
+        dailyLogs: logs,
+        breaks: const [],
+      );
       expect(s.firstLoggedDay, DateTime(2026, 1, 5));
       expect(s.lastLoggedDay, DateTime(2026, 3, 10));
     });
@@ -112,7 +140,11 @@ void main() {
         period(3, DateTime(2026, 2, 10), days: 5), // 20
         period(4, DateTime(2026, 3, 1), days: 5), // 19
       ];
-      final s = ClinicalSummary.build(periodLogs: logs, dailyLogs: []);
+      final s = ClinicalSummary.build(
+        periodLogs: logs,
+        dailyLogs: [],
+        breaks: const [],
+      );
       expect(s.alerts, contains(CycleAlert.consistentlyShort));
     });
   });

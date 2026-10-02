@@ -1,4 +1,5 @@
 import '../models/cycle_info.dart';
+import 'cycle_intervals.dart';
 import '../models/period_log.dart';
 import 'cycle_service.dart';
 
@@ -36,12 +37,14 @@ class PredictionService {
     DateTime? settingsUpdatedAt,
     bool hormonalContraception = false,
     DateTime? today,
+    List<DateSpan> breaks = const [],
   }) {
     final avgLength = _cycleService.calculateAverageCycleLength(
       logs,
       defaultLength: userCycleLength,
+      breaks: breaks,
     );
-    final lastStart = _cycleService.getLastPeriodStart(logs);
+    final lastStart = _cycleService.getLastPeriodStart(logs, breaks: breaks);
     final avgPeriodLength = _calculateAveragePeriodLength(
       logs,
       defaultLength: userPeriodLength,
@@ -86,6 +89,26 @@ class PredictionService {
     // başlık ile düğme farklı şey söylüyordu.
     final currentPeriodLength = _loggedLengthOf(logs, lastStart, today: today);
     final currentPeriodEnd = _endOf(logs, lastStart);
+
+    // Gebelik ya da lohusalık sonrası ilk döngüler düzensiz (emzirmede daha
+    // da). Kesintiden sonra en az bir döngü tamamlanmadan tarih vermek
+    // kendinden emin bir yanlış olur — ve bilinmeyen bir doğurganlık
+    // penceresi "güvenli gün" gibi görünür. Bugünkü regl yine görünüyor;
+    // yalnızca ileriye dönük tahmin yok.
+    final kesintiSonrasiDonguVar =
+        breaks.isEmpty ||
+        CycleIntervals.usableStarts(logs, breaks: breaks).length >= 2;
+    if (!kesintiSonrasiDonguVar) {
+      return CycleInfo(
+        averageCycleLength: effectiveCycleLength,
+        averagePeriodLength: effectivePeriodLength,
+        lastPeriodStart: lastStart,
+        currentPeriodLength: currentPeriodLength,
+        plannedPeriodLength: userPeriodLength,
+        currentPeriodEnd: currentPeriodEnd,
+        fertilityTracked: !hormonalContraception,
+      );
+    }
 
     final nextPeriod = lastStart.add(Duration(days: effectiveCycleLength));
 

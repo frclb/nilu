@@ -28,11 +28,11 @@ void main() {
     test('tek regl kaydından döngü uzunluğu çıkarılamaz', () {
       // Döngünün bitmesi için bir sonrakinin başlaması gerekir.
       final logs = [_period('1', DateTime(2026, 1, 1))];
-      expect(InsightsService.cycleLengths(logs), isEmpty);
+      expect(InsightsService.cycleLengths(logs, breaks: const []), isEmpty);
     });
 
     test('kayıt yokken boş döner', () {
-      expect(InsightsService.cycleLengths(const []), isEmpty);
+      expect(InsightsService.cycleLengths(const [], breaks: const []), isEmpty);
     });
 
     test('ardışık başlangıçlar arasındaki gün sayısını verir', () {
@@ -42,7 +42,7 @@ void main() {
         _period('3', DateTime(2026, 2, 27)), // 29 gün
       ];
 
-      final points = InsightsService.cycleLengths(logs);
+      final points = InsightsService.cycleLengths(logs, breaks: const []);
 
       expect(points.map((p) => p.lengthInDays).toList(), [28, 29]);
       expect(points.first.startDate, DateTime(2026, 1, 1));
@@ -56,7 +56,10 @@ void main() {
       ];
 
       expect(
-        InsightsService.cycleLengths(logs).map((p) => p.lengthInDays).toList(),
+        InsightsService.cycleLengths(
+          logs,
+          breaks: const [],
+        ).map((p) => p.lengthInDays).toList(),
         [28, 29],
       );
     });
@@ -73,7 +76,10 @@ void main() {
       ];
 
       expect(
-        InsightsService.cycleLengths(logs).map((p) => p.lengthInDays).toList(),
+        InsightsService.cycleLengths(
+          logs,
+          breaks: const [],
+        ).map((p) => p.lengthInDays).toList(),
         [28, 28],
       );
     });
@@ -86,7 +92,10 @@ void main() {
       ];
 
       expect(
-        InsightsService.cycleLengths(logs).map((p) => p.lengthInDays).toList(),
+        InsightsService.cycleLengths(
+          logs,
+          breaks: const [],
+        ).map((p) => p.lengthInDays).toList(),
         [28],
       );
     });
@@ -97,7 +106,11 @@ void main() {
           _period('$i', DateTime(2026, 1, 1).add(Duration(days: i * 28))),
       ];
 
-      final points = InsightsService.cycleLengths(logs, limit: 3);
+      final points = InsightsService.cycleLengths(
+        logs,
+        limit: 3,
+        breaks: const [],
+      );
 
       expect(points.length, 3);
       expect(
@@ -283,6 +296,7 @@ void _regularityAndPhaseTests() {
           ],
           periodLogs: const [],
           periodLength: 5,
+          breaks: const [],
         ),
         isEmpty,
       );
@@ -313,6 +327,7 @@ void _regularityAndPhaseTests() {
         dailyLogs: logs,
         periodLogs: periods,
         periodLength: 5,
+        breaks: const [],
       );
 
       expect(counts[CyclePhase.menstruation], 1);
@@ -330,6 +345,7 @@ void _regularityAndPhaseTests() {
         ],
         periodLogs: periods,
         periodLength: 5,
+        breaks: const [],
       );
 
       expect(counts, isEmpty);
@@ -344,6 +360,7 @@ void _regularityAndPhaseTests() {
         ],
         periodLogs: periods,
         periodLength: 5,
+        breaks: const [],
       );
 
       expect(counts, isEmpty);
@@ -357,6 +374,7 @@ void _regularityAndPhaseTests() {
         ],
         periodLogs: periods,
         periodLength: 5,
+        breaks: const [],
       );
 
       expect(counts, isEmpty);
@@ -377,6 +395,7 @@ void _regularityAndPhaseTests() {
           dailyLogs: [cramp(1), cramp(2)],
           periodLogs: periods,
           periodLength: 5,
+          breaks: const [],
         ),
         isNull,
       );
@@ -390,6 +409,7 @@ void _regularityAndPhaseTests() {
           dailyLogs: [cramp(1), cramp(2), cramp(20), cramp(21)],
           periodLogs: periods,
           periodLength: 5,
+          breaks: const [],
         ),
         isNull,
       );
@@ -401,6 +421,7 @@ void _regularityAndPhaseTests() {
         dailyLogs: [cramp(1), cramp(2), cramp(3), cramp(20)],
         periodLogs: periods,
         periodLength: 5,
+        breaks: const [],
       );
 
       expect(result, isNotNull);
@@ -416,6 +437,7 @@ void _regularityAndPhaseTests() {
           dailyLogs: const [],
           periodLogs: periods,
           periodLength: 5,
+          breaks: const [],
         ),
         isNull,
       );

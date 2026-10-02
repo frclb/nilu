@@ -53,6 +53,7 @@ void main() {
       periodLogs: periods,
       dailyLogs: const [],
       now: now,
+      breaks: const [],
     );
   }
 

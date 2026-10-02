@@ -66,9 +66,14 @@ void main() {
   group('klinik özet', () {
     ClinicalSummary summarize(List<DailyLog> logs) => ClinicalSummary.build(
       periodLogs: [
-        PeriodLog(id: 'p', startDate: DateTime(2026, 3, 1), endDate: DateTime(2026, 3, 5)),
+        PeriodLog(
+          id: 'p',
+          startDate: DateTime(2026, 3, 1),
+          endDate: DateTime(2026, 3, 5),
+        ),
       ],
       dailyLogs: logs,
+      breaks: const [],
     );
 
     test('gün sayıları bölgeye göre toplanıyor', () {
@@ -85,7 +90,9 @@ void main() {
     });
 
     test('hiç kaydedilmemiş kod listede yok', () {
-      final summary = summarize([log(1, locations: const ['abdomen'])]);
+      final summary = summarize([
+        log(1, locations: const ['abdomen']),
+      ]);
 
       expect(summary.painLocationDays.map((f) => f.code), ['abdomen']);
     });

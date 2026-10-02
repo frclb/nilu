@@ -44,6 +44,7 @@ class SymptomAnalysisCard extends StatelessWidget {
             dailyLogs: viewModel.dailyLogs,
             periodLogs: viewModel.periodLogs,
             periodLength: viewModel.cycleInfo.averagePeriodLength,
+            breaks: viewModel.cycleBreaks,
           );
 
     final textColor = context.tokens.text;

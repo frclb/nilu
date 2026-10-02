@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../domain/models/period_log.dart';
 import '../../../domain/models/daily_log.dart';
 import '../../../domain/models/cycle_info.dart';
+import '../../../domain/models/life_stage.dart';
+import '../../../domain/services/cycle_intervals.dart';
 import '../../../domain/services/period_service.dart';
 import '../../../domain/services/prediction_service.dart';
 import '../../../data/repositories/period_repository.dart';
@@ -31,25 +33,35 @@ class CalendarViewModel extends ChangeNotifier {
   int _userPeriodLength = 5;
   DateTime? _settingsUpdatedAt;
   bool _hormonalContraception = false;
-  bool _pregnant = false;
+  LifeStage _lifeStage = LifeStage.cycle;
+  List<DateSpan> _cycleBreaks = const [];
 
   /// Hormonal doğum kontrolü açıkken doğurganlık tahmini gösterilmez.
   bool get hormonalContraception => _hormonalContraception;
 
-  /// Süren bir gebelik var mı?
-  bool get pregnant => _pregnant;
+  /// Kullanıcının bulunduğu yaşam evresi.
+  LifeStage get lifeStage => _lifeStage;
 
-  /// Gebelikte regl kaydı tutulmaz.
+  /// Süren bir gebelik var mı?
+  bool get pregnant => _lifeStage == LifeStage.pregnancy;
+
+  /// Döngü istatistiğinden dışlanan gebelik/lohusalık aralıkları.
   ///
-  /// Gebelikte kanama regl **değildir**: hekime götürülmesi gereken bir
-  /// bulgudur (T.C. Sağlık Bakanlığı Doğum Öncesi Bakım Yönetim Rehberi,
-  /// tehlike işaretleri). Regl kaydı açılırsa `lastPeriodStart` kayar ve
-  /// gebelik haftasından bütün tahminlere kadar her şey yanlışlanır — üstelik
-  /// kullanıcı bunu fark etmez, çünkü ekranda makul bir sayı durur.
+  /// Döngü uzunluğu hesaplayan her ekran bunu buradan alıyor:
+  /// `InsightsService.cycleLengths` bu parametreyi **zorunlu** tutuyor, yani
+  /// yeni bir ekran onu unutamıyor.
+  List<DateSpan> get cycleBreaks => _cycleBreaks;
+
+  /// Bu evrede regl kaydı tutulur mu?
+  ///
+  /// Karar tek yerde: `LifeStage.bleedingMeaning`. Gebelikte kanama tehlike
+  /// işareti, lohusalıkta lohia — ikisi de regl değil. Regl kaydı açılırsa
+  /// `lastPeriodStart` kayar ve her şey yanlışlanır; kullanıcı fark etmez,
+  /// çünkü ekranda makul bir sayı durur.
   ///
   /// Reddetme sessiz değil: çağıran `false` alıyor ve arayüz sebebini
   /// söyleyebiliyor.
-  bool get _canRecordPeriods => !_pregnant;
+  bool get _canRecordPeriods => _lifeStage.recordsPeriods;
 
   List<PeriodLog> get periodLogs => _periodLogs;
   List<DailyLog> get dailyLogs => _dailyLogs;
@@ -75,7 +87,9 @@ class CalendarViewModel extends ChangeNotifier {
       _userPeriodLength = await _settingsRepo.getPeriodLength();
       _settingsUpdatedAt = await _settingsRepo.getSettingsUpdatedAt();
       _hormonalContraception = await _settingsRepo.getHormonalContraception();
-      _pregnant = (await _pregnancyRepo.getActive()) != null;
+      final gebelikler = await _pregnancyRepo.getAll();
+      _lifeStage = LifeStage.resolve(gebelikler, today: DateTime.now());
+      _cycleBreaks = CycleBreaks.fromPregnancies(gebelikler);
 
       _recalculate();
     } catch (e) {
@@ -346,6 +360,10 @@ class CalendarViewModel extends ChangeNotifier {
       userPeriodLength: _userPeriodLength,
       settingsUpdatedAt: _settingsUpdatedAt,
       hormonalContraception: _hormonalContraception,
+      // Tek üretim çağıranı burası; varsayılan `const []` olduğu için
+      // unutulursa lohusa anneye eski SAT'tan tahmin yapılır. Bunu
+      // `calendar_breaks_wiring_test` koruyor.
+      breaks: _cycleBreaks,
     );
     _publishWidget();
   }

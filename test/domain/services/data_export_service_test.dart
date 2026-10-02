@@ -116,6 +116,7 @@ void main() {
         dailyLogs: const [],
         generatedAt: DateTime(2026, 8, 18),
         translate: _tr,
+        breaks: const [],
       );
 
       expect(summary, contains('export_title'));
@@ -133,6 +134,7 @@ void main() {
         dailyLogs: const [],
         generatedAt: DateTime(2026, 3, 1),
         translate: _tr,
+        breaks: const [],
       );
 
       expect(summary, contains('export_average(days=28)'));
@@ -148,6 +150,7 @@ void main() {
         ],
         generatedAt: DateTime(2026, 3, 6),
         translate: _tr,
+        breaks: const [],
       );
 
       // Yalnızca gün günlüğü bölümüne bakılıyor: muayene özeti en üstte
@@ -168,6 +171,7 @@ void main() {
         dailyLogs: [DailyLog(date: DateTime(2026, 3, 1))],
         generatedAt: DateTime(2026, 3, 2),
         translate: _tr,
+        breaks: const [],
       );
 
       expect(summary, contains('export_no_logs'));
@@ -182,6 +186,7 @@ void main() {
         ],
         generatedAt: DateTime(2026, 3, 2),
         translate: _tr,
+        breaks: const [],
       );
 
       expect(summary, contains('ağrı kesici aldım'));
@@ -213,6 +218,7 @@ void main() {
         dailyLogs: const [],
         generatedAt: DateTime(2026, 3, 1),
         translate: _tr,
+        breaks: const [],
       );
       expect(out, isNot(contains('export_section_clinical')));
     });
@@ -226,6 +232,7 @@ void main() {
         ],
         generatedAt: DateTime(2026, 3, 1),
         translate: _tr,
+        breaks: const [],
       );
       expect(
         out.indexOf('export_section_clinical'),
@@ -239,6 +246,7 @@ void main() {
         dailyLogs: const [],
         generatedAt: DateTime(2026, 3, 1),
         translate: _tr,
+        breaks: const [],
       );
       expect(out, contains('export_clinical_cycles(n=2)'));
       expect(out, contains('export_clinical_range_days(min=26,max=28)'));
@@ -257,6 +265,7 @@ void main() {
         ],
         generatedAt: DateTime(2026, 3, 1),
         translate: _tr,
+        breaks: const [],
       );
       expect(out, contains('export_clinical_pain(total=2,severe=1)'));
       expect(out, contains('export_clinical_limited(n=1)'));
@@ -270,6 +279,7 @@ void main() {
         dailyLogs: const [],
         generatedAt: DateTime(2026, 3, 1),
         translate: _tr,
+        breaks: const [],
       );
       expect(out, isNot(contains('export_clinical_pain')));
       expect(out, isNot(contains('export_clinical_limited')));
@@ -287,6 +297,7 @@ void main() {
         dailyLogs: const [],
         generatedAt: DateTime(2026, 3, 15),
         translate: _tr,
+        breaks: const [],
       );
       expect(out, contains('alert_short_title'));
     });

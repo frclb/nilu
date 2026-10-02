@@ -1,20 +1,9 @@
 import '../models/cycle_info.dart';
 import '../models/daily_log.dart';
 import '../models/period_log.dart';
+import 'cycle_intervals.dart';
 
-/// Gözlenmiş bir döngünün uzunluğu.
-///
-/// "Gözlenmiş" kelimesi önemli: tahmin değil, kullanıcının işaretlediği iki
-/// ardışık regl başlangıcı arasındaki gerçek gün sayısı.
-class CycleLengthPoint {
-  /// Döngünün başladığı gün (regl ilk günü).
-  final DateTime startDate;
-
-  /// Bir sonraki regl başlangıcına kadar geçen gün sayısı.
-  final int lengthInDays;
-
-  const CycleLengthPoint({required this.startDate, required this.lengthInDays});
-}
+export 'cycle_intervals.dart' show CycleLengthPoint, DateSpan, CycleBreaks;
 
 /// Bir semptomun ne sıklıkta kaydedildiği.
 class SymptomFrequency {
@@ -70,11 +59,11 @@ class InsightsService {
   ///
   /// Bunun ötesi döngü değil, takibe ara verilmiş demektir; grafiğe konursa
   /// ölçeği bozar ve kullanıcıya 200 günlük bir döngü geçirmiş gibi görünür.
-  static const int maxPlausibleCycleDays = 90;
+  static const int maxPlausibleCycleDays = CycleIntervals.maxPlausibleDays;
 
   /// En kısa aralık. Altındaki kayıtlar aynı reglin iki parçası olarak
   /// işaretlenmiş demektir.
-  static const int minPlausibleCycleDays = 15;
+  static const int minPlausibleCycleDays = CycleIntervals.minPlausibleDays;
 
   /// Tamamlanmış döngülerin uzunlukları, eskiden yeniye sıralı.
   ///
@@ -82,21 +71,10 @@ class InsightsService {
   /// gerekir. Yani N regl kaydı en fazla N-1 nokta üretir.
   static List<CycleLengthPoint> cycleLengths(
     List<PeriodLog> logs, {
+    required List<DateSpan> breaks,
     int limit = 6,
   }) {
-    if (logs.length < 2) return const [];
-
-    final starts = logs.map((l) => _dateOnly(l.startDate)).toList()..sort();
-
-    final points = <CycleLengthPoint>[];
-    for (var i = 0; i < starts.length - 1; i++) {
-      final length = starts[i + 1].difference(starts[i]).inDays;
-      if (length < minPlausibleCycleDays || length > maxPlausibleCycleDays) {
-        continue;
-      }
-      points.add(CycleLengthPoint(startDate: starts[i], lengthInDays: length));
-    }
-
+    final points = CycleIntervals.of(logs, breaks: breaks);
     if (points.length <= limit) return points;
     return points.sublist(points.length - limit);
   }
@@ -151,6 +129,7 @@ class InsightsService {
     required List<DailyLog> dailyLogs,
     required List<PeriodLog> periodLogs,
     required int periodLength,
+    required List<DateSpan> breaks,
   }) {
     final starts = periodLogs.map((l) => _dateOnly(l.startDate)).toList()
       ..sort();
@@ -164,6 +143,16 @@ class InsightsService {
       final day = _dateOnly(log.date);
       final start = _lastStartOnOrBefore(starts, day);
       if (start == null) continue;
+
+      // Gebeliğin ilk 90 günü SAT'tan sayılınca makul bir "döngü günü"
+      // çıkıyordu; ilk trimesterin bulantısı "luteal faz belirtisi" diye
+      // sayılıyordu. Gün ile döngü başı arasına kesinti giriyorsa o gün
+      // hiçbir regl evresine ait değil.
+      if (breaks.any(
+        (k) => k.overlaps(start, day.add(const Duration(days: 1))),
+      )) {
+        continue;
+      }
 
       final cycleDay = day.difference(start).inDays + 1;
       final phase = _phaseOf(cycleDay, periodLength: periodLength);
@@ -183,6 +172,7 @@ class InsightsService {
     required List<DailyLog> dailyLogs,
     required List<PeriodLog> periodLogs,
     required int periodLength,
+    required List<DateSpan> breaks,
     int minObservations = 3,
   }) {
     final counts = symptomsByPhase(
@@ -190,6 +180,7 @@ class InsightsService {
       dailyLogs: dailyLogs,
       periodLogs: periodLogs,
       periodLength: periodLength,
+      breaks: breaks,
     );
     if (counts.isEmpty) return null;
 

@@ -34,6 +34,7 @@ void main() {
         dailyLogs: logs,
         generatedAt: generatedAt,
         translate: translate,
+        breaks: const [],
       );
 
   String csvOf(List<DailyLog> logs, {List<PeriodLog> periods = const []}) =>
@@ -152,6 +153,7 @@ void main() {
       final clinical = ClinicalSummary.build(
         periodLogs: const [],
         dailyLogs: logs,
+        breaks: const [],
       );
 
       expect(clinical.firstLoggedDay, isNotNull, reason: 'kurulum');
@@ -173,26 +175,29 @@ void main() {
       // tanımlayıcı ve hiçbir dilde meşru belge içeriği değiller.
       // (Sözlüğün anahtarlarını tek tek aramak işe yaramıyor: "ok" gibi
       // kısa bir anahtar "çok", "okunabilir" içinde geçiyor.)
-      final text = summaryOf([
-        DailyLog(
-          date: DateTime(2026, 3, 3),
-          flowIntensity: 'heavy',
-          symptoms: const ['cramp'],
-          moods: const ['irritable'],
-          sexualActivity: 'protected',
-          painLevel: 'severe',
-          painLimitedActivity: true,
-          painLocations: const ['abdomen'],
-          painContexts: const ['bowel'],
-          notes: 'bir not',
-        ),
-      ], periods: [
-        PeriodLog(
-          id: 'p',
-          startDate: DateTime(2026, 3, 3),
-          endDate: DateTime(2026, 3, 7),
-        ),
-      ]);
+      final text = summaryOf(
+        [
+          DailyLog(
+            date: DateTime(2026, 3, 3),
+            flowIntensity: 'heavy',
+            symptoms: const ['cramp'],
+            moods: const ['irritable'],
+            sexualActivity: 'protected',
+            painLevel: 'severe',
+            painLimitedActivity: true,
+            painLocations: const ['abdomen'],
+            painContexts: const ['bowel'],
+            notes: 'bir not',
+          ),
+        ],
+        periods: [
+          PeriodLog(
+            id: 'p',
+            startDate: DateTime(2026, 3, 3),
+            endDate: DateTime(2026, 3, 7),
+          ),
+        ],
+      );
 
       final identifiers = RegExp(
         r'\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b',
@@ -246,7 +251,9 @@ void main() {
 
     test('regl günleri işaretleniyor', () {
       final csv = csvOf(
-        [DailyLog(date: DateTime(2026, 3, 2), symptoms: const ['cramp'])],
+        [
+          DailyLog(date: DateTime(2026, 3, 2), symptoms: const ['cramp']),
+        ],
         periods: [
           PeriodLog(
             id: 'p',

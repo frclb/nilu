@@ -574,6 +574,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               dailyLogs: data.dailyLogs,
               generatedAt: now,
               translate: translate,
+              breaks: data.breaks,
             );
       final csv = !withReports
           ? ''

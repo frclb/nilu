@@ -136,7 +136,10 @@ class Pregnancy {
   bool get isActive => endedAt == null;
 
   /// Gebeliğin 0+0 kabul edilen günü (EDD − 280).
-  DateTime get _origin =>
+  ///
+  /// SAT değil: hekim tarihi düzelttiyse bu gün de onunla kayıyor. Döngü
+  /// istatistiğinden dışlanacak aralık da buradan başlıyor.
+  DateTime get gestationStart =>
       estimatedDueDate.subtract(const Duration(days: termDays));
 
   /// Verilen gündeki gebelik haftası.
@@ -147,7 +150,7 @@ class Pregnancy {
   GestationalAge? gestationOn(DateTime date) {
     if (!isActive) return null;
 
-    final fark = _day(date).difference(_origin).inDays;
+    final fark = _day(date).difference(gestationStart).inDays;
     if (fark < 0) return null;
 
     return GestationalAge(fark ~/ 7, fark % 7);

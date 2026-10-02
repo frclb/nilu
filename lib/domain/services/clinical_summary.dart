@@ -96,12 +96,18 @@ class ClinicalSummary {
   static ClinicalSummary build({
     required List<PeriodLog> periodLogs,
     required List<DailyLog> dailyLogs,
+    required List<DateSpan> breaks,
     int cycleLimit = 12,
   }) {
-    final cycles = InsightsService.cycleLengths(periodLogs, limit: cycleLimit);
+    final cycles = InsightsService.cycleLengths(
+      periodLogs,
+      breaks: breaks,
+      limit: cycleLimit,
+    );
     final bleedingEpisodes = CycleAlertService.intermenstrualEpisodes(
       dailyLogs: dailyLogs,
       periodLogs: periodLogs,
+      breaks: breaks,
     );
     final lengths = cycles.map((c) => c.lengthInDays).toList()..sort();
 
@@ -122,6 +128,7 @@ class ClinicalSummary {
       variationDays: InsightsService.variation(cycles),
       alerts: CycleAlertService.evaluate(
         cycles,
+        breaks: breaks,
         dailyLogs: dailyLogs,
         periodLogs: periodLogs,
       ),

@@ -25,13 +25,19 @@ class DataExportService {
     required DateTime generatedAt,
     required String Function(String key, {Map<String, String>? params})
     translate,
+    required List<DateSpan> breaks,
   }) {
-    final cycles = InsightsService.cycleLengths(periodLogs, limit: 12);
+    final cycles = InsightsService.cycleLengths(
+      periodLogs,
+      breaks: breaks,
+      limit: 12,
+    );
     final average = InsightsService.averageLength(cycles);
     final variation = InsightsService.variation(cycles);
     final clinical = ClinicalSummary.build(
       periodLogs: periodLogs,
       dailyLogs: dailyLogs,
+      breaks: breaks,
     );
 
     final buffer = StringBuffer()

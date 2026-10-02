@@ -30,6 +30,7 @@ void main() {
       periodLogs: periods,
       dailyLogs: daily,
       now: now,
+      breaks: const [],
     );
   }
 

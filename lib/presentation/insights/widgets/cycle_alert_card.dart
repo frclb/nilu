@@ -24,11 +24,15 @@ class CycleAlertCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final logs = context.select<CalendarViewModel, List>((v) => v.periodLogs);
     final daily = context.select<CalendarViewModel, List>((v) => v.dailyLogs);
+    final breaks = context.select<CalendarViewModel, List<DateSpan>>(
+      (v) => v.cycleBreaks,
+    );
     final periods = List<PeriodLog>.from(logs);
-    final points = InsightsService.cycleLengths(periods);
+    final points = InsightsService.cycleLengths(periods, breaks: breaks);
     final dailyLogs = List<DailyLog>.from(daily);
     final alerts = CycleAlertService.evaluate(
       points,
+      breaks: breaks,
       dailyLogs: dailyLogs,
       periodLogs: periods,
     );
@@ -39,6 +43,7 @@ class CycleAlertCard extends StatelessWidget {
     final episodes = CycleAlertService.intermenstrualEpisodes(
       dailyLogs: dailyLogs,
       periodLogs: periods,
+      breaks: breaks,
     ).length;
 
     if (alerts.isEmpty) return const SizedBox.shrink();

@@ -5,8 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/models/daily_log.dart';
 import '../../domain/models/period_log.dart';
 import '../../domain/services/backup_import_service.dart';
+import '../../domain/services/cycle_intervals.dart';
 import '../local/secure_store.dart';
 import 'period_repository.dart';
+import 'pregnancy_repository.dart';
 
 /// Gizlilik ekranının tercihleri ve veri yönetimi işlemleri.
 class PrivacySettingsRepository {
@@ -15,12 +17,15 @@ class PrivacySettingsRepository {
 
   final SecureStore _store;
   final PeriodRepository _periodRepository;
+  final PregnancyRepository _pregnancyRepository;
 
   const PrivacySettingsRepository({
     SecureStore store = const SecureStore(),
     PeriodRepository periodRepository = const PeriodRepository(),
+    PregnancyRepository pregnancyRepository = const PregnancyRepository(),
   }) : _store = store,
-       _periodRepository = periodRepository;
+       _periodRepository = periodRepository,
+       _pregnancyRepository = pregnancyRepository;
 
   // ─── Tercihler ───
   // Bunlar hassas veri değil, yalnızca aç/kapa tercihi.
@@ -50,11 +55,22 @@ class PrivacySettingsRepository {
   /// Dışa aktarılacak ham veri.
   ///
   /// Biçimlendirme `DataExportService`'in işi; burada yalnızca okuma var.
-  Future<({List<PeriodLog> periodLogs, List<DailyLog> dailyLogs})>
+  ///
+  /// Gebelik kesintileri de dönüyor: hekime giden özetteki döngü uzunlukları
+  /// ve ara kanama sayısı ekrandakiyle aynı kuralla hesaplanmalı. Aksi hâlde
+  /// özet lohiayı ara kanama diye listeler.
+  Future<
+    ({
+      List<PeriodLog> periodLogs,
+      List<DailyLog> dailyLogs,
+      List<DateSpan> breaks,
+    })
+  >
   loadExportData() async {
     return (
       periodLogs: await _periodRepository.getPeriodLogs(),
       dailyLogs: await _periodRepository.getDailyLogs(),
+      breaks: CycleBreaks.fromPregnancies(await _pregnancyRepository.getAll()),
     );
   }
 

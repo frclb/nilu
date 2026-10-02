@@ -32,12 +32,14 @@ void main() {
       CycleAlertService.intermenstrualEpisodes(
         dailyLogs: logs,
         periodLogs: periods,
+        breaks: const [],
       );
 
   bool alerted(List<DailyLog> logs) => CycleAlertService.evaluate(
     const [],
     dailyLogs: logs,
     periodLogs: periods,
+    breaks: const [],
   ).contains(CycleAlert.recurrentIntermenstrualBleeding);
 
   group('atak sayımı', () {
@@ -88,7 +90,9 @@ void main() {
 
     test('akışsız kayıt sayılmaz', () {
       expect(
-        episodes([DailyLog(date: day(12), symptoms: const ['cramps'])]),
+        episodes([
+          DailyLog(date: day(12), symptoms: const ['cramps']),
+        ]),
         isEmpty,
       );
     });
@@ -116,6 +120,7 @@ void main() {
           const [],
           dailyLogs: [bleed(12), bleed(20)],
           periodLogs: const [],
+          breaks: const [],
         ),
         isEmpty,
       );
@@ -137,6 +142,7 @@ void main() {
         CycleAlertService.intermenstrualEpisodes(
           dailyLogs: [bleed(42), bleed(43)],
           periodLogs: ongoing,
+          breaks: const [],
         ),
         isEmpty,
       );

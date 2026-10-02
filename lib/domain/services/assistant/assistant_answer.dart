@@ -41,19 +41,21 @@ class AssistantAnswerBuilder {
     required List<PeriodLog> periodLogs,
     required List<DailyLog> dailyLogs,
     required DateTime now,
+    required List<DateSpan> breaks,
   }) {
     return switch (query.intent) {
       AssistantIntent.nextPeriod => _nextPeriod(cycleInfo, now),
       AssistantIntent.currentPhase => _currentPhase(cycleInfo),
       AssistantIntent.fertileWindow => _fertileWindow(cycleInfo),
-      AssistantIntent.cycleLength => _cycleLength(periodLogs),
+      AssistantIntent.cycleLength => _cycleLength(periodLogs, breaks),
       AssistantIntent.periodLength => _periodLength(cycleInfo, periodLogs),
-      AssistantIntent.regularity => _regularity(periodLogs),
+      AssistantIntent.regularity => _regularity(periodLogs, breaks),
       AssistantIntent.symptomFrequency => _symptomFrequency(
         query.symptomCode,
         dailyLogs,
         periodLogs,
         cycleInfo,
+        breaks,
       ),
       AssistantIntent.lastSymptom => _lastSymptom(query.symptomCode, dailyLogs),
       AssistantIntent.unknown => const AssistantAnswer('assistant_unknown'),
@@ -131,8 +133,11 @@ class AssistantAnswerBuilder {
     );
   }
 
-  static AssistantAnswer _cycleLength(List<PeriodLog> logs) {
-    final cycles = InsightsService.cycleLengths(logs);
+  static AssistantAnswer _cycleLength(
+    List<PeriodLog> logs,
+    List<DateSpan> breaks,
+  ) {
+    final cycles = InsightsService.cycleLengths(logs, breaks: breaks);
     final average = InsightsService.averageLength(cycles);
     if (average == null) {
       return const AssistantAnswer(
@@ -161,8 +166,11 @@ class AssistantAnswerBuilder {
     );
   }
 
-  static AssistantAnswer _regularity(List<PeriodLog> logs) {
-    final cycles = InsightsService.cycleLengths(logs);
+  static AssistantAnswer _regularity(
+    List<PeriodLog> logs,
+    List<DateSpan> breaks,
+  ) {
+    final cycles = InsightsService.cycleLengths(logs, breaks: breaks);
     final regularity = InsightsService.regularity(cycles);
     final spread = InsightsService.variation(cycles);
     if (regularity == null || spread == null) {
@@ -187,6 +195,7 @@ class AssistantAnswerBuilder {
     List<DailyLog> dailyLogs,
     List<PeriodLog> periodLogs,
     CycleInfo info,
+    List<DateSpan> breaks,
   ) {
     if (code == null) return const AssistantAnswer('assistant_unknown');
 
@@ -195,6 +204,7 @@ class AssistantAnswerBuilder {
       dailyLogs: dailyLogs,
       periodLogs: periodLogs,
       periodLength: info.averagePeriodLength,
+      breaks: breaks,
     );
 
     if (dominant == null) {

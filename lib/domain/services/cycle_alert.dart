@@ -81,6 +81,7 @@ class CycleAlertService {
   /// anlamlı, o yüzden [minObservations] eşiğine tabi değil.
   static Set<CycleAlert> evaluate(
     List<CycleLengthPoint> points, {
+    required List<DateSpan> breaks,
     List<DailyLog> dailyLogs = const [],
     List<PeriodLog> periodLogs = const [],
   }) {
@@ -89,6 +90,7 @@ class CycleAlertService {
     if (intermenstrualEpisodes(
           dailyLogs: dailyLogs,
           periodLogs: periodLogs,
+          breaks: breaks,
         ).length >=
         minBleedingEpisodes) {
       alerts.add(CycleAlert.recurrentIntermenstrualBleeding);
@@ -135,6 +137,7 @@ class CycleAlertService {
   static List<DateTime> intermenstrualEpisodes({
     required List<DailyLog> dailyLogs,
     required List<PeriodLog> periodLogs,
+    required List<DateSpan> breaks,
   }) {
     // Hiç regl kaydı yoksa hangi kanamanın "ara"da kaldığı bilinemez.
     // Böyle bir veriyle uyarı üretmek tahminden ibaret olurdu.
@@ -145,6 +148,12 @@ class CycleAlertService {
             .where((l) => LogVocabulary.isBleeding(l.flowIntensity))
             .map((l) => DateUtils.dateOnly(l.date))
             .where((d) => !_nearPeriod(d, periodLogs))
+            // Gebelikteki kanama tehlike işareti, lohusalıktaki lohia —
+            // ikisi de "ara kanama" değil. Sayılsalardı lohusa bir annenin
+            // her günü alarm üretir ve hekime giden özet lohiayı ara kanama
+            // diye listelerdi. O kanamaların kendi değerlendirmesi var
+            // (bkz. `LifeStage.bleedingMeaning`).
+            .where((d) => !breaks.any((k) => k.contains(d)))
             .toSet()
             .toList()
           ..sort();

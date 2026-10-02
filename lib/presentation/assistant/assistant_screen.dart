@@ -69,6 +69,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
       periodLogs: viewModel.periodLogs,
       dailyLogs: viewModel.dailyLogs,
       now: DateTime.now(),
+      breaks: viewModel.cycleBreaks,
     );
 
     setState(() {
