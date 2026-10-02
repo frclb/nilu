@@ -1,3 +1,4 @@
+import '../../pregnancy/stage_bleeding_note.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_tokens.dart';
 import 'package:provider/provider.dart';
@@ -277,29 +278,37 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Regl Durumu
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(
-                      context.tr('day_detail_period_toggle'),
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    trailing: Switch(
-                      value: isPeriod,
-                      onChanged: (_) async {
-                        final success = await viewModel.togglePeriodDay(
-                          widget.date,
-                        );
-                        if (!context.mounted) return;
-                        if (!success) {
-                          AppSnack.error(
-                            context,
-                            context.tr('calendar_future_date_error'),
+                  // Regl Durumu — yalnızca regl kaydının tutulduğu evrede.
+                  // Gebelikte anahtar basılınca koruma reddediyor ve ekran
+                  // "gelecek bir tarihe regl girilemez" diyordu.
+                  if (!viewModel.lifeStage.recordsPeriods)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: StageBleedingNote(stage: viewModel.lifeStage),
+                    )
+                  else
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        context.tr('day_detail_period_toggle'),
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      trailing: Switch(
+                        value: isPeriod,
+                        onChanged: (_) async {
+                          final success = await viewModel.togglePeriodDay(
+                            widget.date,
                           );
-                        }
-                      },
+                          if (!context.mounted) return;
+                          if (!success) {
+                            AppSnack.error(
+                              context,
+                              context.tr('calendar_future_date_error'),
+                            );
+                          }
+                        },
+                      ),
                     ),
-                  ),
 
                   // Regl olmayan günlerde lekelenme. Ara kanama tam da
                   // geçmişe dönük girilen bulgu: kişi genelde ertesi gün

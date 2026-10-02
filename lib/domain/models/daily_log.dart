@@ -54,6 +54,25 @@ class DailyLog {
     this.painContexts = const [],
   });
 
+  /// Yalnızca akışı değiştirilmiş kopya.
+  ///
+  /// `CalendarViewModel.updateDailyLog` günün kaydının **tamamını**
+  /// değiştiriyor. Lohusa panosundaki tek dokunuşluk "bugünkü kanama"
+  /// seçimi yeni bir `DailyLog` kursaydı o günün semptomları, ruh hali ve
+  /// notu silinirdi.
+  DailyLog withFlowIntensity(String? flow) => DailyLog(
+    date: date,
+    symptoms: symptoms,
+    notes: notes,
+    flowIntensity: flow,
+    moods: moods,
+    sexualActivity: sexualActivity,
+    painLevel: painLevel,
+    painLimitedActivity: painLimitedActivity,
+    painLocations: painLocations,
+    painContexts: painContexts,
+  );
+
   /// Bu günde kullanıcının girdiği bir şey var mı?
   ///
   /// Tek kaynak: dışa aktarma ile klinik özet bunu ayrı ayrı tanımlıyordu

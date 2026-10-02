@@ -1,3 +1,7 @@
+import '../pregnancy/danger_signs_screen.dart';
+import '../../domain/models/life_stage.dart';
+import '../../core/navigation/route_names.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../design_system/app_tokens.dart';
 import '../../design_system/app_snack.dart';
@@ -61,16 +65,64 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
     //
     // Önceden koşul `_flowIntensity != null` idi: "Yok" seçen kullanıcı da
     // regl başlatıyordu, lekelenme de regl sayılacaktı.
-    if (LogVocabulary.startsPeriod(_flowIntensity) &&
+    //
+    // Yalnızca regl kaydının tutulduğu evrede: gebelikte ya da lohusalıkta
+    // koruma zaten reddediyor, ama sessiz bir reddetmeye yaslanmak yerine
+    // niyet burada açık.
+    if (viewModel.lifeStage.recordsPeriods &&
+        LogVocabulary.startsPeriod(_flowIntensity) &&
         !viewModel.isPeriodDay(today)) {
       await viewModel.startPeriodToday();
     }
 
-    if (mounted) {
-      AppSnack.show(context, context.tr('home_log_saved'));
+    if (!mounted) return;
+
+    // Gebelikte kanama bir tehlike işareti (Bakanlık listesi). Kayıt sessizce
+    // kaydedilip geçilseydi kullanıcı bunun önemli olduğunu öğrenmezdi.
+    // Lekelenme de dahil: gebelikte "az" kanama da hekime söylenmeli.
+    if (viewModel.lifeStage == LifeStage.pregnancy &&
+        LogVocabulary.isBleeding(_flowIntensity)) {
+      final tehlikeyeGit = await _gebelikteKanamaUyarisi() ?? false;
+      if (!mounted) return;
+      // Diyalog kaydın tutulduğunu zaten söyledi; ayrıca bildirim yok.
+      final router = tehlikeyeGit ? GoRouter.of(context) : null;
       NavigationService().pop();
+      // Kayıt ekranı kapandıktan **sonra** açılıyor. Diyalogdan doğrudan
+      // açıldığında yukarıdaki `pop` kayıt ekranını değil yeni açılan
+      // tehlike işaretleri ekranını kapatıyordu: kullanıcı düğmeye basıyor,
+      // ekran bir an görünüp kayboluyordu.
+      router?.pushNamed(
+        RouteNames.dangerSigns,
+        queryParameters: {'period': DangerPeriod.pregnancy.name},
+      );
+      return;
     }
+
+    AppSnack.show(context, context.tr('home_log_saved'));
+    NavigationService().pop();
   }
+
+  /// Tehlike işaretlerine gidilmek istenirse `true`.
+  Future<bool?> _gebelikteKanamaUyarisi() => showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      key: const Key('preg_bleeding_dialog'),
+      icon: Icon(Icons.health_and_safety_outlined, color: ctx.tokens.warning),
+      title: Text(ctx.tr('preg_bleeding_dialog_title')),
+      content: Text(ctx.tr('preg_bleeding_dialog_body')),
+      actions: [
+        TextButton(
+          key: const Key('preg_bleeding_dialog_danger'),
+          onPressed: () => Navigator.of(ctx).pop(true),
+          child: Text(ctx.tr('preg_danger_entry_title')),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: Text(ctx.tr('ok')),
+        ),
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {

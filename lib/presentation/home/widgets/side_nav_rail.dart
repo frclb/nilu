@@ -1,3 +1,4 @@
+import '../../../domain/view_models/pregnancy_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +27,10 @@ class SideNavRail extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isPartner = context.watch<UserViewModel>().isPartner;
-    final destinations = navDestinations(isPartner: isPartner);
+    final destinations = navDestinations(
+      isPartner: isPartner,
+      stage: context.watch<PregnancyViewModel>().stage,
+    );
 
     // Dal sırasından liste sırasına. Eşleşme yoksa (dal menüde görünmüyorsa)
     // hiçbir şey seçili görünmez — alt menüdeki davranışın aynısı.

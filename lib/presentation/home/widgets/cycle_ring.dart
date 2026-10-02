@@ -15,7 +15,12 @@ import 'cycle_ring_data.dart';
 /// itibaren sırayla açılıyor. Canlandırma yalnızca bu alanı kapsıyor —
 /// kartın geri kalanı ve ekranın diğer bölümleri sabit.
 class CycleRing extends StatefulWidget {
-  const CycleRing({super.key, required this.data, required this.center});
+  const CycleRing({
+    super.key,
+    required this.data,
+    required this.center,
+    this.caption,
+  });
 
   final CycleRingData data;
 
@@ -24,6 +29,12 @@ class CycleRing extends StatefulWidget {
   /// Başlık ve halka önce ayrı bloklardı; ikisi ayrı ayrı dikkat çekiyor ve
   /// aradaki boşluk kartı seyrek gösteriyordu.
   final Widget center;
+
+  /// Merkezin altındaki küçük satır. Verilmezse "N günlük döngü".
+  ///
+  /// Gebelik panosu aynı çelengi 40 haftayla kullanıyor; orada "40 günlük
+  /// döngü" yazması yanlış olurdu.
+  final String? caption;
 
   @override
   State<CycleRing> createState() => _CycleRingState();
@@ -108,10 +119,11 @@ class _CycleRingState extends State<CycleRing>
                   widget.center,
                   const SizedBox(height: 6),
                   Text(
-                    context.tr(
-                      'home_ring_cycle_length',
-                      params: {'n': '${widget.data.expected}'},
-                    ),
+                    widget.caption ??
+                        context.tr(
+                          'home_ring_cycle_length',
+                          params: {'n': '${widget.data.expected}'},
+                        ),
                     textAlign: TextAlign.center,
                     style: theme.textTheme.labelLarge?.copyWith(
                       fontSize: 11,

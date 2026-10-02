@@ -30,4 +30,8 @@ class RouteNames {
   static const String yogaDetail = 'yoga_detail';
   static const String privacyPolicy = 'privacy_policy';
   static const String termsOfService = 'terms_of_service';
+  static const String pregnancySetup = 'pregnancy_setup';
+  static const String careList = 'care_list';
+  static const String dangerSigns = 'danger_signs';
+  static const String endPregnancy = 'end_pregnancy';
 }

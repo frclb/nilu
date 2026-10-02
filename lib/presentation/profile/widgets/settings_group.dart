@@ -10,12 +10,20 @@ class SettingsItem {
   final Color iconBgColor;
   final VoidCallback onTap;
 
+  /// Başlığın altındaki ikinci satır (ör. tahmini doğum tarihi).
+  final String? subtitle;
+
+  /// Sağdaki ok yerine gösterilecek öğe (ör. bir anahtar).
+  final Widget? trailing;
+
   SettingsItem({
     required this.title,
     required this.icon,
     required this.iconColor,
     required this.iconBgColor,
     required this.onTap,
+    this.subtitle,
+    this.trailing,
   });
 }
 
@@ -91,20 +99,36 @@ class SettingsGroup extends StatelessWidget {
                             ),
                             const SizedBox(width: 16),
                             Expanded(
-                              child: Text(
-                                item.title,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.title,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  if (item.subtitle != null) ...[
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      item.subtitle!,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: context.tokens.textMuted,
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
                             ),
-                            Icon(
-                              Icons.chevron_right,
-                              color: isDark
-                                  ? context.tokens.textMuted
-                                  : context.tokens.textFaint,
-                            ),
+                            item.trailing ??
+                                Icon(
+                                  Icons.chevron_right,
+                                  color: isDark
+                                      ? context.tokens.textMuted
+                                      : context.tokens.textFaint,
+                                ),
                           ],
                         ),
                       ),

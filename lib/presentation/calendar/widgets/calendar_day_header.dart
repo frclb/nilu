@@ -1,3 +1,4 @@
+import '../../pregnancy/stage_bleeding_note.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../design_system/app_snack.dart';
@@ -122,85 +123,126 @@ class CalendarDayHeader extends StatelessWidget {
           // Seçili güne uygulanan eylemler.
           // Erişilebilir dokunma alanı (min 48dp); uzun çevirilerde taşma
           // yerine kısaltma.
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => _togglePeriod(context, viewModel),
-                  icon: Icon(
-                    isPeriod ? Icons.water_drop : Icons.water_drop_outlined,
-                    size: 18,
-                    color: isPeriod
-                        ? context.tokens.flow
-                        : theme.colorScheme.primary,
-                  ),
-                  label: Text(
-                    context.tr(
-                      isPeriod
-                          ? 'calendar_unmark_period'
-                          : 'calendar_mark_period',
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
+          // Regl kaydının tutulmadığı evrede (gebelik, lohusalık) işaretleme
+          // düğmesi yok; yerine neden olmadığı yazıyor.
+          if (viewModel.lifeStage.recordsPeriods)
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _togglePeriod(context, viewModel),
+                    icon: Icon(
+                      isPeriod ? Icons.water_drop : Icons.water_drop_outlined,
+                      size: 18,
                       color: isPeriod
                           ? context.tokens.flow
                           : theme.colorScheme.primary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
                     ),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(48),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 12,
+                    label: Text(
+                      context.tr(
+                        isPeriod
+                            ? 'calendar_unmark_period'
+                            : 'calendar_mark_period',
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: isPeriod
+                            ? context.tokens.flow
+                            : theme.colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
                     ),
-                    side: BorderSide(
-                      color: isPeriod
-                          ? context.tokens.flow.withAlpha(102)
-                          : theme.colorScheme.primary.withAlpha(76),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: () => showDayDetailSheet(context, selectedDate),
-                  icon: const Icon(Icons.edit_note, size: 18),
-                  label: Text(
-                    context.tr('calendar_add_note'),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                    ),
-                  ),
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size.fromHeight(48),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 12,
-                    ),
-                    backgroundColor: theme.brightness == Brightness.dark
-                        ? theme.colorScheme.primary.withAlpha(51)
-                        : theme.colorScheme.primary.withAlpha(25),
-                    foregroundColor: theme.colorScheme.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 12,
+                      ),
+                      side: BorderSide(
+                        color: isPeriod
+                            ? context.tokens.flow.withAlpha(102)
+                            : theme.colorScheme.primary.withAlpha(76),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: () => showDayDetailSheet(context, selectedDate),
+                    icon: const Icon(Icons.edit_note, size: 18),
+                    label: Text(
+                      context.tr('calendar_add_note'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 12,
+                      ),
+                      backgroundColor: theme.brightness == Brightness.dark
+                          ? theme.colorScheme.primary.withAlpha(51)
+                          : theme.colorScheme.primary.withAlpha(25),
+                      foregroundColor: theme.colorScheme.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          else
+            Column(
+              children: [
+                StageBleedingNote(stage: viewModel.lifeStage),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () => showDayDetailSheet(context, selectedDate),
+                    icon: const Icon(Icons.edit_note, size: 18),
+                    label: Text(
+                      context.tr('calendar_add_note'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 12,
+                      ),
+                      backgroundColor: theme.brightness == Brightness.dark
+                          ? theme.colorScheme.primary.withAlpha(51)
+                          : theme.colorScheme.primary.withAlpha(25),
+                      foregroundColor: theme.colorScheme.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );

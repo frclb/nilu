@@ -27,8 +27,16 @@ class CycleMasthead extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
     final theme = Theme.of(context);
-    final info = context.watch<CalendarViewModel>().cycleInfo;
+    final takvim = context.watch<CalendarViewModel>();
+    final info = takvim.cycleInfo;
     final now = DateTime.now();
+
+    // Gebelik bitti, ondan sonra henüz regl kaydı yok. Döngü istatistiği
+    // kesintiden sonraki başlangıçlardan hesaplanıyor (bkz.
+    // `CycleIntervals.usableStarts`); kayıt yokken gün de yok. Başlık o
+    // zaman "Henüz kayıt yok" diyordu — kayıtları olan, çoğu zaman da bir
+    // kaybın hemen ardındaki kullanıcıya.
+    final afterPregnancy = takvim.cycleBreaks.isNotEmpty;
 
     final day = info.currentCycleDay;
     final phase = info.currentPhase;
@@ -98,6 +106,7 @@ class CycleMasthead extends StatelessWidget {
                         daysLate,
                         finishedToday: info.periodEndedToday,
                         periodLength: info.currentPeriodLength,
+                        afterPregnancy: afterPregnancy,
                       ),
                       textAlign: TextAlign.center,
                       style: theme.textTheme.displayLarge?.copyWith(
@@ -158,8 +167,15 @@ String _headline(
   int daysLate, {
   required bool finishedToday,
   int? periodLength,
+  bool afterPregnancy = false,
 }) {
-  if (day == null) return context.tr('home_headline_no_data');
+  if (day == null) {
+    return context.tr(
+      afterPregnancy
+          ? 'home_headline_after_pregnancy'
+          : 'home_headline_no_data',
+    );
+  }
   if (phase == CyclePhase.menstruation) {
     // "Reglim bitti" bugünü kayıttan silmiyor, son gün olarak işaretliyor;
     // faz o yüzden hâlâ menstrüasyon. Ama sayfanın en büyük yazısı

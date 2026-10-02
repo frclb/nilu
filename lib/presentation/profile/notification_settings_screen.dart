@@ -105,7 +105,12 @@ class _NotificationSettingsScreenState
         settings.periodReminders ||
         settings.fertileWindow ||
         settings.dailyLogs ||
-        (settings.careReminders && care.events.isNotEmpty);
+        // Gebelik planlama hatırlatıcıları da bu anahtarda ve bakım
+        // kalemine bağlı değil: yalnızca kalemlere bakılsaydı planlama
+        // yapan kullanıcıdan izin hiç istenmez, folik asit hatırlatması
+        // sessizce kurulamazdı.
+        (settings.careReminders &&
+            (care.events.isNotEmpty || care.conception != null));
     if (wantsReminders) {
       final granted = await scheduler.requestPermission();
       if (!granted) {
@@ -202,9 +207,55 @@ class _NotificationSettingsScreenState
                           _settings.dailyLogs,
                           (val) => _update(_settings.copyWith(dailyLogs: val)),
                           Icons.edit_note,
+                          true,
+                        ),
+                        // Gebelik ve lohusalık izlemleri, taramalar, destekler
+                        // ve gebelik planlama (folik asit, hekime başvuru).
+                        _buildSwitchTile(
+                          context.tr('notif_care_setting'),
+                          _settings.careReminders,
+                          (val) =>
+                              _update(_settings.copyWith(careReminders: val)),
+                          Icons.event_note_outlined,
                           false,
                         ),
                       ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Gizlilik ayrı kartta: bir hatırlatıcı türü değil, hepsinin
+                  // nasıl görüneceği.
+                  Container(
+                    decoration: BoxDecoration(
+                      color: context.tokens.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: context.tokens.border),
+                    ),
+                    child: SwitchListTile(
+                      key: const Key('notif_discreet_switch'),
+                      secondary: Icon(
+                        Icons.visibility_off_outlined,
+                        color: context.tokens.textMuted,
+                      ),
+                      title: Text(
+                        context.tr('notif_discreet_setting'),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: context.tokens.text,
+                        ),
+                      ),
+                      subtitle: Text(
+                        context.tr('notif_discreet_setting_body'),
+                        style: TextStyle(
+                          fontSize: 13,
+                          height: 1.4,
+                          color: context.tokens.textMuted,
+                        ),
+                      ),
+                      value: _settings.discreet,
+                      onChanged: (val) =>
+                          _update(_settings.copyWith(discreet: val)),
                     ),
                   ),
                   if (_permissionBlocked) _buildPermissionNotice(),

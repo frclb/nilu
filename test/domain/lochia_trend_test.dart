@@ -27,7 +27,9 @@ void main() {
 
   test('olağan seyir: azalarak sürüyor', () {
     expect(
-      degerlendir(seyir(['heavy', 'heavy', 'medium', 'light', 'spotting', 'none'])),
+      degerlendir(
+        seyir(['heavy', 'heavy', 'medium', 'light', 'spotting', 'none']),
+      ),
       LochiaConcern.none,
     );
   });
@@ -142,5 +144,24 @@ void main() {
       ),
     ];
     expect(degerlendir(l), LochiaConcern.reIncrease);
+  });
+
+  test('akışı değiştirmek günün diğer kayıtlarını silmiyor', () {
+    final dolu = DailyLog(
+      date: bugun,
+      symptoms: const ['cramp'],
+      moods: const ['tired'],
+      notes: 'Uykusuz gece',
+      painLevel: 'mild',
+      painLocations: const ['lower_abdomen'],
+    );
+    final yeni = dolu.withFlowIntensity('light');
+
+    expect(yeni.flowIntensity, 'light');
+    expect(yeni.symptoms, dolu.symptoms);
+    expect(yeni.moods, dolu.moods);
+    expect(yeni.notes, dolu.notes);
+    expect(yeni.painLevel, dolu.painLevel);
+    expect(yeni.painLocations, dolu.painLocations);
   });
 }

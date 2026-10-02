@@ -1,3 +1,5 @@
+import '../../../domain/models/life_stage.dart';
+import '../../../domain/view_models/pregnancy_view_model.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../design_system/app_scrim.dart';
@@ -35,8 +37,26 @@ class NavDestination {
 ///
 /// Saf fonksiyon: dal eşlemesi (özellikle partner modunun 2 numaralı dalı
 /// atlaması) burada test edilir.
-List<NavDestination> navDestinations({required bool isPartner}) =>
-    isPartner ? _partnerDestinations : _standardDestinations;
+List<NavDestination> navDestinations({
+  required bool isPartner,
+  LifeStage stage = LifeStage.cycle,
+}) {
+  if (isPartner) return _partnerDestinations;
+  if (stage == LifeStage.cycle) return _standardDestinations;
+  // Gebelik ve lohusalıkta 3. sekme randevular (bkz. `app_router.dart`):
+  // aynı dal, farklı ekran — etiket de onunla birlikte değişmeli.
+  return [
+    for (final d in _standardDestinations)
+      d.branchIndex == 2 ? _careDestination : d,
+  ];
+}
+
+const NavDestination _careDestination = NavDestination(
+  branchIndex: 2,
+  icon: Icons.event_note_outlined,
+  activeIcon: Icons.event_note,
+  labelKey: 'nav_care',
+);
 
 /// Etiketler kısa tutulur: bunlar sekme adı, ekran başlığı değil. Eskiden
 /// 3. sekme `health_library_title` ("Sağlık Kütüphanesi") kullanıyordu; iki
@@ -113,7 +133,10 @@ class CustomBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isPartner = context.watch<UserViewModel>().isPartner;
-    final destinations = navDestinations(isPartner: isPartner);
+    final destinations = navDestinations(
+      isPartner: isPartner,
+      stage: context.watch<PregnancyViewModel>().stage,
+    );
 
     return Container(
       decoration: BoxDecoration(

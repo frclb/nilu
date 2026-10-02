@@ -1,3 +1,7 @@
+import '../pregnancy/due_date_sheet.dart';
+import '../../localization/date_names.dart';
+import '../../domain/view_models/pregnancy_view_model.dart';
+import '../../domain/models/life_stage.dart';
 import 'package:flutter/material.dart';
 import '../../design_system/app_theme.dart';
 import '../health_check/heavy_bleeding_screen.dart';
@@ -64,6 +68,16 @@ class ProfileSettingsScreen extends StatelessWidget {
               if (!context.watch<UserViewModel>().isPartner)
                 const SizedBox(height: 24),
 
+              // Gebelik bölümü (yalnızca kendi kaydını tutan kullanıcı).
+              //
+              // Giriş noktası burada ve kasten sakin: gecikmede ana ekranda
+              // gebelik önermek her gecikmede rahatsız edici olurdu
+              // (bkz. `PREGNANCY_MODE.md` §5).
+              if (!context.watch<UserViewModel>().isPartner) ...[
+                const _GebelikBolumu(),
+                const SizedBox(height: 24),
+              ],
+
               // Group 2: Application (Standard users only)
               if (!context.watch<UserViewModel>().isPartner)
                 SettingsGroup(
@@ -119,7 +133,6 @@ class ProfileSettingsScreen extends StatelessWidget {
                 ),
               if (!context.watch<UserViewModel>().isPartner)
                 const SizedBox(height: 24),
-
 
               // Group 3: Security & Support
               SettingsGroup(
@@ -293,5 +306,84 @@ class ProfileSettingsScreen extends StatelessWidget {
     // Oturumu kapat. Router `refreshListenable` üzerinden durumu görüp
     // kullanıcıyı onboarding'e yönlendirir — elle gezinmeye gerek yok.
     await context.read<UserViewModel>().signOut();
+  }
+}
+
+class _GebelikBolumu extends StatelessWidget {
+  const _GebelikBolumu();
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<PregnancyViewModel>();
+    final renk = Theme.of(context).colorScheme.primary;
+    final zemin = context.tokens.brandTint;
+    final g = vm.current;
+
+    final List<SettingsItem> satirlar = switch (vm.stage) {
+      LifeStage.cycle => [
+        SettingsItem(
+          title: context.tr('profile_preg_mark'),
+          icon: Icons.pregnant_woman,
+          iconColor: renk,
+          iconBgColor: zemin,
+          onTap: () => context.pushNamed(RouteNames.pregnancySetup),
+        ),
+        SettingsItem(
+          title: context.tr('profile_preg_ttc'),
+          subtitle: context.tr('profile_preg_ttc_body'),
+          icon: Icons.spa_outlined,
+          iconColor: renk,
+          iconBgColor: zemin,
+          onTap: () => vm.setConception(vm.conception == null),
+          trailing: Switch(
+            key: const Key('profile_ttc_switch'),
+            value: vm.conception != null,
+            onChanged: vm.setConception,
+          ),
+        ),
+      ],
+      LifeStage.pregnancy => [
+        SettingsItem(
+          title: context.tr('profile_preg_due'),
+          subtitle: g == null
+              ? null
+              : '${g.estimatedDueDate.day} '
+                    '${context.monthName(g.estimatedDueDate.month)} '
+                    '${g.estimatedDueDate.year}',
+          icon: Icons.event_outlined,
+          iconColor: renk,
+          iconBgColor: zemin,
+          onTap: () => showDueDateSheet(context),
+        ),
+        SettingsItem(
+          title: context.tr('profile_preg_care'),
+          icon: Icons.event_note_outlined,
+          iconColor: renk,
+          iconBgColor: zemin,
+          onTap: () => context.pushNamed(RouteNames.careList),
+        ),
+        SettingsItem(
+          title: context.tr('profile_preg_end'),
+          icon: Icons.stop_circle_outlined,
+          iconColor: renk,
+          iconBgColor: zemin,
+          onTap: () => context.pushNamed(RouteNames.endPregnancy),
+        ),
+      ],
+      LifeStage.postpartum => [
+        SettingsItem(
+          title: context.tr('profile_preg_care'),
+          icon: Icons.event_note_outlined,
+          iconColor: renk,
+          iconBgColor: zemin,
+          onTap: () => context.pushNamed(RouteNames.careList),
+        ),
+      ],
+    };
+
+    return SettingsGroup(
+      title: context.tr('profile_preg_section'),
+      items: satirlar,
+    );
   }
 }

@@ -5,7 +5,15 @@ import 'route_names.dart';
 import 'navigation_service.dart';
 import 'tab_navigation_shell.dart';
 import 'package:provider/provider.dart';
+import '../../domain/models/life_stage.dart';
+import '../../domain/view_models/pregnancy_view_model.dart';
 import '../../domain/view_models/user_view_model.dart';
+import '../../presentation/pregnancy/care_list_screen.dart';
+import '../../presentation/pregnancy/danger_signs_screen.dart';
+import '../../presentation/pregnancy/end_pregnancy_screen.dart';
+import '../../presentation/pregnancy/postpartum_home_screen.dart';
+import '../../presentation/pregnancy/pregnancy_home_screen.dart';
+import '../../presentation/pregnancy/pregnancy_setup_screen.dart';
 import '../../presentation/partner_match/partner_dashboard_screen.dart';
 
 // Screens
@@ -187,9 +195,19 @@ GoRouter createAppRouter(
                 name: RouteNames.home,
                 builder: (context, state) {
                   final isPartner = context.watch<UserViewModel>().isPartner;
-                  return isPartner
-                      ? const PartnerDashboardScreen()
-                      : const HomeScreen();
+                  if (isPartner) return const PartnerDashboardScreen();
+                  // Partner modunun kalıbı: aynı sekme, evreye göre ekran.
+                  // Yönlendirici yapısına dokunulmuyor.
+                  final gebelik = context.watch<PregnancyViewModel>();
+                  // Splash yalnızca kullanıcı durumunu bekliyor. Gebelik
+                  // kaydı ondan sonra okunursa gebe kullanıcı açılışta bir an
+                  // regl tahminli ana ekranı görürdü.
+                  if (!gebelik.loaded) return const Scaffold();
+                  return switch (gebelik.stage) {
+                    LifeStage.cycle => const HomeScreen(),
+                    LifeStage.pregnancy => const PregnancyHomeScreen(),
+                    LifeStage.postpartum => const PostpartumHomeScreen(),
+                  };
                 },
               ),
             ],
@@ -215,7 +233,12 @@ GoRouter createAppRouter(
               GoRoute(
                 path: '/insights',
                 name: RouteNames.insights,
-                builder: (context, state) => const InsightsScreen(),
+                // Gebelik ve lohusalıkta döngü analizi anlamsız (trend yok,
+                // tahmin yok); sekmenin yerini randevular alıyor.
+                builder: (context, state) =>
+                    context.watch<PregnancyViewModel>().stage == LifeStage.cycle
+                    ? const InsightsScreen()
+                    : const CareListScreen(),
               ),
             ],
           ),
@@ -279,6 +302,37 @@ GoRouter createAppRouter(
         name: RouteNames.assistant,
         builder: (context, state) => const AssistantScreen(),
       ),
+      GoRoute(
+        path: '/pregnancy/setup',
+        name: RouteNames.pregnancySetup,
+        builder: (context, state) => const PregnancySetupScreen(),
+      ),
+      GoRoute(
+        path: '/pregnancy/end',
+        name: RouteNames.endPregnancy,
+        builder: (context, state) => const EndPregnancyScreen(),
+      ),
+      GoRoute(
+        path: '/care',
+        name: RouteNames.careList,
+        builder: (context, state) => const CareListScreen(),
+      ),
+      GoRoute(
+        path: '/danger',
+        name: RouteNames.dangerSigns,
+        builder: (context, state) {
+          final istenen = state.uri.queryParameters['period'];
+          final evre = context.read<PregnancyViewModel>().stage;
+          // Parametre yoksa ya da tanınmıyorsa o anki evreye göre: lohusa
+          // bir anneye gebelik listesi göstermek yanlış olurdu.
+          final donem =
+              DangerPeriod.values.where((d) => d.name == istenen).firstOrNull ??
+              (evre == LifeStage.postpartum
+                  ? DangerPeriod.postpartum
+                  : DangerPeriod.pregnancy);
+          return DangerSignsScreen(period: donem);
+        },
+      ),
 
       GoRoute(
         path: '/health_sync',
@@ -339,8 +393,6 @@ GoRouter createAppRouter(
         name: RouteNames.partnerShareSettings,
         builder: (context, state) => const PartnerShareSettingsScreen(),
       ),
-
-
 
       GoRoute(
         path: '/personal_info',
