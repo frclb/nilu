@@ -5,6 +5,9 @@ zaman neyi yapmaya değer), tasarım tarafı (ekranda ne olacak).
 
 Belgedeki klinik iddiaların kaynakları en altta.
 
+Gebelik dışındaki evreler (lohusalık, gebelik planlama, menopoza geçiş) ve
+hepsini bağlayan mimari karar: [LIFE_STAGES.md](LIFE_STAGES.md).
+
 ---
 
 ## 1. Uygulama bugün nerede
@@ -227,7 +230,9 @@ arkasında olamaz):
 
 ### Kapsam dışı (şimdilik)
 
-- Doğum sonrası (postpartum) modu — veri modeli engellememeli ama Faz 1'de yok
+- ~~Doğum sonrası (postpartum) modu~~ → **v1'e alındı.** Asgari lohusalık
+  gebelik modunun doğru bitmesi için zorunlu: yoksa ilk lohia regl olarak
+  kaydedilir. Ayrıntı: [LIFE_STAGES.md §2](LIFE_STAGES.md)
 - Emzirme takibi
 - Bebek büyüme/aşı takibi
 - Meyve boyu karşılaştırmaları tek başına içerik olarak (eklenebilir ama
@@ -347,8 +352,8 @@ Gebelik semptom sözlüğü (bulantı, mide yanması, ödem, Braxton Hicks),
 isteğe bağlı kilo/tansiyon, randevuya götürülecek klinik özet.
 
 **Faz 3 — İçerik ve paylaşım**
-Haftalık içerik (6 dil — asıl maliyet burada), partner görünümü,
-doğum sonrası.
+Haftalık içerik (6 dil — asıl maliyet burada), partner görünümü.
+Doğum sonrası buradan çıkarıldı: asgarisi v1'de (bkz. LIFE_STAGES.md §2).
 
 ### Maliyetin nerede olduğu
 
@@ -402,7 +407,7 @@ ikiye katlar. Faz 1'i içeriksiz tutmanın asıl sebebi bu.
    ve Türkiye protokolünün gerçekten uygulanması. Bunlar aceleye gelirse
    "bir tane daha gebelik uygulaması" oluruz. O yüzden fazlar
    birleştirilmiyor, hepsi yayın kapsamına alınıyor: Faz 1 ve 2 yayına
-   girer, Faz 3 (haftalık içerik, partner görünümü, doğum sonrası) ilk
+   girer, Faz 3 (haftalık içerik, partner görünümü) ilk
    güncellemeye kalır — 6 dilde 40 haftalık içerik yayını aylarca
    geciktirir ve onsuz da ürün bütün.
 
