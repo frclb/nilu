@@ -179,12 +179,11 @@ class PregnancySummary {
                       .compareTo(LogVocabulary.allSymptoms.indexOf(b.code));
           });
 
-    // Tarih sırası: randevusu olanın randevusu, olmayanın penceresi
-    // (`PregnancyViewModel.currentEvents` ile aynı anahtar).
-    DateTime anahtar(CareEvent e) =>
-        e.scheduledAt ?? e.windowStart(pregnancy) ?? pregnancy.estimatedDueDate;
-    final kalemler = events.where((e) => e.pregnancyId == pregnancy.id).toList()
-      ..sort((a, b) => anahtar(a).compareTo(anahtar(b)));
+    // Liste ve panodaki kartla aynı sıra (bkz. `CareOrder`).
+    final kalemler = CareOrder.sorted(
+      events.where((e) => e.pregnancyId == pregnancy.id),
+      pregnancy,
+    );
     // Lohusalıkta gebelik kalemleri listeyi kalabalıklaştırmasın; notu
     // olanlar yine görünüyor (soru hâlâ sorulacak olabilir).
     bool donemde(CareEvent e) =>

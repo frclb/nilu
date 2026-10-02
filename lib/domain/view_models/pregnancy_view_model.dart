@@ -53,14 +53,12 @@ class PregnancyViewModel extends ChangeNotifier {
   Pregnancy? get current =>
       LifeStage.relevantPregnancy(_pregnancies, today: _clock());
 
-  /// O anki gebeliğin bakım kalemleri, tarihe göre sıralı.
+  /// O anki gebeliğin bakım kalemleri, gösterim sırasıyla
+  /// (bkz. `CareOrder`: önce izlem, tarama ve aşı; destekler sonda).
   List<CareEvent> get currentEvents {
     final g = current;
     if (g == null) return const [];
-    DateTime anahtar(CareEvent e) =>
-        e.scheduledAt ?? e.windowStart(g) ?? g.estimatedDueDate;
-    return _events.where((e) => e.pregnancyId == g.id).toList()
-      ..sort((a, b) => anahtar(a).compareTo(anahtar(b)));
+    return CareOrder.sorted(_events.where((e) => e.pregnancyId == g.id), g);
   }
 
   Future<void> load() async {

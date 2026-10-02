@@ -162,6 +162,62 @@ void main() {
     });
   });
 
+  group('sıralama (CareOrder)', () {
+    // 24. haftada D vitamini (12–40) tarih sırasında 24–28. hafta
+    // izleminin önündeydi; "sıradaki" kart gebeliğin sonuna kadar onu
+    // gösterecekti.
+    final kalemler = CareTemplates.generate(
+      gebelik,
+      CareTemplates.turkeyAntenatal,
+    );
+
+    test('destekler en sonda, diğerleri son güne göre', () {
+      final sira = CareOrder.sorted(kalemler, gebelik);
+      final ilkDestek = sira.indexWhere(
+        (e) => e.category == CareCategory.supplement,
+      );
+      expect(ilkDestek, greaterThan(0));
+      expect(
+        sira
+            .skip(ilkDestek)
+            .every((e) => e.category == CareCategory.supplement),
+        isTrue,
+        reason: 'Desteklerden sonra izlem ya da tarama gelmemeli',
+      );
+      final digerleri = sira.take(ilkDestek).toList();
+      for (var i = 1; i < digerleri.length; i++) {
+        expect(
+          CareOrder.deadline(
+            digerleri[i - 1],
+            gebelik,
+          ).isAfter(CareOrder.deadline(digerleri[i], gebelik)),
+          isFalse,
+          reason: 'Son gün sırası bozuk',
+        );
+      }
+    });
+
+    test('özetin sıradakileri destekle başlamıyor', () {
+      final o = ozet(const [], events: kalemler);
+      expect(o.upcomingCare, isNotEmpty);
+      // 24+2: 2. izlem bu hafta bitiyor; şeker yükleme testi ve 3. izlem
+      // 28. haftada. Uzun pencereli tetanoz ve destekler sonra.
+      expect(o.upcomingCare.map((e) => e.code), [
+        'tr_visit_2',
+        'tr_screen_ogtt',
+        'tr_visit_3',
+      ]);
+    });
+
+    test('yalnızca destek kaldıysa sıradaki o', () {
+      final destekler = kalemler
+          .where((e) => e.category == CareCategory.supplement)
+          .toList();
+      final o = ozet(const [], events: destekler);
+      expect(o.upcomingCare, isNotEmpty);
+    });
+  });
+
   group('isPendingOn (panodaki "sıradaki" ve özet aynı kural)', () {
     final kalem = CareEvent.custom(pregnancyId: 'g1', title: 'Kontrol');
 

@@ -185,3 +185,38 @@ class CareEvent {
     return fallback;
   }
 }
+
+/// Bakım kalemlerinin gösterim sırası — liste, panodaki "sıradaki" kartı
+/// ve randevu özeti aynı sırayı kullanıyor.
+///
+/// Önce izlem, tarama ve aşı, **son günü en yakın olan önce**; destekler
+/// en sonda. Pencerenin başlangıcına göre sıralanınca uzun pencereli
+/// kalemler (D vitamini 12–40, tetanoz 12–40) hep öndeydi: 24. haftada
+/// "sıradaki" kart o hafta biten 2. izlemi değil D vitaminini gösteriyordu
+/// — ve gebeliğin sonuna kadar öyle kalacaktı. Destekler ayrıca sonda:
+/// randevu değil, haftalarca süren günlük kullanım.
+class CareOrder {
+  const CareOrder._();
+
+  /// Son gün: randevusu olanın randevusu, olmayanın pencere sonu.
+  static DateTime deadline(CareEvent e, Pregnancy p) =>
+      e.scheduledAt ?? e.windowEnd(p) ?? p.estimatedDueDate;
+
+  /// İlk gün: randevusu olanın randevusu, olmayanın pencere başı.
+  static DateTime start(CareEvent e, Pregnancy p) =>
+      e.scheduledAt ?? e.windowStart(p) ?? p.estimatedDueDate;
+
+  static int compare(CareEvent a, CareEvent b, Pregnancy p) {
+    final aDestek = a.category == CareCategory.supplement;
+    final bDestek = b.category == CareCategory.supplement;
+    if (aDestek != bDestek) return aDestek ? 1 : -1;
+    final son = deadline(a, p).compareTo(deadline(b, p));
+    if (son != 0) return son;
+    final bas = start(a, p).compareTo(start(b, p));
+    // Sonra kimlik: aynı veri her seferinde aynı sırada çizilsin.
+    return bas != 0 ? bas : a.id.compareTo(b.id);
+  }
+
+  static List<CareEvent> sorted(Iterable<CareEvent> events, Pregnancy p) =>
+      events.toList()..sort((a, b) => compare(a, b, p));
+}

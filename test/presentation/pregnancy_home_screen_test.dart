@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
+import 'package:period_tracker/domain/models/care_event.dart';
 import 'package:period_tracker/domain/models/pregnancy.dart';
 import 'package:period_tracker/domain/view_models/pregnancy_view_model.dart';
 import 'package:period_tracker/localization/app_localizations.dart';
@@ -60,7 +61,12 @@ void main() {
       final vm = ctx.read<PregnancyViewModel>();
       final siradaki = NextCareCard.siradaki(vm.currentEvents, g, today);
       expect(siradaki, isNotNull);
-      expect(find.text(ctx.careTitle(siradaki!)), findsOneWidget);
+      expect(
+        siradaki!.category,
+        isNot(CareCategory.supplement),
+        reason: '24. haftada sıradaki iş izlem ya da tarama; D vitamini değil',
+      );
+      expect(find.text(ctx.careTitle(siradaki)), findsOneWidget);
       expect(find.text(ctx.tr('preg_next_care_none')), findsNothing);
 
       expect(find.text(ctx.tr('preg_danger_entry_title')), findsOneWidget);
