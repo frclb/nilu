@@ -10,6 +10,29 @@ hepsini bağlayan mimari karar: [LIFE_STAGES.md](LIFE_STAGES.md).
 
 ---
 
+## 0. Durum (2 Ekim 2026)
+
+**Faz 0, 1 ve 2 kodda; Faz 3 (haftalık içerik, partner görünümü) ilk
+güncellemeye kaldı.** Aşağıdaki plan bölümleri yazıldığı hâliyle duruyor;
+uygulama sırasında verilen kararlar şunlar:
+
+| Konu | Karar | Nerede |
+|---|---|---|
+| Randevu özeti | Ekranda görmek ücretsiz (gebelikte kanama ve yüksek tansiyon gibi güvenlikle ilgili bilgi içeriyor); dosya olarak paylaşmak Premium | `care_summary_screen.dart`, `PremiumGate.canExportReports` |
+| Tansiyon eşikleri | 140/90 ve üstü "dinlenip yeniden ölç, yine yüksekse aynı gün hekime"; 160/110 ve üstü "beklemeden başvur" (NICE NG133, ACOG PB 222). Uyarı ücretsiz, yalnızca o kayıtta değişen değer için | `lib/domain/models/vitals.dart` |
+| Ölçüm bölümü | Yalnızca gebelik ve lohusalıkta (gebelik dışı eşikler farklı) | `log_entry_screen.dart` |
+| Gebelik belirtileri | Bulantı, kusma, mide yanması, ödem, kaşıntı, yalancı sancı, kabızlık, sık idrar, bacak krampı. Tehlike listesine karşılık gelenler (şiddetli baş ağrısı, ani şişlik, geçmeyen kusma, nedensiz kaşıntı) seçilince not | `LogVocabulary.pregnancySymptoms` |
+| Bakım şablonu | Yalnızca Türkçe'de varsayılan; diğer dillerde boş liste + "kendi randevunu ekle" | `pregnancy_setup_screen.dart` |
+| Partner | v1'de gebeliğe dair hiçbir şey görmüyor | `navDestinations` |
+| Hukuki metin | Gizlilik politikası ve şartlar gebeliği kapsıyor (6 dil) — yayından önce hukukçu okuması gerekiyor | `lib/localization/*.json` |
+
+Uygulama sırasında bulunan, gebelikten bağımsız hatalar da düzeltildi:
+"+" kayıt ekranı günün kaydını siliyordu; hatırlatıcı izin gerekçesi izin
+verilmiş kullanıcıya her plan değişikliğinde yeniden açılıyordu; büyük
+harfli başlıklar Türkçede "i"yi "I" yazıyordu.
+
+---
+
 ## 1. Uygulama bugün nerede
 
 Taradım; işe yarayan şu emsaller **zaten var**:
