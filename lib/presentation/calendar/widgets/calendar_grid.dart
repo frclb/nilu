@@ -313,15 +313,20 @@ class CalendarGrid extends StatelessWidget {
                     context.tr('calendar_legend_period'),
                   ),
                   if (!tahminVar) ...[
+                    // Hücredeki işaretlerin kendisi: yuvarlak nokta
+                    // çizilseydi lejant ekranda olmayan bir şekli tarif
+                    // ederdi (hücrede kare ve yıldız).
                     _buildLegendItem(
                       context,
                       Theme.of(context).colorScheme.primary,
                       context.tr('calendar_legend_appointment'),
+                      marker: _appointmentMark(Theme.of(context)),
                     ),
                     _buildLegendItem(
                       context,
                       context.tokens.accent,
                       context.tr('calendar_legend_due'),
+                      marker: _dueMark(Theme.of(context)),
                     ),
                   ],
                   // Gebelikte ve lohusalıkta tahmin yok (bkz.
@@ -385,27 +390,31 @@ class CalendarGrid extends StatelessWidget {
     Color color,
     String label, {
     bool outlined = false,
+    Widget? marker,
   }) {
     final theme = Theme.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: outlined ? Colors.transparent : color,
-            shape: BoxShape.circle,
-            // Doğurganlık tonu bilerek soluk — hücrede zemine serilen tülü
-            // temsil ediyor. Açık temada beyaz yüzeye karşı 1.46:1 kalıyor,
-            // yani nokta olarak seçilmiyordu. Saç teli inceliğinde bir
-            // çerçeve, dolgunun açıklığından bağımsız olarak sınırı veriyor.
-            border: Border.all(
-              color: outlined ? color : context.tokens.border,
-              width: outlined ? 1.5 : 1,
+        if (marker != null)
+          marker
+        else
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: outlined ? Colors.transparent : color,
+              shape: BoxShape.circle,
+              // Doğurganlık tonu bilerek soluk — hücrede zemine serilen tülü
+              // temsil ediyor. Açık temada beyaz yüzeye karşı 1.46:1 kalıyor,
+              // yani nokta olarak seçilmiyordu. Saç teli inceliğinde bir
+              // çerçeve, dolgunun açıklığından bağımsız olarak sınırı veriyor.
+              border: Border.all(
+                color: outlined ? color : context.tokens.border,
+                width: outlined ? 1.5 : 1,
+              ),
             ),
           ),
-        ),
         const SizedBox(width: 4),
         Text(
           label,
@@ -884,26 +893,11 @@ class _DayTile extends StatelessWidget {
     // Tahmini doğum ya da doğum günü: yıldız. Randevu: köşeli işaret —
     // yuvarlak noktalar döngü işaretlerine ayrılmış.
     if (isDueOrBirth) {
-      dots.add(
-        Icon(
-          Icons.star_rounded,
-          key: const Key('calendar_due_mark'),
-          size: 10,
-          color: t.accent,
-        ),
-      );
+      dots.add(_dueMark(theme, key: const Key('calendar_due_mark')));
     }
     if (hasAppointment) {
       dots.add(
-        Container(
-          key: const Key('calendar_appointment_mark'),
-          width: 6,
-          height: 6,
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primary,
-            borderRadius: BorderRadius.circular(1.5),
-          ),
-        ),
+        _appointmentMark(theme, key: const Key('calendar_appointment_mark')),
       );
     }
 
@@ -936,3 +930,24 @@ class _DayTile extends StatelessWidget {
     );
   }
 }
+
+/// Randevu işareti: köşeli, çünkü yuvarlak noktalar döngü işaretlerine
+/// ayrılmış. Hücre ve lejant aynı çiziciyi kullanıyor; biri değişip öteki
+/// kalırsa lejant ekranda olmayan bir şekli tarif eder.
+Widget _appointmentMark(ThemeData theme, {Key? key}) => Container(
+  key: key,
+  width: 6,
+  height: 6,
+  decoration: BoxDecoration(
+    color: theme.colorScheme.primary,
+    borderRadius: BorderRadius.circular(1.5),
+  ),
+);
+
+/// Tahmini doğum (ya da doğum) günü işareti.
+Widget _dueMark(ThemeData theme, {Key? key}) => Icon(
+  Icons.star_rounded,
+  key: key,
+  size: 10,
+  color: (theme.extension<AppTokens>() ?? AppTokens.light).accent,
+);

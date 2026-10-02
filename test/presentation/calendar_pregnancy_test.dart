@@ -91,6 +91,41 @@ void main() {
     expect(find.text(ctx.tr('calendar_legend_due')), findsOneWidget);
   });
 
+  testWidgets('lejant hücredeki işaretlerin şeklini gösteriyor', (
+    tester,
+  ) async {
+    await seedPregnancy();
+    final ctx = await ac(tester);
+    // Lejant öğesi: etikete en yakın satır.
+    Finder oge(String key) => find
+        .ancestor(of: find.text(ctx.tr(key)), matching: find.byType(Row))
+        .first;
+
+    expect(
+      find.descendant(
+        of: oge('calendar_legend_due'),
+        matching: find.byIcon(Icons.star_rounded),
+      ),
+      findsOneWidget,
+      reason: 'Hücrede yıldız var, lejant yuvarlak nokta gösteriyordu',
+    );
+    final isaret = tester
+        .widgetList<Container>(
+          find.descendant(
+            of: oge('calendar_legend_appointment'),
+            matching: find.byType(Container),
+          ),
+        )
+        .map((c) => c.decoration)
+        .whereType<BoxDecoration>()
+        .single;
+    expect(
+      isaret.shape,
+      BoxShape.rectangle,
+      reason: 'Hücrede köşeli kare var, lejant yuvarlak nokta gösteriyordu',
+    );
+  });
+
   testWidgets('lejant: döngüde yok', (tester) async {
     await seedCycles();
     final ctx = await ac(tester);
