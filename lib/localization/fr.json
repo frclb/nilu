@@ -1028,5 +1028,8 @@
   "preg_month_label": "{n}e mois",
   "preg_month_label_first": "1er mois",
   "preg_month_weeks": "Semaines {a} à {b}",
-  "preg_month_empty": "Aucun contrôle prévu ce mois-ci"
+  "preg_month_empty": "Aucun contrôle prévu ce mois-ci",
+  "calendar_due_date": "Date prévue de l'accouchement",
+  "calendar_legend_appointment": "Rendez-vous",
+  "calendar_legend_due": "Terme"
 }

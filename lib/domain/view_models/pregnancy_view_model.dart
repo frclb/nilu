@@ -8,6 +8,7 @@ import '../models/conception_intent.dart';
 import '../models/life_stage.dart';
 import '../models/pregnancy.dart';
 import '../services/care_templates.dart';
+import '../services/pregnancy_calendar.dart';
 
 /// Gebelik, bakım kalemleri ve gebelik planlama niyeti — bellekteki tek
 /// kaynak.
@@ -60,6 +61,13 @@ class PregnancyViewModel extends ChangeNotifier {
     if (g == null) return const [];
     return CareOrder.sorted(_events.where((e) => e.pregnancyId == g.id), g);
   }
+
+  /// [date] gününün takvimdeki gebelik bilgisi (bkz. `PregnancyCalendar`).
+  PregnancyDayInfo dayInfo(DateTime date) => PregnancyCalendar.dayInfo(
+    pregnancies: _pregnancies,
+    events: _events,
+    date: date,
+  );
 
   Future<void> load() async {
     _pregnancies = await _pregnancyRepo.getAll();

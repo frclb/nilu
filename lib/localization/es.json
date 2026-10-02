@@ -1028,5 +1028,8 @@
   "preg_month_label": "Mes {n}",
   "preg_month_label_first": "Mes 1",
   "preg_month_weeks": "Semanas {a}–{b}",
-  "preg_month_empty": "No hay controles previstos este mes"
+  "preg_month_empty": "No hay controles previstos este mes",
+  "calendar_due_date": "Fecha probable de parto",
+  "calendar_legend_appointment": "Cita",
+  "calendar_legend_due": "Fecha probable"
 }

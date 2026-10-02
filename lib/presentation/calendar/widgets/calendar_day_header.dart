@@ -1,3 +1,6 @@
+import '../../../domain/models/pregnancy_month.dart';
+import '../../../domain/view_models/pregnancy_view_model.dart';
+import '../../pregnancy/care_text.dart';
 import '../../pregnancy/stage_bleeding_note.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_tokens.dart';
@@ -43,6 +46,20 @@ class CalendarDayHeader extends StatelessWidget {
     final dateStr =
         '${selectedDate.day} ${context.monthName(selectedDate.month)}';
 
+    // Gebelik ya da lohusalık günü: döngü günü yerine kaçıncı hafta ve ay
+    // ya da doğumdan sonraki gün.
+    final gebelik = context.watch<PregnancyViewModel>().dayInfo(selectedDate);
+    final ga = gebelik.gestation;
+    final lohusa = gebelik.postpartumDay;
+    final evreEtiketi = ga != null
+        ? '${ga.weeks}+${ga.days} · '
+              '${context.monthLabel(PregnancyMonth.of(ga).number)}'
+        : lohusa != null
+        ? (lohusa == 0
+              ? context.tr('pp_day_birth')
+              : context.tr('care_summary_pp_day', params: {'n': '$lohusa'}))
+        : null;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
       child: Column(
@@ -71,7 +88,7 @@ class CalendarDayHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              if (cycleDay != null) ...[
+              if (evreEtiketi != null || cycleDay != null) ...[
                 const SizedBox(width: 12),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -83,10 +100,12 @@ class CalendarDayHeader extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    context.tr(
-                      'calendar_cycle_day',
-                      params: {'day': '$cycleDay'},
-                    ),
+                    evreEtiketi ??
+                        context.tr(
+                          'calendar_cycle_day',
+                          params: {'day': '$cycleDay'},
+                        ),
+                    key: const Key('calendar_day_chip'),
                     style: TextStyle(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w600,
@@ -117,6 +136,21 @@ class CalendarDayHeader extends StatelessWidget {
               ),
             ],
           ),
+
+          // Tahmini doğum günü ve o günün randevuları.
+          if (gebelik.isDueDate)
+            _GebelikSatiri(
+              icon: Icons.star_rounded,
+              text: context.tr('calendar_due_date'),
+            ),
+          for (final e in gebelik.appointments)
+            _GebelikSatiri(
+              icon: Icons.event_available,
+              text:
+                  '${context.careTitle(e)} · '
+                  '${e.scheduledAt!.hour.toString().padLeft(2, '0')}:'
+                  '${e.scheduledAt!.minute.toString().padLeft(2, '0')}',
+            ),
 
           const SizedBox(height: 16),
 
@@ -332,6 +366,37 @@ class _DayStatus {
       context.tr('calendar_status_normal'),
       context.tokens.textMuted,
       Icons.circle_outlined,
+    );
+  }
+}
+
+class _GebelikSatiri extends StatelessWidget {
+  const _GebelikSatiri({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final renk = Theme.of(context).colorScheme.primary;
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: renk),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: renk,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

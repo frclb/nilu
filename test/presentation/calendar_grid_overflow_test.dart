@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:period_tracker/domain/view_models/pregnancy_view_model.dart';
 import 'package:period_tracker/design_system/app_flavor.dart';
 import 'package:period_tracker/design_system/app_theme.dart';
 import 'package:period_tracker/localization/app_localizations.dart';
@@ -44,8 +45,12 @@ void main() {
           supportedLocales: const [Locale('tr')],
           locale: const Locale('tr'),
           home: Scaffold(
-            body: ChangeNotifierProvider(
-              create: (_) => CalendarViewModel(),
+            body: MultiProvider(
+              // Uygulamadaki gibi: ızgara gebelik izini de okuyor.
+              providers: [
+                ChangeNotifierProvider(create: (_) => PregnancyViewModel()),
+                ChangeNotifierProvider(create: (_) => CalendarViewModel()),
+              ],
               child: Center(
                 child: SizedBox(width: width, child: const CalendarGrid()),
               ),

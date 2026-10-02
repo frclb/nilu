@@ -7,6 +7,7 @@ import '../../../localization/date_names.dart';
 import '../../../domain/models/daily_log.dart';
 
 import 'package:provider/provider.dart';
+import '../../../domain/view_models/pregnancy_view_model.dart';
 import '../view_models/calendar_view_model.dart';
 import '../../../domain/models/log_vocabulary.dart';
 
@@ -311,6 +312,18 @@ class CalendarGrid extends StatelessWidget {
                     context.tokens.flow,
                     context.tr('calendar_legend_period'),
                   ),
+                  if (!tahminVar) ...[
+                    _buildLegendItem(
+                      context,
+                      Theme.of(context).colorScheme.primary,
+                      context.tr('calendar_legend_appointment'),
+                    ),
+                    _buildLegendItem(
+                      context,
+                      context.tokens.accent,
+                      context.tr('calendar_legend_due'),
+                    ),
+                  ],
                   // Gebelikte ve lohusalıkta tahmin yok (bkz.
                   // `LifeStage.showsCyclePredictions`); açıklama da yok.
                   if (tahminVar)
@@ -445,6 +458,14 @@ class _DayTile extends StatelessWidget {
         !isPeriod && dailyLog.flowIntensity == LogVocabulary.spotting;
 
     final isToday = DateUtils.isSameDay(date, DateTime.now());
+
+    // Gebeliğin takvimdeki izi: randevu ve tahmini doğum ya da doğum günü
+    // (bkz. `PregnancyCalendar`).
+    final (hasAppointment, isDueOrBirth) = context
+        .select<PregnancyViewModel, (bool, bool)>((v) {
+          final g = v.dayInfo(date);
+          return (g.appointments.isNotEmpty, g.isDueDate || g.isBirthDay);
+        });
 
     // Ardışık gün kontrolü (bağlantı barları için).
     //
@@ -652,6 +673,8 @@ class _DayTile extends StatelessWidget {
               isPeriod: isPeriod,
               isSpotting: isSpotting,
               hasLog: hasLog,
+              hasAppointment: hasAppointment,
+              isDueOrBirth: isDueOrBirth,
               isFaded: isFaded,
               theme: theme,
               isDark: isDark,
@@ -820,6 +843,8 @@ class _DayTile extends StatelessWidget {
     required bool isFaded,
     required ThemeData theme,
     required bool isDark,
+    bool hasAppointment = false,
+    bool isDueOrBirth = false,
   }) {
     if (isFaded) return const SizedBox.shrink();
 
@@ -854,6 +879,32 @@ class _DayTile extends StatelessWidget {
     // yoksa aynı gün iki gri nokta görünüyordu.
     if (hasLog && !isPeriod && !isSpotting) {
       dots.add(_dot(t.textFaint, 4));
+    }
+
+    // Tahmini doğum ya da doğum günü: yıldız. Randevu: köşeli işaret —
+    // yuvarlak noktalar döngü işaretlerine ayrılmış.
+    if (isDueOrBirth) {
+      dots.add(
+        Icon(
+          Icons.star_rounded,
+          key: const Key('calendar_due_mark'),
+          size: 10,
+          color: t.accent,
+        ),
+      );
+    }
+    if (hasAppointment) {
+      dots.add(
+        Container(
+          key: const Key('calendar_appointment_mark'),
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primary,
+            borderRadius: BorderRadius.circular(1.5),
+          ),
+        ),
+      );
     }
 
     if (dots.isEmpty) return const SizedBox.shrink();

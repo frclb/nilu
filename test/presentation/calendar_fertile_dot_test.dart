@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:period_tracker/domain/view_models/pregnancy_view_model.dart';
 import 'package:period_tracker/data/repositories/cycle_settings_repository.dart';
 import 'package:period_tracker/data/repositories/period_repository.dart';
 import 'package:period_tracker/design_system/app_flavor.dart';
@@ -82,8 +83,14 @@ void main() {
           locale: const Locale('tr'),
           home: Scaffold(
             body: Builder(
-              builder: (context) => ChangeNotifierProvider(
-                create: (_) => vm = CalendarViewModel(),
+              builder: (context) => MultiProvider(
+                // Uygulamadaki gibi: ızgara gebelik izini de okuyor.
+                providers: [
+                  ChangeNotifierProvider(create: (_) => PregnancyViewModel()),
+                  ChangeNotifierProvider(
+                    create: (_) => vm = CalendarViewModel(),
+                  ),
+                ],
                 child: const Center(
                   child: SizedBox(width: 340, child: CalendarGrid()),
                 ),
@@ -117,7 +124,11 @@ void main() {
     final ayinIlki = DateTime(bugun.year, bugun.month, 1);
     final ayinSonu = DateTime(bugun.year, bugun.month + 1, 0);
     var kontrolGunuVar = false;
-    for (var g = ayinIlki; !g.isAfter(ayinSonu); g = g.add(const Duration(days: 1))) {
+    for (
+      var g = ayinIlki;
+      !g.isAfter(ayinSonu);
+      g = g.add(const Duration(days: 1))
+    ) {
       if (vm.cycleInfo.isFertile(g) &&
           !vm.isPeriodDay(g) &&
           !vm.cycleInfo.isOvulationDay(g)) {

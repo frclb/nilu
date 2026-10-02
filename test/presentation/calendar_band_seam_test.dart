@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:period_tracker/domain/view_models/pregnancy_view_model.dart';
 import 'package:period_tracker/data/repositories/period_repository.dart';
 import 'package:period_tracker/design_system/app_flavor.dart';
 import 'package:period_tracker/design_system/app_theme.dart';
@@ -72,8 +73,12 @@ void main() {
           supportedLocales: const [Locale('tr')],
           locale: const Locale('tr'),
           home: Scaffold(
-            body: ChangeNotifierProvider(
-              create: (_) => CalendarViewModel(),
+            body: MultiProvider(
+              // Uygulamadaki gibi: ızgara gebelik izini de okuyor.
+              providers: [
+                ChangeNotifierProvider(create: (_) => PregnancyViewModel()),
+                ChangeNotifierProvider(create: (_) => CalendarViewModel()),
+              ],
               child: Center(
                 child: RepaintBoundary(
                   key: key,
@@ -99,7 +104,9 @@ void main() {
 
       double lum(int x, int y) {
         final i = (y * image.width + x) * 4;
-        return 0.2126 * bytes[i] + 0.7152 * bytes[i + 1] + 0.0722 * bytes[i + 2];
+        return 0.2126 * bytes[i] +
+            0.7152 * bytes[i + 1] +
+            0.0722 * bytes[i + 2];
       }
 
       /// Kayıtlı regl bandının pikseli mi?
@@ -168,7 +175,8 @@ void main() {
     expect(
       worst,
       lessThan(20),
-      reason: 'Bant içinde $worstAt. pikselde ${worst.toStringAsFixed(0)} '
+      reason:
+          'Bant içinde $worstAt. pikselde ${worst.toStringAsFixed(0)} '
           'birimlik sıçrama var: iki hücrenin kabı arasından zemin sızıyor.',
     );
   });
@@ -186,13 +194,20 @@ void main() {
     // "ortası daha açık" koşulunu sağlıyordu: iki ton arasında tek piksellik
     // bir sıçrama. Yumuşak geçişte arada onlarca ara ton oluyor.
     final shades = middle.map((v) => v.round()).toSet().length;
-    expect(shades, greaterThan(5),
-        reason: 'Geçişte yalnızca $shades ton var: soluklaşma değil, '
-            'keskin bir çizgi.');
+    expect(
+      shades,
+      greaterThan(5),
+      reason:
+          'Geçişte yalnızca $shades ton var: soluklaşma değil, '
+          'keskin bir çizgi.',
+    );
 
     // Ama "hafif" kalmalı; bant ikiye bölünmüş gibi görünmemeli.
     final peak = middle.reduce((a, b) => a > b ? a : b);
-    expect(peak - body, lessThan(40),
-        reason: 'Geçiş fazla açık: bant tek parça okunmuyor.');
+    expect(
+      peak - body,
+      lessThan(40),
+      reason: 'Geçiş fazla açık: bant tek parça okunmuyor.',
+    );
   });
 }

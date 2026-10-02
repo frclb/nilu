@@ -1028,5 +1028,8 @@
   "preg_month_label": "{n}. Monat",
   "preg_month_label_first": "1. Monat",
   "preg_month_weeks": "Woche {a}–{b}",
-  "preg_month_empty": "Keine Untersuchungen in diesem Monat"
+  "preg_month_empty": "Keine Untersuchungen in diesem Monat",
+  "calendar_due_date": "Errechneter Geburtstermin",
+  "calendar_legend_appointment": "Termin",
+  "calendar_legend_due": "Geburtstermin"
 }

@@ -1028,5 +1028,8 @@
   "preg_month_label": "{n}. ay",
   "preg_month_label_first": "1. ay",
   "preg_month_weeks": "{a}–{b}. hafta",
-  "preg_month_empty": "Bu ayda planlı kontrol yok"
+  "preg_month_empty": "Bu ayda planlı kontrol yok",
+  "calendar_due_date": "Tahmini doğum günü",
+  "calendar_legend_appointment": "Randevu",
+  "calendar_legend_due": "Tahmini doğum"
 }

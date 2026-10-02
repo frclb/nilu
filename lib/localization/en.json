@@ -1028,5 +1028,8 @@
   "preg_month_label": "Month {n}",
   "preg_month_label_first": "Month 1",
   "preg_month_weeks": "Weeks {a}–{b}",
-  "preg_month_empty": "No check-ups planned this month"
+  "preg_month_empty": "No check-ups planned this month",
+  "calendar_due_date": "Due date",
+  "calendar_legend_appointment": "Appointment",
+  "calendar_legend_due": "Due date"
 }
