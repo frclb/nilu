@@ -1,5 +1,7 @@
 import '../../data/repositories/care_repository.dart';
+import '../../data/repositories/conception_repository.dart';
 import '../../data/repositories/pregnancy_repository.dart';
+import '../../data/repositories/profile_repository.dart';
 import '../../domain/models/life_stage.dart';
 import '../../domain/services/reminder_planner.dart';
 
@@ -11,6 +13,8 @@ import '../../domain/services/reminder_planner.dart';
 Future<CarePlanInput> loadCarePlanInput({
   PregnancyRepository pregnancies = const PregnancyRepository(),
   CareRepository care = const CareRepository(),
+  ConceptionRepository conception = const ConceptionRepository(),
+  ProfileRepository profile = const ProfileRepository(),
   DateTime? today,
 }) async {
   final gun = today ?? DateTime.now();
@@ -21,5 +25,7 @@ Future<CarePlanInput> loadCarePlanInput({
     stage: LifeStage.resolve(hepsi, today: gun),
     pregnancy: ilgili,
     events: ilgili == null ? const [] : await care.forPregnancy(ilgili.id),
+    conception: await conception.get(),
+    birthDate: await profile.getBirthDate(),
   );
 }

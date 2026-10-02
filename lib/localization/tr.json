@@ -833,5 +833,9 @@
   "notif_care_tomorrow_body": "Yarın randevun var.",
   "notif_care_custom_title": "Randevu hatırlatması",
   "notif_discreet_title": "Hatırlatma",
-  "notif_discreet_body": "Bugün için bir hatırlatman var."
+  "notif_discreet_body": "Bugün için bir hatırlatman var.",
+  "care_folic_acid_title": "Folik asit",
+  "notif_folic_acid_body": "Gebelik planlıyorsan folik asite gebelikten en az 1 ay önce başlaman öneriliyor. Dozu hekimine danış.",
+  "care_consult_title": "Hekime danışma zamanı",
+  "notif_consult_body": "Bir süredir gebe kalmaya çalışıyorsun. Bu noktada bir değerlendirme öneriliyor — bu bir sorun olduğu anlamına gelmiyor."
 }

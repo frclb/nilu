@@ -833,5 +833,9 @@
   "notif_care_tomorrow_body": "You have an appointment tomorrow.",
   "notif_care_custom_title": "Appointment reminder",
   "notif_discreet_title": "Reminder",
-  "notif_discreet_body": "You have a reminder for today."
+  "notif_discreet_body": "You have a reminder for today.",
+  "care_folic_acid_title": "Folic acid",
+  "notif_folic_acid_body": "If you're planning a pregnancy, starting folic acid at least 1 month beforehand is recommended. Ask your doctor about the dose.",
+  "care_consult_title": "Time to see a doctor",
+  "notif_consult_body": "You've been trying to conceive for a while. An evaluation is recommended at this point — it doesn't mean something is wrong."
 }

@@ -1,4 +1,5 @@
 import '../models/care_event.dart';
+import '../models/conception_intent.dart';
 import '../models/cycle_info.dart';
 import '../models/life_stage.dart';
 import '../models/notification_settings.dart';
@@ -49,10 +50,18 @@ class CarePlanInput {
   final Pregnancy? pregnancy;
   final List<CareEvent> events;
 
+  /// Gebelik planlama niyeti (döngü evresinde).
+  final ConceptionIntent? conception;
+
+  /// Profildeki doğum tarihi — ASRM eşiği yaşa bağlı.
+  final DateTime? birthDate;
+
   const CarePlanInput({
     required this.stage,
     required this.pregnancy,
     required this.events,
+    this.conception,
+    this.birthDate,
   });
 
   /// Gebelik kaydı olmayan kullanıcı.
@@ -139,6 +148,8 @@ class ReminderPlanner {
       for (final e in care.events)
         '${e.id}:${e.done}:${e.reminderOn}:${e.fromDay}:'
             '${e.scheduledAt?.toIso8601String() ?? '-'}',
+      d(care.conception?.since),
+      d(care.birthDate),
     ].join('|');
   }
 
@@ -234,12 +245,59 @@ class ReminderPlanner {
   /// Randevudan önceki akşam.
   static const int eveningHour = 20;
 
+  static const int _conceptionIdBase = 4900;
+
+  /// Gebelik planlama hatırlatıcıları: folik asit ve hekime başvuru.
+  static List<ScheduledReminder> _conceptionReminders(
+    CarePlanInput care,
+    DateTime now,
+  ) {
+    final niyet = care.conception;
+    if (niyet == null || care.stage != LifeStage.cycle) return const [];
+
+    final sonuc = <ScheduledReminder>[];
+
+    // Folik asit: niyetin ertesi sabahı, bir kez. Bakanlık rehberi:
+    // gebelikten en az 1 ay önce başlanmalı — uygulamanın bunu
+    // söyleyebileceği tek an niyetin belirtildiği an.
+    final folik = _at(niyet.since.add(const Duration(days: 1)), morningHour);
+    if (folik.isAfter(now)) {
+      sonuc.add(
+        ScheduledReminder(
+          id: _conceptionIdBase,
+          type: ReminderType.care,
+          when: folik,
+          titleKey: 'care_folic_acid_title',
+          bodyKey: 'notif_folic_acid_body',
+        ),
+      );
+    }
+
+    final basvuru = niyet.consultAt(birthDate: care.birthDate);
+    if (basvuru != null) {
+      final when = _at(basvuru, morningHour);
+      if (when.isAfter(now)) {
+        sonuc.add(
+          ScheduledReminder(
+            id: _conceptionIdBase + 1,
+            type: ReminderType.care,
+            when: when,
+            titleKey: 'care_consult_title',
+            bodyKey: 'notif_consult_body',
+          ),
+        );
+      }
+    }
+    return sonuc;
+  }
+
   static List<ScheduledReminder> _careReminders(
     CarePlanInput care,
     DateTime now,
   ) {
+    final planlama = _conceptionReminders(care, now);
     final gebelik = care.pregnancy;
-    if (gebelik == null) return const [];
+    if (gebelik == null) return planlama;
 
     // Döngü evresinde hiçbir bakım kalemi planlanmıyor. Gebelik hangi
     // sonuçla biterse bitsin bütün hatırlatıcıların aynı anda düşmesinin
@@ -247,7 +305,7 @@ class ReminderPlanner {
     final CareAnchor gecerliCapa;
     switch (care.stage) {
       case LifeStage.cycle:
-        return const [];
+        return planlama;
       case LifeStage.pregnancy:
         gecerliCapa = CareAnchor.gestation;
       case LifeStage.postpartum:
@@ -284,6 +342,7 @@ class ReminderPlanner {
 
     adaylar.sort((a, b) => a.when.compareTo(b.when));
     return [
+      ...planlama,
       for (var i = 0; i < adaylar.length && i < maxCareReminders; i++)
         ScheduledReminder(
           id: _careIdBase + i,

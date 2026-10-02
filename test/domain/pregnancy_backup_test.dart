@@ -5,9 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:period_tracker/data/repositories/care_repository.dart';
+import 'package:period_tracker/data/repositories/conception_repository.dart';
 import 'package:period_tracker/data/repositories/pregnancy_repository.dart';
 import 'package:period_tracker/data/repositories/privacy_settings_repository.dart';
 import 'package:period_tracker/domain/models/care_event.dart';
+import 'package:period_tracker/domain/models/conception_intent.dart';
 import 'package:period_tracker/domain/models/pregnancy.dart';
 import 'package:period_tracker/domain/services/backup_import_service.dart';
 import 'package:period_tracker/domain/services/care_templates.dart';
@@ -257,6 +259,23 @@ void main() {
       );
     });
 
+    test('gebelik planlama niyeti taşınıyor', () async {
+      const repo = PrivacySettingsRepository();
+      await const ConceptionRepository().set(
+        ConceptionIntent(since: DateTime(2026, 1, 10)),
+      );
+      final json = await repo.exportDataAsJson();
+
+      FlutterSecureStorage.setMockInitialValues({});
+      await repo.importDataFromJson(json);
+
+      expect(
+        (await const ConceptionRepository().get())?.since,
+        DateTime(2026, 1, 10),
+        reason: 'Kaybolursa ASRM sayacı yeni telefonda sıfırlanır',
+      );
+    });
+
     test('hesap silmede gebelik ve randevular da siliniyor', () async {
       await const PregnancyRepository().upsert(gebelik);
       await const CareRepository().addMissing(kalemler);
@@ -266,6 +285,14 @@ void main() {
 
       expect(await const PregnancyRepository().getAll(), isEmpty);
       expect(await const CareRepository().getAll(), isEmpty);
+    });
+
+    test('hesap silmede planlama niyeti de siliniyor', () async {
+      await const ConceptionRepository().set(
+        ConceptionIntent(since: DateTime(2026, 1, 10)),
+      );
+      await const PrivacySettingsRepository().deleteAllLocalData();
+      expect(await const ConceptionRepository().get(), isNull);
     });
   });
 }

@@ -833,5 +833,9 @@
   "notif_care_tomorrow_body": "Du hast morgen einen Termin.",
   "notif_care_custom_title": "Terminerinnerung",
   "notif_discreet_title": "Erinnerung",
-  "notif_discreet_body": "Du hast heute eine Erinnerung."
+  "notif_discreet_body": "Du hast heute eine Erinnerung.",
+  "care_folic_acid_title": "Folsäure",
+  "notif_folic_acid_body": "Wenn du eine Schwangerschaft planst, wird empfohlen, mindestens 1 Monat vorher mit Folsäure zu beginnen. Frag deine Ärztin oder deinen Arzt nach der Dosis.",
+  "care_consult_title": "Zeit für ein ärztliches Gespräch",
+  "notif_consult_body": "Du versuchst schon eine Weile, schwanger zu werden. Jetzt wird eine Abklärung empfohlen — das heißt nicht, dass etwas nicht stimmt."
 }

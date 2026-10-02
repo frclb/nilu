@@ -153,6 +153,9 @@ class SecureStore {
     // CareRepository — randevu ve tarama listesi gebeliği ele veriyor
     // ("18–22. hafta: anomali taraması"); gebelik kaydı kadar hassas.
     'care_events',
+    // ConceptionRepository — "gebe kalmaya çalışıyorum" üreme sağlığına dair
+    // hassas bir bilgi.
+    'conception_intent',
   ];
 
   /// Tüm hassas verileri siler (profil → "Verilerimi Sil").

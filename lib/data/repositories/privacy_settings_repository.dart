@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../domain/models/daily_log.dart';
+import '../../domain/models/conception_intent.dart';
 import '../../domain/models/period_log.dart';
 import '../../domain/services/backup_import_service.dart';
 import '../../domain/services/cycle_intervals.dart';
 import '../local/secure_store.dart';
 import 'period_repository.dart';
 import 'care_repository.dart';
+import 'conception_repository.dart';
 import 'pregnancy_repository.dart';
 
 /// Gizlilik ekranının tercihleri ve veri yönetimi işlemleri.
@@ -20,16 +22,19 @@ class PrivacySettingsRepository {
   final PeriodRepository _periodRepository;
   final PregnancyRepository _pregnancyRepository;
   final CareRepository _careRepository;
+  final ConceptionRepository _conceptionRepository;
 
   const PrivacySettingsRepository({
     SecureStore store = const SecureStore(),
     PeriodRepository periodRepository = const PeriodRepository(),
     PregnancyRepository pregnancyRepository = const PregnancyRepository(),
     CareRepository careRepository = const CareRepository(),
+    ConceptionRepository conceptionRepository = const ConceptionRepository(),
   }) : _store = store,
        _periodRepository = periodRepository,
        _pregnancyRepository = pregnancyRepository,
-       _careRepository = careRepository;
+       _careRepository = careRepository,
+       _conceptionRepository = conceptionRepository;
 
   // ─── Tercihler ───
   // Bunlar hassas veri değil, yalnızca aç/kapa tercihi.
@@ -86,6 +91,7 @@ class PrivacySettingsRepository {
     final dailyLogs = await _periodRepository.getDailyLogs();
     final pregnancies = await _pregnancyRepository.getAll();
     final careEvents = await _careRepository.getAll();
+    final conception = await _conceptionRepository.get();
 
     return const JsonEncoder.withIndent('  ').convert({
       'exportedAt': DateTime.now().toIso8601String(),
@@ -95,6 +101,8 @@ class PrivacySettingsRepository {
       // uygulaması döngü moduna düşerdi.
       'pregnancies': pregnancies.map((p) => p.toMap()).toList(),
       'careEvents': careEvents.map((e) => e.toMap()).toList(),
+      // Kaybolursa ASRM'nin 6/12 aylık sayacı yeni telefonda sıfırlanır.
+      if (conception != null) 'conceptionIntent': conception.toMap(),
     });
   }
 
@@ -107,6 +115,8 @@ class PrivacySettingsRepository {
   /// Başarısız bir okumada depoya **hiç dokunulmuyor**: yarım yazılmış bir
   /// durum, hiç yazmamaktan kötü.
   Future<ImportReport> importDataFromJson(String json) async {
+    await _restoreConceptionIntent(json);
+
     final result = BackupImportService.merge(
       json: json,
       periodLogs: await _periodRepository.getPeriodLogs(),
@@ -131,6 +141,22 @@ class PrivacySettingsRepository {
   ///
   /// Geri alınamaz. Uzak (Firestore) veriyi silmez — o, hesap silme akışının
   /// backend tarafına aittir.
+  /// Cihazda niyet yoksa yedektekini alır; varsa cihazdaki kazanır.
+  Future<void> _restoreConceptionIntent(String json) async {
+    if (await _conceptionRepository.get() != null) return;
+    try {
+      final root = jsonDecode(json);
+      final raw = root is Map<String, dynamic> ? root['conceptionIntent'] : null;
+      if (raw is! Map<String, dynamic>) return;
+      final niyet = ConceptionIntent.fromMap(raw);
+      // Gelecek tarihli bir niyet elle bozulmuş demek.
+      if (niyet == null || niyet.since.isAfter(DateTime.now())) return;
+      await _conceptionRepository.set(niyet);
+    } catch (_) {
+      return;
+    }
+  }
+
   Future<void> deleteAllLocalData() async {
     await _store.clearSensitiveData();
     final prefs = await SharedPreferences.getInstance();

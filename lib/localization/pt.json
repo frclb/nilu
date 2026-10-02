@@ -833,5 +833,9 @@
   "notif_care_tomorrow_body": "Há uma consulta marcada para amanhã.",
   "notif_care_custom_title": "Lembrete de consulta",
   "notif_discreet_title": "Lembrete",
-  "notif_discreet_body": "Há um lembrete para hoje."
+  "notif_discreet_body": "Há um lembrete para hoje.",
+  "care_folic_acid_title": "Ácido fólico",
+  "notif_folic_acid_body": "Ao planejar uma gravidez, recomenda-se começar o ácido fólico pelo menos 1 mês antes. A dose deve ser confirmada com o médico.",
+  "care_consult_title": "Hora de consultar um médico",
+  "notif_consult_body": "Já faz algum tempo de tentativas. Neste ponto recomenda-se uma avaliação — isso não significa que haja algum problema."
 }

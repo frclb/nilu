@@ -833,5 +833,9 @@
   "notif_care_tomorrow_body": "Mañana tienes una cita.",
   "notif_care_custom_title": "Recordatorio de cita",
   "notif_discreet_title": "Recordatorio",
-  "notif_discreet_body": "Tienes un recordatorio para hoy."
+  "notif_discreet_body": "Tienes un recordatorio para hoy.",
+  "care_folic_acid_title": "Ácido fólico",
+  "notif_folic_acid_body": "Si planeas un embarazo, se recomienda empezar el ácido fólico al menos 1 mes antes. Consulta la dosis con tu médico.",
+  "care_consult_title": "Momento de consultar",
+  "notif_consult_body": "Llevas un tiempo intentando concebir. En este punto se recomienda una evaluación — no significa que algo vaya mal."
 }

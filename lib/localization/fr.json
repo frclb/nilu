@@ -833,5 +833,9 @@
   "notif_care_tomorrow_body": "Tu as un rendez-vous demain.",
   "notif_care_custom_title": "Rappel de rendez-vous",
   "notif_discreet_title": "Rappel",
-  "notif_discreet_body": "Tu as un rappel pour aujourd'hui."
+  "notif_discreet_body": "Tu as un rappel pour aujourd'hui.",
+  "care_folic_acid_title": "Acide folique",
+  "notif_folic_acid_body": "Si tu prévois une grossesse, il est recommandé de commencer l'acide folique au moins 1 mois avant. Demande la dose à ton médecin.",
+  "care_consult_title": "Le moment de consulter",
+  "notif_consult_body": "Tu essaies de concevoir depuis un moment. Un bilan est recommandé à ce stade — cela ne veut pas dire qu'il y a un problème."
 }
