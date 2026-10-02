@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import '../models/care_event.dart';
 import '../models/daily_log.dart';
 import '../models/period_log.dart';
+import '../models/pregnancy.dart';
 
 /// İçe aktarmanın neden başarısız olduğu.
 enum ImportFailure {
@@ -24,6 +26,8 @@ class ImportReport {
   const ImportReport({
     this.periodsAdded = 0,
     this.dailyAdded = 0,
+    this.pregnanciesAdded = 0,
+    this.careAdded = 0,
     this.alreadyPresent = 0,
     this.invalid = 0,
     this.failure,
@@ -32,11 +36,15 @@ class ImportReport {
   const ImportReport.failed(this.failure)
     : periodsAdded = 0,
       dailyAdded = 0,
+      pregnanciesAdded = 0,
+      careAdded = 0,
       alreadyPresent = 0,
       invalid = 0;
 
   final int periodsAdded;
   final int dailyAdded;
+  final int pregnanciesAdded;
+  final int careAdded;
 
   /// Cihazda zaten bulunan ve bu yüzden dokunulmayan kayıt sayısı.
   final int alreadyPresent;
@@ -47,7 +55,8 @@ class ImportReport {
   final ImportFailure? failure;
 
   bool get succeeded => failure == null;
-  int get totalAdded => periodsAdded + dailyAdded;
+  int get totalAdded =>
+      periodsAdded + dailyAdded + pregnanciesAdded + careAdded;
 }
 
 /// İçe aktarılmış veri ile birleştirilmiş sonuç.
@@ -55,11 +64,15 @@ class ImportedData {
   const ImportedData({
     required this.periodLogs,
     required this.dailyLogs,
+    required this.pregnancies,
+    required this.careEvents,
     required this.report,
   });
 
   final List<PeriodLog> periodLogs;
   final List<DailyLog> dailyLogs;
+  final List<Pregnancy> pregnancies;
+  final List<CareEvent> careEvents;
   final ImportReport report;
 }
 
@@ -97,23 +110,33 @@ class BackupImportService {
     required String json,
     required List<PeriodLog> periodLogs,
     required List<DailyLog> dailyLogs,
+    required List<Pregnancy> pregnancies,
+    required List<CareEvent> careEvents,
     DateTime? today,
   }) {
+    ImportedData unchanged(ImportFailure f) =>
+        _unchanged(periodLogs, dailyLogs, pregnancies, careEvents, f);
+
     final Map<String, dynamic> root;
     try {
       final decoded = jsonDecode(json);
       if (decoded is! Map<String, dynamic>) {
-        return _unchanged(periodLogs, dailyLogs, ImportFailure.wrongFormat);
+        return unchanged(ImportFailure.wrongFormat);
       }
       root = decoded;
     } on FormatException {
-      return _unchanged(periodLogs, dailyLogs, ImportFailure.unreadable);
+      return unchanged(ImportFailure.unreadable);
     }
 
     final rawPeriods = root['periodLogs'];
     final rawDaily = root['dailyLogs'];
-    if (rawPeriods is! List && rawDaily is! List) {
-      return _unchanged(periodLogs, dailyLogs, ImportFailure.wrongFormat);
+    final rawPregnancies = root['pregnancies'];
+    final rawCare = root['careEvents'];
+    if (rawPeriods is! List &&
+        rawDaily is! List &&
+        rawPregnancies is! List &&
+        rawCare is! List) {
+      return unchanged(ImportFailure.wrongFormat);
     }
 
     final limit = _day(today ?? DateTime.now());
@@ -186,17 +209,100 @@ class BackupImportService {
     }
     daily.sort((a, b) => a.date.compareTo(b.date));
 
+    // ── Gebelikler ──
+    //
+    // Yedek gebeliği taşımasaydı yeni telefona geri yüklenen gebe bir
+    // kullanıcının uygulaması döngü moduna düşerdi: regl kaydı korumasız
+    // kalır, tahminler gebelik öncesi SAT'tan yapılırdı.
+    final gebelikler = List<Pregnancy>.from(pregnancies);
+    var pregnanciesAdded = 0;
+    // Tahmini doğum tarihi gelecekte olabilir; makul üst sınır bir gebelik.
+    final eddLimit = limit.add(const Duration(days: Pregnancy.termDays + 30));
+
+    for (final entry in (rawPregnancies is List ? rawPregnancies : const [])) {
+      final g = _readPregnancy(entry);
+      if (g == null) {
+        invalid++;
+        continue;
+      }
+      final bas = g.gestationStart;
+      final bitis = g.endedAt;
+      final makul =
+          !bas.isAfter(limit) &&
+          !bas.isBefore(earliest) &&
+          !g.estimatedDueDate.isAfter(eddLimit) &&
+          (bitis == null || (!bitis.isBefore(bas) && !bitis.isAfter(limit)));
+      if (!makul) {
+        invalid++;
+        continue;
+      }
+      if (gebelikler.any((p) => p.id == g.id)) {
+        alreadyPresent++;
+        continue;
+      }
+      // Aynı anda iki süren gebelik evreyi belirsiz bırakır; cihazdaki
+      // kazanıyor.
+      if (g.isActive && gebelikler.any((p) => p.isActive)) {
+        alreadyPresent++;
+        continue;
+      }
+      gebelikler.add(g);
+      pregnanciesAdded++;
+    }
+    gebelikler.sort((a, b) => a.confirmedAt.compareTo(b.confirmedAt));
+
+    // ── Bakım kalemleri ──
+    final kalemler = List<CareEvent>.from(careEvents);
+    final gebelikKimlikleri = gebelikler.map((p) => p.id).toSet();
+    var careAdded = 0;
+    final randevuSiniri = limit.add(const Duration(days: 400));
+
+    for (final entry in (rawCare is List ? rawCare : const [])) {
+      final e = _readCare(entry);
+      // Gebeliği bulunmayan kalem hiçbir ekranda gösterilemez ve
+      // hatırlatılamaz.
+      if (e == null || !gebelikKimlikleri.contains(e.pregnancyId)) {
+        invalid++;
+        continue;
+      }
+      final randevu = e.scheduledAt;
+      final makul =
+          e.fromDay >= 0 &&
+          e.fromDay <= e.toDay &&
+          e.toDay <= 400 &&
+          (randevu == null ||
+              (!randevu.isBefore(earliest) && !randevu.isAfter(randevuSiniri)));
+      if (!makul) {
+        invalid++;
+        continue;
+      }
+      if (kalemler.any((k) => k.id == e.id)) {
+        alreadyPresent++;
+        continue;
+      }
+      kalemler.add(e);
+      careAdded++;
+    }
+
     final nothingUsable =
-        periodsAdded == 0 && dailyAdded == 0 && alreadyPresent == 0;
+        periodsAdded == 0 &&
+        dailyAdded == 0 &&
+        pregnanciesAdded == 0 &&
+        careAdded == 0 &&
+        alreadyPresent == 0;
 
     return ImportedData(
       periodLogs: periods,
       dailyLogs: daily,
+      pregnancies: gebelikler,
+      careEvents: kalemler,
       report: nothingUsable && invalid == 0
           ? const ImportReport.failed(ImportFailure.empty)
           : ImportReport(
               periodsAdded: periodsAdded,
               dailyAdded: dailyAdded,
+              pregnanciesAdded: pregnanciesAdded,
+              careAdded: careAdded,
               alreadyPresent: alreadyPresent,
               invalid: invalid,
             ),
@@ -206,12 +312,43 @@ class BackupImportService {
   static ImportedData _unchanged(
     List<PeriodLog> periods,
     List<DailyLog> daily,
+    List<Pregnancy> pregnancies,
+    List<CareEvent> care,
     ImportFailure failure,
   ) => ImportedData(
     periodLogs: periods,
     dailyLogs: daily,
+    pregnancies: pregnancies,
+    careEvents: care,
     report: ImportReport.failed(failure),
   );
+
+  static Pregnancy? _readPregnancy(Object? entry) {
+    if (entry is! Map) return null;
+    try {
+      final m = Map<String, dynamic>.from(entry);
+      // Kimliksiz ya da tarihsiz kayıt: `fromMap` bunları bugünle doldururdu,
+      // yani elle bozulmuş bir girdi "bugün başlayan gebelik" olurdu.
+      if (m['id'] is! String || m['estimatedDueDate'] is! String) return null;
+      if (DateTime.tryParse(m['estimatedDueDate'] as String) == null) {
+        return null;
+      }
+      return Pregnancy.fromMap(m);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static CareEvent? _readCare(Object? entry) {
+    if (entry is! Map) return null;
+    try {
+      final m = Map<String, dynamic>.from(entry);
+      if (m['id'] is! String || m['pregnancyId'] is! String) return null;
+      return CareEvent.fromMap(m);
+    } catch (_) {
+      return null;
+    }
+  }
 
   static PeriodLog? _readPeriod(Object? entry) {
     if (entry is! Map) return null;

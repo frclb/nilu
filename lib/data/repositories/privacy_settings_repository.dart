@@ -8,6 +8,7 @@ import '../../domain/services/backup_import_service.dart';
 import '../../domain/services/cycle_intervals.dart';
 import '../local/secure_store.dart';
 import 'period_repository.dart';
+import 'care_repository.dart';
 import 'pregnancy_repository.dart';
 
 /// Gizlilik ekranının tercihleri ve veri yönetimi işlemleri.
@@ -18,14 +19,17 @@ class PrivacySettingsRepository {
   final SecureStore _store;
   final PeriodRepository _periodRepository;
   final PregnancyRepository _pregnancyRepository;
+  final CareRepository _careRepository;
 
   const PrivacySettingsRepository({
     SecureStore store = const SecureStore(),
     PeriodRepository periodRepository = const PeriodRepository(),
     PregnancyRepository pregnancyRepository = const PregnancyRepository(),
+    CareRepository careRepository = const CareRepository(),
   }) : _store = store,
        _periodRepository = periodRepository,
-       _pregnancyRepository = pregnancyRepository;
+       _pregnancyRepository = pregnancyRepository,
+       _careRepository = careRepository;
 
   // ─── Tercihler ───
   // Bunlar hassas veri değil, yalnızca aç/kapa tercihi.
@@ -80,11 +84,17 @@ class PrivacySettingsRepository {
   Future<String> exportDataAsJson() async {
     final periodLogs = await _periodRepository.getPeriodLogs();
     final dailyLogs = await _periodRepository.getDailyLogs();
+    final pregnancies = await _pregnancyRepository.getAll();
+    final careEvents = await _careRepository.getAll();
 
     return const JsonEncoder.withIndent('  ').convert({
       'exportedAt': DateTime.now().toIso8601String(),
       'periodLogs': periodLogs.map((l) => l.toMap()).toList(),
       'dailyLogs': dailyLogs.map((l) => l.toMap()).toList(),
+      // Gebelik yedekte olmasaydı yeni telefonda gebe kullanıcının
+      // uygulaması döngü moduna düşerdi.
+      'pregnancies': pregnancies.map((p) => p.toMap()).toList(),
+      'careEvents': careEvents.map((e) => e.toMap()).toList(),
     });
   }
 
@@ -101,6 +111,8 @@ class PrivacySettingsRepository {
       json: json,
       periodLogs: await _periodRepository.getPeriodLogs(),
       dailyLogs: await _periodRepository.getDailyLogs(),
+      pregnancies: await _pregnancyRepository.getAll(),
+      careEvents: await _careRepository.getAll(),
     );
 
     if (!result.report.succeeded || result.report.totalAdded == 0) {
@@ -109,6 +121,8 @@ class PrivacySettingsRepository {
 
     await _periodRepository.savePeriodLogs(result.periodLogs);
     await _periodRepository.saveDailyLogs(result.dailyLogs);
+    await _pregnancyRepository.saveAll(result.pregnancies);
+    await _careRepository.saveAll(result.careEvents);
     return result.report;
   }
 

@@ -26,6 +26,8 @@ void main() {
     periodLogs: const [],
     dailyLogs: const [],
     today: today,
+    pregnancies: const [],
+    careEvents: const [],
   );
 
   group('makul olmayan tarihler eleniyor', () {
@@ -36,17 +38,25 @@ void main() {
         '"endDate":"${iso(start.subtract(const Duration(days: 9)))}"}]',
       );
 
-      expect(result.periodLogs, isEmpty,
-          reason: 'Ters kayıt dönem uzunluğunu negatife düşürüyor.');
+      expect(
+        result.periodLogs,
+        isEmpty,
+        reason: 'Ters kayıt dönem uzunluğunu negatife düşürüyor.',
+      );
       expect(result.report.invalid, 1);
     });
 
     test('elli yıldan eski kayıt alınmıyor', () {
       final ancient = DateTime(1, 1, 1);
-      final result = importPeriods('[{"id":"a","startDate":"${iso(ancient)}"}]');
+      final result = importPeriods(
+        '[{"id":"a","startDate":"${iso(ancient)}"}]',
+      );
 
-      expect(result.periodLogs, isEmpty,
-          reason: 'Ana ekran altı basamaklı bir döngü günü yazıyordu.');
+      expect(
+        result.periodLogs,
+        isEmpty,
+        reason: 'Ana ekran altı basamaklı bir döngü günü yazıyordu.',
+      );
       expect(result.report.invalid, 1);
     });
 
@@ -61,14 +71,20 @@ void main() {
     test('gelecek tarihli günlük kayıt alınmıyor', () {
       final future = today.add(const Duration(days: 900));
       final result = BackupImportService.merge(
-        json: '{"dailyLogs":[{"date":"${iso(future)}","symptoms":[],"moods":[]}]}',
+        json:
+            '{"dailyLogs":[{"date":"${iso(future)}","symptoms":[],"moods":[]}]}',
         periodLogs: const [],
         dailyLogs: const [],
         today: today,
+        pregnancies: const [],
+        careEvents: const [],
       );
 
-      expect(result.dailyLogs, isEmpty,
-          reason: 'Günlük kayıtta hiç tarih sınırı yoktu.');
+      expect(
+        result.dailyLogs,
+        isEmpty,
+        reason: 'Günlük kayıtta hiç tarih sınırı yoktu.',
+      );
     });
   });
 
@@ -91,6 +107,8 @@ void main() {
           periodLogs: const [],
           dailyLogs: const [],
           today: today,
+          pregnancies: const [],
+          careEvents: const [],
         );
         expect(result.periodLogs, isEmpty);
         expect(result.dailyLogs, isEmpty);
@@ -105,10 +123,13 @@ void main() {
       startDate: today.subtract(const Duration(days: 2)),
     );
     final result = BackupImportService.merge(
-      json: '{"periodLogs":[{"id":"a","startDate":"${iso(DateTime(1, 1, 1))}"}]}',
+      json:
+          '{"periodLogs":[{"id":"a","startDate":"${iso(DateTime(1, 1, 1))}"}]}',
       periodLogs: [good],
       dailyLogs: const [],
       today: today,
+      pregnancies: const [],
+      careEvents: const [],
     );
 
     final info = PredictionService().getCycleInfo(result.periodLogs);

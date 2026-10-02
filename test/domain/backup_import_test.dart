@@ -21,11 +21,7 @@ void main() {
       PeriodLog(id: '$id', startDate: start, endDate: end);
 
   DailyLog daily(DateTime date, {String? flow, List<String>? symptoms}) =>
-      DailyLog(
-        date: date,
-        flowIntensity: flow,
-        symptoms: symptoms ?? const [],
-      );
+      DailyLog(date: date, flowIntensity: flow, symptoms: symptoms ?? const []);
 
   String backup({
     List<PeriodLog> periods = const [],
@@ -45,6 +41,8 @@ void main() {
     periodLogs: periods,
     dailyLogs: logs,
     today: today,
+    pregnancies: const [],
+    careEvents: const [],
   );
 
   group('boş cihaza geri yükleme', () {
@@ -246,10 +244,10 @@ void main() {
         ),
       );
 
-      expect(
-        result.periodLogs.map((l) => l.startDate),
-        [DateTime(2026, 1, 1), DateTime(2026, 3, 1)],
-      );
+      expect(result.periodLogs.map((l) => l.startDate), [
+        DateTime(2026, 1, 1),
+        DateTime(2026, 3, 1),
+      ]);
     });
   });
 }
