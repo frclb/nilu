@@ -1031,5 +1031,14 @@
   "preg_month_empty": "Bu ayda planlı kontrol yok",
   "calendar_due_date": "Tahmini doğum günü",
   "calendar_legend_appointment": "Randevu",
-  "calendar_legend_due": "Tahmini doğum"
+  "calendar_legend_due": "Tahmini doğum",
+  "onb_goal_title": "Hangisi sizi anlatıyor?",
+  "onb_goal_desc": "Ana ekran ve hatırlatıcılar seçiminize göre ayarlanır. Sonradan Profil'den değiştirebilirsiniz.",
+  "onb_goal_cycle": "Döngümü takip etmek istiyorum",
+  "onb_goal_cycle_body": "Regl, belirtiler ve tahminler",
+  "onb_goal_pregnancy": "Hamileyim",
+  "onb_goal_pregnancy_body": "Gebelik haftaları, kontroller ve randevular",
+  "preg_setup_due_method_lmp_assumed": "Son adet tarihine göre, döngünün {n} gün olduğu varsayılarak hesaplandı. Hekimin farklı bir tarih verdiyse onu gir — o geçerlidir.",
+  "preg_setup_good_to_know": "Bilmen gerekenler",
+  "onboarding_success_desc_pregnancy": "Gebelik takibiniz hazır. Haftanız, kontrolleriniz ve randevularınız ana ekranda."
 }

@@ -1031,5 +1031,14 @@
   "preg_month_empty": "No hay controles previstos este mes",
   "calendar_due_date": "Fecha probable de parto",
   "calendar_legend_appointment": "Cita",
-  "calendar_legend_due": "Fecha probable"
+  "calendar_legend_due": "Fecha probable",
+  "onb_goal_title": "¿Cuál es tu caso?",
+  "onb_goal_desc": "La pantalla de inicio y los recordatorios se ajustan a tu elección. Puedes cambiarla más tarde en Perfil.",
+  "onb_goal_cycle": "Quiero seguir mi ciclo",
+  "onb_goal_cycle_body": "Regla, síntomas y predicciones",
+  "onb_goal_pregnancy": "Estoy embarazada",
+  "onb_goal_pregnancy_body": "Semanas de embarazo, controles y citas",
+  "preg_setup_due_method_lmp_assumed": "Calculado a partir de tu última regla, suponiendo un ciclo de {n} días. Si tu médico te da otra fecha, introdúcela: esa es la que vale.",
+  "preg_setup_good_to_know": "Conviene saber",
+  "onboarding_success_desc_pregnancy": "Tu seguimiento del embarazo está listo. Tu semana, tus controles y tus citas están en la pantalla de inicio."
 }

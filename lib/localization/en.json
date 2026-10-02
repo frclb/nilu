@@ -1031,5 +1031,14 @@
   "preg_month_empty": "No check-ups planned this month",
   "calendar_due_date": "Due date",
   "calendar_legend_appointment": "Appointment",
-  "calendar_legend_due": "Due date"
+  "calendar_legend_due": "Due date",
+  "onb_goal_title": "Which one describes you?",
+  "onb_goal_desc": "Your home screen and reminders follow your choice. You can change it later in Profile.",
+  "onb_goal_cycle": "I want to track my cycle",
+  "onb_goal_cycle_body": "Periods, symptoms and predictions",
+  "onb_goal_pregnancy": "I'm pregnant",
+  "onb_goal_pregnancy_body": "Pregnancy weeks, check-ups and appointments",
+  "preg_setup_due_method_lmp_assumed": "Calculated from your last period, assuming a {n}-day cycle. If your doctor gives you a different date, enter that — it takes priority.",
+  "preg_setup_good_to_know": "Good to know",
+  "onboarding_success_desc_pregnancy": "Your pregnancy tracking is ready. Your week, check-ups and appointments are on the home screen."
 }

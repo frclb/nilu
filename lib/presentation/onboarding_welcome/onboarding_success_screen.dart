@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
+import '../../domain/models/life_stage.dart';
+import '../../domain/view_models/pregnancy_view_model.dart';
 import '../../domain/view_models/user_view_model.dart';
 import '../../design_system/app_layout.dart';
 
@@ -39,6 +41,9 @@ class OnboardingSuccessScreen extends StatelessWidget {
     final primaryColor =
         theme.colorScheme.primary; // Often #f04299 based on provided HTML
     final subtlePink = context.tokens.brandTint;
+    // Kurulumda "Hamileyim" seçildiyse ayarlanan bir döngü yok.
+    final gebe =
+        context.watch<PregnancyViewModel>().stage == LifeStage.pregnancy;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -219,7 +224,11 @@ class OnboardingSuccessScreen extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 16),
                                     Text(
-                                      context.tr('onboarding_success_desc'),
+                                      context.tr(
+                                        gebe
+                                            ? 'onboarding_success_desc_pregnancy'
+                                            : 'onboarding_success_desc',
+                                      ),
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontSize: 16,

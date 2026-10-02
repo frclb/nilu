@@ -68,6 +68,13 @@ class CycleSettingsRepository {
     return await _store.getInt(_cycleLengthKey) ?? defaultCycleLength;
   }
 
+  /// Kullanıcı bir döngü uzunluğu kaydetti mi (kurulumda ya da ayarlarda)?
+  ///
+  /// [getCycleLength] kayıt yokken de 28 döndürüyor; o sayının kullanıcıdan
+  /// mı varsayılandan mı geldiğini yalnızca bu söylüyor.
+  Future<bool> hasCycleLength() async =>
+      await _store.getInt(_cycleLengthKey) != null;
+
   /// Kayıtlı kanama süresini döndürür (varsayılan: 5).
   Future<int> getPeriodLength() async {
     return await _store.getInt(_periodLengthKey) ?? defaultPeriodLength;

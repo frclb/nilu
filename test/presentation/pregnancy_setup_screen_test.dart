@@ -121,6 +121,95 @@ void main() {
     expect(vm.currentEvents, isEmpty);
   });
 
+  group('döngü uzunluğu', () {
+    String yontem(BuildContext ctx, String key, int n) =>
+        ctx.tr(key, params: {'n': '$n'});
+
+    testWidgets('kayıtlardan çıkıyorsa onunla hesaplanıp öyle söyleniyor', (
+      tester,
+    ) async {
+      // 30 günlük iki döngü; son regl 20 gün önce.
+      await const PeriodRepository().savePeriodLogs([
+        for (final once in [80, 50, 20])
+          PeriodLog(
+            id: 'p$once',
+            startDate: daysAgo(once),
+            endDate: daysAgo(once - 4),
+          ),
+      ]);
+      await pumpRouter(
+        tester,
+        routes: pregnancyRoutes(const PregnancySetupScreen()),
+      );
+      final ctx = tester.element(find.byType(PregnancySetupScreen));
+
+      expect(
+        find.text(yontem(ctx, 'preg_setup_due_method_lmp', 30)),
+        findsOneWidget,
+      );
+      expect(
+        find.text(yontem(ctx, 'preg_setup_due_method_lmp_assumed', 30)),
+        findsNothing,
+      );
+      // Naegele, döngü düzeltmesiyle: son adet + 280 + (30 − 28).
+      final edd = daysAgo(20).add(const Duration(days: 282));
+      expect(
+        find.text(
+          ctx.tr(
+            'preg_setup_due_result',
+            params: {
+              'date': '${edd.day} ${ctx.monthName(edd.month)} ${edd.year}',
+            },
+          ),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('bilinmiyorsa 28 "senin döngün" diye sunulmuyor', (
+      tester,
+    ) async {
+      // Tek kayıt, kaydedilmiş süre yok: aralık çıkmıyor, 28 varsayılan.
+      await const PeriodRepository().savePeriodLogs([
+        PeriodLog(id: 'tek', startDate: daysAgo(20), endDate: daysAgo(16)),
+      ]);
+      await pumpRouter(
+        tester,
+        routes: pregnancyRoutes(const PregnancySetupScreen()),
+      );
+      final ctx = tester.element(find.byType(PregnancySetupScreen));
+
+      expect(
+        find.text(yontem(ctx, 'preg_setup_due_method_lmp_assumed', 28)),
+        findsOneWidget,
+      );
+      expect(
+        find.text(yontem(ctx, 'preg_setup_due_method_lmp', 28)),
+        findsNothing,
+      );
+    });
+  });
+
+  testWidgets('profilden açılınca "ne değişecek": tahminler de duruyor', (
+    tester,
+  ) async {
+    await seedCycles(lastStartAgo: 20);
+    await pumpRouter(
+      tester,
+      routes: pregnancyRoutes(const PregnancySetupScreen()),
+    );
+    final ctx = tester.element(find.byType(PregnancySetupScreen));
+    expect(
+      find.text(ctx.upper(ctx.tr('preg_setup_changes_section'))),
+      findsOneWidget,
+    );
+    expect(find.text(ctx.tr('preg_setup_change_predictions')), findsOneWidget);
+    expect(
+      find.text(ctx.upper(ctx.tr('preg_setup_good_to_know'))),
+      findsNothing,
+    );
+  });
+
   testWidgets('tahmini doğum geçmişse başlatılamıyor', (tester) async {
     // Tek kayıt, 290 gün önce: son adete göre doğum 10 gün önceydi.
     await const PeriodRepository().savePeriodLogs([

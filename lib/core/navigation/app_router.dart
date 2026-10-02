@@ -21,6 +21,7 @@ import '../../presentation/partner_match/partner_dashboard_screen.dart';
 // Screens
 import '../../presentation/splash/splash_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_welcome_screen.dart';
+import '../../presentation/onboarding_welcome/onboarding_goal_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_last_period_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_period_length_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_cycle_length_screen.dart';
@@ -58,6 +59,8 @@ import '../../presentation/premium/premium_screen.dart';
 const Set<String> preOnboardingPaths = {
   '/splash',
   '/onboarding',
+  '/onboarding_goal',
+  '/onboarding_pregnancy',
   '/onboarding_last_period',
   '/onboarding_period_length',
   '/onboarding_cycle_length',
@@ -159,6 +162,20 @@ GoRouter createAppRouter(
         path: '/onboarding',
         name: RouteNames.onboarding,
         builder: (context, state) => const OnboardingWelcomeScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding_goal',
+        name: RouteNames.onboardingGoal,
+        builder: (context, state) => const OnboardingGoalScreen(),
+      ),
+      // "Hamileyim" yolu: uygulamanın gebelik kurulumu, kurulum kipinde.
+      // `/pregnancy/setup` onboarding'den önce açılamıyor (redirect) ve bitince
+      // ana ekrana gidiyor; kurulumu tamamlayacak olan ise son ekran.
+      GoRoute(
+        path: '/onboarding_pregnancy',
+        name: RouteNames.onboardingPregnancy,
+        builder: (context, state) =>
+            const PregnancySetupScreen(fromOnboarding: true),
       ),
       GoRoute(
         path: '/onboarding_last_period',

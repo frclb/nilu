@@ -5,7 +5,7 @@
 /// biri unutulsaydı kullanıcı adım sayısı değişen bir gösterge görürdü.
 library;
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/navigation/route_names.dart';
@@ -28,7 +28,57 @@ void onboardingBack(BuildContext context) {
 }
 
 /// Karşılama sayfalarından sonra gelen soru ekranları dahil, toplam adım.
-const int onboardingStepCount = 7;
+const int onboardingStepCount = 8;
+
+/// Her soru ekranının göstergedeki yeri (karşılama sayfaları 0–3).
+///
+/// İndeksler ekranlara tek tek yazılıydı; araya hedef adımı girince üçünün
+/// birden kayması gerekti. Sayıyla aynı yerde durmaları bu yüzden.
+///
+/// Gebelik yolu hedef adımından sonra tek bir ekran (gebelik kurulumu);
+/// o ekran göstergeyi göstermiyor, sekiz noktalı bir dizide yanlış yerde
+/// durmasın diye.
+abstract final class OnboardingStep {
+  static const int goal = 4;
+  static const int lastPeriod = 5;
+  static const int periodLength = 6;
+  static const int cycleLength = 7;
+}
+
+/// Soru ekranlarının ilerleme göstergesi.
+class OnboardingStepDots extends StatelessWidget {
+  const OnboardingStepDots({super.key, required this.step});
+
+  /// Etkin nokta (bkz. [OnboardingStep]).
+  final int step;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primary = theme.colorScheme.primary;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(onboardingStepCount, (index) {
+          final isActive = index == step;
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 6),
+            width: isActive ? 24 : 10,
+            height: 10,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: isActive
+                  ? primary
+                  : primary.withAlpha(onboardingIdleDotAlpha(isDark)),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
 
 /// Geçilmemiş noktanın saydamlığı.
 ///

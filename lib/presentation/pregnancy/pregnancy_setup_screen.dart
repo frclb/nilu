@@ -20,7 +20,18 @@ import 'care_text.dart';
 /// "Ne değişecek" bölümü bilerek var: tahminlerin durması ve kanamanın artık
 /// regl sayılmaması kullanıcıya sürpriz olmamalı.
 class PregnancySetupScreen extends StatefulWidget {
-  const PregnancySetupScreen({super.key, @visibleForTesting this.today});
+  const PregnancySetupScreen({
+    super.key,
+    this.fromOnboarding = false,
+    @visibleForTesting this.today,
+  });
+
+  /// İlk kurulumdan, "Hamileyim" seçilerek açıldı.
+  ///
+  /// Bitince ana ekrana değil kurulumun son ekranına gidiliyor (kurulumu o
+  /// tamamlıyor). "Ne değişecek" bölümü de yok: uygulama yeni, değişecek bir
+  /// tahmin yok; yerine aynı uyarıların "bilmen gerekenler" hâli var.
+  final bool fromOnboarding;
 
   final DateTime? today;
 
@@ -65,6 +76,14 @@ class _PregnancySetupScreenState extends State<PregnancySetupScreen> {
 
   int get _donguUzunlugu =>
       context.read<CalendarViewModel>().cycleInfo.averageCycleLength;
+
+  /// Döngü uzunluğu kullanıcının mı, varsayılan mı?
+  ///
+  /// Kurulumda gebelik yolunu seçen kullanıcıya döngüsü hiç sorulmadı; hesap
+  /// 28 günle yapılıyor ve metin bunu "28 günlük döngüne göre" diye değil
+  /// varsayım olarak söylüyor.
+  bool get _donguBiliniyor =>
+      context.read<CalendarViewModel>().cycleLengthKnown;
 
   /// Seçimlere göre oluşacak gebelik; eksikse `null`.
   Pregnancy? get _onizleme {
@@ -130,7 +149,9 @@ class _PregnancySetupScreenState extends State<PregnancySetupScreen> {
       );
     }
     if (!mounted) return;
-    context.goNamed(RouteNames.home);
+    context.goNamed(
+      widget.fromOnboarding ? RouteNames.onboardingSuccess : RouteNames.home,
+    );
   }
 
   String _tarih(DateTime d) =>
@@ -235,9 +256,11 @@ class _PregnancySetupScreenState extends State<PregnancySetupScreen> {
                       const SizedBox(height: 8),
                       Text(
                         context.tr(
-                          _kaynak == _Kaynak.lmp
+                          _kaynak == _Kaynak.clinician
+                              ? 'preg_setup_due_method_clinician'
+                              : _donguBiliniyor
                               ? 'preg_setup_due_method_lmp'
-                              : 'preg_setup_due_method_clinician',
+                              : 'preg_setup_due_method_lmp_assumed',
                           params: {'n': '$_donguUzunlugu'},
                         ),
                         style: govde(t.textMuted),
@@ -299,12 +322,18 @@ class _PregnancySetupScreenState extends State<PregnancySetupScreen> {
 
               // ── 3. Ne değişecek ──
               Text(
-                context.upper(context.tr('preg_setup_changes_section')),
+                context.upper(
+                  context.tr(
+                    widget.fromOnboarding
+                        ? 'preg_setup_good_to_know'
+                        : 'preg_setup_changes_section',
+                  ),
+                ),
                 style: baslik(),
               ),
               const SizedBox(height: 10),
-              for (final k in const [
-                'preg_setup_change_predictions',
+              for (final k in [
+                if (!widget.fromOnboarding) 'preg_setup_change_predictions',
                 'preg_setup_change_bleeding',
                 'preg_setup_change_reminders',
               ])

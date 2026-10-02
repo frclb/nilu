@@ -1031,5 +1031,14 @@
   "preg_month_empty": "Aucun contrôle prévu ce mois-ci",
   "calendar_due_date": "Date prévue de l'accouchement",
   "calendar_legend_appointment": "Rendez-vous",
-  "calendar_legend_due": "Terme"
+  "calendar_legend_due": "Terme",
+  "onb_goal_title": "Qu'est-ce qui te correspond ?",
+  "onb_goal_desc": "L'écran d'accueil et les rappels s'adaptent à ton choix. Tu pourras le modifier plus tard dans Profil.",
+  "onb_goal_cycle": "Je veux suivre mon cycle",
+  "onb_goal_cycle_body": "Règles, symptômes et prévisions",
+  "onb_goal_pregnancy": "Je suis enceinte",
+  "onb_goal_pregnancy_body": "Semaines de grossesse, contrôles et rendez-vous",
+  "preg_setup_due_method_lmp_assumed": "Calculé d'après tes dernières règles, en supposant un cycle de {n} jours. Si ton médecin te donne une autre date, saisis-la : elle prime.",
+  "preg_setup_good_to_know": "Bon à savoir",
+  "onboarding_success_desc_pregnancy": "Ton suivi de grossesse est prêt. Ta semaine, tes contrôles et tes rendez-vous sont sur l'écran d'accueil."
 }

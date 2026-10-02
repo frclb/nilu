@@ -1031,5 +1031,14 @@
   "preg_month_empty": "Keine Untersuchungen in diesem Monat",
   "calendar_due_date": "Errechneter Geburtstermin",
   "calendar_legend_appointment": "Termin",
-  "calendar_legend_due": "Geburtstermin"
+  "calendar_legend_due": "Geburtstermin",
+  "onb_goal_title": "Was trifft auf dich zu?",
+  "onb_goal_desc": "Startbildschirm und Erinnerungen richten sich nach deiner Wahl. Du kannst sie später im Profil ändern.",
+  "onb_goal_cycle": "Ich möchte meinen Zyklus verfolgen",
+  "onb_goal_cycle_body": "Periode, Symptome und Vorhersagen",
+  "onb_goal_pregnancy": "Ich bin schwanger",
+  "onb_goal_pregnancy_body": "Schwangerschaftswochen, Vorsorge und Termine",
+  "preg_setup_due_method_lmp_assumed": "Berechnet aus deiner letzten Periode, ausgehend von einem {n}-Tage-Zyklus. Wenn deine Ärztin oder dein Arzt einen anderen Termin nennt, trag diesen ein — er hat Vorrang.",
+  "preg_setup_good_to_know": "Gut zu wissen",
+  "onboarding_success_desc_pregnancy": "Deine Schwangerschaftsbegleitung ist bereit. Deine Woche, Vorsorge und Termine findest du auf dem Startbildschirm."
 }

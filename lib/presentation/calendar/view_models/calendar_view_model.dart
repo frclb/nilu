@@ -31,6 +31,7 @@ class CalendarViewModel extends ChangeNotifier {
 
   // Kullanıcı ayarları
   int _userCycleLength = 28;
+  bool _cycleLengthSaved = false;
   int _userPeriodLength = 5;
   DateTime? _settingsUpdatedAt;
   bool _hormonalContraception = false;
@@ -40,6 +41,16 @@ class CalendarViewModel extends ChangeNotifier {
 
   /// Hormonal doğum kontrolü açıkken doğurganlık tahmini gösterilmez.
   bool get hormonalContraception => _hormonalContraception;
+
+  /// Ortalama döngü uzunluğu kullanıcıdan mı geliyor?
+  ///
+  /// Ya kendisi bir süre kaydetmiş ya da kayıtlarından en az bir döngü
+  /// aralığı çıkıyor. İkisi de yoksa `cycleInfo.averageCycleLength`
+  /// varsayılan 28: kurulumda gebelik yolunu seçen kullanıcı ne süre söyledi
+  /// ne regl kaydı girdi. O sayıyı "senin döngün" diye sunmamak için.
+  bool get cycleLengthKnown =>
+      _cycleLengthSaved ||
+      CycleIntervals.of(_periodLogs, breaks: _cycleBreaks).isNotEmpty;
 
   /// Kullanıcının bulunduğu yaşam evresi.
   LifeStage get lifeStage => _lifeStage;
@@ -103,6 +114,7 @@ class CalendarViewModel extends ChangeNotifier {
 
       // Kullanıcı döngü ayarlarını yükle
       _userCycleLength = await _settingsRepo.getCycleLength();
+      _cycleLengthSaved = await _settingsRepo.hasCycleLength();
       _userPeriodLength = await _settingsRepo.getPeriodLength();
       _settingsUpdatedAt = await _settingsRepo.getSettingsUpdatedAt();
       _hormonalContraception = await _settingsRepo.getHormonalContraception();

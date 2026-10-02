@@ -207,5 +207,22 @@ void main() {
           reason: 'Adım sayısı kopyalandığında araya ekran eklemek '
               'göstergeleri birbirinden ayırır.');
     });
+
+    test('soru adımları art arda ve son nokta son adım', () {
+      // Karşılama sayfaları 0–3; hedef adımı onlardan hemen sonra.
+      const adimlar = [
+        OnboardingStep.goal,
+        OnboardingStep.lastPeriod,
+        OnboardingStep.periodLength,
+        OnboardingStep.cycleLength,
+      ];
+      expect(adimlar.first, 4);
+      for (var i = 1; i < adimlar.length; i++) {
+        expect(adimlar[i], adimlar[i - 1] + 1);
+      }
+      expect(adimlar.last, onboardingStepCount - 1,
+          reason: 'Araya adım eklenip sayı artırılmazsa son ekranın '
+              'noktası dizinin dışına düşer: hiçbir nokta etkin görünmez.');
+    });
   });
 }

@@ -70,7 +70,9 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
   Future<void> _completeOnboarding() async {
     // `go` değil `push`: `go` yığını değiştiriyor ve sonraki adımların
     // geri düğmesi boşa düşüyordu.
-    context.pushNamed(RouteNames.onboardingLastPeriod);
+    //
+    // "Atla" da buraya geliyor: tanıtımı atlamak yol seçimini atlamak değil.
+    context.pushNamed(RouteNames.onboardingGoal);
   }
 
   void _nextPage() {

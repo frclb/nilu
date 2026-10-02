@@ -92,6 +92,8 @@ void main() {
     test('onboarding akışındaki adımlar serbesttir', () {
       for (final location in [
         '/onboarding',
+        '/onboarding_goal',
+        '/onboarding_pregnancy',
         '/onboarding_last_period',
         '/onboarding_cycle_length',
         '/onboarding_success',

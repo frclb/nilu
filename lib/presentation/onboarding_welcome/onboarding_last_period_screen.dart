@@ -135,29 +135,7 @@ class _OnboardingLastPeriodScreenState
                 ),
               ),
 
-              // Progress Indicator
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(onboardingStepCount, (index) {
-                    final isActive = index == 4;
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 6),
-                      width: isActive ? 24 : 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: isActive
-                            ? (Theme.of(context).colorScheme.primary)
-                            : primaryColor.withAlpha(
-                                onboardingIdleDotAlpha(isDark),
-                              ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
+              const OnboardingStepDots(step: OnboardingStep.lastPeriod),
 
               Expanded(
                 child: SingleChildScrollView(

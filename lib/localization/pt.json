@@ -1031,5 +1031,14 @@
   "preg_month_empty": "Nenhuma consulta prevista neste mês",
   "calendar_due_date": "Data prevista do parto",
   "calendar_legend_appointment": "Consulta",
-  "calendar_legend_due": "Data prevista"
+  "calendar_legend_due": "Data prevista",
+  "onb_goal_title": "Qual é o seu caso?",
+  "onb_goal_desc": "A tela inicial e os lembretes se ajustam à sua escolha. Você pode mudar depois no Perfil.",
+  "onb_goal_cycle": "Quero acompanhar meu ciclo",
+  "onb_goal_cycle_body": "Menstruação, sintomas e previsões",
+  "onb_goal_pregnancy": "Estou grávida",
+  "onb_goal_pregnancy_body": "Semanas de gravidez, consultas e exames",
+  "preg_setup_due_method_lmp_assumed": "Calculado com base na última menstruação, considerando um ciclo de {n} dias. Se o médico informar outra data, insira essa — ela tem prioridade.",
+  "preg_setup_good_to_know": "Bom saber",
+  "onboarding_success_desc_pregnancy": "Seu acompanhamento da gravidez está pronto. Sua semana, consultas e exames estão na tela inicial."
 }
