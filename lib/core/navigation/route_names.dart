@@ -35,4 +35,5 @@ class RouteNames {
   static const String dangerSigns = 'danger_signs';
   static const String endPregnancy = 'end_pregnancy';
   static const String careSummary = 'care_summary';
+  static const String pregnancyMonths = 'pregnancy_months';
 }

@@ -16,6 +16,7 @@ import 'package:period_tracker/presentation/pregnancy/care_list_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/care_summary_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/danger_signs_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/end_pregnancy_screen.dart';
+import 'package:period_tracker/presentation/pregnancy/pregnancy_months_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/pregnancy_setup_screen.dart';
 
 /// Gebelik ve lohusalık ekranlarının testlerinde ortak veri.
@@ -136,6 +137,11 @@ List<RouteBase> pregnancyRoutes(Widget first) => [
     path: '/log-entry',
     name: RouteNames.logEntry,
     builder: (_, _) => const LogEntryScreen(),
+  ),
+  GoRoute(
+    path: '/pregnancy/months',
+    name: RouteNames.pregnancyMonths,
+    builder: (_, _) => const PregnancyMonthsScreen(),
   ),
   GoRoute(
     path: '/care/summary',

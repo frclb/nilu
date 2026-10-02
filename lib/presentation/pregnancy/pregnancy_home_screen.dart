@@ -8,6 +8,7 @@ import '../../design_system/app_layout.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/models/care_event.dart';
 import '../../domain/models/pregnancy.dart';
+import '../../domain/models/pregnancy_month.dart';
 import '../../domain/view_models/pregnancy_view_model.dart';
 import '../../localization/app_localizations.dart';
 import '../../localization/date_names.dart';
@@ -59,6 +60,10 @@ class PregnancyHomeScreen extends StatelessWidget {
                       bugun: bugun,
                     ),
                     const DangerEntryCard(period: DangerPeriod.pregnancy),
+                    // Genel bakış en sonda: önce nerede olduğun, sıradaki iş
+                    // ve tehlike işaretleri — küçük ekranda bu üçü ilk
+                    // bakışta görünmeli.
+                    _AylarKarti(gebelik: gebelik, bugun: bugun),
                   ]),
                 ),
               ),
@@ -116,11 +121,13 @@ class _HaftaKarti extends StatelessWidget {
                 children: [
                   if (trimester != null)
                     Text(
+                      // Ay ve trimester birlikte: kullanıcı süreci aylarla
+                      // düşünüyor, hekim haftayla konuşuyor (bkz.
+                      // `PregnancyMonth`).
                       context.upper(
-                        context.tr(
-                          'preg_trimester_label',
-                          params: {'n': '${trimester.index + 1}'},
-                        ),
+                        '${context.monthLabel(PregnancyMonth.of(ga!).number)}'
+                        ' · '
+                        '${context.tr('preg_trimester_label', params: {'n': '${trimester.index + 1}'})}',
                       ),
                       style: theme.textTheme.labelLarge?.copyWith(
                         fontSize: 11,
@@ -306,6 +313,85 @@ class DangerEntryCard extends StatelessWidget {
                       fontSize: 13,
                       height: 1.4,
                       color: t.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: t.textFaint),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Dokuz ayın neresindesin: geçen aylar dolu, bu ay vurgulu.
+class _AylarKarti extends StatelessWidget {
+  const _AylarKarti({required this.gebelik, required this.bugun});
+
+  final Pregnancy gebelik;
+  final DateTime bugun;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    final ga = gebelik.gestationOn(bugun);
+    if (ga == null) return const SizedBox.shrink();
+    final ay = PregnancyMonth.of(ga);
+    final renk = theme.colorScheme.primary;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+      child: AppCard(
+        key: const Key('preg_months_card'),
+        onTap: () => context.pushNamed(RouteNames.pregnancyMonths),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    context.upper(context.tr('preg_months_title')),
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontSize: 11,
+                      letterSpacing: 1.6,
+                      fontWeight: FontWeight.w700,
+                      color: t.textMuted,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      for (final m in PregnancyMonth.all)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: Container(
+                            width: m.number == ay.number ? 14 : 10,
+                            height: m.number == ay.number ? 14 : 10,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: m.number <= ay.number
+                                  ? renk.withAlpha(
+                                      m.number == ay.number ? 255 : 110,
+                                    )
+                                  : Colors.transparent,
+                              border: Border.all(color: renk),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    '${context.monthLabel(ay.number)} · '
+                    '${context.tr('preg_month_weeks', params: {'a': '${ay.fromWeek}', 'b': '${ay.toWeek}'})}',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: t.text,
                     ),
                   ),
                 ],

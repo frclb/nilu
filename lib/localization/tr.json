@@ -1023,5 +1023,10 @@
   "pp_return_subtitle": "Lohusalık takibini bitirir; kayıtlar silinmez",
   "pp_return_title": "Lohusalık takibini bitir",
   "pp_return_body": "Regl takibine dönüyorsun. Doğum kaydın, randevuların ve notların silinmez; lohusalık hatırlatıcıları durur. İlk reglin geldiğinde takvimden ya da ana ekrandan işaretleyebilirsin. Tahminler ilk döngün tamamlanınca yeniden başlar.",
-  "pp_day_birth": "Doğum günü"
+  "pp_day_birth": "Doğum günü",
+  "preg_months_title": "Ay ay gebelik",
+  "preg_month_label": "{n}. ay",
+  "preg_month_label_first": "1. ay",
+  "preg_month_weeks": "{a}–{b}. hafta",
+  "preg_month_empty": "Bu ayda planlı kontrol yok"
 }

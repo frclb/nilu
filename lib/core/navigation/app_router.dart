@@ -14,6 +14,7 @@ import '../../presentation/pregnancy/danger_signs_screen.dart';
 import '../../presentation/pregnancy/end_pregnancy_screen.dart';
 import '../../presentation/pregnancy/postpartum_home_screen.dart';
 import '../../presentation/pregnancy/pregnancy_home_screen.dart';
+import '../../presentation/pregnancy/pregnancy_months_screen.dart';
 import '../../presentation/pregnancy/pregnancy_setup_screen.dart';
 import '../../presentation/partner_match/partner_dashboard_screen.dart';
 
@@ -307,6 +308,11 @@ GoRouter createAppRouter(
         path: '/pregnancy/setup',
         name: RouteNames.pregnancySetup,
         builder: (context, state) => const PregnancySetupScreen(),
+      ),
+      GoRoute(
+        path: '/pregnancy/months',
+        name: RouteNames.pregnancyMonths,
+        builder: (context, state) => const PregnancyMonthsScreen(),
       ),
       GoRoute(
         path: '/pregnancy/end',

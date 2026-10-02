@@ -54,6 +54,11 @@ extension CareText on BuildContext {
     ),
   };
 
+  /// "6. ay"; Fransızcada birinci ay "1er mois" olduğu için ayrı anahtar.
+  String monthLabel(int n) => n == 1
+      ? tr('preg_month_label_first')
+      : tr('preg_month_label', params: {'n': '$n'});
+
   /// Tahmini doğuma kalan ya da geçen gün — 0 ve 1 için ayrı anahtar.
   String dueCountdown(int kalan) => switch (kalan) {
     0 => tr('preg_due_today'),

@@ -1023,5 +1023,10 @@
   "pp_return_subtitle": "Arrête le suivi post-partum ; rien n'est supprimé",
   "pp_return_title": "Arrêter le suivi post-partum",
   "pp_return_body": "Tu reviens au suivi des règles. Ton accouchement, tes rendez-vous et tes notes sont conservés ; les rappels post-partum s'arrêtent. Quand tes premières règles arrivent, tu peux les noter dans le calendrier ou sur l'accueil. Les prévisions reprennent une fois ton premier cycle terminé.",
-  "pp_day_birth": "Jour de la naissance"
+  "pp_day_birth": "Jour de la naissance",
+  "preg_months_title": "Mois par mois",
+  "preg_month_label": "{n}e mois",
+  "preg_month_label_first": "1er mois",
+  "preg_month_weeks": "Semaines {a} à {b}",
+  "preg_month_empty": "Aucun contrôle prévu ce mois-ci"
 }

@@ -10,6 +10,7 @@ import 'package:period_tracker/presentation/pregnancy/care_list_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/care_text.dart';
 import 'package:period_tracker/presentation/pregnancy/danger_signs_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/pregnancy_home_screen.dart';
+import 'package:period_tracker/presentation/pregnancy/pregnancy_months_screen.dart';
 
 import 'pregnancy_fixtures.dart';
 import 'screen_harness.dart';
@@ -51,10 +52,13 @@ void main() {
       );
       expect(
         find.text(
-          ctx.upper(ctx.tr('preg_trimester_label', params: {'n': '2'})),
+          ctx.upper(
+            '${ctx.monthLabel(6)} · '
+            '${ctx.tr('preg_trimester_label', params: {'n': '2'})}',
+          ),
         ),
         findsOneWidget,
-        reason: '24. hafta ikinci trimester',
+        reason: '24+2: 6. ay, ikinci trimester',
       );
 
       // Sıradaki kontrol: Türkiye şemasında 24. haftada açık kalem var.
@@ -73,6 +77,19 @@ void main() {
       expect(rawKeysOnScreen(tester), isEmpty);
     });
   }
+
+  testWidgets('ay kartı aylar ekranını açıyor', (tester) async {
+    await seedPregnancy(weeks: 24, days: 2);
+    await pumpRouter(
+      tester,
+      routes: pregnancyRoutes(const PregnancyHomeScreen()),
+    );
+    final kart = find.byKey(const Key('preg_months_card'));
+    await tester.ensureVisible(kart);
+    await tester.tap(kart);
+    await settleAsync(tester);
+    expect(find.byType(PregnancyMonthsScreen), findsOneWidget);
+  });
 
   testWidgets('kalan gün tahmini doğuma göre', (tester) async {
     final g = await seedPregnancy(weeks: 24, days: 2);
