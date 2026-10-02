@@ -84,6 +84,12 @@ class Pregnancy {
   final PregnancyOutcome? outcome;
   final DateTime? endedAt;
 
+  /// Kurulumda seçilen bakım şablonu (`'tr'`) ya da `null` (kendi
+  /// randevularım). Doğumda lohusa şablonunun üretilip üretilmeyeceği buna
+  /// bağlı: kendi randevularını tutan kullanıcıya Bakanlık takvimi
+  /// dayatılmamalı.
+  final String? careTemplate;
+
   const Pregnancy({
     required this.id,
     required this.estimatedDueDate,
@@ -92,6 +98,7 @@ class Pregnancy {
     this.dueDateFromClinician = false,
     this.outcome,
     this.endedAt,
+    this.careTemplate,
   });
 
   /// Son adet tarihinden kurar.
@@ -105,6 +112,7 @@ class Pregnancy {
     required int cycleLength,
     DateTime? confirmedAt,
     String? id,
+    String? careTemplate,
   }) {
     final gun = _day(lmp);
     final guvenilir =
@@ -116,6 +124,7 @@ class Pregnancy {
       lmp: gun,
       estimatedDueDate: gun.add(Duration(days: termDays + duzeltme)),
       confirmedAt: _day(confirmedAt ?? DateTime.now()),
+      careTemplate: careTemplate,
     );
   }
 
@@ -125,13 +134,32 @@ class Pregnancy {
     DateTime? lmp,
     DateTime? confirmedAt,
     String? id,
+    String? careTemplate,
   }) => Pregnancy(
     id: id ?? _id(confirmedAt ?? DateTime.now()),
     lmp: lmp == null ? null : _day(lmp),
     estimatedDueDate: _day(dueDate),
     dueDateFromClinician: true,
     confirmedAt: _day(confirmedAt ?? DateTime.now()),
+    careTemplate: careTemplate,
   );
+
+  /// Tahmini doğum tarihini değiştirir.
+  ///
+  /// Hekim ilk trimester ultrasonuyla tarihi düzelttiğinde kullanılıyor.
+  /// Hafta hesabı ve bakım pencereleri EDD'den türediği için onlar da
+  /// kendiliğinden kayıyor (bkz. [gestationStart]).
+  Pregnancy withDueDate(DateTime dueDate, {required bool fromClinician}) =>
+      Pregnancy(
+        id: id,
+        lmp: lmp,
+        estimatedDueDate: _day(dueDate),
+        dueDateFromClinician: fromClinician,
+        confirmedAt: confirmedAt,
+        outcome: outcome,
+        endedAt: endedAt,
+        careTemplate: careTemplate,
+      );
 
   bool get isActive => endedAt == null;
 
@@ -175,6 +203,7 @@ class Pregnancy {
         confirmedAt: confirmedAt,
         outcome: outcome,
         endedAt: _day(at ?? DateTime.now()),
+        careTemplate: careTemplate,
       );
 
   Map<String, dynamic> toMap() => {
@@ -185,6 +214,7 @@ class Pregnancy {
     'confirmedAt': _iso(confirmedAt),
     if (outcome != null) 'outcome': outcome!.name,
     if (endedAt != null) 'endedAt': _iso(endedAt!),
+    if (careTemplate != null) 'careTemplate': careTemplate,
   };
 
   factory Pregnancy.fromMap(Map<String, dynamic> map) {
@@ -199,6 +229,7 @@ class Pregnancy {
       // yüzünden kayıt "hâlâ sürüyor" görünmesin.
       outcome: bitis == null ? null : _outcome(map['outcome']),
       endedAt: bitis,
+      careTemplate: map['careTemplate'] as String?,
     );
   }
 

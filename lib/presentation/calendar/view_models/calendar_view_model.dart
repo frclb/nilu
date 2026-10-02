@@ -3,6 +3,7 @@ import '../../../domain/models/period_log.dart';
 import '../../../domain/models/daily_log.dart';
 import '../../../domain/models/cycle_info.dart';
 import '../../../domain/models/life_stage.dart';
+import '../../../domain/models/pregnancy.dart';
 import '../../../domain/services/cycle_intervals.dart';
 import '../../../domain/services/period_service.dart';
 import '../../../domain/services/prediction_service.dart';
@@ -35,6 +36,7 @@ class CalendarViewModel extends ChangeNotifier {
   bool _hormonalContraception = false;
   LifeStage _lifeStage = LifeStage.cycle;
   List<DateSpan> _cycleBreaks = const [];
+  int _pregnancyRevision = -1;
 
   /// Hormonal doğum kontrolü açıkken doğurganlık tahmini gösterilmez.
   bool get hormonalContraception => _hormonalContraception;
@@ -51,6 +53,23 @@ class CalendarViewModel extends ChangeNotifier {
   /// `InsightsService.cycleLengths` bu parametreyi **zorunlu** tutuyor, yani
   /// yeni bir ekran onu unutamıyor.
   List<DateSpan> get cycleBreaks => _cycleBreaks;
+
+  /// Gebelik durumundaki değişikliği uygular.
+  ///
+  /// `PregnancyViewModel` her değiştiğinde `main.dart`'taki
+  /// `ChangeNotifierProxyProvider` bunu çağırıyor. Gebelik bittiği an takvim
+  /// de biliyor; hiçbir ekranın "takvimi yenilemeyi" hatırlaması gerekmiyor.
+  /// Aynı sürüm ikinci kez uygulanmıyor: yeniden çizimlerde boşuna
+  /// hesaplamasın.
+  void applyPregnancies(List<Pregnancy> gebelikler, {required int revision}) {
+    if (revision == _pregnancyRevision) return;
+    _pregnancyRevision = revision;
+    _lifeStage = LifeStage.resolve(gebelikler, today: DateTime.now());
+    _cycleBreaks = CycleBreaks.fromPregnancies(gebelikler);
+    if (_isLoading) return;
+    _recalculate();
+    notifyListeners();
+  }
 
   /// Bu evrede regl kaydı tutulur mu?
   ///

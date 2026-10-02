@@ -16,6 +16,7 @@ import 'presentation/reminders/reminder_sync.dart';
 import 'presentation/calendar/view_models/calendar_view_model.dart';
 import 'domain/view_models/intimacy_view_model.dart';
 import 'domain/view_models/partner_view_model.dart';
+import 'domain/view_models/pregnancy_view_model.dart';
 import 'domain/view_models/user_view_model.dart';
 import 'domain/view_models/subscription_view_model.dart';
 import 'domain/services/subscription_service.dart';
@@ -113,7 +114,25 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: widget.userViewModel),
-        ChangeNotifierProvider(create: (_) => CalendarViewModel()),
+        ChangeNotifierProvider(create: (_) => PregnancyViewModel()..load()),
+
+        // Takvim koruması evreyi gebelik ViewModel'inden alıyor. Gebelik
+        // bittiği an takvim de biliyor; bir ekranın "takvimi yenilemeyi"
+        // hatırlaması gerekmiyor — unutulsaydı gebeliği biten kullanıcı regl
+        // işaretleyemezdi.
+        ChangeNotifierProxyProvider<PregnancyViewModel, CalendarViewModel>(
+          create: (_) => CalendarViewModel(),
+          update: (_, gebelik, takvim) {
+            final vm = takvim ?? CalendarViewModel();
+            if (gebelik.loaded) {
+              vm.applyPregnancies(
+                gebelik.pregnancies,
+                revision: gebelik.revision,
+              );
+            }
+            return vm;
+          },
+        ),
         ChangeNotifierProvider(create: (_) => SubscriptionViewModel()),
 
         // Abonelik durumu temayı besler: abonelik bitince premium tema

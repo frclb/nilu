@@ -8,6 +8,7 @@ import 'package:period_tracker/design_system/app_flavor.dart';
 import 'package:period_tracker/design_system/app_theme.dart';
 import 'package:period_tracker/domain/view_models/intimacy_view_model.dart';
 import 'package:period_tracker/domain/view_models/partner_view_model.dart';
+import 'package:period_tracker/domain/view_models/pregnancy_view_model.dart';
 import 'package:period_tracker/domain/view_models/subscription_view_model.dart';
 import 'package:period_tracker/domain/view_models/theme_view_model.dart';
 import 'package:period_tracker/domain/view_models/user_view_model.dart';
@@ -52,42 +53,56 @@ Widget wrapWithProviders(
   Widget screen, {
   UserViewModel? userViewModel,
   PartnerViewModel? partnerViewModel,
-}) =>
-    MultiProvider(
-      providers: [
-        if (userViewModel != null)
-          ChangeNotifierProvider.value(value: userViewModel)
-        else
-          ChangeNotifierProvider(create: (_) => UserViewModel()),
-        ChangeNotifierProvider(create: (_) => CalendarViewModel()),
-        ChangeNotifierProvider(create: (_) => SubscriptionViewModel()),
-        ChangeNotifierProxyProvider<SubscriptionViewModel, ThemeViewModel>(
-          create: (_) => ThemeViewModel(),
-          update: (_, subscription, theme) {
-            final vm = theme ?? ThemeViewModel();
-            vm.setPremium(subscription.isPremium);
-            return vm;
-          },
-        ),
-        ChangeNotifierProxyProvider<UserViewModel, IntimacyViewModel>(
-          create: (_) => IntimacyViewModel(),
-          update: (_, userVM, intimacyVM) {
-            final vm = intimacyVM ?? IntimacyViewModel();
-            vm.init(userVM.myId);
-            return vm;
-          },
-        ),
-        ChangeNotifierProxyProvider<UserViewModel, PartnerViewModel>(
-          create: (_) => partnerViewModel ?? PartnerViewModel(),
-          update: (_, userVM, partnerVM) {
-            final vm = partnerVM ?? partnerViewModel ?? PartnerViewModel();
-            vm.init(userVM.partnerId);
-            return vm;
-          },
-        ),
-      ],
-      child: screen,
-    );
+}) => MultiProvider(
+  providers: [
+    if (userViewModel != null)
+      ChangeNotifierProvider.value(value: userViewModel)
+    else
+      ChangeNotifierProvider(create: (_) => UserViewModel()),
+    ChangeNotifierProvider(create: (_) => PregnancyViewModel()..load()),
+
+    // Takvim koruması evreyi gebelik ViewModel'inden alıyor. Gebelik
+    // bittiği an takvim de biliyor; bir ekranın "takvimi yenilemeyi"
+    // hatırlaması gerekmiyor — unutulsaydı gebeliği biten kullanıcı regl
+    // işaretleyemezdi.
+    ChangeNotifierProxyProvider<PregnancyViewModel, CalendarViewModel>(
+      create: (_) => CalendarViewModel(),
+      update: (_, gebelik, takvim) {
+        final vm = takvim ?? CalendarViewModel();
+        if (gebelik.loaded) {
+          vm.applyPregnancies(gebelik.pregnancies, revision: gebelik.revision);
+        }
+        return vm;
+      },
+    ),
+    ChangeNotifierProvider(create: (_) => SubscriptionViewModel()),
+    ChangeNotifierProxyProvider<SubscriptionViewModel, ThemeViewModel>(
+      create: (_) => ThemeViewModel(),
+      update: (_, subscription, theme) {
+        final vm = theme ?? ThemeViewModel();
+        vm.setPremium(subscription.isPremium);
+        return vm;
+      },
+    ),
+    ChangeNotifierProxyProvider<UserViewModel, IntimacyViewModel>(
+      create: (_) => IntimacyViewModel(),
+      update: (_, userVM, intimacyVM) {
+        final vm = intimacyVM ?? IntimacyViewModel();
+        vm.init(userVM.myId);
+        return vm;
+      },
+    ),
+    ChangeNotifierProxyProvider<UserViewModel, PartnerViewModel>(
+      create: (_) => partnerViewModel ?? PartnerViewModel(),
+      update: (_, userVM, partnerVM) {
+        final vm = partnerVM ?? partnerViewModel ?? PartnerViewModel();
+        vm.init(userVM.partnerId);
+        return vm;
+      },
+    ),
+  ],
+  child: screen,
+);
 
 /// Ekranı verilen boyutta çizer.
 ///
