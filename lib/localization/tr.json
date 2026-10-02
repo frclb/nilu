@@ -1018,5 +1018,9 @@
   "care_summary_share": "Paylaş",
   "reminder_permission_body_care": "Kontrollerini, taramalarını ve randevularını zamanında hatırlatabilmemiz için bildirim izni gerekiyor. Bildirimler cihazında hazırlanır, içerikleri hiçbir yere gönderilmez.",
   "bp_symptoms_title": "Tansiyonun yüksek ve belirtin var",
-  "bp_symptoms_body": "{s}/{d} mmHg ile birlikte baş ağrısı, şişlik ya da kusma preeklampsi işareti olabilir. Gebelikte ve doğumdan sonra bu, beklemeden değerlendirilmesi gereken bir durum. Bir sağlık kuruluşuna başvur."
+  "bp_symptoms_body": "{s}/{d} mmHg ile birlikte baş ağrısı, şişlik ya da kusma preeklampsi işareti olabilir. Gebelikte ve doğumdan sonra bu, beklemeden değerlendirilmesi gereken bir durum. Bir sağlık kuruluşuna başvur.",
+  "pp_return_to_cycle": "Regl takibine dön",
+  "pp_return_subtitle": "Lohusalık takibini bitirir; kayıtlar silinmez",
+  "pp_return_title": "Lohusalık takibini bitir",
+  "pp_return_body": "Regl takibine dönüyorsun. Doğum kaydın, randevuların ve notların silinmez; lohusalık hatırlatıcıları durur. İlk reglin geldiğinde takvimden ya da ana ekrandan işaretleyebilirsin. Tahminler ilk döngün tamamlanınca yeniden başlar."
 }

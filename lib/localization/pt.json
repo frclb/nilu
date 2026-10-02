@@ -1018,5 +1018,9 @@
   "care_summary_share": "Compartilhar",
   "reminder_permission_body_care": "Para lembrar a tempo das consultas, exames e retornos, é preciso permissão de notificações. As notificações são preparadas no dispositivo; o conteúdo nunca é enviado para lugar nenhum.",
   "bp_symptoms_title": "Pressão alta com sintomas",
-  "bp_symptoms_body": "{s}/{d} mmHg junto com dor de cabeça, inchaço ou vômitos pode ser sinal de pré-eclâmpsia. Na gravidez e após o parto, isso precisa ser avaliado sem esperar. Procurar um serviço de saúde agora."
+  "bp_symptoms_body": "{s}/{d} mmHg junto com dor de cabeça, inchaço ou vômitos pode ser sinal de pré-eclâmpsia. Na gravidez e após o parto, isso precisa ser avaliado sem esperar. Procurar um serviço de saúde agora.",
+  "pp_return_to_cycle": "Voltar ao acompanhamento da menstruação",
+  "pp_return_subtitle": "Encerra o acompanhamento pós-parto; nada é apagado",
+  "pp_return_title": "Encerrar o acompanhamento pós-parto",
+  "pp_return_body": "O acompanhamento volta para a menstruação. O registro do parto, as consultas e as anotações são mantidos; os lembretes do pós-parto param. Quando a primeira menstruação chegar, ela pode ser marcada no calendário ou na tela inicial. As previsões voltam quando o primeiro ciclo terminar."
 }

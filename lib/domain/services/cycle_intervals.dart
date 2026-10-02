@@ -126,9 +126,8 @@ class CycleBreaks {
         p.gestationStart,
         p.endedAt == null
             ? null
-            : LifeStage.deliveries.contains(p.outcome)
-            ? p.endedAt!.add(const Duration(days: LifeStage.postpartumDays))
-            : p.endedAt,
+            // Doğumda lohusalığın sonuna kadar (erken bitirildiyse o güne).
+            : LifeStage.postpartumEndOf(p) ?? p.endedAt,
       ),
   ];
 }

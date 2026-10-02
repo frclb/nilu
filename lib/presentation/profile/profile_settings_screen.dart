@@ -1,3 +1,4 @@
+import '../pregnancy/return_to_cycle.dart';
 import '../pregnancy/due_date_sheet.dart';
 import '../../localization/date_names.dart';
 import '../../domain/view_models/pregnancy_view_model.dart';
@@ -391,6 +392,14 @@ class _GebelikBolumu extends StatelessWidget {
           iconColor: renk,
           iconBgColor: zemin,
           onTap: () => context.pushNamed(RouteNames.careSummary),
+        ),
+        SettingsItem(
+          title: context.tr('pp_return_to_cycle'),
+          subtitle: context.tr('pp_return_subtitle'),
+          icon: Icons.water_drop_outlined,
+          iconColor: renk,
+          iconBgColor: zemin,
+          onTap: () => confirmReturnToCycle(context),
         ),
       ],
     };

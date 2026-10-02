@@ -78,10 +78,7 @@ void main() {
         outcome: PregnancyOutcome.birth,
         at: DateTime(2026, 5, 20),
       );
-      final s = birlestir(
-        yedekle(gebelikler: [gebelik]),
-        cihazdaki: [cihazda],
-      );
+      final s = birlestir(yedekle(gebelikler: [gebelik]), cihazdaki: [cihazda]);
 
       expect(s.pregnancies.single.isActive, isFalse);
       expect(s.report.alreadyPresent, 1);
@@ -120,10 +117,7 @@ void main() {
     });
 
     test('cihazdaki randevu notu yedekle ezilmiyor', () {
-      final cihazda = kalemler.first.copyWith(
-        done: true,
-        note: 'Sonuç normal',
-      );
+      final cihazda = kalemler.first.copyWith(done: true, note: 'Sonuç normal');
       final s = birlestir(
         yedekle(gebelikler: [gebelik], bakim: kalemler),
         cihazdaki: [gebelik],
@@ -135,10 +129,22 @@ void main() {
       expect(geri.note, 'Sonuç normal');
     });
 
+    test('lohusalığın erken bitişi yedekle taşınıyor', () {
+      // Taşınmasaydı "regl takibine dön" demiş kullanıcı yeni telefonda
+      // yeniden lohusalığa düşerdi.
+      final dogum = gebelik
+          .ended(outcome: PregnancyOutcome.birth, at: DateTime(2026, 5, 1))
+          .withPostpartumEndedAt(DateTime(2026, 5, 20));
+      final s = birlestir(yedekle(gebelikler: [dogum]));
+      expect(s.pregnancies.single.postpartumEndedAt, DateTime(2026, 5, 20));
+    });
+
     test('yalnızca gebelik içeren yedek de geçerli', () {
       // Eski biçimde regl/günlük alanı yoksa "yanlış biçim" denmemeli.
       final s = BackupImportService.merge(
-        json: jsonEncode({'pregnancies': [gebelik.toMap()]}),
+        json: jsonEncode({
+          'pregnancies': [gebelik.toMap()],
+        }),
         periodLogs: const [],
         dailyLogs: const [],
         pregnancies: const [],
@@ -227,9 +233,7 @@ void main() {
       final m = kalemler.first.toMap()
         ..['fromDay'] = 50
         ..['toDay'] = 10;
-      final s = birlestir(
-        yedekle(gebelikler: [gebelik])..['careEvents'] = [m],
-      );
+      final s = birlestir(yedekle(gebelikler: [gebelik])..['careEvents'] = [m]);
       expect(s.careEvents, isEmpty);
     });
   });

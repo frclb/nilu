@@ -150,6 +150,18 @@ class PregnancyViewModel extends ChangeNotifier {
     await _reload();
   }
 
+  /// Lohusalığı erken bitirip regl takibine döner.
+  ///
+  /// Doğum kaydı ve randevular kalıyor; lohusa hatırlatıcıları evreden
+  /// geldiği için kendiliğinden duruyor (bkz. `ReminderPlanner`).
+  Future<void> endPostpartum() async {
+    if (stage != LifeStage.postpartum) return;
+    final g = current;
+    if (g == null) return;
+    await _pregnancyRepo.upsert(g.withPostpartumEndedAt(_clock()));
+    await _reload();
+  }
+
   // ─── Bakım kalemleri ───
 
   /// Kalemi kaydeder. Yalnızca o anki gebeliğin kalemleri yazılabilir.

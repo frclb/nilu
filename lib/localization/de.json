@@ -1018,5 +1018,9 @@
   "care_summary_share": "Teilen",
   "reminder_permission_body_care": "Damit wir dich rechtzeitig an Untersuchungen, Screenings und Termine erinnern können, brauchen wir die Mitteilungsberechtigung. Mitteilungen werden auf deinem Gerät erstellt; ihr Inhalt wird nirgendwohin gesendet.",
   "bp_symptoms_title": "Hoher Blutdruck mit Beschwerden",
-  "bp_symptoms_body": "{s}/{d} mmHg zusammen mit Kopfschmerzen, Schwellungen oder Erbrechen kann ein Zeichen einer Präeklampsie sein. In der Schwangerschaft und nach der Geburt muss das sofort abgeklärt werden. Wende dich jetzt an eine Klinik oder Praxis."
+  "bp_symptoms_body": "{s}/{d} mmHg zusammen mit Kopfschmerzen, Schwellungen oder Erbrechen kann ein Zeichen einer Präeklampsie sein. In der Schwangerschaft und nach der Geburt muss das sofort abgeklärt werden. Wende dich jetzt an eine Klinik oder Praxis.",
+  "pp_return_to_cycle": "Zurück zur Periodenverfolgung",
+  "pp_return_subtitle": "Beendet den Wochenbett-Modus; nichts wird gelöscht",
+  "pp_return_title": "Wochenbett-Modus beenden",
+  "pp_return_body": "Du kehrst zur Periodenverfolgung zurück. Geburtseintrag, Termine und Notizen bleiben erhalten; Wochenbett-Erinnerungen hören auf. Wenn deine erste Periode kommt, kannst du sie im Kalender oder auf dem Startbildschirm eintragen. Prognosen starten wieder, sobald dein erster Zyklus abgeschlossen ist."
 }

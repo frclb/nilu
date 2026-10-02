@@ -19,6 +19,7 @@ import '../home/widgets/log_entry_fab.dart';
 import 'care_grouping.dart';
 import 'danger_signs_screen.dart';
 import 'pregnancy_home_screen.dart';
+import 'return_to_cycle.dart';
 
 /// Lohusalıkta ana sekme (doğumdan sonraki 42 gün).
 ///
@@ -70,6 +71,14 @@ class PostpartumHomeScreen extends StatelessWidget {
                     ),
                     const DangerEntryCard(period: DangerPeriod.postpartum),
                     const _Bilgi(),
+                    Center(
+                      child: TextButton.icon(
+                        key: const Key('pp_return_button'),
+                        onPressed: () => confirmReturnToCycle(context),
+                        icon: const Icon(Icons.water_drop_outlined, size: 18),
+                        label: Text(context.tr('pp_return_to_cycle')),
+                      ),
+                    ),
                   ]),
                 ),
               ),

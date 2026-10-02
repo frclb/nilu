@@ -46,6 +46,27 @@ enum LifeStage {
     PregnancyOutcome.stillbirth,
   };
 
+  /// Lohusalığın bittiği gün (o gün artık döngü): doğumdan [postpartumDays]
+  /// gün sonra ya da kullanıcı daha önce "regl takibine dön" dediyse o gün.
+  /// Doğumla bitmeyen gebelikte `null`.
+  ///
+  /// Evre çözümlemesi ve döngü kesintisi (`CycleBreaks`) aynı günü
+  /// kullanıyor; ayrı hesaplansalardı kullanıcı döngüye dönmüş olur ama
+  /// girdiği regl hâlâ kesinti içinde sayılırdı.
+  static DateTime? postpartumEndOf(Pregnancy p) {
+    final dogum = p.endedAt;
+    if (dogum == null || !deliveries.contains(p.outcome)) return null;
+    final dogal = DateTime(dogum.year, dogum.month, dogum.day + postpartumDays);
+    final erken = p.postpartumEndedAt;
+    return erken != null && erken.isBefore(dogal) ? erken : dogal;
+  }
+
+  /// [p] [gun] gününde lohusalıkta mı?
+  static bool _inPostpartum(Pregnancy p, DateTime gun) {
+    final son = postpartumEndOf(p);
+    return son != null && !gun.isBefore(p.endedAt!) && gun.isBefore(son);
+  }
+
   /// Kayıtlardan bugünkü evreyi çıkarır.
   static LifeStage resolve(
     Iterable<Pregnancy> pregnancies, {
@@ -57,12 +78,8 @@ enum LifeStage {
     // yeniden gebe kalınması nadir ama mümkün.
     if (pregnancies.any((p) => p.isActive)) return LifeStage.pregnancy;
 
-    for (final p in pregnancies) {
-      final bitis = p.endedAt;
-      if (bitis == null || !deliveries.contains(p.outcome)) continue;
-
-      final gecen = gun.difference(bitis).inDays;
-      if (gecen >= 0 && gecen < postpartumDays) return LifeStage.postpartum;
+    if (pregnancies.any((p) => _inPostpartum(p, gun))) {
+      return LifeStage.postpartum;
     }
 
     return LifeStage.cycle;
@@ -85,12 +102,7 @@ enum LifeStage {
         return pregnancies.lastWhere((p) => p.isActive);
       case LifeStage.postpartum:
         return pregnancies
-            .where(
-              (p) =>
-                  p.endedAt != null &&
-                  deliveries.contains(p.outcome) &&
-                  gun.difference(p.endedAt!).inDays < postpartumDays,
-            )
+            .where((p) => _inPostpartum(p, gun))
             .reduce((a, b) => a.endedAt!.isAfter(b.endedAt!) ? a : b);
     }
   }

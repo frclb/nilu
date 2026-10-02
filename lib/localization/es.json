@@ -1018,5 +1018,9 @@
   "care_summary_share": "Compartir",
   "reminder_permission_body_care": "Para recordarte a tiempo tus controles, pruebas y citas necesitamos permiso de notificaciones. Las notificaciones se preparan en tu dispositivo; su contenido no se envía a ningún sitio.",
   "bp_symptoms_title": "Tensión alta con síntomas",
-  "bp_symptoms_body": "{s}/{d} mmHg junto con dolor de cabeza, hinchazón o vómitos puede ser un signo de preeclampsia. En el embarazo y después del parto hay que valorarlo sin esperar. Acude ya a un servicio de salud."
+  "bp_symptoms_body": "{s}/{d} mmHg junto con dolor de cabeza, hinchazón o vómitos puede ser un signo de preeclampsia. En el embarazo y después del parto hay que valorarlo sin esperar. Acude ya a un servicio de salud.",
+  "pp_return_to_cycle": "Volver al seguimiento de la regla",
+  "pp_return_subtitle": "Termina el seguimiento posparto; no se borra nada",
+  "pp_return_title": "Terminar el seguimiento posparto",
+  "pp_return_body": "Vuelves al seguimiento de la regla. Tu registro del parto, tus citas y tus notas se conservan; los recordatorios del posparto se detienen. Cuando llegue tu primera regla, puedes marcarla en el calendario o en la pantalla de inicio. Las predicciones vuelven cuando se complete tu primer ciclo."
 }

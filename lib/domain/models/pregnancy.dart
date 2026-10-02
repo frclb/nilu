@@ -90,6 +90,13 @@ class Pregnancy {
   /// dayatılmamalı.
   final String? careTemplate;
 
+  /// Kullanıcının lohusalığı erken bitirip regl takibine döndüğü gün.
+  ///
+  /// Lohusalık doğumdan sonra 42 gün sürüyor (bkz. `LifeStage`); ilk regl
+  /// daha önce gelebilir, kullanıcı lohusa ekranlarını istemeyebilir.
+  /// Önceden bu evreden çıkmanın bir yolu yoktu.
+  final DateTime? postpartumEndedAt;
+
   const Pregnancy({
     required this.id,
     required this.estimatedDueDate,
@@ -99,6 +106,7 @@ class Pregnancy {
     this.outcome,
     this.endedAt,
     this.careTemplate,
+    this.postpartumEndedAt,
   });
 
   /// Son adet tarihinden kurar.
@@ -159,7 +167,21 @@ class Pregnancy {
         outcome: outcome,
         endedAt: endedAt,
         careTemplate: careTemplate,
+        postpartumEndedAt: postpartumEndedAt,
       );
+
+  /// Lohusalığı [at] gününde bitirir ("regl takibine dön").
+  Pregnancy withPostpartumEndedAt(DateTime at) => Pregnancy(
+    id: id,
+    lmp: lmp,
+    estimatedDueDate: estimatedDueDate,
+    dueDateFromClinician: dueDateFromClinician,
+    confirmedAt: confirmedAt,
+    outcome: outcome,
+    endedAt: endedAt,
+    careTemplate: careTemplate,
+    postpartumEndedAt: _day(at),
+  );
 
   bool get isActive => endedAt == null;
 
@@ -215,6 +237,8 @@ class Pregnancy {
     if (outcome != null) 'outcome': outcome!.name,
     if (endedAt != null) 'endedAt': _iso(endedAt!),
     if (careTemplate != null) 'careTemplate': careTemplate,
+    if (postpartumEndedAt != null)
+      'postpartumEndedAt': _iso(postpartumEndedAt!),
   };
 
   factory Pregnancy.fromMap(Map<String, dynamic> map) {
@@ -230,6 +254,12 @@ class Pregnancy {
       outcome: bitis == null ? null : _outcome(map['outcome']),
       endedAt: bitis,
       careTemplate: map['careTemplate'] as String?,
+      // Bitişten önce ya da bitişsiz bir lohusalık sonu bozuk kayıt demek;
+      // düşüyor (gebeliğin kendisi kalıyor).
+      postpartumEndedAt: switch (_parse(map['postpartumEndedAt'])) {
+        final son? when bitis != null && !son.isBefore(bitis) => son,
+        _ => null,
+      },
     );
   }
 
