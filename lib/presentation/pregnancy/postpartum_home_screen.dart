@@ -6,6 +6,7 @@ import '../../core/navigation/route_names.dart';
 import '../../design_system/app_card.dart';
 import '../../design_system/app_layout.dart';
 import '../../design_system/app_tokens.dart';
+import '../../domain/models/calendar_day.dart';
 import '../../domain/models/life_stage.dart';
 import '../../domain/models/log_vocabulary.dart';
 import '../../domain/services/lochia_trend.dart';
@@ -99,11 +100,7 @@ class _GunKarti extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
     final theme = Theme.of(context);
-    final gun = DateTime(
-      bugun.year,
-      bugun.month,
-      bugun.day,
-    ).difference(DateTime(dogum.year, dogum.month, dogum.day)).inDays;
+    final gun = bugun.daysSince(dogum);
 
     // 42 çiçek, her biri bir gün — gebelik panosundaki 40 haftalık çelengin
     // lohusalık karşılığı.

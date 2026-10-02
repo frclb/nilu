@@ -1,3 +1,4 @@
+import '../models/calendar_day.dart';
 import '../models/care_event.dart';
 import '../models/life_stage.dart';
 import '../models/pregnancy.dart';
@@ -65,7 +66,7 @@ class PregnancyCalendar {
       if (!_shown(p)) continue;
       gosterilen.add(p.id);
 
-      final fark = gun.difference(_day(p.gestationStart)).inDays;
+      final fark = gun.daysSince(p.gestationStart);
       final bitis = p.endedAt;
       if (fark >= 0 &&
           (bitis == null
@@ -79,7 +80,7 @@ class PregnancyCalendar {
         final dogum = _day(bitis);
         final son = LifeStage.postpartumEndOf(p);
         if (!gun.isBefore(dogum) && son != null && gun.isBefore(son)) {
-          lohusa = gun.difference(dogum).inDays;
+          lohusa = gun.daysSince(dogum);
         }
         if (gun == dogum) dogumGunu = true;
       }

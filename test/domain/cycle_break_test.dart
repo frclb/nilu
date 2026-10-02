@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:period_tracker/domain/models/calendar_day.dart';
 import 'package:period_tracker/domain/models/pregnancy.dart';
 import 'package:period_tracker/domain/models/period_log.dart';
 import 'package:period_tracker/domain/services/insights_service.dart';
@@ -103,7 +104,7 @@ void main() {
       expect(kesinti.start, gebelik.gestationStart);
       expect(
         kesinti.end,
-        g(10, 8).add(const Duration(days: 42)),
+        g(10, 8).plusDays(42),
         reason: 'Lohusalık (42 gün) da döngü değil',
       );
     });

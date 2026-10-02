@@ -1,3 +1,4 @@
+import '../models/calendar_day.dart';
 import '../models/care_event.dart';
 import '../models/pregnancy.dart';
 
@@ -207,9 +208,7 @@ class CareTemplates {
     Pregnancy pregnancy,
     List<CareTemplateItem> template,
   ) {
-    final onayGunu = pregnancy.confirmedAt
-        .difference(pregnancy.gestationStart)
-        .inDays;
+    final onayGunu = pregnancy.confirmedAt.daysSince(pregnancy.gestationStart);
 
     return [
       for (final k in template)

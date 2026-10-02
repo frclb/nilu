@@ -1,3 +1,4 @@
+import '../../domain/models/calendar_day.dart';
 import '../../domain/models/care_event.dart';
 import '../../domain/models/life_stage.dart';
 import '../../domain/models/pregnancy.dart';
@@ -21,9 +22,7 @@ class CareGrouping {
     if (randevu != null) {
       final r = DateTime(randevu.year, randevu.month, randevu.day);
       if (r.isBefore(gun)) return CareGroup.past;
-      return r.difference(gun).inDays <= soonDays
-          ? CareGroup.now
-          : CareGroup.upcoming;
+      return r.daysSince(gun) <= soonDays ? CareGroup.now : CareGroup.upcoming;
     }
 
     // Tarihi olmayan kendi kalemi: kullanıcı onu hatırlamak için ekledi,

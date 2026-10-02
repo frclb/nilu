@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:period_tracker/domain/models/calendar_day.dart';
 import 'package:period_tracker/domain/models/pregnancy.dart';
 
 /// Gebelik haftası ve tahmini doğum tarihi hesabı.
@@ -21,7 +22,7 @@ void main() {
       final g = Pregnancy.fromLmp(lmp: sat, cycleLength: 28);
       expect(g.estimatedDueDate, DateTime(2026, 10, 8));
       expect(
-        g.estimatedDueDate.difference(sat).inDays,
+        g.estimatedDueDate.daysSince(sat),
         280,
         reason: 'Naegele kuralı 280 gün',
       );
@@ -32,13 +33,13 @@ void main() {
       final kisa = Pregnancy.fromLmp(lmp: sat, cycleLength: 21);
 
       expect(
-        uzun.estimatedDueDate.difference(sat).inDays,
+        uzun.estimatedDueDate.daysSince(sat),
         287,
         reason:
             '35 günlük döngüde yumurtlama bir hafta geç; düz Naegele bir '
             'hafta erken tarih verirdi',
       );
-      expect(kisa.estimatedDueDate.difference(sat).inDays, 273);
+      expect(kisa.estimatedDueDate.daysSince(sat), 273);
     });
 
     test('döngü uzunluğu sınırların dışındaysa 28 varsayılır', () {
@@ -46,7 +47,7 @@ void main() {
       for (final uzunluk in [0, 1, 200, -5]) {
         final g = Pregnancy.fromLmp(lmp: sat, cycleLength: uzunluk);
         expect(
-          g.estimatedDueDate.difference(sat).inDays,
+          g.estimatedDueDate.daysSince(sat),
           280,
           reason: '$uzunluk günlük döngü güvenilir değil',
         );
@@ -129,7 +130,7 @@ void main() {
       expect(hekim.lmp, sat, reason: 'SAT referans olarak kalmalı');
 
       final gun = DateTime(2026, 5, 1);
-      final satTan = gun.difference(sat).inDays;
+      final satTan = gun.daysSince(sat);
       final hesap = hekim.gestationOn(gun)!.totalDays;
 
       expect(
@@ -182,10 +183,10 @@ void main() {
 
   group('bitmiş gebelik', () {
     test('bittiğinde artık sürmüyor sayılır', () {
-      final g = Pregnancy.fromLmp(lmp: sat, cycleLength: 28).ended(
-        outcome: PregnancyOutcome.birth,
-        at: DateTime(2026, 10, 5),
-      );
+      final g = Pregnancy.fromLmp(
+        lmp: sat,
+        cycleLength: 28,
+      ).ended(outcome: PregnancyOutcome.birth, at: DateTime(2026, 10, 5));
 
       expect(g.isActive, isFalse);
       expect(g.outcome, PregnancyOutcome.birth);
@@ -194,20 +195,20 @@ void main() {
 
     test('sebep belirtmeden de bitirilebilir', () {
       // Kayıp yaşayan kullanıcıdan sebep istemek kabul edilemez.
-      final g = Pregnancy.fromLmp(lmp: sat, cycleLength: 28).ended(
-        outcome: PregnancyOutcome.undisclosed,
-        at: DateTime(2026, 3, 1),
-      );
+      final g = Pregnancy.fromLmp(
+        lmp: sat,
+        cycleLength: 28,
+      ).ended(outcome: PregnancyOutcome.undisclosed, at: DateTime(2026, 3, 1));
 
       expect(g.isActive, isFalse);
       expect(g.outcome, PregnancyOutcome.undisclosed);
     });
 
     test('bittikten sonra hafta hesaplanmaz', () {
-      final g = Pregnancy.fromLmp(lmp: sat, cycleLength: 28).ended(
-        outcome: PregnancyOutcome.miscarriage,
-        at: DateTime(2026, 3, 1),
-      );
+      final g = Pregnancy.fromLmp(
+        lmp: sat,
+        cycleLength: 28,
+      ).ended(outcome: PregnancyOutcome.miscarriage, at: DateTime(2026, 3, 1));
 
       expect(
         g.gestationOn(DateTime(2026, 6, 1)),
@@ -236,10 +237,9 @@ void main() {
     });
 
     test('bitmiş olan', () {
-      final g = Pregnancy.fromDueDate(dueDate: DateTime(2026, 10, 1)).ended(
-        outcome: PregnancyOutcome.stillbirth,
-        at: DateTime(2026, 9, 20),
-      );
+      final g = Pregnancy.fromDueDate(
+        dueDate: DateTime(2026, 10, 1),
+      ).ended(outcome: PregnancyOutcome.stillbirth, at: DateTime(2026, 9, 20));
       final geri = Pregnancy.fromMap(g.toMap());
 
       expect(geri.outcome, PregnancyOutcome.stillbirth);

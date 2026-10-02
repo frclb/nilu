@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:period_tracker/data/repositories/pregnancy_repository.dart';
+import 'package:period_tracker/domain/models/calendar_day.dart';
 import 'package:period_tracker/domain/models/life_stage.dart';
 import 'package:period_tracker/domain/models/period_log.dart';
 import 'package:period_tracker/domain/models/pregnancy.dart';
@@ -47,10 +48,7 @@ void main() {
       final g = dogum(
         10,
       ).withPostpartumEndedAt(bugun.add(const Duration(days: 60)));
-      expect(
-        LifeStage.postpartumEndOf(g),
-        once(10).add(const Duration(days: 42)),
-      );
+      expect(LifeStage.postpartumEndOf(g), once(10).plusDays(42));
     });
 
     test('doğumla bitmeyen gebelikte lohusalık yok', () {

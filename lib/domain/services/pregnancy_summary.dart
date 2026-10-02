@@ -1,3 +1,4 @@
+import '../models/calendar_day.dart';
 import '../models/care_event.dart';
 import '../models/daily_log.dart';
 import '../models/life_stage.dart';
@@ -101,7 +102,7 @@ class PregnancySummary {
   int? get daysSinceBirth {
     final dogum = pregnancy.endedAt;
     if (dogum == null) return null;
-    return _day(today).difference(_day(dogum)).inDays;
+    return today.daysSince(dogum);
   }
 
   /// Gebelikte bugünkü gebelik haftası.
@@ -157,9 +158,7 @@ class PregnancySummary {
           FlowDay(_day(l.date), l.flowIntensity!),
     ];
 
-    final pencereBas = gun.subtract(
-      const Duration(days: symptomWindowDays - 1),
-    );
+    final pencereBas = gun.plusDays(-(symptomWindowDays - 1));
     final sayac = <String, int>{};
     for (final l in donem) {
       if (_day(l.date).isBefore(pencereBas)) continue;

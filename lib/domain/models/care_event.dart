@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import 'calendar_day.dart';
 import 'pregnancy.dart';
 
 /// Bakım kaleminin türü.
@@ -87,13 +88,13 @@ class CareEvent {
   /// tarih bilinmeden pencere uydurulmuyor.
   DateTime? windowStart(Pregnancy p) {
     final cipa = _anchorDay(p);
-    return cipa?.add(Duration(days: fromDay));
+    return cipa?.plusDays(fromDay);
   }
 
   /// Pencerenin son günü (dahil).
   DateTime? windowEnd(Pregnancy p) {
     final cipa = _anchorDay(p);
-    return cipa?.add(Duration(days: toDay));
+    return cipa?.plusDays(toDay);
   }
 
   /// [today] itibarıyla hâlâ yapılacak mı: yapılmamış ve randevusu ya da

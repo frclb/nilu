@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:period_tracker/domain/models/calendar_day.dart';
 import 'package:period_tracker/domain/models/care_event.dart';
 import 'package:period_tracker/domain/models/pregnancy.dart';
 import 'package:period_tracker/domain/services/care_templates.dart';
@@ -122,10 +123,10 @@ void main() {
         CareTemplates.turkeyAntenatal,
       ).singleWhere((o) => o.code == 'tr_screen_anomaly');
 
-      expect(anomali.windowStart(g), sat.add(const Duration(days: 18 * 7)));
+      expect(anomali.windowStart(g), sat.plusDays(18 * 7));
       expect(
         anomali.windowEnd(g),
-        sat.add(const Duration(days: 22 * 7 + 6)),
+        sat.plusDays(22 * 7 + 6),
         reason: '22. haftanın son günü',
       );
     });
@@ -134,7 +135,7 @@ void main() {
       // Pencere SAT'tan değil gebelik başlangıcından (EDD − 280) sayılıyor;
       // hekim tarihi 7 gün öteledi ise taramalar da 7 gün ötelenmeli.
       final hekim = Pregnancy.fromDueDate(
-        dueDate: sat.add(const Duration(days: 287)),
+        dueDate: sat.plusDays(287),
         lmp: sat,
         id: 'g1',
       );
@@ -143,42 +144,42 @@ void main() {
         CareTemplates.turkeyAntenatal,
       ).singleWhere((o) => o.code == 'tr_screen_anomaly');
 
-      expect(
-        anomali.windowStart(hekim),
-        sat.add(const Duration(days: 18 * 7 + 7)),
-      );
+      expect(anomali.windowStart(hekim), sat.plusDays(18 * 7 + 7));
     });
 
-    test('14. haftadan sonra işaretlenirse ilk izlem kaçırılmış sayılmıyor', () {
-      // Rehber: "14. gebelik haftasından sonraki gebe tespitleri, gebelik
-      // haftasına bakılmaksızın İlk İzlem olarak değerlendirilir."
-      final gec = gebelik(onay: sat.add(const Duration(days: 20 * 7)));
-      final ilk = CareTemplates.generate(
-        gec,
-        CareTemplates.turkeyAntenatal,
-      ).singleWhere((o) => o.code == 'tr_visit_1');
+    test(
+      '14. haftadan sonra işaretlenirse ilk izlem kaçırılmış sayılmıyor',
+      () {
+        // Rehber: "14. gebelik haftasından sonraki gebe tespitleri, gebelik
+        // haftasına bakılmaksızın İlk İzlem olarak değerlendirilir."
+        final gec = gebelik(onay: sat.plusDays(20 * 7));
+        final ilk = CareTemplates.generate(
+          gec,
+          CareTemplates.turkeyAntenatal,
+        ).singleWhere((o) => o.code == 'tr_visit_1');
 
-      expect(
-        ilk.windowStart(gec),
-        DateTime(2026, 5, 21),
-        reason: 'Pencere işaretleme gününden başlamalı',
-      );
-      expect(
-        ilk.windowEnd(gec)!.difference(ilk.windowStart(gec)!).inDays,
-        6,
-        reason: 'Bir hafta içinde',
-      );
-    });
+        expect(
+          ilk.windowStart(gec),
+          DateTime(2026, 5, 21),
+          reason: 'Pencere işaretleme gününden başlamalı',
+        );
+        expect(
+          ilk.windowEnd(gec)!.difference(ilk.windowStart(gec)!).inDays,
+          6,
+          reason: 'Bir hafta içinde',
+        );
+      },
+    );
 
     test('zamanında işaretlenirse ilk izlem rehberdeki pencerede', () {
-      final g = gebelik(onay: sat.add(const Duration(days: 6 * 7)));
+      final g = gebelik(onay: sat.plusDays(6 * 7));
       final ilk = CareTemplates.generate(
         g,
         CareTemplates.turkeyAntenatal,
       ).singleWhere((o) => o.code == 'tr_visit_1');
 
       expect(ilk.windowStart(g), sat);
-      expect(ilk.windowEnd(g), sat.add(const Duration(days: 13 * 7 + 6)));
+      expect(ilk.windowEnd(g), sat.plusDays(13 * 7 + 6));
     });
 
     test('doğum sonu kalemleri doğum gününden sayılıyor', () {
@@ -222,15 +223,14 @@ void main() {
 
   group('json yuvarlak gidip gelir', () {
     test('şablondan gelen', () {
-      final o = CareTemplates.generate(
-        gebelik(),
-        CareTemplates.turkeyAntenatal,
-      ).first.copyWith(
-        scheduledAt: DateTime(2026, 3, 1, 10, 15),
-        done: true,
-        note: 'Hekime sor: bulantı',
-        reminderOn: false,
-      );
+      final o = CareTemplates.generate(gebelik(), CareTemplates.turkeyAntenatal)
+          .first
+          .copyWith(
+            scheduledAt: DateTime(2026, 3, 1, 10, 15),
+            done: true,
+            note: 'Hekime sor: bulantı',
+            reminderOn: false,
+          );
       final geri = CareEvent.fromMap(o.toMap());
 
       expect(geri.id, o.id);

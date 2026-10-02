@@ -6,6 +6,7 @@ import '../../core/navigation/route_names.dart';
 import '../../design_system/app_card.dart';
 import '../../design_system/app_layout.dart';
 import '../../design_system/app_tokens.dart';
+import '../../domain/models/calendar_day.dart';
 import '../../domain/models/care_event.dart';
 import '../../domain/models/pregnancy.dart';
 import '../../domain/models/pregnancy_month.dart';
@@ -87,11 +88,7 @@ class _HaftaKarti extends StatelessWidget {
     final ga = gebelik.gestationOn(bugun);
     final trimester = gebelik.trimesterOn(bugun);
     final edd = gebelik.estimatedDueDate;
-    final kalan = DateTime(
-      edd.year,
-      edd.month,
-      edd.day,
-    ).difference(DateTime(bugun.year, bugun.month, bugun.day)).inDays;
+    final kalan = edd.daysSince(bugun);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),

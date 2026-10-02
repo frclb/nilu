@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'calendar_day.dart';
 
 /// Gebeliğin nasıl sonlandığı.
 ///
@@ -130,7 +131,7 @@ class Pregnancy {
     return Pregnancy(
       id: id ?? _id(confirmedAt ?? DateTime.now()),
       lmp: gun,
-      estimatedDueDate: gun.add(Duration(days: termDays + duzeltme)),
+      estimatedDueDate: gun.plusDays(termDays + duzeltme),
       confirmedAt: _day(confirmedAt ?? DateTime.now()),
       careTemplate: careTemplate,
     );
@@ -189,8 +190,7 @@ class Pregnancy {
   ///
   /// SAT değil: hekim tarihi düzelttiyse bu gün de onunla kayıyor. Döngü
   /// istatistiğinden dışlanacak aralık da buradan başlıyor.
-  DateTime get gestationStart =>
-      estimatedDueDate.subtract(const Duration(days: termDays));
+  DateTime get gestationStart => estimatedDueDate.plusDays(-termDays);
 
   /// Verilen gündeki gebelik haftası.
   ///
@@ -200,9 +200,22 @@ class Pregnancy {
   GestationalAge? gestationOn(DateTime date) {
     if (!isActive) return null;
 
-    final fark = _day(date).difference(gestationStart).inDays;
+    final fark = date.daysSince(gestationStart);
     if (fark < 0) return null;
 
+    return GestationalAge(fark ~/ 7, fark % 7);
+  }
+
+  /// Gebeliğin bittiği gündeki haftası; sürüyorsa `null`.
+  ///
+  /// [gestationOn] biten gebelikte bilerek `null`: takvimde gezinirken
+  /// kaybın haftası önüne çıkmasın. Bu, yalnızca bilinçli olarak açılan
+  /// geçmiş gebelik kaydı için (bkz. `PregnancySummary.past`).
+  GestationalAge? get gestationAtEnd {
+    final bitis = endedAt;
+    if (bitis == null) return null;
+    final fark = bitis.daysSince(gestationStart);
+    if (fark < 0) return null;
     return GestationalAge(fark ~/ 7, fark % 7);
   }
 
