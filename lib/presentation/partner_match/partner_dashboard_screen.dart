@@ -317,7 +317,7 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
           ),
           child: Center(
             child: Text(
-              userName.isNotEmpty ? userName[0].toUpperCase() : 'P',
+              userName.isNotEmpty ? context.upper(userName[0]) : 'P',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,

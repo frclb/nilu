@@ -196,7 +196,7 @@ class _PartnerSupportScreenState extends State<PartnerSupportScreen>
               Icon(Icons.water_drop, color: primaryColor, size: 14),
               const SizedBox(width: 6),
               Text(
-                (context.tr('partner_support_day_1')).toUpperCase(),
+                context.upper(context.tr('partner_support_day_1')),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,

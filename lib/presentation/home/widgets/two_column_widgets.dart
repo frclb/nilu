@@ -120,7 +120,7 @@ class TwoColumnWidgets extends StatelessWidget {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              context.tr('home_partner_title').toUpperCase(),
+                              context.upper(context.tr('home_partner_title')),
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
@@ -183,7 +183,7 @@ class TwoColumnWidgets extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          context.tr('home_last_log_title').toUpperCase(),
+                          context.upper(context.tr('home_last_log_title')),
                           style: theme.textTheme.labelLarge?.copyWith(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,

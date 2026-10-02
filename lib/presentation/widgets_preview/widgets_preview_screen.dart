@@ -105,7 +105,7 @@ class WidgetsPreviewScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0, left: 4.0),
       child: Text(
-        title.toUpperCase(),
+        context.upper(title),
         style: TextStyle(
           color: primaryColor,
           fontSize: 14,

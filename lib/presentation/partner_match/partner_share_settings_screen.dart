@@ -240,7 +240,7 @@ class _PartnerShareSettingsScreenState
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Text(
-            (context.tr('partner_share_visible_data')).toUpperCase(),
+            context.upper(context.tr('partner_share_visible_data')),
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,

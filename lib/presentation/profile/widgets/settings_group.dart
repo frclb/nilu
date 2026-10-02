@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
+import '../../../localization/app_localizations.dart';
 
 class SettingsItem {
   final String title;
@@ -34,7 +35,7 @@ class SettingsGroup extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
           child: Text(
-            title.toUpperCase(),
+            context.upper(title),
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,

@@ -74,9 +74,9 @@ class CycleMasthead extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    context
-                        .tr(_headlineLabelKey(phase, daysLate))
-                        .toUpperCase(),
+                    context.upper(
+                      context.tr(_headlineLabelKey(phase, daysLate)),
+                    ),
                     style: theme.textTheme.labelLarge?.copyWith(
                       fontSize: 11,
                       letterSpacing: 2.2,
@@ -120,7 +120,7 @@ class CycleMasthead extends StatelessWidget {
                 children: [
                   const SizedBox(height: 14),
                   Text(
-                    context.tr('home_agenda_title').toUpperCase(),
+                    context.upper(context.tr('home_agenda_title')),
                     style: theme.textTheme.labelLarge?.copyWith(
                       fontSize: 10,
                       letterSpacing: 2,

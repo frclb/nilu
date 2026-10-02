@@ -124,4 +124,20 @@ extension AppLocalizationsExtension on BuildContext {
   String tr(String key, {Map<String, String>? params}) {
     return AppLocalizations.of(this)?.translate(key, params: params) ?? key;
   }
+
+  /// Etkin dile göre büyük harf. Ekranda görünen her büyük harfli metin
+  /// buradan geçmeli; `String.toUpperCase()` değil.
+  String upper(String text) =>
+      upperFor(AppLocalizations.of(this)?.locale.languageCode, text);
 }
+
+/// [languageCode] diline göre büyük harf.
+///
+/// `String.toUpperCase()` dilden habersiz ve Türkçede yanlış: "i"nin büyüğü
+/// "İ", Dart ise "I" yazıyor. "Gizlilik" başlığı "GIZLILIK", "Diğer"
+/// "DIĞER", "3 gün gecikti" "3 GÜN GECIKTI" çıkıyordu — Türkçe okuyan için
+/// üçü de başka (ya da anlamsız) kelime. "ı"nın büyüğü zaten "I", ona
+/// dokunmak gerekmiyor.
+String upperFor(String? languageCode, String text) => languageCode == 'tr'
+    ? text.replaceAll('i', 'İ').toUpperCase()
+    : text.toUpperCase();

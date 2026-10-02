@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 import 'app_colors.dart';
 
 /// İçerik görselleri için uygulama içinde çizilen illüstrasyon.
@@ -177,7 +178,7 @@ class InitialAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final initial = _initialOf(name);
+    final initial = _initialOf(context, name);
 
     return Container(
       width: size,
@@ -207,9 +208,10 @@ class InitialAvatar extends StatelessWidget {
     );
   }
 
-  static String? _initialOf(String? name) {
+  /// "irem" → "İ": baş harf de dile göre büyütülüyor.
+  static String? _initialOf(BuildContext context, String? name) {
     final trimmed = name?.trim();
     if (trimmed == null || trimmed.isEmpty) return null;
-    return trimmed.characters.first.toUpperCase();
+    return context.upper(trimmed.characters.first);
   }
 }

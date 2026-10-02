@@ -38,7 +38,7 @@ class ExerciseContentSection extends StatelessWidget {
 
           // Titles
           Text(
-            context.tr('exercise_tag').toUpperCase(),
+            context.upper(context.tr('exercise_tag')),
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,

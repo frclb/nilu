@@ -222,7 +222,7 @@ class CalendarGrid extends StatelessWidget {
               children: daysOfWeek.map((day) {
                 return Expanded(
                   child: Text(
-                    day.toUpperCase(),
+                    context.upper(day),
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -655,7 +655,6 @@ class _DayTile extends StatelessWidget {
     );
   }
 
-
   /// Ardışık regl (veya tahmin) günlerini görsel olarak birleştiren bant.
   ///
   /// Bant, komşu gün de aynı türdeyse o yöne doğru hücre kenarına kadar
@@ -690,8 +689,7 @@ class _DayTile extends StatelessWidget {
 
     // Bandın genişliği: kapalı uçlar daireden başlıyor, düz uçlar hücre
     // kenarına dayanıyor.
-    final width =
-        cellWidth - (flatLeft ? 0 : inset) - (flatRight ? 0 : inset);
+    final width = cellWidth - (flatLeft ? 0 : inset) - (flatRight ? 0 : inset);
 
     // Dikişteki sönme **tam olarak iki daire arasındaki boşluğa** oturmalı.
     // Daha geniş olursa sönme dairenin altında başlar: daire tam opak
