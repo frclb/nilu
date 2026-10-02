@@ -96,6 +96,22 @@ class CareEvent {
     return cipa?.add(Duration(days: toDay));
   }
 
+  /// [today] itibarıyla hâlâ yapılacak mı: yapılmamış ve randevusu ya da
+  /// penceresi geçmemiş.
+  ///
+  /// Panodaki "sıradaki" kartı ve randevu özeti aynı kuralı kullanıyor;
+  /// ayrı yazılsaydı ikisi farklı "sıradaki"yi gösterebilirdi.
+  bool isPendingOn(Pregnancy p, DateTime today) {
+    if (done) return false;
+    final gun = DateTime(today.year, today.month, today.day);
+    final randevu = scheduledAt;
+    if (randevu != null) {
+      return !DateTime(randevu.year, randevu.month, randevu.day).isBefore(gun);
+    }
+    final son = windowEnd(p);
+    return son != null && !son.isBefore(gun);
+  }
+
   DateTime? _anchorDay(Pregnancy p) => switch (anchor) {
     CareAnchor.gestation => p.gestationStart,
     CareAnchor.postpartum => p.endedAt,

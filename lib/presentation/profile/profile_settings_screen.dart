@@ -363,6 +363,13 @@ class _GebelikBolumu extends StatelessWidget {
           onTap: () => context.pushNamed(RouteNames.careList),
         ),
         SettingsItem(
+          title: context.tr('care_summary_title'),
+          icon: Icons.summarize_outlined,
+          iconColor: renk,
+          iconBgColor: zemin,
+          onTap: () => context.pushNamed(RouteNames.careSummary),
+        ),
+        SettingsItem(
           title: context.tr('profile_preg_end'),
           icon: Icons.stop_circle_outlined,
           iconColor: renk,
@@ -377,6 +384,13 @@ class _GebelikBolumu extends StatelessWidget {
           iconColor: renk,
           iconBgColor: zemin,
           onTap: () => context.pushNamed(RouteNames.careList),
+        ),
+        SettingsItem(
+          title: context.tr('care_summary_title'),
+          icon: Icons.summarize_outlined,
+          iconColor: renk,
+          iconBgColor: zemin,
+          onTap: () => context.pushNamed(RouteNames.careSummary),
         ),
       ],
     };

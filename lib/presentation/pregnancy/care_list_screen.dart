@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/navigation/route_names.dart';
 import '../../design_system/app_layout.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/models/care_event.dart';
@@ -45,6 +47,13 @@ class CareListScreen extends StatelessWidget {
         automaticallyImplyLeading: Navigator.of(context).canPop(),
         title: Text(context.tr('care_list_title')),
         actions: [
+          if (g != null)
+            IconButton(
+              key: const Key('care_summary_open'),
+              tooltip: context.tr('care_summary_title'),
+              icon: const Icon(Icons.summarize_outlined),
+              onPressed: () => context.pushNamed(RouteNames.careSummary),
+            ),
           if (g != null)
             IconButton(
               key: const Key('care_add'),

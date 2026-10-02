@@ -190,27 +190,13 @@ class NextCareCard extends StatelessWidget {
   final List<CareEvent> olaylar;
   final DateTime bugun;
 
-  /// Henüz yapılmamış ve penceresi geçmemiş ilk kalem.
+  /// Henüz yapılmamış ve penceresi geçmemiş ilk kalem
+  /// (bkz. `CareEvent.isPendingOn`).
   static CareEvent? siradaki(
     List<CareEvent> olaylar,
     Pregnancy gebelik,
     DateTime bugun,
-  ) {
-    final gun = DateTime(bugun.year, bugun.month, bugun.day);
-    for (final e in olaylar) {
-      if (e.done) continue;
-      final randevu = e.scheduledAt;
-      if (randevu != null) {
-        if (!DateTime(randevu.year, randevu.month, randevu.day).isBefore(gun)) {
-          return e;
-        }
-        continue;
-      }
-      final son = e.windowEnd(gebelik);
-      if (son != null && !son.isBefore(gun)) return e;
-    }
-    return null;
-  }
+  ) => olaylar.where((e) => e.isPendingOn(gebelik, bugun)).firstOrNull;
 
   @override
   Widget build(BuildContext context) {

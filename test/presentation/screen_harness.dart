@@ -55,6 +55,7 @@ Widget wrapWithProviders(
   Widget screen, {
   UserViewModel? userViewModel,
   PartnerViewModel? partnerViewModel,
+  SubscriptionViewModel? subscriptionViewModel,
 }) => MultiProvider(
   providers: [
     if (userViewModel != null)
@@ -77,7 +78,10 @@ Widget wrapWithProviders(
         return vm;
       },
     ),
-    ChangeNotifierProvider(create: (_) => SubscriptionViewModel()),
+    if (subscriptionViewModel != null)
+      ChangeNotifierProvider.value(value: subscriptionViewModel)
+    else
+      ChangeNotifierProvider(create: (_) => SubscriptionViewModel()),
     ChangeNotifierProxyProvider<SubscriptionViewModel, ThemeViewModel>(
       create: (_) => ThemeViewModel(),
       update: (_, subscription, theme) {
@@ -186,6 +190,7 @@ Future<GoRouter> pumpRouter(
   Locale locale = const Locale('tr'),
   GoRouter? router,
   UserViewModel? userViewModel,
+  SubscriptionViewModel? subscriptionViewModel,
 }) async {
   tester.view.physicalSize = size * 3;
   tester.view.devicePixelRatio = 3;
@@ -205,6 +210,7 @@ Future<GoRouter> pumpRouter(
     await tester.pumpWidget(
       wrapWithProviders(
         userViewModel: userViewModel,
+        subscriptionViewModel: subscriptionViewModel,
         MaterialApp.router(
           theme: AppTheme.light(AppFlavor.plum),
           localizationsDelegates: const [

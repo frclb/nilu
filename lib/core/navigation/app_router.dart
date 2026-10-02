@@ -9,6 +9,7 @@ import '../../domain/models/life_stage.dart';
 import '../../domain/view_models/pregnancy_view_model.dart';
 import '../../domain/view_models/user_view_model.dart';
 import '../../presentation/pregnancy/care_list_screen.dart';
+import '../../presentation/pregnancy/care_summary_screen.dart';
 import '../../presentation/pregnancy/danger_signs_screen.dart';
 import '../../presentation/pregnancy/end_pregnancy_screen.dart';
 import '../../presentation/pregnancy/postpartum_home_screen.dart';
@@ -316,6 +317,11 @@ GoRouter createAppRouter(
         path: '/care',
         name: RouteNames.careList,
         builder: (context, state) => const CareListScreen(),
+      ),
+      GoRoute(
+        path: '/care/summary',
+        name: RouteNames.careSummary,
+        builder: (context, state) => const CareSummaryScreen(),
       ),
       GoRoute(
         path: '/danger',

@@ -13,6 +13,7 @@ import 'package:period_tracker/domain/models/pregnancy.dart';
 import 'package:period_tracker/domain/services/care_templates.dart';
 import 'package:period_tracker/presentation/log_entry/log_entry_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/care_list_screen.dart';
+import 'package:period_tracker/presentation/pregnancy/care_summary_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/danger_signs_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/end_pregnancy_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/pregnancy_setup_screen.dart';
@@ -136,7 +137,20 @@ List<RouteBase> pregnancyRoutes(Widget first) => [
     name: RouteNames.logEntry,
     builder: (_, _) => const LogEntryScreen(),
   ),
+  GoRoute(
+    path: '/care/summary',
+    name: RouteNames.careSummary,
+    builder: (_, _) => const CareSummaryScreen(),
+  ),
+  GoRoute(
+    path: '/premium',
+    name: RouteNames.premium,
+    builder: (_, _) => const Scaffold(body: Text(premiumMarker)),
+  ),
 ];
+
+/// Ödeme duvarının yerine konan işaret.
+const String premiumMarker = 'premium-ekrani';
 
 /// Ekranda çevrilmemiş, anahtarın kendisi olarak duran metinler.
 ///
