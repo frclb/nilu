@@ -41,6 +41,35 @@ class ReminderScheduler {
     _initialized = true;
   }
 
+  /// İzin zaten verilmiş mi? Sistem istemini **açmadan** bakar.
+  ///
+  /// Hata da "verilmemiş" sayılıyor: emin olamadığımızda gerekçeyi gösterip
+  /// sormak, sessizce planlayıp hiç bildirim gelmemesinden iyidir.
+  Future<bool> isPermissionGranted() async {
+    try {
+      await init();
+      final ios = _plugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >();
+      if (ios != null) {
+        final durum = await ios.checkPermissions();
+        return durum != null && (durum.isEnabled || durum.isProvisionalEnabled);
+      }
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      if (android != null) {
+        return await android.areNotificationsEnabled() ?? false;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('Could not read notification permission: $e');
+      return false;
+    }
+  }
+
   /// Bildirim iznini ister. Kullanıcı reddederse false döner.
   Future<bool> requestPermission() async {
     await init();

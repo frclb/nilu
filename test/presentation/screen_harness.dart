@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import 'package:period_tracker/core/navigation/navigation_service.dart';
 import 'package:period_tracker/design_system/app_flavor.dart';
 import 'package:period_tracker/design_system/app_theme.dart';
 import 'package:period_tracker/domain/view_models/intimacy_view_model.dart';
@@ -116,6 +118,7 @@ Future<void> pumpScreen(
   Locale locale = const Locale('tr'),
   UserViewModel? userViewModel,
   PartnerViewModel? partnerViewModel,
+  GlobalKey<NavigatorState>? navigatorKey,
 }) async {
   tester.view.physicalSize = size * 3;
   tester.view.devicePixelRatio = 3;
@@ -125,6 +128,9 @@ Future<void> pumpScreen(
   await tester.runAsync(() async {
     await tester.pumpWidget(
       MaterialApp(
+        // Diyaloğunu `NavigationService` anahtarından açan ekranlar için
+        // (bkz. `ReminderSync`). Verilmezse o diyaloglar testte hiç açılmaz.
+        navigatorKey: navigatorKey,
         theme: AppTheme.light(AppFlavor.plum),
         localizationsDelegates: const [
           AppLocalizations.delegate,
@@ -155,6 +161,87 @@ Future<void> pumpScreen(
   // yani buradaki tek kare test düzeneğine özgü bir darlıktı — panonun
   // içeriği o yüzden hiç çizilmiyordu.
   for (var i = 0; i < 6; i++) {
+    await tester.pump(const Duration(milliseconds: 200));
+  }
+}
+
+/// Ekranı **gerçek bir yönlendiriciyle** ve sağlayıcılar `MaterialApp`'in
+/// üstündeyken çizer — uygulamadaki (`main.dart`) dizilişle aynı.
+///
+/// [pumpScreen] iki yerde yetmiyor:
+///
+/// - `goNamed`/`pushNamed` çağıran ekranlar düz `MaterialApp(home:)`
+///   altında hata fırlatıyor; gezinme hiç sınanamıyor.
+/// - Orada sağlayıcılar ilk rotanın **içinde**. Alt sayfa ve diyaloglar
+///   navigator'a ayrı rota olarak ekleniyor, yani sağlayıcıları görmüyor:
+///   sayfanın içinden `context.read` hata verirdi. Uygulamada öyle değil.
+///
+/// Kök navigator `NavigationService` anahtarını kullanıyor: o servisle
+/// kapanan ekranlar (kayıt ekranı) testte de kapanabilsin.
+Future<GoRouter> pumpRouter(
+  WidgetTester tester, {
+  required List<RouteBase> routes,
+  String initialLocation = '/',
+  Size size = const Size(390, 844),
+  Locale locale = const Locale('tr'),
+  GoRouter? router,
+  UserViewModel? userViewModel,
+}) async {
+  tester.view.physicalSize = size * 3;
+  tester.view.devicePixelRatio = 3;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
+  final yonlendirici =
+      router ??
+      GoRouter(
+        navigatorKey: NavigationService().navigatorKey,
+        initialLocation: initialLocation,
+        routes: routes,
+      );
+  addTearDown(yonlendirici.dispose);
+
+  await tester.runAsync(() async {
+    await tester.pumpWidget(
+      wrapWithProviders(
+        userViewModel: userViewModel,
+        MaterialApp.router(
+          theme: AppTheme.light(AppFlavor.plum),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          locale: locale,
+          supportedLocales: [locale],
+          routerConfig: yonlendirici,
+        ),
+      ),
+    );
+    // Sağlayıcılar tembel: ilk okunduklarında kuruluyorlar. Uygulamada
+    // takvim açılışta okunuyor (`ReminderSync` onu izliyor) ve gebelik
+    // kaydı onunla birlikte yükleniyor. İlk ekran ikisini de okumuyorsa
+    // testte yükleme ancak sonraki bir ekranda başlıyordu ve iddialar
+    // evre henüz "döngü"yken sınanıyordu.
+    final kok = tester.element(find.byType(MaterialApp));
+    kok.read<PregnancyViewModel>();
+    kok.read<CalendarViewModel>();
+    await Future<void>.delayed(const Duration(milliseconds: 400));
+  });
+  await settleAsync(tester);
+  return yonlendirici;
+}
+
+/// Depoya yazan bir işlemden sonra: gerçek zamanlı bekleme ve birkaç kare.
+///
+/// Depo işlemleri sahte zamanda ilerlemiyor; yalnızca `pump` etmek, kaydın
+/// henüz yazılmadığı bir ağaçta iddia sınamak demek.
+Future<void> settleAsync(WidgetTester tester, {int rounds = 4}) async {
+  for (var i = 0; i < rounds; i++) {
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 100)),
+    );
     await tester.pump(const Duration(milliseconds: 200));
   }
 }

@@ -117,6 +117,20 @@ class _ReminderSyncState extends State<ReminderSync> {
       // ana ekrana düşer düşmez bağlamsız bir kutu görüyordu — hem reddetme
       // oranını artırıyor hem de iOS istemi bir daha göstermediği için
       // kararı kalıcı hâle getiriyordu.
+      // İzin zaten verilmişse gerekçeye gerek yok, doğrudan uygula.
+      //
+      // Bu kontrol yokken gerekçe kutusu izni çoktan vermiş kullanıcıya
+      // **her** plan değişikliğinde yeniden açılıyordu: her açılışta, regl
+      // işaretleyince, gebelik başlatınca, randevu girince. Oturum bayrağı
+      // yalnızca "şimdi değil" ve reddedilme yolunda kuruluyordu; izin
+      // verilen yolda hiç kurulmuyordu.
+      if (await _scheduler.isPermissionGranted()) {
+        if (!mounted) return;
+        await _scheduler.apply(plan, localize: context.tr);
+        _applied = signature;
+        return;
+      }
+
       if (_permissionSettledThisSession || !mounted) return;
 
       final wantsToBeAsked = await _explainReminders();
