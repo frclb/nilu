@@ -1015,5 +1015,8 @@
   "care_summary_upcoming": "Coming up",
   "care_summary_section_notes": "Notes and questions",
   "care_summary_none": "Nothing logged",
-  "care_summary_share": "Share"
+  "care_summary_share": "Share",
+  "reminder_permission_body_care": "To remind you of your check-ups, screenings and appointments in time, we need notification permission. Notifications are prepared on your device; their content is never sent anywhere.",
+  "bp_symptoms_title": "High blood pressure with symptoms",
+  "bp_symptoms_body": "{s}/{d} mmHg together with a headache, swelling or vomiting can be a sign of pre-eclampsia. In pregnancy and after birth this needs to be checked without waiting. Contact a health service now."
 }

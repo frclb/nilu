@@ -1015,5 +1015,8 @@
   "care_summary_upcoming": "Próximos",
   "care_summary_section_notes": "Notas y preguntas",
   "care_summary_none": "Sin registros",
-  "care_summary_share": "Compartir"
+  "care_summary_share": "Compartir",
+  "reminder_permission_body_care": "Para recordarte a tiempo tus controles, pruebas y citas necesitamos permiso de notificaciones. Las notificaciones se preparan en tu dispositivo; su contenido no se envía a ningún sitio.",
+  "bp_symptoms_title": "Tensión alta con síntomas",
+  "bp_symptoms_body": "{s}/{d} mmHg junto con dolor de cabeza, hinchazón o vómitos puede ser un signo de preeclampsia. En el embarazo y después del parto hay que valorarlo sin esperar. Acude ya a un servicio de salud."
 }

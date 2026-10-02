@@ -122,6 +122,71 @@ void main() {
     expect(find.byKey(const Key('preg_bleeding_dialog')), findsNothing);
   });
 
+  Future<void> belirtiSec(WidgetTester tester, String kod) async {
+    final f = find.descendant(
+      of: find.byType(SymptomsSection),
+      matching: find.text(ctx(tester).tr('log_symptom_$kod')),
+    );
+    await tester.ensureVisible(f);
+    await tester.pumpAndSettle();
+    await tester.tap(f);
+    await tester.pump();
+  }
+
+  testWidgets('yüksek tansiyon ve baş ağrısı birlikte: beklemeden uyarısı', (
+    tester,
+  ) async {
+    // NICE NG133: 140/90 ve üstüyle birlikte şiddetli baş ağrısı, şişlik
+    // ya da kusma preeklampsi belirtisi — "aynı gün" değil "beklemeden".
+    await seedPregnancy();
+    await ac(tester);
+
+    await belirtiSec(tester, 'headache');
+    await tansiyon(tester, '150', '95');
+    await kaydet(tester);
+
+    expect(find.byKey(const Key('bp_symptoms_dialog')), findsOneWidget);
+    expect(find.byKey(const Key('bp_high_dialog')), findsNothing);
+  });
+
+  testWidgets('sabah ölçülen yüksek tansiyona sonradan baş ağrısı eklenince '
+      'de uyarıyor', (tester) async {
+    await seedPregnancy();
+    await const PeriodRepository().saveDailyLogs([
+      DailyLog(date: today, systolic: 150, diastolic: 95),
+    ]);
+    await ac(tester);
+
+    await belirtiSec(tester, 'headache');
+    await kaydet(tester);
+
+    expect(
+      find.byKey(const Key('bp_symptoms_dialog')),
+      findsOneWidget,
+      reason: 'Tansiyon değişmedi ama tablo artık acil',
+    );
+  });
+
+  testWidgets('belirti ve tansiyon değişmeden kaydedilince tekrar etmiyor', (
+    tester,
+  ) async {
+    await seedPregnancy();
+    await const PeriodRepository().saveDailyLogs([
+      DailyLog(
+        date: today,
+        systolic: 150,
+        diastolic: 95,
+        symptoms: const ['headache'],
+      ),
+    ]);
+    await ac(tester);
+
+    await belirtiSec(tester, 'nausea');
+    await kaydet(tester);
+
+    expect(find.byType(AlertDialog), findsNothing);
+  });
+
   testWidgets('geçersiz ölçüm: kaydedilmiyor, ekran açık kalıyor', (
     tester,
   ) async {

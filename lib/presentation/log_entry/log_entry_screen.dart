@@ -200,7 +200,8 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
   /// açıldığından, sabah lekelenme girip akşam yalnızca ruh hâli ekleyen
   /// gebe kullanıcı aynı uyarıyı her kayıtta yeniden görürdü.
   ///
-  /// Öncelik: ağır tansiyon (acil) > gebelikte kanama > yüksek tansiyon.
+  /// Öncelik: ağır tansiyon > yüksek tansiyonla preeklampsi belirtisi
+  /// (ikisi de acil) > gebelikte kanama > yüksek tansiyon.
   _Uyari? _uyari(LifeStage stage, DailyLog log) {
     if (stage == LifeStage.cycle) return null;
 
@@ -214,7 +215,26 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
         ? Vitals.classify(buyuk, kucuk)
         : BloodPressureLevel.normal;
 
+    // Yüksek tansiyonla birlikte preeklampsi belirtisi. Sabah ölçülen
+    // tansiyona akşam baş ağrısı eklenirse de uyarıyor: değişen tansiyon
+    // değil belirti, ama tablo artık acil.
+    final gununSeviyesi = buyuk != null && kucuk != null
+        ? Vitals.classify(buyuk, kucuk)
+        : BloodPressureLevel.normal;
+    bool belirti(Iterable<String> kodlar) =>
+        kodlar.any(LogVocabulary.preeclampsiaSymptoms.contains);
+    final belirtiYeni =
+        belirti(log.symptoms) &&
+        !log.symptoms
+            .where(LogVocabulary.preeclampsiaSymptoms.contains)
+            .every(_mevcut.symptoms.contains);
+
     if (seviye == BloodPressureLevel.severe) return _Uyari.tansiyonAgir;
+    if (gununSeviyesi != BloodPressureLevel.normal &&
+        belirti(log.symptoms) &&
+        (tansiyonYeni || belirtiYeni)) {
+      return _Uyari.tansiyonBelirtili;
+    }
     if (stage == LifeStage.pregnancy &&
         LogVocabulary.isBleeding(log.flowIntensity) &&
         log.flowIntensity != _mevcut.flowIntensity) {
@@ -242,6 +262,11 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
         'bp_severe_dialog',
         'bp_severe_title',
         'bp_severe_body',
+      ),
+      _Uyari.tansiyonBelirtili => (
+        'bp_symptoms_dialog',
+        'bp_symptoms_title',
+        'bp_symptoms_body',
       ),
     };
     return showDialog<bool>(
@@ -450,4 +475,4 @@ class _GebelikBelirtiNotu extends StatelessWidget {
   }
 }
 
-enum _Uyari { kanama, tansiyonYuksek, tansiyonAgir }
+enum _Uyari { kanama, tansiyonYuksek, tansiyonAgir, tansiyonBelirtili }

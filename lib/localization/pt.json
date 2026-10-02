@@ -1015,5 +1015,8 @@
   "care_summary_upcoming": "Próximos",
   "care_summary_section_notes": "Notas e perguntas",
   "care_summary_none": "Sem registros",
-  "care_summary_share": "Compartilhar"
+  "care_summary_share": "Compartilhar",
+  "reminder_permission_body_care": "Para lembrar a tempo das consultas, exames e retornos, é preciso permissão de notificações. As notificações são preparadas no dispositivo; o conteúdo nunca é enviado para lugar nenhum.",
+  "bp_symptoms_title": "Pressão alta com sintomas",
+  "bp_symptoms_body": "{s}/{d} mmHg junto com dor de cabeça, inchaço ou vômitos pode ser sinal de pré-eclâmpsia. Na gravidez e após o parto, isso precisa ser avaliado sem esperar. Procurar um serviço de saúde agora."
 }

@@ -1015,5 +1015,8 @@
   "care_summary_upcoming": "À venir",
   "care_summary_section_notes": "Notes et questions",
   "care_summary_none": "Rien de noté",
-  "care_summary_share": "Partager"
+  "care_summary_share": "Partager",
+  "reminder_permission_body_care": "Pour te rappeler à temps tes contrôles, dépistages et rendez-vous, nous avons besoin de l'autorisation de notification. Les notifications sont préparées sur ton appareil ; leur contenu n'est envoyé nulle part.",
+  "bp_symptoms_title": "Tension élevée avec des symptômes",
+  "bp_symptoms_body": "{s}/{d} mmHg avec un mal de tête, un gonflement ou des vomissements peut être un signe de pré-éclampsie. Pendant la grossesse et après l'accouchement, cela doit être évalué sans attendre. Contacte un service de santé maintenant."
 }

@@ -14,6 +14,7 @@ import 'package:period_tracker/localization/app_localizations.dart';
 import 'package:period_tracker/presentation/calendar/view_models/calendar_view_model.dart';
 import 'package:period_tracker/presentation/reminders/reminder_sync.dart';
 
+import 'pregnancy_fixtures.dart';
 import 'screen_harness.dart';
 
 /// İzin durumunu taklit eden zamanlayıcı. İzin isteği her zaman kabul
@@ -163,5 +164,32 @@ void main() {
     );
     expect(z.istek, 1, reason: 'İzin ikinci kez istendi');
     expect(z.uygulama, 2);
+  });
+
+  testWidgets('gebelikte gerekçe regli değil kontrolleri anlatıyor', (
+    tester,
+  ) async {
+    // Gebelikte regl ve doğurganlık tahmini yok; gerekçe yine de "reglinin
+    // yaklaştığını haber verebilmemiz için" diyordu.
+    FlutterSecureStorage.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'onboarding_complete': true});
+    await tester.runAsync(() => seedPregnancy(weeks: 24, days: 2));
+
+    final z = _Zamanlayici(izinli: false);
+    await pumpScreen(
+      tester,
+      ReminderSync(
+        scheduler: z,
+        child: const Scaffold(body: SizedBox(key: Key('kok'))),
+      ),
+      size: const Size(390, 844),
+      navigatorKey: NavigationService().navigatorKey,
+    );
+    await bekle(tester);
+    final ctx = tester.element(find.byKey(const Key('kok')));
+
+    expect(find.text(ctx.tr('reminder_permission_title')), findsOneWidget);
+    expect(find.text(ctx.tr('reminder_permission_body_care')), findsOneWidget);
+    expect(find.text(ctx.tr('reminder_permission_body')), findsNothing);
   });
 }

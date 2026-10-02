@@ -6,6 +6,7 @@ import '../../core/navigation/navigation_service.dart';
 import '../../data/local/reminder_scheduler.dart';
 import '../../design_system/app_theme.dart';
 import '../../data/repositories/notification_settings_repository.dart';
+import '../../domain/models/life_stage.dart';
 import '../../domain/services/reminder_planner.dart';
 import '../../localization/app_localizations.dart';
 import '../../domain/view_models/user_view_model.dart';
@@ -133,7 +134,7 @@ class _ReminderSyncState extends State<ReminderSync> {
 
       if (_permissionSettledThisSession || !mounted) return;
 
-      final wantsToBeAsked = await _explainReminders();
+      final wantsToBeAsked = await _explainReminders(care.stage);
       if (!wantsToBeAsked) {
         _permissionSettledThisSession = true;
         return;
@@ -161,7 +162,11 @@ class _ReminderSyncState extends State<ReminderSync> {
   /// "Şimdi değil" sistem istemini hiç açmıyor: iOS onu bir kez gösterip bir
   /// daha göstermediği için, kullanıcının hazır olmadığı anda yakmak kalıcı
   /// bir kayıp olurdu. Sonraki açılışta yeniden sorulur.
-  Future<bool> _explainReminders() async {
+  ///
+  /// Gerekçe evreye göre: gebelikte ve lohusalıkta regl ve doğurganlık
+  /// tahmini yok, hatırlatıcılar kontroller için. Önceden gebe kullanıcıya
+  /// da "reglinin yaklaştığını haber verebilmemiz için" deniyordu.
+  Future<bool> _explainReminders(LifeStage stage) async {
     // Diyalog **router'ın** navigator'ından açılıyor. `ReminderSync`
     // `MaterialApp.builder` içinde, yani Navigator'ın üstünde duruyor;
     // kendi context'iyle `showDialog` çağırmak "No Navigator" hatası verir
@@ -173,7 +178,13 @@ class _ReminderSyncState extends State<ReminderSync> {
       context: dialogContext,
       builder: (ctx) => AlertDialog(
         title: Text(ctx.tr('reminder_permission_title')),
-        content: Text(ctx.tr('reminder_permission_body')),
+        content: Text(
+          ctx.tr(
+            stage == LifeStage.cycle
+                ? 'reminder_permission_body'
+                : 'reminder_permission_body_care',
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),

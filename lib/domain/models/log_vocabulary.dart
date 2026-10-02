@@ -71,6 +71,17 @@ class LogVocabulary {
     'itching',
   };
 
+  /// Yüksek tansiyonla birlikte preeklampsi belirtisi sayılanlar
+  /// (NICE NG133; NHS): şiddetli baş ağrısı, ani şişlik, kusma. Tansiyon
+  /// 140/90 ve üstüyken bunlardan biri de varsa uyarı "aynı gün" değil
+  /// "beklemeden" oluyor. Kaşıntı burada yok: kolestaz işareti, tansiyonla
+  /// ilgisi yok.
+  static const Set<String> preeclampsiaSymptoms = {
+    'headache',
+    'swelling',
+    'vomiting',
+  };
+
   static const List<String> moods = [
     'happy',
     'calm',

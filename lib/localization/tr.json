@@ -1015,5 +1015,8 @@
   "care_summary_upcoming": "Sıradakiler",
   "care_summary_section_notes": "Notlar ve sorular",
   "care_summary_none": "Kayıt yok",
-  "care_summary_share": "Paylaş"
+  "care_summary_share": "Paylaş",
+  "reminder_permission_body_care": "Kontrollerini, taramalarını ve randevularını zamanında hatırlatabilmemiz için bildirim izni gerekiyor. Bildirimler cihazında hazırlanır, içerikleri hiçbir yere gönderilmez.",
+  "bp_symptoms_title": "Tansiyonun yüksek ve belirtin var",
+  "bp_symptoms_body": "{s}/{d} mmHg ile birlikte baş ağrısı, şişlik ya da kusma preeklampsi işareti olabilir. Gebelikte ve doğumdan sonra bu, beklemeden değerlendirilmesi gereken bir durum. Bir sağlık kuruluşuna başvur."
 }
