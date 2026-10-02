@@ -1,3 +1,4 @@
+import '../../domain/view_models/pregnancy_view_model.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../design_system/app_theme.dart';
@@ -636,6 +637,8 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               final messenger = ScaffoldMessenger.of(context);
               final router = GoRouter.of(context);
               final userViewModel = context.read<UserViewModel>();
+              final gebelik = context.read<PregnancyViewModel>();
+              final takvim = context.read<CalendarViewModel>();
               final doneMessage = context.tr('privacy_delete_done');
               final reauthMessage = context.tr('privacy_delete_reauth');
               Navigator.of(ctx).pop();
@@ -645,6 +648,12 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               final accountDeleted = await userViewModel.deleteRemoteData();
               await _repository.deleteAllLocalData();
               await userViewModel.reloadAfterDataWipe();
+              // Bellekteki kopyalar da. Yalnızca depo silinip ViewModel'ler
+              // yeniden okunmasaydı uygulama silinmiş kayıtları tutmaya
+              // devam ediyordu: onboarding'den yeniden geçen kullanıcıya
+              // silinmiş doğumun lohusa panosu açılıyordu.
+              await gebelik.load();
+              await takvim.refreshData();
 
               // Kimlik silinemediyse (Firebase eskimiş oturumu reddeder)
               // "hesabın silindi" demek yanlış olur: veri gitti ama hesap
