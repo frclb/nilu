@@ -1,3 +1,4 @@
+import 'care_plan_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,9 +26,12 @@ import '../calendar/view_models/calendar_view_model.dart';
 /// Uygulama açılışında ve her yeniden hesapta çalışır. Bildirim metinleri
 /// cihazda üretildiği için çeviri burada, `MaterialApp` altında çözülüyor.
 class ReminderSync extends StatefulWidget {
-  const ReminderSync({super.key, required this.child});
+  const ReminderSync({super.key, required this.child, this.scheduler});
 
   final Widget child;
+
+  /// Testte sahte bir zamanlayıcı verilebilsin diye.
+  final ReminderScheduler? scheduler;
 
   @override
   State<ReminderSync> createState() => _ReminderSyncState();
@@ -36,7 +40,8 @@ class ReminderSync extends StatefulWidget {
 class _ReminderSyncState extends State<ReminderSync> {
   final NotificationSettingsRepository _repository =
       NotificationSettingsRepository();
-  final ReminderScheduler _scheduler = ReminderScheduler();
+  late final ReminderScheduler _scheduler =
+      widget.scheduler ?? ReminderScheduler();
 
   /// En son uygulanan planın imzası. Aynı imzayla yeniden yazmıyoruz.
   String? _applied;
@@ -61,30 +66,41 @@ class _ReminderSyncState extends State<ReminderSync> {
 
     try {
       final settings = await _repository.getGeneralSettings();
+      final care = await loadCarePlanInput();
       if (!mounted) return;
 
+      final now = DateTime.now();
       final signature = ReminderPlanner.signature(
         cycleInfo: viewModel.cycleInfo,
         settings: settings,
-        now: DateTime.now(),
+        now: now,
+        care: care,
       );
       if (signature == _applied) return;
-
-      final wantsReminders =
-          settings.periodReminders ||
-          settings.fertileWindow ||
-          settings.dailyLogs;
-      if (!wantsReminders) {
-        _applied = signature;
-        return;
-      }
 
       final plan = ReminderPlanner.plan(
         cycleInfo: viewModel.cycleInfo,
         settings: settings,
-        now: DateTime.now(),
+        now: now,
+        care: care,
       );
-      if (plan.isEmpty) return;
+
+      // Plan boşsa yine de temizle.
+      //
+      // Önceden burada `return` vardı — hatırlatacak bir şey yokken izin
+      // sormamak için — ve `apply` hiç çağrılmadığından `cancelAll()` da
+      // çalışmıyordu. Düşükten sonra döngü tahmini olmadığı için plan tam
+      // olarak boş oluyor; daha önce kurulmuş "18–22. hafta: anomali
+      // taraması" bildirimi olduğu gibi kalıyordu. İptal izin gerektirmiyor,
+      // yani izin sorusu hâlâ sorulmuyor.
+      //
+      // Bütün anahtarlar kapalıyken de aynı şey: eskiden imza kaydedilip
+      // dönülüyor, kurulu bildirimler duruyordu.
+      if (plan.isEmpty) {
+        await _scheduler.cancelAll();
+        _applied = signature;
+        return;
+      }
 
       // İzin buradan isteniyor çünkü regl ve doğurganlık hatırlatıcıları
       // varsayılan olarak açık: ayar ekranına hiç girmeyen kullanıcı

@@ -118,7 +118,14 @@ void main() {
 
       // 'p$offset' ya da 'kart$i' anahtar değil. Anahtar ad uzayları uzun
       // ve alt çizgili olur; bu ayrım olmadan '^p.+$' her şeyi yutuyordu.
-      if (prefix.length < 6 || !prefix.contains('_')) continue;
+      //
+      // Alt çizgiyle biten 5+ karakterlik önek de ad alanı: 'care_$code'
+      // şablon kodundan üretilen anahtarlar (bkz. CareTemplates). Kural yalnızca
+      // bu kadar genişletildi; 'id_$x' gibi kısa önekler hâlâ elenir.
+      final adAlani =
+          (prefix.length >= 6 && prefix.contains('_')) ||
+          (prefix.length >= 5 && prefix.endsWith('_'));
+      if (!adAlani) continue;
 
       final escaped = RegExp.escape(literal)
           .replaceAll(RegExp(r'\\\$\\\{[^}]*\\\}'), '[A-Za-z0-9_]+')

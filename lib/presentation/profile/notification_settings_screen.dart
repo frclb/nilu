@@ -1,3 +1,4 @@
+import '../reminders/care_plan_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -94,11 +95,17 @@ class _NotificationSettingsScreenState
 
     final scheduler = ReminderScheduler();
 
+    // Gebelik/lohusalık hatırlatıcıları da plana giriyor. `apply` önce
+    // hepsini iptal ediyor; bu girdi olmasaydı bir döngü anahtarını
+    // değiştirmek bütün gebelik hatırlatıcılarını silerdi.
+    final care = await loadCarePlanInput();
+
     // Kullanıcı ilk kez bir hatırlatıcı açtığında izin iste.
     final wantsReminders =
         settings.periodReminders ||
         settings.fertileWindow ||
-        settings.dailyLogs;
+        settings.dailyLogs ||
+        (settings.careReminders && care.events.isNotEmpty);
     if (wantsReminders) {
       final granted = await scheduler.requestPermission();
       if (!granted) {
@@ -116,6 +123,7 @@ class _NotificationSettingsScreenState
       cycleInfo: cycleInfo,
       settings: settings,
       now: DateTime.now(),
+      care: care,
     );
 
     await scheduler.apply(plan, localize: localize);

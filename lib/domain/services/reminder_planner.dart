@@ -1,8 +1,11 @@
+import '../models/care_event.dart';
 import '../models/cycle_info.dart';
+import '../models/life_stage.dart';
 import '../models/notification_settings.dart';
+import '../models/pregnancy.dart';
 
 /// Planlanabilecek hatırlatıcı türleri.
-enum ReminderType { periodApproaching, fertileWindow, dailyLog }
+enum ReminderType { periodApproaching, fertileWindow, dailyLog, care }
 
 /// Belirli bir anda gösterilecek hatırlatıcı.
 class ScheduledReminder {
@@ -14,16 +17,50 @@ class ScheduledReminder {
   final String titleKey;
   final String bodyKey;
 
+  /// Lokalizasyon anahtarı yerine olduğu gibi gösterilecek başlık.
+  ///
+  /// Kullanıcının kendi eklediği randevunun adı bir anahtar değil, serbest
+  /// metin ("Diş hekimi"). Gizli bildirimde bu da gizleniyor.
+  final String? literalTitle;
+
   const ScheduledReminder({
     required this.id,
     required this.type,
     required this.when,
     required this.titleKey,
     required this.bodyKey,
+    this.literalTitle,
   });
 
   @override
   String toString() => '$type @ $when (#$id)';
+}
+
+/// Bakım (gebelik/lohusalık) hatırlatıcılarının girdisi.
+///
+/// Planlayıcıda **zorunlu**: planı iki yer yazıyor (açılıştaki senkronizasyon
+/// ve bildirim ayarları ekranı) ve ikisi de `cancelAll()` ile başlıyor.
+/// Ayarlar ekranı bu girdiyi bilmeseydi bir döngü anahtarını değiştirmek
+/// bütün gebelik hatırlatıcılarını silerdi.
+class CarePlanInput {
+  final LifeStage stage;
+
+  /// Evreye ait gebelik: gebelikte süren, lohusalıkta doğumla biten.
+  final Pregnancy? pregnancy;
+  final List<CareEvent> events;
+
+  const CarePlanInput({
+    required this.stage,
+    required this.pregnancy,
+    required this.events,
+  });
+
+  /// Gebelik kaydı olmayan kullanıcı.
+  static const CarePlanInput none = CarePlanInput(
+    stage: LifeStage.cycle,
+    pregnancy: null,
+    events: [],
+  );
 }
 
 /// Döngü tahminlerinden hatırlatıcı planı üretir.
@@ -64,6 +101,7 @@ class ReminderPlanner {
     required CycleInfo cycleInfo,
     required GeneralNotificationSettings settings,
     required DateTime now,
+    required CarePlanInput care,
   }) {
     String d(DateTime? value) =>
         value == null ? '-' : '${value.year}-${value.month}-${value.day}';
@@ -86,6 +124,21 @@ class ReminderPlanner {
       d(cycleInfo.fertileWindowStart),
       ...cycleInfo.futurePredictions.map((p) => d(p.startDate)),
       ...cycleInfo.futurePredictions.map((p) => d(p.fertileStart)),
+      // Gizlilik ayarı: açılınca zaten kurulmuş açık metinli bildirimler
+      // yeniden yazılmalı.
+      settings.discreet,
+      settings.careReminders,
+      // Evre ve bakım kalemleri. Düşükten önce ve sonra döngü tahmini
+      // olmadığı için yukarıdaki kısım aynı kalıyor; evre buraya girmeseydi
+      // plan hiç yenilenmez ve "anomali taraması" bildirimi olduğu gibi
+      // dururdu.
+      care.stage.name,
+      care.pregnancy?.id ?? '-',
+      d(care.pregnancy?.estimatedDueDate),
+      d(care.pregnancy?.endedAt),
+      for (final e in care.events)
+        '${e.id}:${e.done}:${e.reminderOn}:${e.fromDay}:'
+            '${e.scheduledAt?.toIso8601String() ?? '-'}',
     ].join('|');
   }
 
@@ -94,6 +147,7 @@ class ReminderPlanner {
     required CycleInfo cycleInfo,
     required GeneralNotificationSettings settings,
     required DateTime now,
+    required CarePlanInput care,
   }) {
     final reminders = <ScheduledReminder>[];
 
@@ -157,9 +211,105 @@ class ReminderPlanner {
       );
     }
 
+    if (settings.careReminders) {
+      reminders.addAll(_careReminders(care, now));
+    }
+
     reminders.sort((a, b) => a.when.compareTo(b.when));
+
+    // Gizlilik tek yerde, planın sonunda uygulanıyor: türlere tek tek
+    // uygulansaydı yeni bir tür eklendiğinde unutulabilirdi.
+    if (settings.discreet) return reminders.map(_discreet).toList();
     return reminders;
   }
+
+  // ─── Bakım hatırlatıcıları ───
+
+  static const int _careIdBase = 4000;
+
+  /// iOS uygulama başına en fazla 64 bekleyen bildirime izin veriyor.
+  /// Döngü hatırlatıcıları en fazla 7; bakım için güvenli bir pay.
+  static const int maxCareReminders = 24;
+
+  /// Randevudan önceki akşam.
+  static const int eveningHour = 20;
+
+  static List<ScheduledReminder> _careReminders(
+    CarePlanInput care,
+    DateTime now,
+  ) {
+    final gebelik = care.pregnancy;
+    if (gebelik == null) return const [];
+
+    // Döngü evresinde hiçbir bakım kalemi planlanmıyor. Gebelik hangi
+    // sonuçla biterse bitsin bütün hatırlatıcıların aynı anda düşmesinin
+    // garantisi bu satır.
+    final CareAnchor gecerliCapa;
+    switch (care.stage) {
+      case LifeStage.cycle:
+        return const [];
+      case LifeStage.pregnancy:
+        gecerliCapa = CareAnchor.gestation;
+      case LifeStage.postpartum:
+        gecerliCapa = CareAnchor.postpartum;
+    }
+
+    final adaylar = <({DateTime when, CareEvent event, bool tomorrow})>[];
+    for (final e in care.events) {
+      if (e.pregnancyId != gebelik.id || e.done || !e.reminderOn) continue;
+
+      final randevu = e.scheduledAt;
+      if (randevu != null) {
+        // Kullanıcının aldığı randevu: bir önceki akşam.
+        final when = _at(
+          randevu.subtract(const Duration(days: 1)),
+          eveningHour,
+        );
+        if (when.isAfter(now)) {
+          adaylar.add((when: when, event: e, tomorrow: true));
+        }
+        continue;
+      }
+
+      // Şablondan gelen ve henüz randevusu alınmamış kalem: pencerenin ilk
+      // günü sabah. Kullanıcının kendi eklediği kalemin penceresi yok.
+      if (e.isCustom || e.anchor != gecerliCapa) continue;
+      final bas = e.windowStart(gebelik);
+      if (bas == null) continue;
+      final when = _at(bas, morningHour);
+      if (when.isAfter(now)) {
+        adaylar.add((when: when, event: e, tomorrow: false));
+      }
+    }
+
+    adaylar.sort((a, b) => a.when.compareTo(b.when));
+    return [
+      for (var i = 0; i < adaylar.length && i < maxCareReminders; i++)
+        ScheduledReminder(
+          id: _careIdBase + i,
+          type: ReminderType.care,
+          when: adaylar[i].when,
+          titleKey: adaylar[i].event.isCustom
+              ? 'notif_care_custom_title'
+              : 'care_${adaylar[i].event.code}_title',
+          bodyKey: adaylar[i].tomorrow
+              ? 'notif_care_tomorrow_body'
+              : 'notif_care_window_body',
+          literalTitle: adaylar[i].event.isCustom
+              ? adaylar[i].event.title
+              : null,
+        ),
+    ];
+  }
+
+  /// Kilit ekranında içerik göstermeyen hâli.
+  static ScheduledReminder _discreet(ScheduledReminder r) => ScheduledReminder(
+    id: r.id,
+    type: r.type,
+    when: r.when,
+    titleKey: 'notif_discreet_title',
+    bodyKey: 'notif_discreet_body',
+  );
 
   /// Tahmin edilen regl başlangıçları (en fazla [maxCycles] adet).
   static List<DateTime> _periodStarts(CycleInfo info) {

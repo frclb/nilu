@@ -150,6 +150,9 @@ class SecureStore {
     // geçtiğinde ya da yedek sızdığında sonucu en ağır olan bu. Düz metin
     // saklanamaz.
     'pregnancies',
+    // CareRepository — randevu ve tarama listesi gebeliği ele veriyor
+    // ("18–22. hafta: anomali taraması"); gebelik kaydı kadar hassas.
+    'care_events',
   ];
 
   /// Tüm hassas verileri siler (profil → "Verilerimi Sil").

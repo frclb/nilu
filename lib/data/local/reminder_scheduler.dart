@@ -84,7 +84,7 @@ class ReminderScheduler {
       try {
         await _plugin.zonedSchedule(
           id: reminder.id,
-          title: localize(reminder.titleKey),
+          title: reminder.literalTitle ?? localize(reminder.titleKey),
           body: localize(reminder.bodyKey),
           scheduledDate: tz.TZDateTime.from(reminder.when, tz.local),
           notificationDetails: const NotificationDetails(
@@ -109,9 +109,15 @@ class ReminderScheduler {
     }
   }
 
+  /// Bekleyen bütün hatırlatıcıları iptal eder. Hata fırlatmaz.
+  ///
+  /// Temizlik "elinden geleni yap" türünde bir işlem: başarısız olması
+  /// çağıranı durdurmamalı. Önceden `init()` hata yakalamanın dışındaydı;
+  /// senkronizasyon boş planda da temizlik yapmaya başlayınca eklentinin
+  /// başlatılamadığı her durumda yakalanmamış bir hata fırlıyordu.
   Future<void> cancelAll() async {
-    await init();
     try {
+      await init();
       await _plugin.cancelAll();
     } catch (e) {
       debugPrint('Could not cancel reminders: $e');

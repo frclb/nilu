@@ -23,6 +23,7 @@ List<ScheduledReminder> plan({
   cycleInfo: info ?? cycle(),
   settings: settings,
   now: at ?? now,
+  care: CarePlanInput.none,
 );
 
 List<ScheduledReminder> ofType(
@@ -283,8 +284,18 @@ void main() {
         fertileStart: DateTime(2026, 3, 12),
       );
       expect(
-        ReminderPlanner.signature(cycleInfo: info, settings: on, now: now),
-        ReminderPlanner.signature(cycleInfo: info, settings: on, now: now),
+        ReminderPlanner.signature(
+          cycleInfo: info,
+          settings: on,
+          now: now,
+          care: CarePlanInput.none,
+        ),
+        ReminderPlanner.signature(
+          cycleInfo: info,
+          settings: on,
+          now: now,
+          care: CarePlanInput.none,
+        ),
       );
     });
 
@@ -296,12 +307,14 @@ void main() {
           cycleInfo: cycle(nextPeriod: DateTime(2026, 4, 1)),
           settings: on,
           now: now,
+          care: CarePlanInput.none,
         ),
         isNot(
           ReminderPlanner.signature(
             cycleInfo: cycle(nextPeriod: DateTime(2026, 3, 25)),
             settings: on,
             now: now,
+            care: CarePlanInput.none,
           ),
         ),
       );
@@ -313,12 +326,14 @@ void main() {
           cycleInfo: cycle(fertileStart: DateTime(2026, 3, 12)),
           settings: on,
           now: now,
+          care: CarePlanInput.none,
         ),
         isNot(
           ReminderPlanner.signature(
             cycleInfo: cycle(fertileStart: DateTime(2026, 3, 15)),
             settings: on,
             now: now,
+            care: CarePlanInput.none,
           ),
         ),
       );
@@ -326,7 +341,12 @@ void main() {
 
     test('ileri tahminler değişince imza değişir', () {
       expect(
-        ReminderPlanner.signature(cycleInfo: cycle(), settings: on, now: now),
+        ReminderPlanner.signature(
+          cycleInfo: cycle(),
+          settings: on,
+          now: now,
+          care: CarePlanInput.none,
+        ),
         isNot(
           ReminderPlanner.signature(
             cycleInfo: cycle(
@@ -334,6 +354,7 @@ void main() {
             ),
             settings: on,
             now: now,
+            care: CarePlanInput.none,
           ),
         ),
       );
@@ -342,12 +363,18 @@ void main() {
     test('ayar değişince imza değişir', () {
       final info = cycle(nextPeriod: DateTime(2026, 4, 1));
       expect(
-        ReminderPlanner.signature(cycleInfo: info, settings: on, now: now),
+        ReminderPlanner.signature(
+          cycleInfo: info,
+          settings: on,
+          now: now,
+          care: CarePlanInput.none,
+        ),
         isNot(
           ReminderPlanner.signature(
             cycleInfo: info,
             settings: on.copyWith(periodReminders: false),
             now: now,
+            care: CarePlanInput.none,
           ),
         ),
       );
@@ -361,11 +388,13 @@ void main() {
           cycleInfo: cycle(nextPeriod: DateTime(2026, 4, 1, 3)),
           settings: on,
           now: now,
+          care: CarePlanInput.none,
         ),
         ReminderPlanner.signature(
           cycleInfo: cycle(nextPeriod: DateTime(2026, 4, 1, 22)),
           settings: on,
           now: now,
+          care: CarePlanInput.none,
         ),
       );
     });

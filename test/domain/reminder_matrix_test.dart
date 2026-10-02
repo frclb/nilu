@@ -44,7 +44,12 @@ void main() {
   List<ScheduledReminder> planFor(
     CycleInfo info, {
     GeneralNotificationSettings settings = allOn,
-  }) => ReminderPlanner.plan(cycleInfo: info, settings: settings, now: now);
+  }) => ReminderPlanner.plan(
+    cycleInfo: info,
+    settings: settings,
+    now: now,
+    care: CarePlanInput.none,
+  );
 
   Iterable<ScheduledReminder> ofType(
     List<ScheduledReminder> plan,
@@ -143,12 +148,14 @@ void main() {
           cycleInfo: info,
           settings: allOn,
           now: now,
+          care: CarePlanInput.none,
         ),
         isNot(
           ReminderPlanner.signature(
             cycleInfo: info,
             settings: allOn,
             now: afterDueDate,
+            care: CarePlanInput.none,
           ),
         ),
       );
@@ -162,11 +169,13 @@ void main() {
           cycleInfo: info,
           settings: allOn,
           now: now,
+          care: CarePlanInput.none,
         ),
         ReminderPlanner.signature(
           cycleInfo: info,
           settings: allOn,
           now: now.add(const Duration(hours: 3)),
+          care: CarePlanInput.none,
         ),
       );
     });
@@ -178,12 +187,14 @@ void main() {
           cycleInfo: info,
           settings: allOn,
           now: now,
+          care: CarePlanInput.none,
         ),
         isNot(
           ReminderPlanner.signature(
             cycleInfo: info,
             settings: const GeneralNotificationSettings(fertileWindow: false),
             now: now,
+            care: CarePlanInput.none,
           ),
         ),
       );
@@ -224,11 +235,14 @@ void main() {
         ),
         {ReminderType.dailyLog},
       ),
-      'hepsi açık': (allOn, {
-        ReminderType.periodApproaching,
-        ReminderType.fertileWindow,
-        ReminderType.dailyLog,
-      }),
+      'hepsi açık': (
+        allOn,
+        {
+          ReminderType.periodApproaching,
+          ReminderType.fertileWindow,
+          ReminderType.dailyLog,
+        },
+      ),
     };
 
     for (final entry in cases.entries) {
@@ -285,6 +299,7 @@ void main() {
         cycleInfo: infoFor(dayOfCycle: 12),
         settings: allOn,
         now: evening,
+        care: CarePlanInput.none,
       ).firstWhere((r) => r.type == ReminderType.dailyLog);
 
       expect(reminder.when.day, 19);
@@ -323,4 +338,5 @@ List<ScheduledReminder> plan(CycleInfo info) => ReminderPlanner.plan(
     dailyLogs: true,
   ),
   now: DateTime(2026, 9, 18, 10),
+  care: CarePlanInput.none,
 );

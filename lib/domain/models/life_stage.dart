@@ -68,6 +68,33 @@ enum LifeStage {
     return LifeStage.cycle;
   }
 
+  /// Bugünkü evreye ait gebelik: gebelikte süren, lohusalıkta doğumla
+  /// biten. Döngü evresinde `null`.
+  ///
+  /// [resolve] ile aynı kuralı kullanıyor — ayrı yazılsaydı ikisi
+  /// ayrışabilirdi.
+  static Pregnancy? relevantPregnancy(
+    Iterable<Pregnancy> pregnancies, {
+    required DateTime today,
+  }) {
+    final gun = DateTime(today.year, today.month, today.day);
+    switch (resolve(pregnancies, today: gun)) {
+      case LifeStage.cycle:
+        return null;
+      case LifeStage.pregnancy:
+        return pregnancies.lastWhere((p) => p.isActive);
+      case LifeStage.postpartum:
+        return pregnancies
+            .where(
+              (p) =>
+                  p.endedAt != null &&
+                  deliveries.contains(p.outcome) &&
+                  gun.difference(p.endedAt!).inDays < postpartumDays,
+            )
+            .reduce((a, b) => a.endedAt!.isAfter(b.endedAt!) ? a : b);
+    }
+  }
+
   BleedingMeaning get bleedingMeaning => switch (this) {
     LifeStage.cycle => BleedingMeaning.period,
     LifeStage.pregnancy => BleedingMeaning.warningSign,

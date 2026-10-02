@@ -11,6 +11,8 @@ class NotificationSettingsRepository {
   static const String _periodRemindersKey = 'notif_period_reminders';
   static const String _fertileWindowKey = 'notif_fertile_window';
   static const String _dailyLogsKey = 'notif_daily_logs';
+  static const String _careRemindersKey = 'notif_care_reminders';
+  static const String _discreetKey = 'notif_discreet';
 
 
   Future<GeneralNotificationSettings> getGeneralSettings() async {
@@ -22,6 +24,9 @@ class NotificationSettingsRepository {
           prefs.getBool(_periodRemindersKey) ?? defaults.periodReminders,
       fertileWindow: prefs.getBool(_fertileWindowKey) ?? defaults.fertileWindow,
       dailyLogs: prefs.getBool(_dailyLogsKey) ?? defaults.dailyLogs,
+      careReminders:
+          prefs.getBool(_careRemindersKey) ?? defaults.careReminders,
+      discreet: prefs.getBool(_discreetKey) ?? defaults.discreet,
     );
   }
 
@@ -30,6 +35,8 @@ class NotificationSettingsRepository {
     await prefs.setBool(_periodRemindersKey, settings.periodReminders);
     await prefs.setBool(_fertileWindowKey, settings.fertileWindow);
     await prefs.setBool(_dailyLogsKey, settings.dailyLogs);
+    await prefs.setBool(_careRemindersKey, settings.careReminders);
+    await prefs.setBool(_discreetKey, settings.discreet);
   }
 
 
