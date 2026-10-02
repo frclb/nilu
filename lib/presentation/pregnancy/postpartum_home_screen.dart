@@ -141,7 +141,11 @@ class _GunKarti extends StatelessWidget {
               FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  context.tr('pp_day', params: {'n': '$gun'}),
+                  // Doğum günü "0. gün" yazıyordu: tutarlı (pencereler
+                  // doğumdan sonraki günlerle sayılıyor) ama hata gibi.
+                  gun == 0
+                      ? context.tr('pp_day_birth')
+                      : context.tr('pp_day', params: {'n': '$gun'}),
                   style: theme.textTheme.displayLarge?.copyWith(
                     fontSize: 34,
                     height: 1.1,

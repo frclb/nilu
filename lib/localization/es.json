@@ -1022,5 +1022,6 @@
   "pp_return_to_cycle": "Volver al seguimiento de la regla",
   "pp_return_subtitle": "Termina el seguimiento posparto; no se borra nada",
   "pp_return_title": "Terminar el seguimiento posparto",
-  "pp_return_body": "Vuelves al seguimiento de la regla. Tu registro del parto, tus citas y tus notas se conservan; los recordatorios del posparto se detienen. Cuando llegue tu primera regla, puedes marcarla en el calendario o en la pantalla de inicio. Las predicciones vuelven cuando se complete tu primer ciclo."
+  "pp_return_body": "Vuelves al seguimiento de la regla. Tu registro del parto, tus citas y tus notas se conservan; los recordatorios del posparto se detienen. Cuando llegue tu primera regla, puedes marcarla en el calendario o en la pantalla de inicio. Las predicciones vuelven cuando se complete tu primer ciclo.",
+  "pp_day_birth": "Día del parto"
 }

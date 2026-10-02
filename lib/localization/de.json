@@ -1022,5 +1022,6 @@
   "pp_return_to_cycle": "Zurück zur Periodenverfolgung",
   "pp_return_subtitle": "Beendet den Wochenbett-Modus; nichts wird gelöscht",
   "pp_return_title": "Wochenbett-Modus beenden",
-  "pp_return_body": "Du kehrst zur Periodenverfolgung zurück. Geburtseintrag, Termine und Notizen bleiben erhalten; Wochenbett-Erinnerungen hören auf. Wenn deine erste Periode kommt, kannst du sie im Kalender oder auf dem Startbildschirm eintragen. Prognosen starten wieder, sobald dein erster Zyklus abgeschlossen ist."
+  "pp_return_body": "Du kehrst zur Periodenverfolgung zurück. Geburtseintrag, Termine und Notizen bleiben erhalten; Wochenbett-Erinnerungen hören auf. Wenn deine erste Periode kommt, kannst du sie im Kalender oder auf dem Startbildschirm eintragen. Prognosen starten wieder, sobald dein erster Zyklus abgeschlossen ist.",
+  "pp_day_birth": "Tag der Geburt"
 }

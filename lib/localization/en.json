@@ -1022,5 +1022,6 @@
   "pp_return_to_cycle": "Return to period tracking",
   "pp_return_subtitle": "Ends postnatal tracking; nothing is deleted",
   "pp_return_title": "End postnatal tracking",
-  "pp_return_body": "You're returning to period tracking. Your birth record, appointments and notes are kept; postnatal reminders stop. When your first period comes, you can mark it in the calendar or on the home screen. Predictions restart once your first cycle is complete."
+  "pp_return_body": "You're returning to period tracking. Your birth record, appointments and notes are kept; postnatal reminders stop. When your first period comes, you can mark it in the calendar or on the home screen. Predictions restart once your first cycle is complete.",
+  "pp_day_birth": "Day of birth"
 }

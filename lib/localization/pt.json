@@ -1022,5 +1022,6 @@
   "pp_return_to_cycle": "Voltar ao acompanhamento da menstruação",
   "pp_return_subtitle": "Encerra o acompanhamento pós-parto; nada é apagado",
   "pp_return_title": "Encerrar o acompanhamento pós-parto",
-  "pp_return_body": "O acompanhamento volta para a menstruação. O registro do parto, as consultas e as anotações são mantidos; os lembretes do pós-parto param. Quando a primeira menstruação chegar, ela pode ser marcada no calendário ou na tela inicial. As previsões voltam quando o primeiro ciclo terminar."
+  "pp_return_body": "O acompanhamento volta para a menstruação. O registro do parto, as consultas e as anotações são mantidos; os lembretes do pós-parto param. Quando a primeira menstruação chegar, ela pode ser marcada no calendário ou na tela inicial. As previsões voltam quando o primeiro ciclo terminar.",
+  "pp_day_birth": "Dia do parto"
 }

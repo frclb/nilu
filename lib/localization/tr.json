@@ -1022,5 +1022,6 @@
   "pp_return_to_cycle": "Regl takibine dön",
   "pp_return_subtitle": "Lohusalık takibini bitirir; kayıtlar silinmez",
   "pp_return_title": "Lohusalık takibini bitir",
-  "pp_return_body": "Regl takibine dönüyorsun. Doğum kaydın, randevuların ve notların silinmez; lohusalık hatırlatıcıları durur. İlk reglin geldiğinde takvimden ya da ana ekrandan işaretleyebilirsin. Tahminler ilk döngün tamamlanınca yeniden başlar."
+  "pp_return_body": "Regl takibine dönüyorsun. Doğum kaydın, randevuların ve notların silinmez; lohusalık hatırlatıcıları durur. İlk reglin geldiğinde takvimden ya da ana ekrandan işaretleyebilirsin. Tahminler ilk döngün tamamlanınca yeniden başlar.",
+  "pp_day_birth": "Doğum günü"
 }

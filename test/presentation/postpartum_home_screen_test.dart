@@ -49,6 +49,17 @@ void main() {
     });
   }
 
+  testWidgets('doğum gününde "0. gün" değil "Doğum günü"', (tester) async {
+    await seedPostpartum(daysSinceBirth: 0);
+    await pumpRouter(
+      tester,
+      routes: pregnancyRoutes(const PostpartumHomeScreen()),
+    );
+    final ctx = tester.element(find.byType(PostpartumHomeScreen));
+    expect(find.text(ctx.tr('pp_day_birth')), findsOneWidget);
+    expect(find.text(ctx.tr('pp_day', params: {'n': '0'})), findsNothing);
+  });
+
   testWidgets('lohia seçimi bugünün kaydına yazılıyor, diğer alanlar kalıyor', (
     tester,
   ) async {
