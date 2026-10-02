@@ -13,6 +13,8 @@ import 'widgets/symptoms_section.dart';
 import 'widgets/mood_section.dart';
 import 'widgets/pain_section.dart';
 import 'widgets/notes_section.dart';
+import 'widgets/measurements_section.dart';
+import '../../domain/models/vitals.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../core/navigation/navigation_service.dart';
 import '../../../domain/models/daily_log.dart';
@@ -40,6 +42,11 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
   /// kullanıcının hepsi siliniyordu.
   late final DailyLog _mevcut;
 
+  // Ölçümler (gebelik ve lohusalık). Doğrulama kaydederken (bkz. `_olcum`).
+  final TextEditingController _kilo = TextEditingController();
+  final TextEditingController _buyuk = TextEditingController();
+  final TextEditingController _kucuk = TextEditingController();
+
   String? _flowIntensity;
   List<String> _symptoms = [];
   List<String> _moods = [];
@@ -61,10 +68,46 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
       contexts: _mevcut.painContexts,
     );
     _notesController.text = _mevcut.notes ?? '';
+    final kilo = _mevcut.weightKg;
+    if (kilo != null) _kilo.text = _kiloMetni(kilo);
+    if (_mevcut.systolic != null) _buyuk.text = '${_mevcut.systolic}';
+    if (_mevcut.diastolic != null) _kucuk.text = '${_mevcut.diastolic}';
+  }
+
+  /// 64.0 → "64", 64.5 → "64,5" (alan virgülü de kabul ediyor).
+  static String _kiloMetni(double kg) => kg == kg.roundToDouble()
+      ? '${kg.round()}'
+      : kg.toStringAsFixed(1).replaceAll('.', ',');
+
+  /// Ölçüm alanlarını okur. Boş alan "yok" demek; dolu ama geçersiz alan
+  /// `null` döndürür ve kayıt yapılmaz — "1205" ya da tek başına büyük
+  /// tansiyon hekime giden özete girmemeli.
+  ({double? kilo, int? buyuk, int? kucuk})? _olcum() {
+    double? kilo;
+    final k = _kilo.text.trim();
+    if (k.isNotEmpty) {
+      kilo = Vitals.parseDecimal(k);
+      if (kilo == null || !Vitals.isPlausibleWeight(kilo)) return null;
+    }
+
+    final b = _buyuk.text.trim();
+    final c = _kucuk.text.trim();
+    if (b.isEmpty && c.isEmpty) return (kilo: kilo, buyuk: null, kucuk: null);
+    final buyuk = int.tryParse(b);
+    final kucuk = int.tryParse(c);
+    if (buyuk == null ||
+        kucuk == null ||
+        !Vitals.isPlausibleBloodPressure(buyuk, kucuk)) {
+      return null;
+    }
+    return (kilo: kilo, buyuk: buyuk, kucuk: kucuk);
   }
 
   @override
   void dispose() {
+    _kilo.dispose();
+    _buyuk.dispose();
+    _kucuk.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -72,19 +115,37 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
   Future<void> _saveLog() async {
     final viewModel = context.read<CalendarViewModel>();
     final today = DateTime.now();
+    final stage = viewModel.lifeStage;
 
-    final log = DailyLog(
-      date: today,
+    // Ölçümler yalnızca gebelik ve lohusalıkta soruluyor; döngüde bölüm
+    // yok ve kayıttaki değerlere dokunulmuyor.
+    final olcumVar = stage != LifeStage.cycle;
+    final olcum = olcumVar ? _olcum() : null;
+    if (olcumVar && olcum == null) {
+      AppSnack.error(context, context.tr('log_measure_invalid'));
+      return;
+    }
+
+    final not = _notesController.text.isNotEmpty ? _notesController.text : null;
+    // `copyWith`: bu ekranda sorulmayan alanlar (cinsel aktivite; döngüde
+    // ölçümler) günün kaydından olduğu gibi korunuyor.
+    final log = _mevcut.copyWith(
       flowIntensity: _flowIntensity,
+      clearFlow: _flowIntensity == null,
       symptoms: _symptoms,
       moods: _moods,
-      notes: _notesController.text.isNotEmpty ? _notesController.text : null,
+      notes: not,
+      clearNotes: not == null,
       painLevel: _pain.level,
+      clearPain: _pain.level == null,
       painLimitedActivity: _pain.limitedActivity,
       painLocations: _pain.locations,
       painContexts: _pain.contexts,
-      // Bu ekranda sorulmuyor; günün kaydından korunuyor.
-      sexualActivity: _mevcut.sexualActivity,
+      weightKg: olcum?.kilo,
+      clearWeight: olcum != null && olcum.kilo == null,
+      systolic: olcum?.buyuk,
+      diastolic: olcum?.kucuk,
+      clearBloodPressure: olcum != null && olcum.buyuk == null,
     );
 
     await viewModel.updateDailyLog(log);
@@ -99,7 +160,7 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
     // Yalnızca regl kaydının tutulduğu evrede: gebelikte ya da lohusalıkta
     // koruma zaten reddediyor, ama sessiz bir reddetmeye yaslanmak yerine
     // niyet burada açık.
-    if (viewModel.lifeStage.recordsPeriods &&
+    if (stage.recordsPeriods &&
         LogVocabulary.startsPeriod(_flowIntensity) &&
         !viewModel.isPeriodDay(today)) {
       await viewModel.startPeriodToday();
@@ -107,12 +168,9 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
 
     if (!mounted) return;
 
-    // Gebelikte kanama bir tehlike işareti (Bakanlık listesi). Kayıt sessizce
-    // kaydedilip geçilseydi kullanıcı bunun önemli olduğunu öğrenmezdi.
-    // Lekelenme de dahil: gebelikte "az" kanama da hekime söylenmeli.
-    if (viewModel.lifeStage == LifeStage.pregnancy &&
-        LogVocabulary.isBleeding(_flowIntensity)) {
-      final tehlikeyeGit = await _gebelikteKanamaUyarisi() ?? false;
+    final uyari = _uyari(stage, log);
+    if (uyari != null) {
+      final tehlikeyeGit = await _uyariGoster(uyari, log) ?? false;
       if (!mounted) return;
       // Diyalog kaydın tutulduğunu zaten söyledi; ayrıca bildirim yok.
       final router = tehlikeyeGit ? GoRouter.of(context) : null;
@@ -123,7 +181,11 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
       // ekran bir an görünüp kayboluyordu.
       router?.pushNamed(
         RouteNames.dangerSigns,
-        queryParameters: {'period': DangerPeriod.pregnancy.name},
+        queryParameters: {
+          'period': stage == LifeStage.postpartum
+              ? DangerPeriod.postpartum.name
+              : DangerPeriod.pregnancy.name,
+        },
       );
       return;
     }
@@ -132,27 +194,77 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
     NavigationService().pop();
   }
 
+  /// Kayıttan sonra gösterilecek uyarı; yoksa `null`.
+  ///
+  /// Yalnızca bu kayıtta **değişen** değer için. Ekran günün kaydıyla
+  /// açıldığından, sabah lekelenme girip akşam yalnızca ruh hâli ekleyen
+  /// gebe kullanıcı aynı uyarıyı her kayıtta yeniden görürdü.
+  ///
+  /// Öncelik: ağır tansiyon (acil) > gebelikte kanama > yüksek tansiyon.
+  _Uyari? _uyari(LifeStage stage, DailyLog log) {
+    if (stage == LifeStage.cycle) return null;
+
+    final buyuk = log.systolic;
+    final kucuk = log.diastolic;
+    final tansiyonYeni =
+        buyuk != null &&
+        kucuk != null &&
+        (buyuk != _mevcut.systolic || kucuk != _mevcut.diastolic);
+    final seviye = tansiyonYeni
+        ? Vitals.classify(buyuk, kucuk)
+        : BloodPressureLevel.normal;
+
+    if (seviye == BloodPressureLevel.severe) return _Uyari.tansiyonAgir;
+    if (stage == LifeStage.pregnancy &&
+        LogVocabulary.isBleeding(log.flowIntensity) &&
+        log.flowIntensity != _mevcut.flowIntensity) {
+      return _Uyari.kanama;
+    }
+    if (seviye == BloodPressureLevel.high) return _Uyari.tansiyonYuksek;
+    return null;
+  }
+
   /// Tehlike işaretlerine gidilmek istenirse `true`.
-  Future<bool?> _gebelikteKanamaUyarisi() => showDialog<bool>(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      key: const Key('preg_bleeding_dialog'),
-      icon: Icon(Icons.health_and_safety_outlined, color: ctx.tokens.warning),
-      title: Text(ctx.tr('preg_bleeding_dialog_title')),
-      content: Text(ctx.tr('preg_bleeding_dialog_body')),
-      actions: [
-        TextButton(
-          key: const Key('preg_bleeding_dialog_danger'),
-          onPressed: () => Navigator.of(ctx).pop(true),
-          child: Text(ctx.tr('preg_danger_entry_title')),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(ctx).pop(false),
-          child: Text(ctx.tr('ok')),
-        ),
-      ],
-    ),
-  );
+  Future<bool?> _uyariGoster(_Uyari uyari, DailyLog log) {
+    final deger = {'s': '${log.systolic}', 'd': '${log.diastolic}'};
+    final (anahtar, baslik, govde) = switch (uyari) {
+      _Uyari.kanama => (
+        'preg_bleeding_dialog',
+        'preg_bleeding_dialog_title',
+        'preg_bleeding_dialog_body',
+      ),
+      _Uyari.tansiyonYuksek => (
+        'bp_high_dialog',
+        'bp_high_title',
+        'bp_high_body',
+      ),
+      _Uyari.tansiyonAgir => (
+        'bp_severe_dialog',
+        'bp_severe_title',
+        'bp_severe_body',
+      ),
+    };
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        key: Key(anahtar),
+        icon: Icon(Icons.health_and_safety_outlined, color: ctx.tokens.warning),
+        title: Text(ctx.tr(baslik)),
+        content: Text(ctx.tr(govde, params: deger)),
+        actions: [
+          TextButton(
+            key: const Key('warning_dialog_danger'),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(ctx.tr('danger_signs_action')),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.tr('ok')),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -257,6 +369,14 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
                     },
                   ),
                   _buildDivider(isDark, theme),
+                  if (stage != LifeStage.cycle) ...[
+                    MeasurementsSection(
+                      weight: _kilo,
+                      systolic: _buyuk,
+                      diastolic: _kucuk,
+                    ),
+                    _buildDivider(isDark, theme),
+                  ],
                   NotesSection(controller: _notesController),
                 ],
               ),
@@ -329,3 +449,5 @@ class _GebelikBelirtiNotu extends StatelessWidget {
     );
   }
 }
+
+enum _Uyari { kanama, tansiyonYuksek, tansiyonAgir }

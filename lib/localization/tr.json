@@ -978,5 +978,16 @@
   "log_symptom_frequent_urination": "Sık İdrara Çıkma",
   "log_symptom_leg_cramps": "Bacak Krampı",
   "log_preg_symptom_note": "Şiddetli baş ağrısı; yüzde, ellerde ya da bacaklarda ani şişlik; geçmeyen kusma ve nedeni açıklanamayan kaşıntı gebelikte beklemeden hekime danışılması gereken işaretlerdir.",
-  "danger_signs_action": "Tehlike işaretlerine bak"
+  "danger_signs_action": "Tehlike işaretlerine bak",
+  "log_measure_title": "Ölçümler",
+  "log_measure_hint": "İsteğe bağlı. Tansiyonu oturup birkaç dakika dinlendikten sonra, kolun kalp hizasındayken ölç.",
+  "log_measure_weight": "Kilo",
+  "log_measure_bp": "Tansiyon",
+  "log_measure_systolic": "Büyük",
+  "log_measure_diastolic": "Küçük",
+  "log_measure_invalid": "Ölçümlerden biri geçersiz. Kiloyu kg olarak, tansiyonu iki değeriyle birlikte gir (ör. 120 / 80).",
+  "bp_high_title": "Tansiyonun yüksek",
+  "bp_high_body": "{s}/{d} mmHg. Gebelikte ve doğumdan sonra 140/90 ve üstü hekime bildirilmesi gereken bir değer. Birkaç dakika oturup dinlendikten sonra yeniden ölç; yine yüksekse aynı gün hekimine ya da ebene ulaş. Baş ağrısı, görme bozukluğu ya da ani şişlik de varsa beklemeden başvur.",
+  "bp_severe_title": "Tansiyonun çok yüksek",
+  "bp_severe_body": "{s}/{d} mmHg. 160/110 ve üstü acil değerlendirme gerektiren bir değer. Beklemeden bir sağlık kuruluşuna başvur."
 }

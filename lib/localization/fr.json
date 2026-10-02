@@ -978,5 +978,16 @@
   "log_symptom_frequent_urination": "Envies fréquentes d'uriner",
   "log_symptom_leg_cramps": "Crampes aux jambes",
   "log_preg_symptom_note": "Pendant la grossesse, un mal de tête intense, un gonflement soudain du visage, des mains ou des jambes, des vomissements qui ne s'arrêtent pas ou des démangeaisons inexpliquées doivent te faire consulter sans attendre.",
-  "danger_signs_action": "Voir les signes d'alerte"
+  "danger_signs_action": "Voir les signes d'alerte",
+  "log_measure_title": "Mesures",
+  "log_measure_hint": "Facultatif. Mesure ta tension assise, après quelques minutes de repos, le bras à hauteur du cœur.",
+  "log_measure_weight": "Poids",
+  "log_measure_bp": "Tension artérielle",
+  "log_measure_systolic": "Systolique",
+  "log_measure_diastolic": "Diastolique",
+  "log_measure_invalid": "Une mesure n'est pas valide. Saisis le poids en kg et la tension avec ses deux valeurs (ex. 120 / 80).",
+  "bp_high_title": "Ta tension est élevée",
+  "bp_high_body": "{s}/{d} mmHg. Pendant la grossesse et après l'accouchement, une tension de 140/90 ou plus doit être signalée au médecin ou à la sage-femme. Reste assise quelques minutes et mesure à nouveau ; si elle est toujours élevée, contacte-les le jour même. En cas de mal de tête, de troubles de la vue ou de gonflement soudain, consulte sans attendre.",
+  "bp_severe_title": "Ta tension est très élevée",
+  "bp_severe_body": "{s}/{d} mmHg. Une tension de 160/110 ou plus nécessite une évaluation urgente. Consulte sans attendre."
 }

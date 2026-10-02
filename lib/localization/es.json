@@ -978,5 +978,16 @@
   "log_symptom_frequent_urination": "Ganas frecuentes de orinar",
   "log_symptom_leg_cramps": "Calambres en las piernas",
   "log_preg_symptom_note": "En el embarazo, un dolor de cabeza intenso, una hinchazón repentina de la cara, las manos o las piernas, vómitos que no paran o picor sin causa aparente son señales para consultar sin esperar.",
-  "danger_signs_action": "Ver señales de alarma"
+  "danger_signs_action": "Ver señales de alarma",
+  "log_measure_title": "Mediciones",
+  "log_measure_hint": "Opcional. Mide la tensión sentada, tras unos minutos de reposo, con el brazo a la altura del corazón.",
+  "log_measure_weight": "Peso",
+  "log_measure_bp": "Tensión arterial",
+  "log_measure_systolic": "Sistólica",
+  "log_measure_diastolic": "Diastólica",
+  "log_measure_invalid": "Una de las mediciones no es válida. Introduce el peso en kg y la tensión con sus dos valores (p. ej. 120 / 80).",
+  "bp_high_title": "Tu tensión está alta",
+  "bp_high_body": "{s}/{d} mmHg. En el embarazo y después del parto, una tensión de 140/90 o más debe comunicarse al médico o a la matrona. Descansa sentada unos minutos y vuelve a medirla; si sigue alta, contacta con ellos ese mismo día. Si además tienes dolor de cabeza, problemas de visión o hinchazón repentina, acude sin esperar.",
+  "bp_severe_title": "Tu tensión está muy alta",
+  "bp_severe_body": "{s}/{d} mmHg. Una tensión de 160/110 o más requiere valoración urgente. Acude ya a un servicio de salud."
 }

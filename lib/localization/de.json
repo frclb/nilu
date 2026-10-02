@@ -978,5 +978,16 @@
   "log_symptom_frequent_urination": "Häufiger Harndrang",
   "log_symptom_leg_cramps": "Wadenkrämpfe",
   "log_preg_symptom_note": "In der Schwangerschaft sind starke Kopfschmerzen, plötzliche Schwellungen an Gesicht, Händen oder Beinen, anhaltendes Erbrechen und unerklärlicher Juckreiz Zeichen, bei denen du dich sofort ärztlich melden solltest.",
-  "danger_signs_action": "Warnzeichen ansehen"
+  "danger_signs_action": "Warnzeichen ansehen",
+  "log_measure_title": "Messwerte",
+  "log_measure_hint": "Optional. Miss den Blutdruck im Sitzen nach ein paar Minuten Ruhe, den Arm auf Herzhöhe.",
+  "log_measure_weight": "Gewicht",
+  "log_measure_bp": "Blutdruck",
+  "log_measure_systolic": "Systolisch",
+  "log_measure_diastolic": "Diastolisch",
+  "log_measure_invalid": "Ein Messwert ist ungültig. Gib das Gewicht in kg und den Blutdruck mit beiden Werten ein (z. B. 120 / 80).",
+  "bp_high_title": "Dein Blutdruck ist erhöht",
+  "bp_high_body": "{s}/{d} mmHg. In der Schwangerschaft und nach der Geburt sollte ein Wert von 140/90 oder höher ärztlich gemeldet werden. Ruh dich ein paar Minuten im Sitzen aus und miss erneut; ist er noch hoch, melde dich noch am selben Tag bei deiner Ärztin, deinem Arzt oder deiner Hebamme. Kommen Kopfschmerzen, Sehstörungen oder plötzliche Schwellungen hinzu, such sofort Hilfe.",
+  "bp_severe_title": "Dein Blutdruck ist sehr hoch",
+  "bp_severe_body": "{s}/{d} mmHg. Ein Wert von 160/110 oder höher muss dringend abgeklärt werden. Such sofort eine Klinik oder Praxis auf."
 }

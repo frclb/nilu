@@ -73,18 +73,8 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
   }
 
   void _save() {
-    final updatedLog = DailyLog(
-      date: widget.date,
-      symptoms: _currentLog.symptoms,
-      notes: _notesController.text,
-      flowIntensity: _currentLog.flowIntensity,
-      moods: _currentLog.moods,
-      sexualActivity: _currentLog.sexualActivity,
-      painLevel: _currentLog.painLevel,
-      painLimitedActivity: _currentLog.painLimitedActivity,
-      painLocations: _currentLog.painLocations,
-      painContexts: _currentLog.painContexts,
-    );
+    // `copyWith`: bu sayfada olmayan alanlar (tansiyon, kilo) korunuyor.
+    final updatedLog = _currentLog.copyWith(notes: _notesController.text);
     context.read<CalendarViewModel>().updateDailyLog(updatedLog);
   }
 
@@ -105,26 +95,18 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
     bool clearFlow = false,
   }) {
     setState(() {
-      _currentLog = DailyLog(
-        date: widget.date,
-        symptoms: symptoms ?? _currentLog.symptoms,
+      _currentLog = _currentLog.copyWith(
+        symptoms: symptoms,
         notes: _notesController.text,
-        flowIntensity: clearFlow
-            ? null
-            : (flowIntensity ?? _currentLog.flowIntensity),
-        moods: moods ?? _currentLog.moods,
-        sexualActivity: sexualActivity ?? _currentLog.sexualActivity,
-        painLevel: clearPain ? null : (painLevel ?? _currentLog.painLevel),
-        painLimitedActivity:
-            painLimitedActivity ?? _currentLog.painLimitedActivity,
-        // Ağrı kaldırılınca yer ve bağlam da düşüyor: "ağrım yok ama
-        // ilişkide ağrıyor" diye bir kayıt kalmamalı.
-        painLocations: clearPain
-            ? const []
-            : (painLocations ?? _currentLog.painLocations),
-        painContexts: clearPain
-            ? const []
-            : (painContexts ?? _currentLog.painContexts),
+        flowIntensity: flowIntensity,
+        clearFlow: clearFlow,
+        moods: moods,
+        sexualActivity: sexualActivity,
+        painLevel: painLevel,
+        clearPain: clearPain,
+        painLimitedActivity: painLimitedActivity,
+        painLocations: painLocations,
+        painContexts: painContexts,
       );
     });
     _save(); // Auto-save

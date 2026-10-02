@@ -978,5 +978,16 @@
   "log_symptom_frequent_urination": "Vontade frequente de urinar",
   "log_symptom_leg_cramps": "Cãibras nas pernas",
   "log_preg_symptom_note": "Na gravidez, dor de cabeça forte, inchaço repentino do rosto, das mãos ou das pernas, vômitos que não param ou coceira sem causa aparente são sinais para procurar atendimento sem esperar.",
-  "danger_signs_action": "Ver sinais de alerta"
+  "danger_signs_action": "Ver sinais de alerta",
+  "log_measure_title": "Medições",
+  "log_measure_hint": "Opcional. Medir a pressão sentada, após alguns minutos de repouso, com o braço na altura do coração.",
+  "log_measure_weight": "Peso",
+  "log_measure_bp": "Pressão arterial",
+  "log_measure_systolic": "Sistólica",
+  "log_measure_diastolic": "Diastólica",
+  "log_measure_invalid": "Uma das medições não é válida. Informe o peso em kg e a pressão com os dois valores (ex.: 120 / 80).",
+  "bp_high_title": "A pressão está alta",
+  "bp_high_body": "{s}/{d} mmHg. Na gravidez e após o parto, uma pressão de 140/90 ou mais deve ser informada ao médico ou à parteira. Descansar sentada alguns minutos e medir novamente; se continuar alta, entrar em contato no mesmo dia. Se houver também dor de cabeça, alteração na visão ou inchaço repentino, procurar atendimento sem esperar.",
+  "bp_severe_title": "A pressão está muito alta",
+  "bp_severe_body": "{s}/{d} mmHg. Uma pressão de 160/110 ou mais exige avaliação urgente. Procurar atendimento sem esperar."
 }

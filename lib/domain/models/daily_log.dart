@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'log_vocabulary.dart';
+import 'vitals.dart';
 
 /// Bir güne özel semptom, not gibi detayları tutan model.
 ///
@@ -41,6 +42,13 @@ class DailyLog {
   /// bunların hiçbirini yakalamıyordu.
   final List<String> painContexts;
 
+  /// Evde ölçülen kilo (kg). Gebelik ve lohusalıkta, isteğe bağlı.
+  final double? weightKg;
+
+  /// Evde ölçülen tansiyon (mmHg). İkisi birlikte var ya da ikisi de yok.
+  final int? systolic;
+  final int? diastolic;
+
   DailyLog({
     required this.date,
     this.symptoms = const [],
@@ -52,7 +60,57 @@ class DailyLog {
     this.painLimitedActivity = false,
     this.painLocations = const [],
     this.painContexts = const [],
+    this.weightKg,
+    this.systolic,
+    this.diastolic,
   });
+
+  /// Değiştirilmeyen her alan aynen kalan kopya — sonradan eklenen alanlar
+  /// da.
+  ///
+  /// Kayıt önceden dört ayrı yerde alan alan yeniden kuruluyordu (kayıt
+  /// ekranı, gün ayrıntısının iki yolu, lohusa panosu). Modele bir alan
+  /// eklendiğinde biri unutulursa o alan o yoldan her kayıtta sessizce
+  /// siliniyordu.
+  ///
+  /// `clear…` bayrakları: `null` "dokunma" demek; bir alanı boşaltmanın
+  /// yolu bayrak. Ağrı kaldırılınca yeri ve bağlamı da düşüyor — "ağrım
+  /// yok ama ilişkide ağrıyor" diye bir kayıt kalmamalı.
+  DailyLog copyWith({
+    List<String>? symptoms,
+    String? notes,
+    bool clearNotes = false,
+    String? flowIntensity,
+    bool clearFlow = false,
+    List<String>? moods,
+    String? sexualActivity,
+    String? painLevel,
+    bool clearPain = false,
+    bool? painLimitedActivity,
+    List<String>? painLocations,
+    List<String>? painContexts,
+    double? weightKg,
+    bool clearWeight = false,
+    int? systolic,
+    int? diastolic,
+    bool clearBloodPressure = false,
+  }) => DailyLog(
+    date: date,
+    symptoms: symptoms ?? this.symptoms,
+    notes: clearNotes ? null : (notes ?? this.notes),
+    flowIntensity: clearFlow ? null : (flowIntensity ?? this.flowIntensity),
+    moods: moods ?? this.moods,
+    sexualActivity: sexualActivity ?? this.sexualActivity,
+    painLevel: clearPain ? null : (painLevel ?? this.painLevel),
+    painLimitedActivity: clearPain
+        ? false
+        : (painLimitedActivity ?? this.painLimitedActivity),
+    painLocations: clearPain ? const [] : (painLocations ?? this.painLocations),
+    painContexts: clearPain ? const [] : (painContexts ?? this.painContexts),
+    weightKg: clearWeight ? null : (weightKg ?? this.weightKg),
+    systolic: clearBloodPressure ? null : (systolic ?? this.systolic),
+    diastolic: clearBloodPressure ? null : (diastolic ?? this.diastolic),
+  );
 
   /// Yalnızca akışı değiştirilmiş kopya.
   ///
@@ -60,18 +118,8 @@ class DailyLog {
   /// değiştiriyor. Lohusa panosundaki tek dokunuşluk "bugünkü kanama"
   /// seçimi yeni bir `DailyLog` kursaydı o günün semptomları, ruh hali ve
   /// notu silinirdi.
-  DailyLog withFlowIntensity(String? flow) => DailyLog(
-    date: date,
-    symptoms: symptoms,
-    notes: notes,
-    flowIntensity: flow,
-    moods: moods,
-    sexualActivity: sexualActivity,
-    painLevel: painLevel,
-    painLimitedActivity: painLimitedActivity,
-    painLocations: painLocations,
-    painContexts: painContexts,
-  );
+  DailyLog withFlowIntensity(String? flow) =>
+      copyWith(flowIntensity: flow, clearFlow: flow == null);
 
   /// Bu günde kullanıcının girdiği bir şey var mı?
   ///
@@ -89,6 +137,8 @@ class DailyLog {
       painLimitedActivity ||
       painLocations.isNotEmpty ||
       painContexts.isNotEmpty ||
+      weightKg != null ||
+      systolic != null ||
       (notes?.isNotEmpty ?? false);
 
   Map<String, dynamic> toMap() {
@@ -103,6 +153,9 @@ class DailyLog {
       'painLimitedActivity': painLimitedActivity,
       'painLocations': painLocations,
       'painContexts': painContexts,
+      'weightKg': weightKg,
+      'systolic': systolic,
+      'diastolic': diastolic,
     };
   }
 
@@ -111,6 +164,16 @@ class DailyLog {
   factory DailyLog.fromMap(Map<String, dynamic> map) {
     final rawFlow = map['flowIntensity'] as String?;
     final rawSexualActivity = map['sexualActivity'] as String?;
+
+    // Ölçümler aralık dışındaysa düşüyor: bozuk bir yedek ya da elle
+    // düzenlenmiş bir dosya hekime giden özete "1205 mmHg" koymasın.
+    final kilo = (map['weightKg'] as num?)?.toDouble();
+    final buyuk = (map['systolic'] as num?)?.toInt();
+    final kucuk = (map['diastolic'] as num?)?.toInt();
+    final tansiyonGecerli =
+        buyuk != null &&
+        kucuk != null &&
+        Vitals.isPlausibleBloodPressure(buyuk, kucuk);
 
     return DailyLog(
       date: DateTime.parse(map['date']),
@@ -148,6 +211,9 @@ class DailyLog {
               rawSexualActivity,
               LogVocabulary.sexualActivities,
             ),
+      weightKg: kilo != null && Vitals.isPlausibleWeight(kilo) ? kilo : null,
+      systolic: tansiyonGecerli ? buyuk : null,
+      diastolic: tansiyonGecerli ? kucuk : null,
     );
   }
 

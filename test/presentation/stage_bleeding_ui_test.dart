@@ -177,7 +177,7 @@ void main() {
       final ctx = await ac(tester);
 
       await kanamaKaydet(tester, ctx);
-      await tester.tap(find.byKey(const Key('preg_bleeding_dialog_danger')));
+      await tester.tap(find.byKey(const Key('warning_dialog_danger')));
       await settleAsync(tester);
 
       // Önce: diyalog tehlike ekranını açıyor, ardından kayıt ekranını

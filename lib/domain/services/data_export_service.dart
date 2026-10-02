@@ -268,7 +268,7 @@ class DataExportService {
     // klinik özetin üzerine kurulduğu veri, tablodan tamamen eksikti.
     final rows = <String>[
       'date,is_period,flow,pain,pain_limited,pain_locations,pain_contexts,'
-          'symptoms,moods,sexual_activity,notes',
+          'symptoms,moods,sexual_activity,weight_kg,systolic,diastolic,notes',
     ];
 
     final logged = dailyLogs.where((l) => l.hasContent).toList()
@@ -288,6 +288,11 @@ class DataExportService {
           log.symptoms.join('; '),
           log.moods.join('; '),
           log.sexualActivity ?? '',
+          // Gebelik ve lohusalıkta, isteğe bağlı. Not en sonda kalıyor:
+          // serbest metin, tablo programında en çok yer kaplayan sütun.
+          log.weightKg?.toString() ?? '',
+          log.systolic?.toString() ?? '',
+          log.diastolic?.toString() ?? '',
           log.notes ?? '',
         ].map(_csvField).join(','),
       );

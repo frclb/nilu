@@ -978,5 +978,16 @@
   "log_symptom_frequent_urination": "Frequent Urination",
   "log_symptom_leg_cramps": "Leg Cramps",
   "log_preg_symptom_note": "In pregnancy, a severe headache, sudden swelling of the face, hands or legs, vomiting that won't stop, or unexplained itching are signs to contact your doctor or midwife without waiting.",
-  "danger_signs_action": "See warning signs"
+  "danger_signs_action": "See warning signs",
+  "log_measure_title": "Measurements",
+  "log_measure_hint": "Optional. Measure your blood pressure sitting down after resting for a few minutes, with your arm at heart level.",
+  "log_measure_weight": "Weight",
+  "log_measure_bp": "Blood pressure",
+  "log_measure_systolic": "Systolic",
+  "log_measure_diastolic": "Diastolic",
+  "log_measure_invalid": "One of the measurements isn't valid. Enter weight in kg and blood pressure with both numbers (e.g. 120 / 80).",
+  "bp_high_title": "Your blood pressure is high",
+  "bp_high_body": "{s}/{d} mmHg. In pregnancy and after birth, 140/90 or higher should be reported to your doctor or midwife. Rest sitting down for a few minutes and measure again; if it's still high, contact them the same day. If you also have a headache, vision problems or sudden swelling, get care without waiting.",
+  "bp_severe_title": "Your blood pressure is very high",
+  "bp_severe_body": "{s}/{d} mmHg. 160/110 or higher needs urgent assessment. Get care now — don't wait."
 }

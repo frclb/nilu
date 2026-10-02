@@ -71,6 +71,30 @@ void main() {
       );
     });
 
+    test('ölçümler kendi sütunlarında', () {
+      final csv = DataExportService.buildCsv(
+        dailyLogs: [
+          DailyLog(
+            date: DateTime(2026, 3, 1),
+            weightKg: 64.5,
+            systolic: 118,
+            diastolic: 76,
+          ),
+        ],
+        periodLogs: const [],
+      );
+      final satirlar = csv.split('\n');
+      final baslik = satirlar.first.split(',');
+      final alanlar = satirlar[1]
+          .substring(1, satirlar[1].length - 1)
+          .split('","');
+      String sutun(String ad) => alanlar[baslik.indexOf(ad)];
+
+      expect(sutun('weight_kg'), '64.5');
+      expect(sutun('systolic'), '118');
+      expect(sutun('diastolic'), '76');
+    });
+
     test('nottaki tırnak ikilenir', () {
       final csv = DataExportService.buildCsv(
         dailyLogs: [
