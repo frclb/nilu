@@ -112,6 +112,10 @@ class _PregnancySetupScreenState extends State<PregnancySetupScreen> {
 
     final vm = context.read<PregnancyViewModel>();
     final sablon = (_turkiyeSablonu ?? false) ? 'tr' : null;
+    // Gebelik başlamadan: başladıktan sonra takvimde regl kaydı
+    // değiştirilemiyor (bkz. `CalendarViewModel._canRecordPeriods`).
+    await context.read<CalendarViewModel>().closeOngoingPeriods();
+    if (!mounted) return;
     if (_kaynak == _Kaynak.lmp) {
       await vm.startFromLmp(
         lmp: _sat!,

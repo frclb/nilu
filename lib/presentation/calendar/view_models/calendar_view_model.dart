@@ -167,11 +167,25 @@ class CalendarViewModel extends ChangeNotifier {
   /// Yalnızca son kayıttan saymak gelecek tarihlerde 30., 40. güne uzuyordu;
   /// tahmin edilen başlangıçlar da çapa sayılıyor.
   int? getCycleDayForDate(DateTime date) {
-    return _cycleInfo.cycleDayForDate(
-      date,
-      loggedStart: _periodService.getLastPeriodStartBefore(_periodLogs, date),
-    );
+    // Gebelik ve lohusalık günlerinde döngü yok. Önceden 24 haftalık
+    // gebelikte takvim başlığı "Döngü günü 5" diyordu.
+    if (_inBreak(date)) return null;
+    final start = _periodService.getLastPeriodStartBefore(_periodLogs, date);
+    // Kesintiden sonra henüz regl yoksa gün de yok: gebelik öncesi son
+    // adetten sayılsaydı düşükten bir ay sonra "Döngü günü 171" yazılırdı.
+    if (start != null && _startPrecedesBreakEnd(start, date)) return null;
+    return _cycleInfo.cycleDayForDate(date, loggedStart: start);
   }
+
+  /// [date] bir gebelik ya da lohusalık aralığında mı (bkz. `CycleBreaks`)?
+  bool _inBreak(DateTime date) => _cycleBreaks.any((b) => b.contains(date));
+
+  /// [start] ile [date] arasında biten bir kesinti var mı?
+  bool _startPrecedesBreakEnd(DateTime start, DateTime date) =>
+      _cycleBreaks.any((b) {
+        final son = b.end;
+        return son != null && !date.isBefore(son) && start.isBefore(son);
+      });
 
   /// Bir günü regl günü olarak işaretler veya kaldırır. Başarılıysa true döner.
   Future<bool> togglePeriodDay(DateTime rawDate) async {
@@ -206,8 +220,12 @@ class CalendarViewModel extends ChangeNotifier {
   ///
   /// İki kaynak var: sonraki döngünün tahmini, bir de devam eden dönemin
   /// bugünden sonraki beklenen günleri.
+  /// Gebelik ve lohusalık günlerinde tahmin yok: açık kalmış bir kanama
+  /// kaydının "beklenen devamı" da dahil. Kurulum ekranı "tahminler duracak"
+  /// diyor; takvim bunu boyamaya devam ediyordu.
   bool isPredictedPeriodDay(DateTime date) =>
-      _cycleInfo.isPredictedPeriod(date) || isExpectedPeriodDay(date);
+      !_inBreak(date) &&
+      (_cycleInfo.isPredictedPeriod(date) || isExpectedPeriodDay(date));
 
   /// Ana ekrandaki düğmenin bugün için sunduğu eylem.
   PeriodAction get periodActionToday {
@@ -333,6 +351,29 @@ class CalendarViewModel extends ChangeNotifier {
     }
 
     await _repository.saveDailyLogs(_dailyLogs);
+    notifyListeners();
+  }
+
+  /// Bitişi girilmemiş regl kayıtlarını kapatır: planlanan regl süresinin
+  /// sonunda, bugünü geçmeden.
+  ///
+  /// Açık kayıt bugüne kadar uzanıyor (bkz. `PeriodLog.lastRecordedDay`).
+  /// Gebelik başlarken kapatılmazsa, "Reglim bitti"ye basmayı unutmuş
+  /// kullanıcının takviminde bütün gebelik regl günü olarak boyanırdı.
+  /// Kayıt silinmiyor; yalnızca makul bir sonla kapanıyor.
+  Future<void> closeOngoingPeriods() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    var degisti = false;
+    for (final log in _periodLogs) {
+      if (!log.isOngoing) continue;
+      final planlanan = log.firstDay.add(Duration(days: _userPeriodLength - 1));
+      log.endDate = planlanan.isAfter(today) ? today : planlanan;
+      degisti = true;
+    }
+    if (!degisti) return;
+    await _repository.savePeriodLogs(_periodLogs);
+    _recalculate();
     notifyListeners();
   }
 

@@ -59,12 +59,22 @@ void main() {
           );
           expect(notEkle, findsOneWidget, reason: 'Not her evrede eklenir');
 
+          final tahminLejanti = find.text(
+            ctx.tr('calendar_legend_predicted'),
+            skipOffstage: false,
+          );
           if (d.key == 'döngü') {
             expect(evre, LifeStage.cycle);
+            expect(tahminLejanti, findsOneWidget);
             expect(isaretle, findsOneWidget);
             expect(find.byKey(const Key('stage_bleeding_note')), findsNothing);
           } else {
             expect(evre.recordsPeriods, isFalse);
+            expect(
+              tahminLejanti,
+              findsNothing,
+              reason: 'Tahmin çizilmeyen evrede açıklaması da olmamalı',
+            );
             expect(
               isaretle,
               findsNothing,

@@ -166,4 +166,47 @@ void main() {
     expect(g.dueDateFromClinician, isTrue);
     expect(g.estimatedDueDate, today);
   });
+
+  testWidgets('kapatılmamış son regl gebeliğin içine uzanmıyor', (
+    tester,
+  ) async {
+    // Açık kayıt bugüne kadar uzanıyor (`PeriodLog.lastRecordedDay`).
+    // "Reglim bitti"ye basmayı unutup haftalar sonra gebeliğini işaretleyen
+    // kullanıcının takviminde bütün gebelik regl günü olarak boyanıyordu.
+    await const PeriodRepository().savePeriodLogs([
+      PeriodLog(id: 'p1', startDate: daysAgo(96), endDate: daysAgo(92)),
+      PeriodLog(id: 'p2', startDate: daysAgo(68), endDate: daysAgo(64)),
+      PeriodLog(id: 'acik', startDate: daysAgo(40)),
+    ]);
+    await pumpRouter(
+      tester,
+      routes: pregnancyRoutes(const PregnancySetupScreen()),
+    );
+    final takvim = tester
+        .element(find.byType(PregnancySetupScreen))
+        .read<CalendarViewModel>();
+    expect(
+      takvim.isPeriodDay(today),
+      isTrue,
+      reason: 'Ön koşul: açık kayıt bugüne uzanıyor',
+    );
+
+    await tester.ensureVisible(baslat());
+    await tester.tap(baslat());
+    await settleAsync(tester);
+
+    final acik = takvim.periodLogs.firstWhere((l) => l.id == 'acik');
+    expect(
+      acik.endDate,
+      daysAgo(36),
+      reason: 'Planlanan regl süresi (5 gün) sonunda kapanmalı',
+    );
+    expect(takvim.isPeriodDay(today), isFalse);
+    expect(takvim.isPeriodDay(daysAgo(20)), isFalse);
+    expect(
+      takvim.isPeriodDay(daysAgo(38)),
+      isTrue,
+      reason: 'Kayıt silinmemeli',
+    );
+  });
 }

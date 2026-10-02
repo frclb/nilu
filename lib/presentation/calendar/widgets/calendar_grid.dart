@@ -107,6 +107,7 @@ class CalendarGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final viewModel = context.watch<CalendarViewModel>();
+    final tahminVar = viewModel.lifeStage.showsCyclePredictions;
 
     if (viewModel.isLoading) {
       return const SizedBox(
@@ -293,6 +294,8 @@ class CalendarGrid extends StatelessWidget {
 
             // Açıklamalar (Legend)
             //
+            // Yalnızca takvimde gerçekten çizilebilecek işaretler.
+            //
             // Sabit bir Row idi; dört etiket tek satıra sığmak zorundaydı.
             // Uzun çevirilerde (ör. Almanca "Fruchtbares Fenster") taşıyordu.
             // Wrap ile gerektiğinde alt satıra iniyor.
@@ -308,11 +311,14 @@ class CalendarGrid extends StatelessWidget {
                     context.tokens.flow,
                     context.tr('calendar_legend_period'),
                   ),
-                  _buildLegendItem(
-                    context,
-                    context.tokens.flowSoft,
-                    context.tr('calendar_legend_predicted'),
-                  ),
+                  // Gebelikte ve lohusalıkta tahmin yok (bkz.
+                  // `LifeStage.showsCyclePredictions`); açıklama da yok.
+                  if (tahminVar)
+                    _buildLegendItem(
+                      context,
+                      context.tokens.flowSoft,
+                      context.tr('calendar_legend_predicted'),
+                    ),
                   // Lekelenme kanama ama regl değil: rengi regl rengiyle
                   // aynı, biçimi halka. Dolu nokta doğurganlık işaretiyle
                   // karışırdı.
@@ -325,9 +331,10 @@ class CalendarGrid extends StatelessWidget {
                   // Hormonal doğum kontrolünde takvimde doğurganlık ve
                   // yumurtlama işareti çizilmiyor; açıklama satırında da
                   // görünmemeli, yoksa var olmayan renkleri tarif ediyor.
-                  if (context.select<CalendarViewModel, bool>(
-                    (v) => v.cycleInfo.fertilityTracked,
-                  )) ...[
+                  if (tahminVar &&
+                      context.select<CalendarViewModel, bool>(
+                        (v) => v.cycleInfo.fertilityTracked,
+                      )) ...[
                     // Koyu temada `secondaryPinkDark` kullanılıyordu: zemine
                     // çok yakın bir ton, nokta görünmüyordu. Üstelik hücrenin
                     // gerçekte boyadığı renk bu değil — açıklama ile takvim
