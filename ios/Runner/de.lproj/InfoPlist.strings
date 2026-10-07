@@ -3,5 +3,5 @@
 
 "NSCameraUsageDescription" = "Die Kamera wird verwendet, um den QR-Code deiner Partnerin zu scannen. Es werden keine Kameraaufnahmen gespeichert.";
 "NSFaceIDUsageDescription" = "Face ID sorgt dafür, dass bei aktiver App-Sperre nur du auf deine Gesundheitsdaten zugreifen kannst.";
-"NSHealthShareUsageDescription" = "Deine Zyklus-, Schlaf- und Herzfrequenzdaten werden aus der Health-App gelesen, um Vorhersagen zu verbessern.";
+"NSHealthShareUsageDescription" = "Deine Periodendaten werden aus der Health-App gelesen, um Vorhersagen zu verbessern.";
 "NSHealthUpdateUsageDescription" = "In dieser App markierte Periodentage werden mit deiner Erlaubnis auch in die Health-App geschrieben.";

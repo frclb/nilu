@@ -44,7 +44,7 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>Uygulama kilidi açıkken sağlık verilerinize yalnızca siz erişebilesiniz diye Face ID kullanılır.</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>Regl, uyku ve nabız verilerini Sağlık uygulamasından okuyup döngü tahminlerini iyileştirmek için kullanılır.</string>
+	<string>Regl verilerin Sağlık uygulamasından okunur; döngü tahminlerini iyileştirmek için kullanılır.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Bu uygulamada işaretlediğin regl günleri, izin verirsen Sağlık uygulamasına da yazılır.</string>
 	<!--

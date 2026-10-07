@@ -51,6 +51,7 @@ void main() {
     WidgetTester tester,
     Widget kart, {
     required bool premium,
+    int reglSayisi = 7,
   }) async {
     FlutterSecureStorage.setMockInitialValues({});
     SharedPreferences.setMockInitialValues({});
@@ -62,11 +63,11 @@ void main() {
     await tester.runAsync(() async {
       // Altı tamamlanmış döngü: ücretsiz sınır (3) aşılsın.
       await const PeriodRepository().savePeriodLogs([
-        for (var i = 0; i < 7; i++)
+        for (var i = 0; i < reglSayisi; i++)
           PeriodLog(
             id: 'p$i',
-            startDate: DateTime(2026, 1, 1).add(Duration(days: i * 28)),
-            endDate: DateTime(2026, 1, 5).add(Duration(days: i * 28)),
+            startDate: DateTime(2025, 1, 1 + i * 28),
+            endDate: DateTime(2025, 1, 5 + i * 28),
           ),
       ]);
       // Belirti kaydı: evre kırılımı bölümü ancak veriyle çiziliyor.
@@ -121,7 +122,11 @@ void main() {
         .map((p) => p.trim())
         .where((p) => p.length > 3)
         .toList();
-    expect(parcalar, isNotEmpty, reason: '$key yalnızca yer tutucudan oluşuyor');
+    expect(
+      parcalar,
+      isNotEmpty,
+      reason: '$key yalnızca yer tutucudan oluşuyor',
+    );
     parcalar.sort((a, b) => b.length.compareTo(a.length));
     return parcalar.first;
   }
@@ -146,6 +151,17 @@ void main() {
       await kartiAc(tester, const CycleTrendCard(), premium: true);
       // Yedi kayıttan altı tamamlanmış aralık çıkıyor.
       expect(find.text('Son 6 döngü'), findsOneWidget);
+    });
+
+    testWidgets('premiumda on iki döngüde kesilmiyor', (tester) async {
+      // Ödeme ekranı "geçmişin tamamı" diyordu, kod 12'de kesiyordu.
+      await kartiAc(
+        tester,
+        const CycleTrendCard(),
+        premium: true,
+        reglSayisi: 21,
+      );
+      expect(find.text('Son 20 döngü'), findsOneWidget);
     });
 
     testWidgets('ücretsizde kilit uyarısı görünür', (tester) async {

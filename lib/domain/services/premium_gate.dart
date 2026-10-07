@@ -17,9 +17,14 @@ class PremiumGate {
   /// trend ve düzenlilik ise daha uzun geçmiş ister.
   static const int freeCycleHistory = 3;
 
-  /// Trend grafiğinde gösterilecek döngü sayısı.
-  static int cycleHistoryLimit({required bool isPremium}) =>
-      isPremium ? 12 : freeCycleHistory;
+  /// Trend grafiğinde gösterilecek döngü sayısı; Premium'da sınır yok
+  /// (`null`).
+  ///
+  /// Ödeme ekranı "geçmişin tamamı" diyordu ama burada 12 döngüde
+  /// kesiliyordu. Döngülerin listesi ve ortalaması ise herkese açık (bkz.
+  /// `CycleHistoryCard`); Premium'un kattığı, tüm geçmişle trend grafiği.
+  static int? cycleHistoryLimit({required bool isPremium}) =>
+      isPremium ? null : freeCycleHistory;
 
   /// Geçmişin kırpılıp kırpılmadığı — ekran "daha fazlası var" diyebilsin.
   static bool historyIsTrimmed({
@@ -64,7 +69,7 @@ class PremiumGate {
     required bool isPremium,
   }) {
     final limit = cycleHistoryLimit(isPremium: isPremium);
-    if (all.length <= limit) return all;
+    if (limit == null || all.length <= limit) return all;
     return all.sublist(all.length - limit);
   }
 }

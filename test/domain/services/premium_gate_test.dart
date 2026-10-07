@@ -27,6 +27,15 @@ void main() {
       );
     });
 
+    test('premiumda sınır yok', () {
+      // Ödeme ekranı "geçmişin tamamı" diyordu, burada 12'de kesiliyordu.
+      expect(PremiumGate.cycleHistoryLimit(isPremium: true), isNull);
+      expect(
+        PremiumGate.visibleCycles(cycles(40), isPremium: true),
+        hasLength(40),
+      );
+    });
+
     test('sınırın altındaki geçmiş kırpılmaz', () {
       expect(
         PremiumGate.visibleCycles(cycles(2), isPremium: false),

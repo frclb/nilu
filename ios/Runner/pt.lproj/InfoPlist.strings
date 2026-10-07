@@ -3,5 +3,5 @@
 
 "NSCameraUsageDescription" = "A câmara é usada para ler o código QR da tua parceira. Não são guardadas imagens da câmara.";
 "NSFaceIDUsageDescription" = "O Face ID garante que só tu acedes aos teus dados de saúde com o bloqueio ativo.";
-"NSHealthShareUsageDescription" = "Os teus dados de período, sono e frequência cardíaca são lidos da app Saúde para melhorar as previsões.";
+"NSHealthShareUsageDescription" = "Seus dados de período são lidos do app Saúde para melhorar as previsões.";
 "NSHealthUpdateUsageDescription" = "Os dias de período que marcares aqui também são escritos na app Saúde, se permitires.";

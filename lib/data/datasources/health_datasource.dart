@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:health/health.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../domain/models/calendar_day.dart';
 import '../../domain/models/period_log.dart';
+import '../../domain/services/health_export.dart';
 import '../../domain/services/health_import.dart';
 
 /// Sağlık verisine erişim isteğinin sonucu.
@@ -27,15 +27,13 @@ enum HealthAccess {
 /// Tüm platform çağrıları burada; birleştirme mantığı `HealthImport`'ta ve
 /// saf. Böylece kural değişikliği için cihaz gerekmiyor.
 class HealthDatasource {
-  /// Okunacak veri tipleri.
+  /// Okunacak veri tipleri: yalnız regl.
   ///
-  /// Regl verisi tahminleri besliyor; uyku ve dinlenme nabzı ise döngü
-  /// evresiyle ilişkili sinyaller — kullanıcı bunları zaten saatinden
-  /// topluyor, tekrar elle girmesi anlamsız.
+  /// Önceden uyku ve dinlenme nabzı da isteniyordu ama hiçbir ekran onları
+  /// kullanmıyordu. İzin ekranında okunmayan veriyi istemek hem App Store
+  /// incelemesinde (5.1.1) hem de gizlilik etiketinde yanlış bir beyan.
   static const List<HealthDataType> readTypes = [
     HealthDataType.MENSTRUATION_FLOW,
-    HealthDataType.SLEEP_ASLEEP,
-    HealthDataType.RESTING_HEART_RATE,
   ];
 
   /// Yazılacak tipler. Yalnızca regl: uygulamanın ürettiği tek veri bu.
@@ -124,51 +122,34 @@ class HealthDatasource {
     }
   }
 
-  /// Son [days] gün için ortalama gece uykusu (saat).
+  /// Uygulamanın regl günlerini Sağlık'a **ayna** olarak yazar.
   ///
-  /// Veri yoksa null — uydurma bir ortalama göstermektense hiçbir şey
-  /// göstermemek doğru.
-  Future<double?> averageSleepHours({int days = 14}) async {
+  /// Önce bu uygulamanın [from]–[to] arasında yazdığı regl kayıtları
+  /// siliniyor (HealthKit yalnız uygulamanın kendi kayıtlarını silmeye izin
+  /// veriyor; başka uygulamaların ya da Apple Watch'un verisine dokunulmuyor),
+  /// sonra güncel günler yazılıyor. Böylece uygulamada silinen bir gün
+  /// Sağlık'ta kalmıyor, aynı gün iki kez yazılmıyor.
+  Future<bool> mirrorPeriods(
+    List<HealthPeriodDay> days, {
+    required DateTime from,
+    required DateTime to,
+  }) async {
     try {
       await _ensureConfigured();
-      final points = await _health.getHealthDataFromTypes(
-        types: const [HealthDataType.SLEEP_ASLEEP],
-        startTime: DateTime.now().subtract(Duration(days: days)),
-        endTime: DateTime.now(),
+      await _health.delete(
+        type: HealthDataType.MENSTRUATION_FLOW,
+        startTime: from,
+        endTime: to,
       );
-      if (points.isEmpty) return null;
-
-      final totalMinutes = points.fold<double>(
-        0,
-        (sum, p) => sum + p.dateTo.difference(p.dateFrom).inMinutes,
-      );
-      final nights = points
-          .map(
-            (p) => DateTime(p.dateFrom.year, p.dateFrom.month, p.dateFrom.day),
-          )
-          .toSet()
-          .length;
-      if (nights == 0) return null;
-
-      return (totalMinutes / nights) / 60;
-    } on Exception catch (e) {
-      debugPrint('Health sleep read failed: $e');
-      return null;
-    }
-  }
-
-  /// Uygulamada işaretlenen regl günlerini Sağlık'a yazar.
-  Future<bool> writePeriod(PeriodLog log) async {
-    try {
-      await _ensureConfigured();
-      final end = log.endDate ?? log.startDate;
       var ok = true;
-      for (var day = log.startDate; !day.isAfter(end); day = day.plusDays(1)) {
+      for (final d in days) {
         final written = await _health.writeMenstruationFlow(
-          flow: MenstrualFlow.medium,
-          isStartOfCycle: day == log.startDate,
-          startTime: day,
-          endTime: day.add(const Duration(hours: 1)),
+          flow: _flowOf(d.flow),
+          isStartOfCycle: d.isStartOfCycle,
+          startTime: d.date,
+          endTime: d.date.add(const Duration(hours: 1)),
+          // Kullanıcının kendi girdisi; ölçülmüş bir değer değil.
+          recordingMethod: RecordingMethod.manual,
         );
         ok = ok && written;
       }
@@ -178,4 +159,11 @@ class HealthDatasource {
       return false;
     }
   }
+
+  static MenstrualFlow _flowOf(String? code) => switch (code) {
+    'light' => MenstrualFlow.light,
+    'medium' => MenstrualFlow.medium,
+    'heavy' => MenstrualFlow.heavy,
+    _ => MenstrualFlow.unspecified,
+  };
 }

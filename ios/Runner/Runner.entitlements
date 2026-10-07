@@ -21,21 +21,6 @@
 	<key>com.apple.developer.healthkit</key>
 	<true/>
 	<!--
-	  Apple ile Giriş.
-
-	  Uygulama `SignInWithApple.getAppleIDCredential` çağırıyor
-	  (`firebase_auth_datasource.dart`). Bu yetki olmadan çağrı cihazda
-	  1000 hatasıyla düşüyor; simülatörde ve testte görünmüyor, ilk kez
-	  TestFlight'ta ortaya çıkar.
-
-	  Apple Developer portalında App ID üzerinde "Sign in with Apple"
-	  yeteneği de açık olmalı, yoksa imzalama başarısız olur.
-	-->
-	<key>com.apple.developer.applesignin</key>
-	<array>
-		<string>Default</string>
-	</array>
-	<!--
 	  Push bildirim ortamı.
 
 	  `UIBackgroundModes` içinde `remote-notification` var ve

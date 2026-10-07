@@ -3,5 +3,5 @@
 
 "NSCameraUsageDescription" = "Partnerinin QR kodunu okutabilmek için kameraya erişilir. Kamera görüntüsü kaydedilmez.";
 "NSFaceIDUsageDescription" = "Uygulama kilidi açıkken sağlık verilerine yalnızca sen erişebilesin diye Face ID kullanılır.";
-"NSHealthShareUsageDescription" = "Regl, uyku ve nabız verilerin Sağlık uygulamasından okunur; döngü tahminlerini iyileştirmek için kullanılır.";
+"NSHealthShareUsageDescription" = "Regl verilerin Sağlık uygulamasından okunur; döngü tahminlerini iyileştirmek için kullanılır.";
 "NSHealthUpdateUsageDescription" = "Bu uygulamada işaretlediğin regl günleri, izin verirsen Sağlık uygulamasına da yazılır.";

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../../../domain/models/calendar_day.dart';
 import '../../../domain/models/period_log.dart';
@@ -11,6 +13,7 @@ import '../../../domain/services/prediction_service.dart';
 import '../../../data/repositories/period_repository.dart';
 import '../../../data/datasources/widget_datasource.dart';
 import '../../../data/repositories/cycle_settings_repository.dart';
+import '../../../data/repositories/health_write_back.dart';
 import '../../../data/repositories/pregnancy_repository.dart';
 import '../../../domain/services/widget_snapshot.dart';
 
@@ -22,6 +25,7 @@ class CalendarViewModel extends ChangeNotifier {
   final CycleSettingsRepository _settingsRepo = CycleSettingsRepository();
   final WidgetDatasource _widget = const WidgetDatasource();
   final PregnancyRepository _pregnancyRepo = const PregnancyRepository();
+  final HealthWriteBack _healthWriteBack;
 
   List<PeriodLog> _periodLogs = [];
   List<DailyLog> _dailyLogs = [];
@@ -101,7 +105,8 @@ class CalendarViewModel extends ChangeNotifier {
   DateTime get currentMonth => _currentMonth;
   bool get isLoading => _isLoading;
 
-  CalendarViewModel() {
+  CalendarViewModel({HealthWriteBack? healthWriteBack})
+    : _healthWriteBack = healthWriteBack ?? HealthWriteBack() {
     _loadData();
   }
 
@@ -349,6 +354,18 @@ class CalendarViewModel extends ChangeNotifier {
     _recalculate();
     await _repository.savePeriodLogs(_periodLogs);
     notifyListeners();
+    _mirrorToHealth();
+  }
+
+  /// Kullanıcı açtıysa regl günlerini Sağlık'a da yazar (bkz.
+  /// `HealthWriteBack`). Beklenmiyor: ekran yazımı beklememeli.
+  void _mirrorToHealth() {
+    unawaited(
+      _healthWriteBack.syncIfEnabled(
+        periods: _periodLogs,
+        dailyLogs: _dailyLogs,
+      ),
+    );
   }
 
   /// Günlük detayı (semptom/not) günceller.
@@ -357,6 +374,7 @@ class CalendarViewModel extends ChangeNotifier {
       (l) => DateUtils.isSameDay(l.date, log.date),
     );
 
+    final oncekiAkis = index != -1 ? _dailyLogs[index].flowIntensity : null;
     if (index != -1) {
       _dailyLogs[index] = log;
     } else {
@@ -365,6 +383,8 @@ class CalendarViewModel extends ChangeNotifier {
 
     await _repository.saveDailyLogs(_dailyLogs);
     notifyListeners();
+    // Sağlık'a yazılan günün akışı değişti.
+    if (oncekiAkis != log.flowIntensity) _mirrorToHealth();
   }
 
   /// Bitişi girilmemiş regl kayıtlarını kapatır: planlanan regl süresinin

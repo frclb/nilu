@@ -3,5 +3,5 @@
 
 "NSCameraUsageDescription" = "The camera is used to scan your partner’s QR code. No camera footage is stored.";
 "NSFaceIDUsageDescription" = "Face ID is used so that only you can reach your health data while App Lock is on.";
-"NSHealthShareUsageDescription" = "Your period, sleep and heart-rate data are read from the Health app to improve cycle predictions.";
+"NSHealthShareUsageDescription" = "Your period data is read from the Health app to improve cycle predictions.";
 "NSHealthUpdateUsageDescription" = "Period days you mark here are also written to the Health app, if you allow it.";

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/datasources/health_datasource.dart';
+import '../../data/repositories/health_write_back.dart';
 import '../../data/repositories/period_repository.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/services/health_import.dart';
@@ -14,24 +15,86 @@ import '../../design_system/app_layout.dart';
 /// Apple Watch ve diğer uygulamaların verisi HealthKit'e akıyor; buradan
 /// içeri almak, kullanıcının aynı bilgiyi iki kez girmesini önlüyor.
 class HealthSyncScreen extends StatefulWidget {
-  const HealthSyncScreen({super.key});
+  const HealthSyncScreen({
+    super.key,
+    @visibleForTesting this.health,
+    @visibleForTesting this.writeBack,
+  });
+
+  /// Testte platform kanalı yok; sahte Sağlık kaynağı ve onunla kurulan
+  /// yazma servisi buradan veriliyor.
+  final HealthDatasource? health;
+  final HealthWriteBack? writeBack;
 
   @override
   State<HealthSyncScreen> createState() => _HealthSyncScreenState();
 }
 
 class _HealthSyncScreenState extends State<HealthSyncScreen> {
-  final HealthDatasource _health = HealthDatasource();
+  late final HealthDatasource _health = widget.health ?? HealthDatasource();
   final PeriodRepository _repository = const PeriodRepository();
+  late final HealthWriteBack _writeBack =
+      widget.writeBack ?? HealthWriteBack(datasource: _health);
 
   bool _available = true;
   bool _busy = false;
+  bool _writeBackOn = false;
   String? _result;
 
   @override
   void initState() {
     super.initState();
     _checkAvailability();
+    _writeBack.isEnabled().then((on) {
+      if (mounted) setState(() => _writeBackOn = on);
+    });
+  }
+
+  /// Sağlık'a yazmayı açar ya da kapatır.
+  ///
+  /// Açarken yazma izni isteniyor ve geçmiş hemen yazılıyor; izin yoksa ayar
+  /// açılmıyor. Kapatınca Sağlık'a daha önce yazılanlar orada kalıyor:
+  /// kullanıcının Sağlık'taki verisini sessizce silmek doğru olmaz.
+  Future<void> _setWriteBack(bool on) async {
+    if (!on) {
+      await _writeBack.setEnabled(false);
+      if (!mounted) return;
+      setState(() {
+        _writeBackOn = false;
+        _result = context.tr('health_write_off');
+      });
+      return;
+    }
+
+    setState(() {
+      _busy = true;
+      _result = null;
+    });
+    final denied = context.tr('health_permission_denied');
+    final unavailable = context.tr('health_permission_unavailable');
+    final calendar = context.read<CalendarViewModel>();
+
+    final access = await _health.requestPermissions(includeWrite: true);
+    if (!mounted) return;
+    if (access != HealthAccess.granted) {
+      setState(() {
+        _busy = false;
+        _result = access == HealthAccess.denied ? denied : unavailable;
+      });
+      return;
+    }
+
+    final ok = await _writeBack.syncNow(
+      periods: calendar.periodLogs,
+      dailyLogs: calendar.dailyLogs,
+    );
+    if (ok) await _writeBack.setEnabled(true);
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      _writeBackOn = ok;
+      _result = context.tr(ok ? 'health_write_done' : 'health_write_failed');
+    });
   }
 
   Future<void> _checkAvailability() async {
@@ -154,6 +217,18 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
                     : const Icon(Icons.download_outlined),
                 label: Text(context.tr('health_import_button')),
               ),
+
+            if (_available) ...[
+              const SizedBox(height: AppSpacing.lg),
+              SwitchListTile(
+                key: const Key('health_write_back'),
+                contentPadding: EdgeInsets.zero,
+                title: Text(context.tr('health_write_title')),
+                subtitle: Text(context.tr('health_write_body')),
+                value: _writeBackOn,
+                onChanged: _busy ? null : _setWriteBack,
+              ),
+            ],
 
             if (_result != null) ...[
               const SizedBox(height: AppSpacing.lg),

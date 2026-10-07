@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../design_system/app_tokens.dart';
 import 'widgets/insights_app_bar.dart';
 import 'widgets/cycle_alert_card.dart';
+import 'widgets/cycle_history_card.dart';
 import 'widgets/cycle_trend_card.dart';
 import 'widgets/symptom_analysis_card.dart';
 import '../../design_system/app_layout.dart';
@@ -36,6 +37,10 @@ class InsightsScreen extends StatelessWidget {
                 spacing: 24,
                 children: [CycleTrendCard(), SymptomAnalysisCard()],
               ),
+              SizedBox(height: 24),
+              // Döngülerin listesi herkese açık; tam genişlikte, çünkü uzun
+              // geçmişte satır satır okunuyor.
+              CycleHistoryCard(),
             ],
           ),
         ),

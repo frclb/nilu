@@ -73,10 +73,10 @@ class InsightsService {
   static List<CycleLengthPoint> cycleLengths(
     List<PeriodLog> logs, {
     required List<DateSpan> breaks,
-    int limit = 6,
+    int? limit = 6,
   }) {
     final points = CycleIntervals.of(logs, breaks: breaks);
-    if (points.length <= limit) return points;
+    if (limit == null || points.length <= limit) return points;
     return points.sublist(points.length - limit);
   }
 

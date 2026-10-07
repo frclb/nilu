@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:flutter/foundation.dart';
 import '../../../core/firebase/firebase_config.dart';
 
@@ -26,29 +25,6 @@ class FirebaseAuthDataSource {
       return await _auth.signInAnonymously();
     } catch (e) {
       debugPrint("Anonymous sign in error: $e");
-      return null;
-    }
-  }
-
-  Future<UserCredential?> signInWithApple() async {
-    if (!FirebaseConfig.isAvailable) return null;
-    try {
-      final appleIdCredential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
-
-      final OAuthProvider oauthProvider = OAuthProvider('apple.com');
-      final AuthCredential credential = oauthProvider.credential(
-        idToken: appleIdCredential.identityToken,
-        accessToken: appleIdCredential.authorizationCode,
-      );
-
-      return await _auth.signInWithCredential(credential);
-    } catch (e) {
-      debugPrint("Apple Sign In error: $e");
       return null;
     }
   }

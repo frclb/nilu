@@ -33,7 +33,7 @@ class CycleTrendCard extends StatelessWidget {
     final allPoints = InsightsService.cycleLengths(
       viewModel.periodLogs,
       breaks: viewModel.cycleBreaks,
-      limit: 24,
+      limit: null,
     );
     final points = PremiumGate.visibleCycles(allPoints, isPremium: isPremium);
     final trimmed = PremiumGate.historyIsTrimmed(

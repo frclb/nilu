@@ -79,7 +79,6 @@ void main() {
       'AdMob': 'google_mobile_ads',
       'Firebase': 'firebase_core',
       'RevenueCat': 'purchases_flutter',
-      'Apple': 'sign_in_with_apple',
     };
 
     final pubspec = File('pubspec.yaml').readAsStringSync();
@@ -109,6 +108,30 @@ void main() {
   });
 
   group('bilinen yanlış beyanlar geri gelmedi', () {
+    test('Apple ile Giriş anılmıyor', () {
+      // Paket, yetki ve yöntem vardı ama hiçbir yerden çağrılmıyordu;
+      // politika olmayan bir giriş yöntemini anlatıyordu. Kaldırıldı.
+      const ifadeler = {
+        'tr': 'Apple ile Giriş',
+        'en': 'Sign in with Apple',
+        'de': 'Mit Apple anmelden',
+        'es': 'Iniciar sesión con Apple',
+        'fr': 'Se connecter avec Apple',
+        'pt': 'com a Apple',
+      };
+      expect(
+        File('pubspec.yaml').readAsStringSync(),
+        isNot(contains('sign_in_with_apple')),
+      );
+      for (final lang in languages) {
+        final policy = dictionary(lang).entries
+            .where((e) => e.key.startsWith('privacy_policy'))
+            .map((e) => e.value)
+            .join(' ');
+        expect(policy, isNot(contains(ifadeler[lang]!)), reason: lang);
+      }
+    });
+
     test('üçüncü tarafla hiç paylaşılmadığı iddiası yok', () {
       const claims = {
         'tr': 'hiçbir üçüncü tarafla paylaşılmaz',
