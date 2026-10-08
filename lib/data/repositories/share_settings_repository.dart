@@ -2,12 +2,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../domain/models/share_settings.dart';
 
-/// Partner paylaşım tercihini saklayan repository.
+/// Partner paylaşım tercihini ve açık rızayı saklayan repository.
 ///
-/// Bu ekrandaki anahtarlar eskiden yalnızca `setState` ile çalışıyordu:
-/// kullanıcı kapatıyor, ekrandan çıkınca ayar geri geliyordu.
+/// Paylaşım ancak rıza kaydı varken açık sayılıyor. Önceki sürümler
+/// paylaşımı varsayılan olarak açık kaydediyordu; rıza alınmadan açık
+/// kalmış bir ayar, yükseltmeden sonra kapalı okunuyor.
 class ShareSettingsRepository {
   static const String intimacyKey = 'share_intimacy_status';
+
+  /// Açık rızanın verildiği an (ISO-8601). Rıza geri alınınca siliniyor.
+  static const String consentKey = 'share_intimacy_consent_at';
 
   /// Eski dört anahtar. Yalnızca göç için okunuyor.
   static const String legacyPhaseInfoKey = 'share_phase_info';
@@ -19,28 +23,39 @@ class ShareSettingsRepository {
 
   Future<ShareSettings> load() async {
     final prefs = await SharedPreferences.getInstance();
-    const defaults = ShareSettings();
+    if (prefs.getString(consentKey) == null) return ShareSettings.none;
+    return ShareSettings(intimacyStatus: prefs.getBool(intimacyKey) ?? false);
+  }
 
-    final stored = prefs.getBool(intimacyKey);
-    if (stored != null) return ShareSettings(intimacyStatus: stored);
+  /// Rızanın verildiği an; verilmediyse `null`.
+  Future<DateTime?> consentedAt() async {
+    final prefs = await SharedPreferences.getInstance();
+    return DateTime.tryParse(prefs.getString(consentKey) ?? '');
+  }
 
-    // Göç: eski dört anahtarın **hiçbiri** tek başına bir şey kontrol
-    // etmiyordu; paylaşımı durduran şey dördünün birden kapalı olmasıydı.
-    // O yüzden yeni tek anahtar da o toplamı devralıyor — dördünü kapatmış
-    // bir kullanıcının paylaşımı sessizce geri açılmamalı.
-    final legacy = [
+  /// Açık rızayla paylaşımı açar.
+  Future<void> grantConsent({DateTime? now}) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      consentKey,
+      (now ?? DateTime.now()).toIso8601String(),
+    );
+    await prefs.setBool(intimacyKey, true);
+  }
+
+  /// Paylaşımı kapatır ve rızayı geri alır. Sunucudaki paylaşılmış durumu
+  /// silmek çağıranın işi (bkz. `IntimacyViewModel.stopSharing`).
+  Future<void> withdrawConsent() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(consentKey);
+    await prefs.setBool(intimacyKey, false);
+    for (final k in [
       legacyPhaseInfoKey,
       legacySymptomDetailsKey,
       legacyMoodKey,
       legacyPredictionsKey,
-    ].map(prefs.getBool).toList();
-
-    if (legacy.every((value) => value == null)) return defaults;
-    return ShareSettings(intimacyStatus: legacy.any((value) => value == true));
-  }
-
-  Future<void> save(ShareSettings settings) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(intimacyKey, settings.intimacyStatus);
+    ]) {
+      await prefs.remove(k);
+    }
   }
 }

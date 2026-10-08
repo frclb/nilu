@@ -4,14 +4,12 @@ import 'package:uuid/uuid.dart';
 import '../../data/datasources/remote/firebase_auth_datasource.dart';
 import '../../data/datasources/remote/firestore_datasource.dart';
 import '../../data/repositories/pairing_repository.dart';
-import '../../data/datasources/remote/notification_service.dart';
 import '../services/subscription_service.dart';
 
 class UserViewModel extends ChangeNotifier {
-  final FirebaseAuthDataSource _authDS = FirebaseAuthDataSource();
-  final FirestoreDataSource _firestoreDS = FirestoreDataSource();
-  final PairingRepository _pairing = PairingRepository();
-  final NotificationService _notificationService = NotificationService();
+  final FirebaseAuthDataSource _authDS;
+  final FirestoreDataSource _firestoreDS;
+  final PairingRepository _pairing;
 
   /// Durum yerel depodan okunana kadar false kalır.
   ///
@@ -35,9 +33,22 @@ class UserViewModel extends ChangeNotifier {
   String? get myId => _myId;
   bool get hasPartner => _hasPartner;
 
-  UserViewModel() {
+  /// Uzak kaynaklar testte sahteleriyle değiştirilebilsin diye enjekte.
+  UserViewModel({
+    FirebaseAuthDataSource? auth,
+    FirestoreDataSource? firestore,
+    PairingRepository? pairing,
+  }) : _authDS = auth ?? FirebaseAuthDataSource(),
+       _firestoreDS = firestore ?? FirestoreDataSource(),
+       _pairing =
+           pairing ??
+           PairingRepository(remote: firestore ?? FirestoreDataSource()) {
     _loadState();
   }
+
+  /// Partner olarak okutulan kod; onaylanmadan ayrılırsa istek geri
+  /// çekilsin diye saklanıyor.
+  static const String _requestTokenKey = 'pairing_request_token';
 
   Future<void> _loadState() async {
     final prefs = await SharedPreferences.getInstance();
@@ -52,8 +63,6 @@ class UserViewModel extends ChangeNotifier {
     if (user != null) {
       _myId = user.uid;
       await prefs.setString('myId', user.uid);
-      // Push bildirim için token dinlemeyi başlat
-      _notificationService.initialize(user.uid);
     }
 
     _isLoaded = true;
@@ -89,48 +98,47 @@ class UserViewModel extends ChangeNotifier {
   /// QR eşleştirme ve onboarding aynı kimliği görsün diye her iki akış da
   /// bu metodu çağırır — kimliği başka hiçbir yerde üretme.
   Future<String> ensureMyId() async {
-    if (_myId != null && _myId!.isNotEmpty) return _myId!;
-
     final prefs = await SharedPreferences.getInstance();
 
-    final credential = await _authDS.signInAnonymously();
-    final uid = credential?.user?.uid ?? const Uuid().v4();
-
-    await prefs.setString('myId', uid);
-    _myId = uid;
-    notifyListeners();
-    return uid;
-  }
-
-  /// Onboarding tamamlandığında kimliği çözer, (mümkünse) Firestore'da profil
-  /// oluşturur ve onboarding'i tamamlanmış olarak işaretler.
-  ///
-  /// Firebase erişilemese bile onboarding **her zaman** tamamlanır; uygulama
-  /// yerel-only modda çalışmaya devam eder.
-  Future<void> completeOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    try {
-      final uid = await ensureMyId();
-
-      // Firestore'da kullanıcı dokümanı oluştur (Firebase yoksa no-op)
-      await _firestoreDS.createUserProfile(uid, {
-        'createdAt': DateTime.now().toIso8601String(),
-        'isPartner': _isPartner,
-        'hasPartner': _hasPartner,
-      });
-
-      // Bildirimleri başlat (Firebase yoksa no-op)
-      _notificationService.initialize(uid);
-    } catch (e) {
-      debugPrint("Error completing onboarding: $e");
+    Future<String> sakla(String id) async {
+      if (_myId != id) {
+        await prefs.setString('myId', id);
+        _myId = id;
+        notifyListeners();
+      }
+      return id;
     }
 
-    // Uzak taraf başarısız olsa bile kullanıcıyı onboarding'de kilitleme.
-    await prefs.setBool('onboarding_complete', true);
-    _onboardingComplete = true;
-    notifyListeners();
+    // Sunucu varken kimlik **oturumun** kimliği olmalı: kurallar yazanın
+    // kimliğine bakıyor. Önceden giriş bir kez başarısız olunca yerel bir
+    // UUID kalıcı olarak saklanıyor ve bir daha giriş denenmiyordu; o
+    // cihazdan eşleşme hiçbir zaman kurulamıyordu.
+    final oturum = _authDS.currentUser?.uid;
+    if (oturum != null) return sakla(oturum);
+
+    if (!_firestoreDS.isAvailable) {
+      final mevcut = _myId;
+      return (mevcut != null && mevcut.isNotEmpty)
+          ? mevcut
+          : sakla(const Uuid().v4());
+    }
+
+    final uid = (await _authDS.signInAnonymously())?.user?.uid;
+    if (uid != null) return sakla(uid);
+    // Giriş başarısız: geçici kimlik, saklanmıyor — sonraki deneme gerçek
+    // kimliği alabilsin. Bu kimlikle yapılan yazımları kurallar reddeder
+    // ve ekran "bağlantı kurulamadı" der.
+    return _myId ?? const Uuid().v4();
   }
+
+  /// Onboarding'i tamamlar.
+  ///
+  /// Önceden burada her kullanıcı için anonim Firebase girişi yapılıyor,
+  /// sunucuda bir profil dokümanı açılıyor ve bildirim jetonu yazılıyordu —
+  /// partner modunu hiç kullanmayacak kullanıcı için bile. Kimlik artık
+  /// yalnızca eşleşme başlatılınca üretiliyor ([ensureMyId]); onboarding
+  /// sunucuya hiçbir şey yazmıyor.
+  Future<void> completeOnboarding() => markOnboardingComplete();
 
   Future<void> setPartnerState({
     required bool isPartner,
@@ -139,27 +147,15 @@ class UserViewModel extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isPartner', isPartner);
 
-    bool hasPartnerNow = false;
+    // Yalnızca yerel durum. Uzak taraftaki erişim [approvePartnerRequest],
+    // [removePartnerAccess] ve [leavePartnerRole] ile değişiyor. Önceden
+    // burada da yazılıyordu: kodu okutan partner, sahibi **kendi**
+    // listesine ekliyor; onaylayan sahip aynı yazımı iki kez yapıyordu.
+    final hasPartnerNow = partnerId != null;
     if (partnerId != null) {
       await prefs.setString('partnerId', partnerId);
-      hasPartnerNow = true;
-
-      // Erişimi kendi dokümanımızdaki listeye yazıyoruz. Önceden karşı
-      // tarafın dokümanına da yazılıyordu; iptal edilemeyen eşleştirmenin
-      // sebebi buydu (bkz. firestore.rules).
-      if (_myId != null) {
-        await _firestoreDS.approvePartner(_myId!, partnerId);
-      }
     } else {
       await prefs.remove('partnerId');
-      hasPartnerNow = false;
-
-      // Erişimi kendi listemizden çıkarıyoruz. Karşı taraf kendini geri
-      // ekleyemiyor: liste bizim dokümanımızda ve kurallar yalnızca sahibin
-      // yazmasına izin veriyor.
-      if (_myId != null && _partnerId != null) {
-        await _firestoreDS.removePartner(_myId!, _partnerId!);
-      }
     }
     await prefs.setBool('hasPartner', hasPartnerNow);
 
@@ -182,6 +178,87 @@ class UserViewModel extends ChangeNotifier {
     await prefs.setBool('hasPartner', value);
     _hasPartner = value;
     notifyListeners();
+  }
+
+  // ─── Partner bağlantısı ───
+
+  /// Sahip bir eşleştirme isteğini onaylar.
+  ///
+  /// **Tek partner.** Önceki partner varsa erişimi kalkıyor ve paylaşılmış
+  /// durum geri çekiliyor: yeni partner, öncekine gönderilmiş durumu
+  /// görmemeli. Sunucuya yazılamazsa hiçbir şey değişmiyor ve `false`.
+  Future<bool> approvePartnerRequest(
+    String requesterUid, {
+    required String token,
+  }) async {
+    final myId = await ensureMyId();
+    final previous = _partnerId;
+    if (!await _firestoreDS.approvePartner(myId, requesterUid)) return false;
+    if (previous != null && previous != requesterUid) {
+      await _firestoreDS.deleteIntimacyStatus(myId);
+    }
+    await _firestoreDS.clearPairingRequest(token, requesterUid);
+    await setPartnerState(isPartner: false, partnerId: requesterUid);
+    return true;
+  }
+
+  /// Sahip partnerin erişimini kaldırır.
+  ///
+  /// Önceden yalnızca listeden çıkarılıyordu: paylaşılmış son durum
+  /// sunucuda kalıyor, eski QR da geçerliliğini koruyordu. Şimdi durum
+  /// siliniyor ve kod yenileniyor — eski QR ile yeniden istek
+  /// gönderilemiyor.
+  Future<bool> removePartnerAccess() async {
+    final myId = _myId;
+    final partner = _partnerId;
+    if (myId != null && partner != null && _firestoreDS.isAvailable) {
+      if (!await _firestoreDS.removePartner(myId, partner)) return false;
+      await _firestoreDS.deleteIntimacyStatus(myId);
+      await _pairing.rotate(myId);
+    }
+    await setPartnerState(isPartner: false, partnerId: null);
+    return true;
+  }
+
+  /// Partner kodu okuttuktan sonra: istek bırakılır ve bu cihaz partner
+  /// moduna geçer. Veri ancak sahip onaylayınca okunabiliyor.
+  Future<bool> requestPartnerAccess({
+    required String token,
+    required String ownerUid,
+  }) async {
+    final myId = await ensureMyId();
+    if (!await _firestoreDS.requestPairing(token, myId)) return false;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_requestTokenKey, token);
+    await setPartnerState(isPartner: true, partnerId: ownerUid);
+    await completeOnboarding();
+    return true;
+  }
+
+  /// Partner kendi erişimini bırakır ve partner modundan çıkar.
+  ///
+  /// Önceden yalnızca bu cihazdaki kayıt siliniyordu: sahibin listesinde
+  /// kalan partner yeniden okuyabiliyordu, onay bekleyen istek de sahibin
+  /// ekranında duruyordu. Şimdi ikisi de sunucudan kalkıyor. Sunucuya
+  /// ulaşılamazsa `false` — "bağlantı kesildi" denmiyor.
+  ///
+  /// Bu cihaz kendi döngüsü için hiç kurulmadı; kurulum baştan başlıyor.
+  Future<bool> leavePartnerRole() async {
+    final myId = _myId;
+    final owner = _partnerId;
+    final prefs = await SharedPreferences.getInstance();
+    if (myId != null && owner != null && _firestoreDS.isAvailable) {
+      final ok = await _firestoreDS.leavePartner(ownerUid: owner, myUid: myId);
+      if (!ok) return false;
+      final token = prefs.getString(_requestTokenKey);
+      if (token != null) await _firestoreDS.clearPairingRequest(token, myId);
+    }
+    await prefs.remove(_requestTokenKey);
+    await setPartnerState(isPartner: false, partnerId: null);
+    await prefs.setBool('onboarding_complete', false);
+    _onboardingComplete = false;
+    notifyListeners();
+    return true;
   }
 
   /// Hesabın uzak verisini siler.
@@ -209,7 +286,14 @@ class UserViewModel extends ChangeNotifier {
       debugPrint('Pairing token revoke failed: $e');
     }
 
-    await _firestoreDS.deleteUserData(uid, partnerId: _partnerId);
+    if (_isPartner && _partnerId != null) {
+      // Partner rolünde liste sahibin dokümanında: kendimizi oradan
+      // çıkarıyoruz. Kendi listemizde kimse yok.
+      await _firestoreDS.leavePartner(ownerUid: _partnerId!, myUid: uid);
+      await _firestoreDS.deleteUserData(uid);
+    } else {
+      await _firestoreDS.deleteUserData(uid, partnerId: _partnerId);
+    }
 
     try {
       await SubscriptionService.logout();

@@ -5,8 +5,10 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:period_tracker/domain/services/pairing_token.dart';
+import 'package:period_tracker/localization/app_localizations.dart';
 import 'package:period_tracker/presentation/partner_match/partner_qr_gen_screen.dart';
 
+import '../support/fake_partner_remote.dart';
 import 'screen_harness.dart';
 
 /// Davet ekranı kodu gerçekten gösteriyor mu?
@@ -26,7 +28,7 @@ void main() {
     FlutterSecureStorage.setMockInitialValues({});
     SharedPreferences.setMockInitialValues({'onboarding_complete': true});
 
-    const screen = PartnerQrGenScreen();
+    final screen = PartnerQrGenScreen(remote: FakePartnerRemote());
     await pumpScreen(tester, screen, size: const Size(390, 844));
 
     expect(find.byWidget(screen), findsOneWidget);
@@ -64,7 +66,7 @@ void main() {
     FlutterSecureStorage.setMockInitialValues({});
     SharedPreferences.setMockInitialValues({'onboarding_complete': true});
 
-    const screen = PartnerQrGenScreen();
+    final screen = PartnerQrGenScreen(remote: FakePartnerRemote());
     await pumpScreen(tester, screen, size: const Size(390, 844));
 
     String? oku() => tester
@@ -88,5 +90,45 @@ void main() {
           'Kod ekranda dururken değişirse kullanıcı okuttuğu kodun artık '
           'geçersiz olduğunu göremez',
     );
+  });
+
+  testWidgets('sunucu yokken QR gösterilmiyor, nedeni yazıyor', (tester) async {
+    // Önceden sunucu yokken de geçerli görünen bir QR üretiliyordu;
+    // okutan kişi "geçersiz kod" görüyordu.
+    FlutterSecureStorage.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'onboarding_complete': true});
+
+    final screen = PartnerQrGenScreen(
+      remote: FakePartnerRemote(available: false),
+    );
+    await pumpScreen(tester, screen, size: const Size(390, 844));
+
+    expect(find.byType(QrImageView), findsNothing);
+    expect(find.byKey(const Key('partner_qr_failed')), findsOneWidget);
+    final ctx = tester.element(find.byWidget(screen));
+    expect(find.text(ctx.tr('partner_unavailable')), findsOneWidget);
+  });
+
+  testWidgets('kod yayımlanamazsa QR yok, yeniden denenebiliyor', (
+    tester,
+  ) async {
+    FlutterSecureStorage.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'onboarding_complete': true});
+
+    final remote = FakePartnerRemote(writesSucceed: false);
+    final screen = PartnerQrGenScreen(remote: remote);
+    await pumpScreen(tester, screen, size: const Size(390, 844));
+    final ctx = tester.element(find.byWidget(screen));
+
+    expect(find.byType(QrImageView), findsNothing);
+    expect(find.text(ctx.tr('partner_qr_gen_failed')), findsOneWidget);
+
+    remote.writesSucceed = true;
+    await tester.tap(find.text(ctx.tr('retry')));
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 300)),
+    );
+    await tester.pump();
+    expect(find.byType(QrImageView), findsOneWidget);
   });
 }

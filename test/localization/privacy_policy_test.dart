@@ -139,7 +139,7 @@ void main() {
         'de': 'mit keinem dritten geteilt',
         'es': 'no se comparten con terceros',
         'fr': 'ne sont partagées avec aucun tiers',
-        'pt': 'não são partilhados com terceiros',
+        'pt': 'não são compartilhados com terceiros',
       };
 
       for (final lang in languages) {

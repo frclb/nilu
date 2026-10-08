@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:period_tracker/data/repositories/pairing_repository.dart';
 import 'package:period_tracker/domain/services/pairing_token.dart';
 
+import '../support/fake_partner_remote.dart';
+
 /// Eşleştirme kodu okunduğunda **değişmemeli**.
 ///
 /// Kodun üretimi ve doğrulaması ayrıca sınanıyor (bkz. `pairing_token_test`),
@@ -12,9 +14,14 @@ import 'package:period_tracker/domain/services/pairing_token.dart';
 /// ekranı bir daha açtığı anda geçersiz oluyor ve eşleşme hiç kurulamıyor.
 /// Ekranı açmak kodu döndürmemeli — döndürmek yalnızca "Kodu yenile"nin işi.
 void main() {
-  setUp(() => FlutterSecureStorage.setMockInitialValues({}));
+  late FakePartnerRemote remote;
+  late PairingRepository repo;
 
-  final repo = PairingRepository();
+  setUp(() {
+    FlutterSecureStorage.setMockInitialValues({});
+    remote = FakePartnerRemote();
+    repo = PairingRepository(remote: remote);
+  });
 
   test('aynı kod tekrar tekrar döner', () async {
     final first = await repo.currentToken('uid-1');
@@ -57,5 +64,25 @@ void main() {
           'Geçersiz kod olduğu gibi döndürülürse QR okunuyor ama hiçbir '
           'kullanıcıya çözülmüyor',
     );
+  });
+
+  test('yenilenen kod sunucuda da eskisinin yerini alıyor', () async {
+    final before = await repo.currentToken('uid-1');
+    final after = await repo.rotate('uid-1');
+    expect(remote.tokens.keys, [after]);
+    expect(remote.tokens, isNot(contains(before)));
+  });
+
+  test('yayımlanamayan kod saklanmıyor ve gösterilmiyor', () async {
+    // Sunucu yokken de geçerli görünen bir QR üretiliyordu; okutan kişi
+    // "geçersiz kod" görüyordu.
+    remote.writesSucceed = false;
+    expect(await repo.currentToken('uid-1'), isNull);
+    expect(await repo.existingToken(), isNull);
+  });
+
+  test('sekmeyi açmak kod üretmiyor', () async {
+    expect(await repo.existingToken(), isNull);
+    expect(remote.calls, isEmpty);
   });
 }

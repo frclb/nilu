@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../design_system/app_scrim.dart';
+import 'widgets/partner_unavailable_notice.dart';
 import 'widgets/scan_unavailable.dart';
 import '../../design_system/app_tokens.dart';
 import '../../data/datasources/remote/firestore_datasource.dart';
@@ -14,7 +15,10 @@ import '../../../core/navigation/route_names.dart';
 import '../../design_system/app_layout.dart';
 
 class PartnerScanScreen extends StatefulWidget {
-  const PartnerScanScreen({super.key});
+  const PartnerScanScreen({super.key, this.remote});
+
+  /// Testte sahte eşleşme sunucusu.
+  final FirestoreDataSource? remote;
 
   @override
   State<PartnerScanScreen> createState() => _PartnerScanScreenState();
@@ -23,7 +27,8 @@ class PartnerScanScreen extends StatefulWidget {
 class _PartnerScanScreenState extends State<PartnerScanScreen> {
   // We use MobileScannerController to pause/start parsing barcodes
   final MobileScannerController _scannerController = MobileScannerController();
-  final FirestoreDataSource _remote = FirestoreDataSource();
+  late final FirestoreDataSource _remote =
+      widget.remote ?? FirestoreDataSource();
 
   /// Okunan eşleştirme kodu. İstek bu koda bırakılıyor.
   String? _scannedToken;
@@ -67,7 +72,18 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     await _pauseScanner();
 
     final token = PairingToken.normalize(raw!);
-    final ownerUid = await _remote.resolvePairingToken(token);
+    final String? ownerUid;
+    try {
+      ownerUid = await _remote.resolvePairingToken(token);
+    } on PairingUnavailable {
+      // Sunucuya ulaşılamadı: "geçersiz kod" demek yanlış olurdu.
+      if (!mounted) return;
+      _showMessage(context.tr('partner_scan_unreachable'));
+      await _resumeScanner();
+      if (!mounted) return;
+      setState(() => _isProcessing = false);
+      return;
+    }
     if (!mounted) return;
 
     final status = PartnerCode.validateOwner(
@@ -147,6 +163,18 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
         backgroundColor: context.tokens.danger,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _showMessage(String text) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(text),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
       ),
     );
   }
@@ -261,8 +289,13 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     );
   }
 
-  Future<void> _confirmConnection(String code) async {
-    // Show a loading overlay immediately
+  /// İstek bırakır ve bu cihazı partner moduna geçirir.
+  ///
+  /// Kodu okumak tek başına erişim vermiyor: sahip onaylayana kadar hiçbir
+  /// şey okunamaz. İstek gönderilemezse (sunucu yok, bağlantı yok) cihaz
+  /// partner moduna geçmiyor — önceden geçiyor ve "istek gönderildi"
+  /// diyordu.
+  Future<void> _confirmConnection(String ownerUid) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -274,27 +307,24 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     );
 
     final userViewModel = context.read<UserViewModel>();
-    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final router = GoRouter.of(context);
     final requested = context.tr('partner_scan_requested');
+    final failed = context.tr('partner_scan_request_failed');
 
-    // Kodu okumak tek başına erişim vermiyor: sahip onaylayana kadar hiçbir
-    // şey okunamaz. Önceki modelde okuyan taraf kendini doğrudan bağlıyordu —
-    // erişimi verenin sahip olmaması, iptalin çalışmamasının da sebebiydi.
-    final myId = await userViewModel.ensureMyId();
-    await _remote.requestPairing(_scannedToken!, myId);
-
-    // Yerel taraf partner moduna geçiyor; veriyi ancak onay sonrası görecek.
-    await userViewModel.setPartnerState(isPartner: true, partnerId: code);
-    await userViewModel.completeOnboarding();
-
-    if (mounted) {
-      // pop loading
-      Navigator.pop(context);
-      // pop sheet
-      Navigator.pop(context);
-
-      messenger.showSnackBar(SnackBar(content: Text(requested)));
-      context.goNamed(RouteNames.home);
+    final ok = await userViewModel.requestPartnerAccess(
+      token: _scannedToken!,
+      ownerUid: ownerUid,
+    );
+    if (!mounted) return;
+    navigator.pop(); // yükleniyor
+    navigator.pop(); // onay sayfası
+    _showMessage(ok ? requested : failed);
+    if (ok) {
+      router.goNamed(RouteNames.home);
+    } else {
+      setState(() => _isProcessing = false);
+      await _resumeScanner();
     }
   }
 
@@ -316,59 +346,66 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
       ),
       extendBodyBehindAppBar: true,
       body: AppContentWidth(
-        child: MobileScanner(
-          controller: _scannerController,
-          onDetect: _onDetect,
-          // Paketin kendi hata ekranı İngilizce sabit metin gösteriyor
-          // ("Scanning is not supported on this device"). Kullanıcı kamera
-          // iznini reddettiğinde de bu ekran çıkıyor, yani gerçek cihazda
-          // ulaşılabilir bir durum.
-          errorBuilder: (context, error) => ScanUnavailable(error: error),
-          // Çerçeve ve alt ipucu `overlayBuilder`'a veriliyor; paket bunları
-          // **yalnızca önizleme görünürken** çiziyor.
-          //
-          // Önceden ikisi de `Stack`'te `MobileScanner`'ın kardeşiydi ve
-          // kamera açılamadığında da çiziliyordu: karartma katmanı hata
-          // metnini kenarlardan soluklaştırıyor, köşe parantezleri "Ayarları
-          // aç" düğmesinin üstüne biniyor, altta da "Karekod otomatik olarak
-          // taranacaktır" yazıyordu — hiçbir şeyin taranamayacağı bir ekranda.
-          overlayBuilder: (context, constraints) => Stack(
-            children: [
-              // Kesim alanı **gelen genişlikten** hesaplanıyor, ekranınkinden
-              // değil: geniş ekranda önizleme okunur genişlikte ortalanıyor ve
-              // ekran genişliğinin %70'i kutunun kendisinden büyük çıkıyordu.
-              Positioned.fill(
-                child: Container(
-                  decoration: ShapeDecoration(
-                    shape: _ScannerOverlayShape(
-                      borderColor: Theme.of(context).primaryColor,
-                      borderRadius: 12,
-                      borderLength: 40,
-                      borderWidth: 6,
-                      cutOutSize: constraints.biggest.shortestSide * 0.70,
+        child: !_remote.isAvailable
+            ? const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(24),
+                  child: PartnerUnavailableNotice(),
+                ),
+              )
+            : MobileScanner(
+                controller: _scannerController,
+                onDetect: _onDetect,
+                // Paketin kendi hata ekranı İngilizce sabit metin gösteriyor
+                // ("Scanning is not supported on this device"). Kullanıcı kamera
+                // iznini reddettiğinde de bu ekran çıkıyor, yani gerçek cihazda
+                // ulaşılabilir bir durum.
+                errorBuilder: (context, error) => ScanUnavailable(error: error),
+                // Çerçeve ve alt ipucu `overlayBuilder`'a veriliyor; paket bunları
+                // **yalnızca önizleme görünürken** çiziyor.
+                //
+                // Önceden ikisi de `Stack`'te `MobileScanner`'ın kardeşiydi ve
+                // kamera açılamadığında da çiziliyordu: karartma katmanı hata
+                // metnini kenarlardan soluklaştırıyor, köşe parantezleri "Ayarları
+                // aç" düğmesinin üstüne biniyor, altta da "Karekod otomatik olarak
+                // taranacaktır" yazıyordu — hiçbir şeyin taranamayacağı bir ekranda.
+                overlayBuilder: (context, constraints) => Stack(
+                  children: [
+                    // Kesim alanı **gelen genişlikten** hesaplanıyor, ekranınkinden
+                    // değil: geniş ekranda önizleme okunur genişlikte ortalanıyor ve
+                    // ekran genişliğinin %70'i kutunun kendisinden büyük çıkıyordu.
+                    Positioned.fill(
+                      child: Container(
+                        decoration: ShapeDecoration(
+                          shape: _ScannerOverlayShape(
+                            borderColor: Theme.of(context).primaryColor,
+                            borderRadius: 12,
+                            borderLength: 40,
+                            borderWidth: 6,
+                            cutOutSize: constraints.biggest.shortestSide * 0.70,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
 
-              // Helper text at bottom
-              Positioned(
-                bottom: MediaQuery.of(context).padding.bottom + 40,
-                left: 20,
-                right: 20,
-                child: Text(
-                  context.tr('partner_scan_helper'),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AppScrim.inkMuted,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+                    // Helper text at bottom
+                    Positioned(
+                      bottom: MediaQuery.of(context).padding.bottom + 40,
+                      left: 20,
+                      right: 20,
+                      child: Text(
+                        context.tr('partner_scan_helper'),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: AppScrim.inkMuted,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
       ),
     );
   }

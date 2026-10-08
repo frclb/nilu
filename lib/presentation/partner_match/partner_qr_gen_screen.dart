@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../design_system/app_scrim.dart';
 import '../../design_system/app_tokens.dart';
+import '../../data/datasources/remote/firestore_datasource.dart';
 import '../../data/repositories/pairing_repository.dart';
+import 'widgets/pairing_requests_section.dart';
 import '../../domain/services/pairing_token.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -12,14 +14,19 @@ import 'package:go_router/go_router.dart';
 import '../../design_system/app_layout.dart';
 
 class PartnerQrGenScreen extends StatefulWidget {
-  const PartnerQrGenScreen({super.key});
+  const PartnerQrGenScreen({super.key, this.remote});
+
+  /// Testte sahte eşleşme sunucusu.
+  final FirestoreDataSource? remote;
 
   @override
   State<PartnerQrGenScreen> createState() => _PartnerQrGenScreenState();
 }
 
 class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
-  final PairingRepository _pairing = PairingRepository();
+  late final FirestoreDataSource _remote =
+      widget.remote ?? FirestoreDataSource();
+  late final PairingRepository _pairing = PairingRepository(remote: _remote);
 
   /// QR'da paylaşılan eşleştirme kodu.
   ///
@@ -30,6 +37,10 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
   String? _token;
   bool _rotating = false;
 
+  /// Kod sunucuda yayımlanamadı (sunucu yok ya da bağlantı yok). Önceden
+  /// bu durumda da QR gösteriliyordu; okutan kişi "geçersiz kod" görüyordu.
+  bool _failed = false;
+
   @override
   void initState() {
     super.initState();
@@ -37,12 +48,19 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
   }
 
   Future<void> _load() async {
+    setState(() => _failed = false);
+    if (!_remote.isAvailable) {
+      setState(() => _failed = true);
+      return;
+    }
     // Kimlik üretimi tek bir yerde: UserViewModel.ensureMyId().
-    // Firebase varsa anonim UID, yoksa yerel UUID döner.
     final id = await context.read<UserViewModel>().ensureMyId();
     final token = await _pairing.currentToken(id);
     if (!mounted) return;
-    setState(() => _token = token);
+    setState(() {
+      _token = token;
+      _failed = token == null;
+    });
   }
 
   /// Kodu yeniler. Daha önce paylaşılmış bütün QR'lar geçersiz olur.
@@ -51,10 +69,17 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
     final id = await context.read<UserViewModel>().ensureMyId();
     final token = await _pairing.rotate(id);
     if (!mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final failed = context.tr('partner_qr_gen_failed');
     setState(() {
-      _token = token;
+      // Yenilenemezse eski kod geçerli kalıyor; ekran onu göstermeye devam
+      // ediyor.
+      _token = token ?? _token;
       _rotating = false;
     });
+    if (token == null) {
+      messenger.showSnackBar(SnackBar(content: Text(failed)));
+    }
     // Onay bildirimi kaldırıldı: QR ile kodun kendisi zaten gözle görülür
     // biçimde değişiyor, bildirim ise "Eşleşme Kodunu Kopyala" düğmesinin
     // üstüne binip (390×844'te düğme 789, bildirim 780–844) yeni kodu
@@ -95,7 +120,9 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
         ),
       ),
       body: AppContentWidth(
-        child: _token == null
+        child: _failed
+            ? _Failed(unavailable: !_remote.isAvailable, onRetry: _load)
+            : _token == null
             ? Center(child: CircularProgressIndicator(color: primaryColor))
             : SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(
@@ -255,6 +282,14 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
                       ),
                     ),
 
+                    // Partner kodu okutunca istek burada beliriyor: sahip
+                    // QR'ı gösterirken onaylayabiliyor.
+                    PairingRequestsSection(
+                      key: ValueKey(_token),
+                      remote: _remote,
+                      pairing: _pairing,
+                    ),
+
                     const SizedBox(height: 24),
 
                     // Share Button Alternative
@@ -290,6 +325,45 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
                   ],
                 ),
               ),
+      ),
+    );
+  }
+}
+
+class _Failed extends StatelessWidget {
+  const _Failed({required this.unavailable, required this.onRetry});
+
+  final bool unavailable;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          key: const Key('partner_qr_failed'),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_outlined, size: 56, color: t.textMuted),
+            const SizedBox(height: 16),
+            Text(
+              context.tr(
+                unavailable ? 'partner_unavailable' : 'partner_qr_gen_failed',
+              ),
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 15, height: 1.5, color: t.text),
+            ),
+            if (!unavailable) ...[
+              const SizedBox(height: 16),
+              OutlinedButton(
+                onPressed: onRetry,
+                child: Text(context.tr('retry')),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

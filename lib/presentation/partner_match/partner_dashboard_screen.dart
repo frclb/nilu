@@ -10,6 +10,7 @@ import '../../localization/app_localizations.dart';
 import '../../localization/relative_time.dart';
 import '../../domain/view_models/partner_view_model.dart';
 import '../../domain/view_models/user_view_model.dart';
+import '../../domain/services/pairing_token.dart';
 import '../../domain/services/partner_suggestion_engine.dart';
 import '../../design_system/app_layout.dart';
 
@@ -116,12 +117,8 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
             letterSpacing: -0.3,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings_outlined, color: textMainColor),
-            onPressed: () => context.pushNamed(RouteNames.partnerShareSettings),
-          ),
-        ],
+        // Ayar simgesi sahibin paylaşım ayarlarını açıyordu; partner
+        // rolünde orada değiştirebileceği bir şey yok.
       ),
       body: AppContentWidth(
         child: FadeTransition(
@@ -157,44 +154,66 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
     Color borderColor,
     Color warmBg,
   ) {
-    // ── Edge State: Bağlantı Yok ──
-    if (!vm.isConnected) {
-      return _NotConnectedState(
-        primaryColor: primaryColor,
-        textMainColor: textMainColor,
-        textMutedColor: textMutedColor,
-      );
-    }
-
-    // ── Edge State: Paylaşım Kapalı ──
-    if (!vm.isSharingEnabled) {
-      return _SharingDisabledState(
-        primaryColor: primaryColor,
-        warmAccent: warmAccent,
-        textMainColor: textMainColor,
-        textMutedColor: textMutedColor,
-      );
-    }
-
-    // ── Edge State: Veri Yok ──
-    if (!vm.hasData) {
-      return _EmptyDataState(
-        primaryColor: primaryColor,
-        warmAccent: warmAccent,
-        textMainColor: textMainColor,
-        textMutedColor: textMutedColor,
-      );
+    final kod = PairingToken.confirmationCode(
+      context.watch<UserViewModel>().myId ?? '',
+    );
+    switch (vm.state) {
+      case PartnerLinkState.notConnected:
+        return _StateMessage(
+          icon: Icons.link_off,
+          titleKey: 'pv_no_connection_title',
+          descKey: 'pv_no_connection_desc',
+          color: primaryColor,
+          showLeave: true,
+        );
+      case PartnerLinkState.unavailable:
+        return _StateMessage(
+          icon: Icons.cloud_off_outlined,
+          titleKey: 'pv_unavailable_title',
+          descKey: 'partner_unavailable',
+          color: primaryColor,
+          showLeave: true,
+        );
+      case PartnerLinkState.awaitingApproval:
+        // Onay gelene kadar kurallar okumayı reddediyor; dinleyici kendini
+        // yeniden deniyor. Partner, sahibin ekranındaki kodla kendi
+        // kodunu karşılaştırıyor.
+        return _StateMessage(
+          key: const Key('pv_awaiting'),
+          icon: Icons.hourglass_top_rounded,
+          titleKey: 'pv_awaiting_title',
+          desc: context.tr('pv_awaiting_desc', params: {'code': kod}),
+          color: primaryColor,
+          showLeave: true,
+        );
+      case PartnerLinkState.unreachable:
+        return _StateMessage(
+          icon: Icons.wifi_off_rounded,
+          titleKey: 'pv_unreachable_title',
+          descKey: 'pv_unreachable_desc',
+          color: warmAccent,
+          showLeave: true,
+        );
+      case PartnerLinkState.connected:
+        if (!vm.hasData) {
+          // Hiç paylaşılmamış ya da paylaşım kapatılmış: kapatınca doküman
+          // siliniyor, ikisi ayırt edilemiyor ve ekran ayırt ediyormuş gibi
+          // yapmıyor.
+          return _StateMessage(
+            key: const Key('pv_empty'),
+            icon: Icons.hourglass_empty_rounded,
+            titleKey: 'pv_empty_title',
+            descKey: 'pv_empty_desc',
+            color: warmAccent,
+            showLeave: true,
+          );
+        }
     }
 
     // ── Normal State ──
     return RefreshIndicator(
       color: primaryColor,
-      onRefresh: () async {
-        // ViewModel'daki yenileme metodunu çağır (Firestore üzerinden tekrar okur)
-        // refreshStatus şu an mevcut değilse stream kendisi dinlediği için bekleyebiliriz veya stream'i resetletebiliriz.
-        // PartnerViewModel stream tabanlı olduğu için sadece gecikme ekliyoruz, akış zaten realtime.
-        await Future.delayed(const Duration(seconds: 1));
-      },
+      onRefresh: () async => vm.retry(),
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
@@ -317,7 +336,8 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
           ),
           child: Center(
             child: Text(
-              userName.isNotEmpty ? context.upper(userName[0]) : 'P',
+              // Ad saklanmıyor; harf yerelleştirilmiş etiketten.
+              context.upper(userName.characters.first),
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -726,39 +746,10 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
       ),
       child: Column(
         children: [
-          // Bildirim Kontrol
-          InkWell(
-            onTap: () => vm.toggleMuteNotifications(),
-            borderRadius: BorderRadius.circular(10),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                children: [
-                  Icon(
-                    vm.notificationsMuted
-                        ? Icons.notifications_off_outlined
-                        : Icons.notifications_active_outlined,
-                    size: 20,
-                    color: textMutedColor,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      vm.notificationsMuted
-                          ? context.tr('pv_unmute')
-                          : context.tr('pv_mute'),
-                      style: TextStyle(fontSize: 14, color: textMainColor),
-                    ),
-                  ),
-                  Icon(Icons.chevron_right, size: 20, color: textMutedColor),
-                ],
-              ),
-            ),
-          ),
-          Divider(color: borderColor, height: 16),
           // Bağlantı Kes
           InkWell(
-            onTap: () => _showDisconnectDialog(context, vm, primaryColor),
+            key: const Key('pv_leave'),
+            onTap: () => confirmLeavePartner(context),
             borderRadius: BorderRadius.circular(10),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -774,60 +765,6 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
                   ),
                   Icon(Icons.chevron_right, size: 20, color: textMutedColor),
                 ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Disconnect Dialog ──
-  void _showDisconnectDialog(
-    BuildContext context,
-    PartnerViewModel vm,
-    Color primaryColor,
-  ) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(context.tr('pv_disconnect_title')),
-        content: Text(context.tr('pv_disconnect_desc')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(context.tr('pv_cancel')),
-          ),
-          TextButton(
-            onPressed: () async {
-              // Buradaki tek çağrı `vm.disconnect()` idi ve o yalnızca
-              // bellekteki durumu temizliyordu: `partnerId` hâlâ
-              // SharedPreferences'ta, `isPartner` hâlâ true kalıyordu.
-              // Uygulama yeniden açıldığında partner bağlı geliyor, uzak
-              // taraftaki bağlantı da hiç kopmuyordu — oysa uyarı metni
-              // "bu işlem geri alınamaz" diyor.
-              final userViewModel = ctx.read<UserViewModel>();
-              final router = GoRouter.of(ctx);
-
-              Navigator.pop(ctx);
-
-              vm.disconnect();
-              await userViewModel.setPartnerState(
-                isPartner: false,
-                partnerId: null,
-              );
-
-              // Partner modundan çıkıldı; kabuk artık partner ekranlarını
-              // göstermemeli.
-              router.goNamed(RouteNames.onboarding);
-            },
-            // Bağlantıyı kesmek geri alınamaz; iki eylem aynı görünüyordu ve
-            // hangisinin yıkıcı olduğu okunmuyordu.
-            child: Text(
-              context.tr('pv_disconnect_confirm'),
-              style: TextStyle(
-                color: context.tokens.danger,
-                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -973,24 +910,35 @@ class _CollapsibleHistoryState extends State<_CollapsibleHistory> {
 }
 
 // ══════════════════════════════════════════════════════════════
-// EDGE STATE: BAĞLANTI YOK
+// KENAR DURUMLAR
 // ══════════════════════════════════════════════════════════════
 
-class _NotConnectedState extends StatelessWidget {
-  final Color primaryColor;
-  final Color textMainColor;
-  final Color textMutedColor;
-
-  const _NotConnectedState({
-    required this.primaryColor,
-    required this.textMainColor,
-    required this.textMutedColor,
+/// Bağlantı yok, sunucu yok, onay bekleniyor, ulaşılamıyor ya da paylaşılan
+/// durum yok. Her birinde partner modundan çıkabilmeli: önceden "Partner
+/// Davet Et" düğmesi partner sekmesini açıyor, o da bu ekrana dönüyordu.
+class _StateMessage extends StatelessWidget {
+  const _StateMessage({
+    super.key,
+    required this.icon,
+    required this.titleKey,
+    this.descKey,
+    this.desc,
+    required this.color,
+    this.showLeave = false,
   });
+
+  final IconData icon;
+  final String titleKey;
+  final String? descKey;
+  final String? desc;
+  final Color color;
+  final bool showLeave;
 
   @override
   Widget build(BuildContext context) {
+    final t = context.tokens;
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -999,51 +947,39 @@ class _NotConnectedState extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: primaryColor.withAlpha(15),
+                color: color.withAlpha(15),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.link_off,
-                size: 36,
-                color: primaryColor.withAlpha(150),
-              ),
+              child: Icon(icon, size: 36, color: color.withAlpha(180)),
             ),
             const SizedBox(height: 24),
             Text(
-              context.tr('pv_no_connection_title'),
+              context.tr(titleKey),
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: textMainColor,
+                color: t.text,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              context.tr('pv_no_connection_desc'),
+              desc ?? context.tr(descKey!),
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: textMutedColor,
-                height: 1.5,
-              ),
+              style: TextStyle(fontSize: 14, color: t.textMuted, height: 1.5),
             ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () => context.pushNamed(RouteNames.partner),
-              icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
-              label: Text(context.tr('pv_invite_partner')),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            if (showLeave) ...[
+              const SizedBox(height: 24),
+              TextButton.icon(
+                key: const Key('pv_leave'),
+                onPressed: () => confirmLeavePartner(context),
+                icon: Icon(Icons.link_off, size: 18, color: t.danger),
+                label: Text(
+                  context.tr('pv_disconnect'),
+                  style: TextStyle(color: t.danger),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),
@@ -1051,130 +987,47 @@ class _NotConnectedState extends StatelessWidget {
   }
 }
 
-// ══════════════════════════════════════════════════════════════
-// EDGE STATE: PAYLAŞIM KAPALI
-// ══════════════════════════════════════════════════════════════
-
-class _SharingDisabledState extends StatelessWidget {
-  final Color primaryColor;
-  final Color warmAccent;
-  final Color textMainColor;
-  final Color textMutedColor;
-
-  const _SharingDisabledState({
-    required this.primaryColor,
-    required this.warmAccent,
-    required this.textMainColor,
-    required this.textMutedColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: warmAccent.withAlpha(15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.visibility_off_outlined,
-                size: 36,
-                color: warmAccent.withAlpha(180),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              context.tr('pv_sharing_disabled_title'),
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: textMainColor,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              context.tr('pv_sharing_disabled_desc'),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: textMutedColor,
-                height: 1.5,
-              ),
-            ),
-          ],
+/// Partner modundan çıkış: sahibin listesinden kendini çıkarır, bekleyen
+/// isteği geri çeker ve bu cihazda kurulumu baştan başlatır.
+///
+/// Önceden yalnızca bu cihazdaki kayıt siliniyordu ve uyarı "geri
+/// alınamaz" diyordu: sunucuda erişim duruyordu, yeniden bağlanmak da
+/// yeni bir davetle mümkündü.
+Future<void> confirmLeavePartner(BuildContext context) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(ctx.tr('pv_disconnect_title')),
+      content: Text(ctx.tr('pv_disconnect_desc')),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: Text(ctx.tr('pv_cancel')),
         ),
-      ),
-    );
-  }
-}
-
-// ══════════════════════════════════════════════════════════════
-// EDGE STATE: VERİ YOK
-// ══════════════════════════════════════════════════════════════
-
-class _EmptyDataState extends StatelessWidget {
-  final Color primaryColor;
-  final Color warmAccent;
-  final Color textMainColor;
-  final Color textMutedColor;
-
-  const _EmptyDataState({
-    required this.primaryColor,
-    required this.warmAccent,
-    required this.textMainColor,
-    required this.textMutedColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: warmAccent.withAlpha(15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.hourglass_empty_rounded,
-                size: 36,
-                color: warmAccent.withAlpha(180),
-              ),
+        TextButton(
+          key: const Key('pv_leave_confirm'),
+          onPressed: () => Navigator.pop(ctx, true),
+          child: Text(
+            ctx.tr('pv_disconnect_confirm'),
+            style: TextStyle(
+              color: ctx.tokens.danger,
+              fontWeight: FontWeight.w600,
             ),
-            const SizedBox(height: 24),
-            Text(
-              context.tr('pv_empty_title'),
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: textMainColor,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              context.tr('pv_empty_desc'),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: textMutedColor,
-                height: 1.5,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
-    );
+      ],
+    ),
+  );
+  if (confirmed != true || !context.mounted) return;
+
+  final user = context.read<UserViewModel>();
+  final messenger = ScaffoldMessenger.of(context);
+  final router = GoRouter.of(context);
+  final failed = context.tr('pv_disconnect_failed');
+  if (await user.leavePartnerRole()) {
+    // Kurulum bayrağı da sıfırlandı; yönlendirici artık geri sıçratmıyor.
+    router.goNamed(RouteNames.onboarding);
+  } else {
+    messenger.showSnackBar(SnackBar(content: Text(failed)));
   }
 }

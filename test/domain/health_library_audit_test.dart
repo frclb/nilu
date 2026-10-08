@@ -96,7 +96,7 @@ void main() {
         'de': 'sieht, in welcher phase du bist',
         'es': 'puede ver en qué fase estás',
         'fr': 'voit dans quelle phase tu es',
-        'pt': 'vê em que fase estás',
+        'pt': 'vê em que fase você está',
       };
 
       for (final lang in languages) {

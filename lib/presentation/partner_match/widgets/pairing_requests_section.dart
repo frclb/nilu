@@ -5,8 +5,11 @@ import 'package:provider/provider.dart';
 import '../../../data/datasources/remote/firestore_datasource.dart';
 import '../../../data/repositories/pairing_repository.dart';
 import '../../../design_system/app_tokens.dart';
+import '../../../domain/services/pairing_token.dart';
+import '../../../domain/view_models/intimacy_view_model.dart';
 import '../../../domain/view_models/user_view_model.dart';
 import '../../../localization/app_localizations.dart';
+import 'intimacy_consent.dart';
 
 /// Bekleyen eşleştirme istekleri ve onayları.
 ///
@@ -16,15 +19,24 @@ import '../../../localization/app_localizations.dart';
 /// Önceki modelde okuyan taraf kendini doğrudan bağlıyordu; erişimi verenin
 /// sahip olmaması, ayrılıktan sonra erişimin kesilememesinin de sebebiydi.
 class PairingRequestsSection extends StatefulWidget {
-  const PairingRequestsSection({super.key});
+  const PairingRequestsSection({
+    super.key,
+    this.remote,
+    this.pairing,
+  });
+
+  final FirestoreDataSource? remote;
+  final PairingRepository? pairing;
 
   @override
   State<PairingRequestsSection> createState() => _PairingRequestsSectionState();
 }
 
 class _PairingRequestsSectionState extends State<PairingRequestsSection> {
-  final PairingRepository _pairing = PairingRepository();
-  final FirestoreDataSource _remote = FirestoreDataSource();
+  late final FirestoreDataSource _remote =
+      widget.remote ?? FirestoreDataSource();
+  late final PairingRepository _pairing =
+      widget.pairing ?? PairingRepository(remote: _remote);
 
   String? _token;
   final Set<String> _busy = {};
@@ -35,29 +47,34 @@ class _PairingRequestsSectionState extends State<PairingRequestsSection> {
     _loadToken();
   }
 
+  /// Yalnızca daha önce paylaşılmış bir kod varsa: sekmeyi açmak tek
+  /// başına kimlik ve kod üretip sunucuya yazmamalı.
   Future<void> _loadToken() async {
-    final id = await context.read<UserViewModel>().ensureMyId();
-    final token = await _pairing.currentToken(id);
+    final token = await _pairing.existingToken();
     if (!mounted) return;
     setState(() => _token = token);
   }
 
   Future<void> _approve(String requesterUid) async {
     final userViewModel = context.read<UserViewModel>();
+    final intimacy = context.read<IntimacyViewModel>();
     final messenger = ScaffoldMessenger.of(context);
     final approved = context.tr('partner_request_approved');
+    final failed = context.tr('partner_request_failed');
 
     setState(() => _busy.add(requesterUid));
-    final myId = await userViewModel.ensureMyId();
-    await _remote.approvePartner(myId, requesterUid);
-    await userViewModel.setPartnerState(
-      isPartner: false,
-      partnerId: requesterUid,
+    final ok = await userViewModel.approvePartnerRequest(
+      requesterUid,
+      token: _token!,
     );
-    await _remote.clearPairingRequest(_token!, requesterUid);
     if (!mounted) return;
     setState(() => _busy.remove(requesterUid));
-    messenger.showSnackBar(SnackBar(content: Text(approved)));
+    messenger.showSnackBar(SnackBar(content: Text(ok ? approved : failed)));
+    // Onay erişimi veriyor ama paylaşımı başlatmıyor: paylaşım ayrı bir
+    // açık rıza istiyor.
+    if (ok && !intimacy.sharingOn && await askIntimacyConsent(context)) {
+      await intimacy.startSharing();
+    }
   }
 
   Future<void> _reject(String requesterUid) async {
@@ -150,12 +167,14 @@ class _RequestTile extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              // Kimlik dışında gösterecek bir şey yok: uygulama isim
-              // toplamıyor. Kısaltılmış kimlik en azından iki farklı isteği
-              // ayırt etmeye yetiyor.
-              requesterUid.length > 8
-                  ? '${requesterUid.substring(0, 8)}…'
-                  : requesterUid,
+              // Uygulama isim toplamıyor. Önceden kısaltılmış bir kimlik
+              // gösteriliyordu ("k3Jd9QzL…") ve sahip isteği kimin
+              // gönderdiğini ayırt edemiyordu. Aynı dört haneli kod
+              // partnerin ekranında da yazıyor: eşleşiyorsa doğru kişi.
+              context.tr(
+                'partner_request_code',
+                params: {'code': PairingToken.confirmationCode(requesterUid)},
+              ),
               style: theme.textTheme.labelLarge?.copyWith(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,

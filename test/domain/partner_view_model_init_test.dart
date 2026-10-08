@@ -12,6 +12,9 @@ class _SessizKaynak extends FirestoreDataSource {
   int aboneSayisi = 0;
 
   @override
+  bool get isAvailable => true;
+
+  @override
   Stream<DocumentSnapshot<Map<String, dynamic>>> intimacyStatusStream(
     String partnerUid,
   ) {

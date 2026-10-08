@@ -21,19 +21,10 @@
 	<key>com.apple.developer.healthkit</key>
 	<true/>
 	<!--
-	  Push bildirim ortamı.
-
-	  `UIBackgroundModes` içinde `remote-notification` var ve
-	  `notification_service.dart` FCM jetonu istiyor; bu anahtar olmadan
-	  jeton hiç üretilmiyor ("geçerli bir aps-environment yetki anahtarı
-	  bulunamadı").
-
-	  Değer `development`: Xcode, App Store'a dışa aktarırken bunu
-	  kendiliğinden `production` yapıyor. Portalda "Push Notifications"
-	  yeteneği de açık olmalı.
+	  `aps-environment` (push) BİLEREK yok. Uygulama push göndermiyor:
+	  hatırlatıcılar cihazda planlanan yerel bildirimler. Önceden FCM jetonu
+	  toplanıp sunucuya yazılıyordu ama hiçbir şey gönderilmiyordu.
 	-->
-	<key>aps-environment</key>
-	<string>development</string>
 	<!--
 	  `com.apple.developer.healthkit.access` BİLEREK yok.
 

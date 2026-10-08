@@ -21,7 +21,6 @@ import 'package:period_tracker/presentation/home/widgets/custom_bottom_nav.dart'
 import 'package:period_tracker/presentation/home/widgets/cycle_masthead.dart';
 import 'package:period_tracker/presentation/log_entry/log_entry_screen.dart';
 import 'package:period_tracker/presentation/partner_match/partner_match_screen.dart';
-import 'package:period_tracker/presentation/partner_match/partner_share_settings_screen.dart';
 import 'package:period_tracker/presentation/session/session_screen.dart';
 import 'package:period_tracker/presentation/yoga/yoga_detail_screen.dart';
 import 'package:period_tracker/presentation/home/widgets/side_nav_rail.dart';
@@ -501,30 +500,24 @@ void main() {
       });
     }
 
-    testWidgets('paylaşım ayarları taşmadan açılır', (tester) async {
+    testWidgets('panoda sahibin ayarı yok, partner modundan çıkılabiliyor', (
+      tester,
+    ) async {
       await openAt(tester, phones.first);
 
-      // Partner panosunun sağ üstündeki dişli.
-      final gear = find.descendant(
-        of: find.byType(AppBar),
-        matching: find.byIcon(Icons.settings_outlined),
-      );
-      expect(gear, findsOneWidget, reason: 'panoda dişli bulunamadı');
-
-      await tester.tap(gear);
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 500));
-
+      // Dişli sahibin paylaşım ayarlarını açıyordu; partner rolünde orada
+      // değiştirebileceği bir şey yok.
       expect(
-        find.byType(PartnerShareSettingsScreen),
-        findsOneWidget,
-        reason: 'paylaşım ayarları açılmadı — iddia boşa gider',
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.byIcon(Icons.settings_outlined),
+        ),
+        findsNothing,
       );
-      expect(
-        tester.takeException(),
-        isNull,
-        reason: 'paylaşım ayarlarında düzen hatası var',
-      );
+      // Testte eşleşme sunucusu yok: pano bunu söylüyor ve çıkış yolu
+      // bırakıyor.
+      expect(find.byKey(const Key('pv_leave')), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
 
     // Sahibin eşleşme ekranı. Taramada yoktu ve bir taşma orada

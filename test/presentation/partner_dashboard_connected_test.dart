@@ -20,6 +20,9 @@ import 'screen_harness.dart';
 /// bağlantıdaki eşleşmiş kullanıcının gördüğü ekran sınanabiliyor.
 class _SessizKaynak extends FirestoreDataSource {
   @override
+  bool get isAvailable => true;
+
+  @override
   Stream<DocumentSnapshot<Map<String, dynamic>>> intimacyStatusStream(
     String partnerUid,
   ) => StreamController<DocumentSnapshot<Map<String, dynamic>>>().stream;
@@ -30,6 +33,9 @@ class _YayinKaynagi extends FirestoreDataSource {
   _YayinKaynagi(this.kayitlar);
 
   final List<Map<String, dynamic>?> kayitlar;
+
+  @override
+  bool get isAvailable => true;
 
   @override
   Stream<DocumentSnapshot<Map<String, dynamic>>> intimacyStatusStream(
@@ -83,6 +89,7 @@ void main() {
       'onboarding_complete': true,
       'partnerId': 'partner-uuid-1',
       'hasPartner': true,
+      'isPartner': true,
     });
 
     const screen = PartnerDashboardScreen();
@@ -116,6 +123,7 @@ void main() {
         'onboarding_complete': true,
         'partnerId': 'partner-uuid-1',
         'hasPartner': true,
+        'isPartner': true,
       });
 
       // Beş kayıt: geçmiş listesi üst sınırında çiziliyor.
@@ -159,14 +167,13 @@ void main() {
     });
   }
 
-  testWidgets('partner paylaşımı kapattığında ayrı metin gösteriliyor', (
-    tester,
-  ) async {
+  testWidgets('paylaşım kapalı eski kayıt gösterilmiyor', (tester) async {
     FlutterSecureStorage.setMockInitialValues({});
     SharedPreferences.setMockInitialValues({
       'onboarding_complete': true,
       'partnerId': 'partner-uuid-1',
       'hasPartner': true,
+      'isPartner': true,
     });
 
     const screen = PartnerDashboardScreen();
@@ -183,13 +190,9 @@ void main() {
 
     final context = tester.element(find.byWidget(screen));
 
-    expect(
-      find.text(context.tr('pv_sharing_disabled_title')),
-      findsOneWidget,
-      reason:
-          'Paylaşımı kapatmak ile hiç veri göndermemek ayrı durumlar; '
-          'kullanıcı hangisi olduğunu bilmeli',
-    );
+    // Paylaşım kapatılınca doküman artık siliniyor; eski sürümlerin
+    // bıraktığı `isShared: false` kaydı "paylaşılan durum yok" sayılıyor.
+    expect(find.text(context.tr('pv_empty_title')), findsOneWidget);
     expect(
       find.text(context.tr('pv_desire_passionate')),
       findsNothing,
@@ -208,6 +211,7 @@ void main() {
       'onboarding_complete': true,
       'partnerId': uid,
       'hasPartner': true,
+      'isPartner': true,
     });
 
     const screen = PartnerDashboardScreen();

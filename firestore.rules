@@ -3,10 +3,12 @@ rules_version = '2';
 // RCApp — Cloud Firestore güvenlik kuralları
 //
 // Veri modeli (lib/data/datasources/remote/firestore_datasource.dart):
-//   users/{uid}                  -> profil, partners, fcmTokens
-//   users/{uid}/logs/{dateStr}   -> günlük sağlık logları (HASSAS)
-//   intimacy/{uid}               -> yakınlık durumu (HASSAS)
+//   users/{uid}                  -> partners (tek kişi)
+//   users/{uid}/logs/{dateStr}   -> ESKİ: artık yazılmıyor; yalnızca silme
+//   intimacy/{uid}               -> paylaşılan yakınlık durumu (HASSAS)
 //   pairingTokens/{token}        -> eşleştirme kodu → sahip UID
+//
+// Kimlik anonim ve yalnızca partner eşleşmesi başlatılınca açılıyor.
 //
 // Temel ilke: kullanıcı yalnızca kendi verisine yazar. Erişim verme yetkisi
 // yalnızca verinin sahibinde.
@@ -64,18 +66,30 @@ service cloud.firestore {
                .data.get('partners', []);
     }
 
+    // Partner **yalnızca kendini** sahibin listesinden çıkarabilir: başka
+    // hiçbir alan değişmemeli ve yeni liste eskisinden yalnızca istekte
+    // bulunanın çıkarılmış hâli olmalı. Önceden partner tarafındaki
+    // "Bağlantıyı Kes" sunucuda hiçbir şey değiştirmiyordu.
+    function isSelfRemoval(uid) {
+      let before = resource.data.get('partners', []);
+      let after = request.resource.data.get('partners', []);
+      return isSignedIn()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['partners'])
+        && after == before.removeAll([request.auth.uid]);
+    }
+
     match /users/{uid} {
-      // Profili yalnızca sahibi okur. Partner, karşı tarafın profiline
-      // (dolayısıyla fcmTokens'a) erişemez.
+      // Dokümanı yalnızca sahibi okur.
       allow read: if isOwner(uid);
 
-      // Eşleştirme artık başka birinin dokümanına yazmayı gerektirmiyor;
-      // herkes yalnızca kendi dokümanına yazar.
-      allow create, update, delete: if isOwner(uid);
+      allow create, delete: if isOwner(uid);
+      allow update: if isOwner(uid) || isSelfRemoval(uid);
 
-      // Günlük sağlık logları hiçbir koşulda paylaşılmaz.
+      // Eski sürümlerin yazdığı loglar: artık yazılmıyor, sahibi silebilsin.
       match /logs/{dateStr} {
-        allow read, write: if isOwner(uid);
+        allow read, delete: if isOwner(uid);
+        allow create, update: if false;
       }
     }
 

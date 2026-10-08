@@ -82,7 +82,7 @@ void main() {
       // Eşleşme ve paylaşım ekranları: hiç geçmemeli.
       const surfaces = [
         'partner_match_encryption_notice',
-        'partner_share_security_desc',
+        'consent_where',
         'privacy_policy_section3_content',
       ];
 
@@ -139,28 +139,33 @@ void main() {
 
   group('paylaşım ekranı yalnızca gerçekten gideni sayıyor', () {
     test('tek anahtar var ve yakınlık durumunu anlatıyor', () {
-      final source = File(
+      final ekran = File(
         'lib/presentation/partner_match/partner_share_settings_screen.dart',
       ).readAsStringSync();
+      final anahtar = File(
+        'lib/presentation/partner_match/widgets/privacy_control_section.dart',
+      ).readAsStringSync();
 
-      expect(source.contains('partner_share_intimacy'), isTrue);
+      expect(ekran.contains('PrivacyControlSection'), isTrue);
+      expect(anahtar.contains('partner_match_allow_sharing'), isTrue);
       for (final gone in [
         'partner_share_phase_info',
         'partner_share_symptom_details',
         'partner_share_mood',
         'partner_share_predictions',
       ]) {
-        expect(source.contains(gone), isFalse, reason: '$gone duruyor');
+        expect(ekran.contains(gone), isFalse, reason: '$gone duruyor');
+        expect(anahtar.contains(gone), isFalse, reason: '$gone duruyor');
       }
     });
 
     test('döngü verisinin gitmediği yazılı', () {
-      // Kullanıcının bilmesi gereken asıl şey bu.
+      // Kullanıcının bilmesi gereken asıl şey bu: rıza metni de söylüyor.
       for (final lang in languages) {
         expect(
-          dictionary(lang)['partner_share_security_desc'],
+          dictionary(lang)['consent_what'],
           isNotNull,
-          reason: '$lang: güvenlik açıklaması eksik',
+          reason: '$lang: rıza metni eksik',
         );
       }
     });

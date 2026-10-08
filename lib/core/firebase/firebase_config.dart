@@ -15,6 +15,11 @@ class FirebaseConfig {
   /// yapmadan önce bunu kontrol eder.
   static bool get isAvailable => _isAvailable;
 
+  /// Testte "Firebase yapılandırılmış" durumunu kurmak için. Uzak çağrılar
+  /// testte yine sahte kaynaklardan geçmeli.
+  @visibleForTesting
+  static set debugAvailable(bool value) => _isAvailable = value;
+
   static Future<void> init() async {
     try {
       await Firebase.initializeApp();

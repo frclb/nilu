@@ -14,10 +14,14 @@
 class ShareSettings {
   /// Yakınlık durumu partnerle paylaşılsın mı?
   ///
-  /// Uygulamanın partnere gönderdiği tek veri bu.
+  /// Uygulamanın partnere gönderdiği tek veri bu. **Varsayılan kapalı** ve
+  /// ancak açık rızayla açılıyor (bkz. `ShareSettingsRepository`): cinsel
+  /// yaşamla ilgili veri KVKK'da özel nitelikli. Önceden varsayılan açıktı;
+  /// partnerini onaylayan kullanıcı ayrıca hiçbir şey sorulmadan paylaşıma
+  /// başlamış sayılıyordu.
   final bool intimacyStatus;
 
-  const ShareSettings({this.intimacyStatus = true});
+  const ShareSettings({this.intimacyStatus = false});
 
   /// Hiçbir şeyin paylaşılmadığı ayar.
   static const ShareSettings none = ShareSettings(intimacyStatus: false);

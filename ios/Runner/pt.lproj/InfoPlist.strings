@@ -1,7 +1,7 @@
 /* Sistem izin kutularinda gorunen metinler.
    Info.plist icindekiler yalnizca yedek; cihaz dili buradan okur. */
 
-"NSCameraUsageDescription" = "A câmara é usada para ler o código QR da tua parceira. Não são guardadas imagens da câmara.";
-"NSFaceIDUsageDescription" = "O Face ID garante que só tu acedes aos teus dados de saúde com o bloqueio ativo.";
+"NSCameraUsageDescription" = "A câmera é usada para ler o QR code do seu parceiro. Nenhuma imagem da câmera é armazenada.";
+"NSFaceIDUsageDescription" = "O Face ID garante que só você acesse seus dados de saúde quando o bloqueio estiver ativado.";
 "NSHealthShareUsageDescription" = "Seus dados de período são lidos do app Saúde para melhorar as previsões.";
-"NSHealthUpdateUsageDescription" = "Os dias de período que marcares aqui também são escritos na app Saúde, se permitires.";
+"NSHealthUpdateUsageDescription" = "Os dias de período que você marcar aqui também são gravados no app Saúde, se você permitir.";

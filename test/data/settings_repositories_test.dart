@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:period_tracker/data/repositories/favorites_repository.dart';
 import 'package:period_tracker/data/repositories/share_settings_repository.dart';
-import 'package:period_tracker/domain/models/share_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -15,75 +14,38 @@ void main() {
   group('ShareSettingsRepository', () {
     const repo = ShareSettingsRepository();
 
-    test('kayıt yokken varsayılan açık', () async {
+    // Yakınlık durumu cinsel yaşamla ilgili özel nitelikli veri: paylaşım
+    // varsayılan olarak kapalı ve ancak açık rızayla açılıyor.
+    test('kayıt yokken kapalı', () async {
+      expect((await repo.load()).intimacyStatus, isFalse);
+      expect(await repo.consentedAt(), isNull);
+    });
+
+    test('rıza verilince açılıyor ve anı kaydediliyor', () async {
+      final an = DateTime(2026, 10, 8, 9, 30);
+      await repo.grantConsent(now: an);
       expect((await repo.load()).intimacyStatus, isTrue);
+      expect(await repo.consentedAt(), an);
     });
 
-    test('kapatılan ayar kapalı kalır', () async {
-      await repo.save(ShareSettings.none);
-
-      // Yeni bir repository örneği = ekranın yeniden açılması.
-      const freshRepo = ShareSettingsRepository();
-      final loaded = await freshRepo.load();
-
-      expect(loaded.intimacyStatus, isFalse);
-      expect(loaded.sharesAnything, isFalse);
-    });
-
-    group('eski dört anahtardan göç', () {
-      // Eskiden faz/semptom/ruh hali/tahmin diye dört anahtar vardı ve
-      // hiçbiri tek başına bir şey kontrol etmiyordu; paylaşımı durduran
-      // şey dördünün birden kapalı olmasıydı. Yeni tek anahtar o toplamı
-      // devralıyor.
-
-      Future<bool> migrate(Map<String, Object> stored) async {
-        SharedPreferences.resetStatic();
-        SharedPreferences.setMockInitialValues(stored);
-        return (await const ShareSettingsRepository().load()).intimacyStatus;
-      }
-
-      test('dördü de kapalıysa kapalı kalıyor', () async {
-        // Asıl önemli hâl: paylaşımı bilerek durdurmuş kullanıcının
-        // ayarı sessizce geri açılmamalı.
-        expect(
-          await migrate({
-            ShareSettingsRepository.legacyPhaseInfoKey: false,
-            ShareSettingsRepository.legacySymptomDetailsKey: false,
-            ShareSettingsRepository.legacyMoodKey: false,
-            ShareSettingsRepository.legacyPredictionsKey: false,
-          }),
-          isFalse,
-        );
-      });
-
-      test('biri bile açıksa açık geliyor', () async {
-        expect(
-          await migrate({
-            ShareSettingsRepository.legacyPhaseInfoKey: false,
-            ShareSettingsRepository.legacySymptomDetailsKey: false,
-            ShareSettingsRepository.legacyMoodKey: true,
-            ShareSettingsRepository.legacyPredictionsKey: false,
-          }),
-          isTrue,
-        );
-      });
-
-      test('yeni anahtar varsa eskiler okunmuyor', () async {
-        expect(
-          await migrate({
-            ShareSettingsRepository.intimacyKey: false,
-            ShareSettingsRepository.legacyPhaseInfoKey: true,
-          }),
-          isFalse,
-        );
-      });
-    });
-
-    test('copyWith değeri değiştirir', () {
+    test('rıza geri alınınca kapalı kalıyor', () async {
+      await repo.grantConsent();
+      await repo.withdrawConsent();
       expect(
-        const ShareSettings().copyWith(intimacyStatus: false).sharesAnything,
+        (await const ShareSettingsRepository().load()).intimacyStatus,
         isFalse,
       );
+      expect(await repo.consentedAt(), isNull);
+    });
+
+    test('rızasız eski "açık" kaydı kapalı okunuyor', () async {
+      // Önceki sürümler paylaşımı varsayılan açık kaydediyordu; eski dört
+      // anahtardan biri açık olan kullanıcı da açık sayılıyordu.
+      SharedPreferences.setMockInitialValues({
+        ShareSettingsRepository.intimacyKey: true,
+        ShareSettingsRepository.legacyMoodKey: true,
+      });
+      expect((await repo.load()).intimacyStatus, isFalse);
     });
   });
 

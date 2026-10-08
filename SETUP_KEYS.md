@@ -127,7 +127,7 @@ Sonra iki App ID:
 
 | App ID | Capability |
 |---|---|
-| `com.furkan.rcperiodtracker` | HealthKit, App Groups, Push Notifications |
+| `com.furkan.rcperiodtracker` | HealthKit, App Groups |
 | `com.furkan.rcperiodtracker.CycleWidget` | App Groups |
 
 Bunlar `ios/Runner/Runner.entitlements` ile **eşleşmek zorunda**. (Sign in with
@@ -145,9 +145,8 @@ yalnızca regl akışı okuyor ve kullanıcı açarsa yazıyor; normal HealthKit
 kapsamında.
 (Ayrıntısı `Runner.entitlements` içindeki yorumda.)
 
-**Push Notifications için** ayrıca bir APNs anahtarı gerekiyor: Keys → yeni
-anahtar → "Apple Push Notifications service (APNs)". İnen `.p8` dosyası **bir
-kez** indirilebiliyor. Firebase'e yüklenecek (adım 7).
+**Push Notifications açılmayacak.** Uygulama push göndermiyor; hatırlatıcılar
+cihazda planlanan yerel bildirimler ve bunlar için yetenek gerekmiyor.
 
 ---
 
@@ -363,16 +362,17 @@ flutterfire configure
 
 `ios/Runner/GoogleService-Info.plist` üretilir. Sonra:
 
-- **APNs anahtarı** (adım 2'deki `.p8`) → Firebase Console → Project settings →
-  Cloud Messaging → Apple app configuration. Bu olmadan bildirim gitmez.
+- **Authentication → Sign-in method → Anonymous** açık olmalı: partner
+  eşleşmesi anonim bir kimlikle çalışıyor (e-posta, ad, hesap yok).
 - **Firestore kuralları:**
 
   ```bash
   firebase deploy --only firestore:rules
   ```
 
-Partner senkronizasyonu ve bildirim bunlara bağlı; yapılandırılmazsa uygulama
-çalışıyor ama partner özelliği yerel kalıyor.
+Partner eşleşmesi bunlara bağlı. Yapılandırılmazsa uygulama çalışıyor ve
+partner ekranı eşleşmenin şu an kullanılamadığını söylüyor (geçerli görünen
+bir QR göstermiyor).
 
 ---
 

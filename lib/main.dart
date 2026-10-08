@@ -152,7 +152,10 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
           create: (_) => IntimacyViewModel(),
           update: (_, userVM, intimacyVM) {
             final vm = intimacyVM ?? IntimacyViewModel();
-            vm.init(userVM.myId);
+            vm.init(
+              userVM.myId,
+              hasPartner: userVM.hasPartner && !userVM.isPartner,
+            );
             return vm;
           },
         ),
@@ -161,7 +164,9 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
           create: (_) => PartnerViewModel(),
           update: (_, userVM, partnerVM) {
             final vm = partnerVM ?? PartnerViewModel();
-            vm.init(userVM.partnerId);
+            // Yalnızca partner rolünde: sahibin cihazı partnerinin
+            // dokümanını dinlemiyor (partner bir şey paylaşmıyor).
+            vm.init(userVM.isPartner ? userVM.partnerId : null);
             return vm;
           },
         ),

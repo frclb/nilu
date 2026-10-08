@@ -8,6 +8,11 @@ import '../../../localization/relative_time.dart';
 
 /// Ana ekrandaki duygusal yakınlık bölümü — iki küçük kompakt kart.
 /// Tıklandığında BottomSheet ile detaylı seçim yapılır.
+///
+/// Yalnızca onaylanmış bir partner varken ve paylaşıma açık rıza
+/// verilmişken görünüyor. Önceden herkesin ana ekranında "Cinsel İstek"
+/// kartı duruyordu: partneri olmayan kullanıcı için anlamsız, telefona göz
+/// atan biri için de fazla açık.
 class IntimacySection extends StatelessWidget {
   const IntimacySection({super.key});
 
@@ -15,7 +20,7 @@ class IntimacySection extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<IntimacyViewModel>();
 
-    if (!viewModel.isLoaded) {
+    if (!viewModel.isLoaded || !viewModel.hasPartner || !viewModel.sharingOn) {
       return const SizedBox.shrink();
     }
 
@@ -68,7 +73,7 @@ class _ShareControls extends StatelessWidget {
         return context.tr('intimacy_share_failed_msg');
       case 'sharing_disabled':
         return context.tr('intimacy_sharing_disabled_msg');
-      case 'not_logged_in':
+      case 'no_partner':
         return context.tr('intimacy_no_partner_desc');
       default:
         return null;
@@ -505,7 +510,10 @@ class _MiniAffectionCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       hasSelection
-                          ? '${needs.length} seçili'
+                          ? context.tr(
+                              'intimacy_selected_count',
+                              params: {'n': '${needs.length}'},
+                            )
                           : context.tr('intimacy_change'),
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontSize: 9,

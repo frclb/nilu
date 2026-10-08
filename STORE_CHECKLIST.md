@@ -35,7 +35,7 @@ Her yüklemede build numarası artmalıdır.
 ## 2. İmzalama ve yetkiler
 
 **Apple Developer Program üyeliği ($99/yıl)** ⬜
-Mağazaya yükleme, HealthKit, App Groups ve push bildirim bunsuz çalışmaz.
+Mağazaya yükleme, HealthKit ve App Groups bunsuz çalışmaz.
 Üyelik alındıktan sonra Xcode → Runner → Signing & Capabilities → Team seçin.
 Otomatik imzalama yeterlidir. **CycleWidget hedefinde de aynı takımı seçin**
 — ayrı bir hedef, kendi takımını istiyor.
@@ -191,8 +191,8 @@ Aşağıdakiler **koddan çıkarılmıştır** — formu buna göre doldurun.
 | Sağlık ve fitness | Regl tarihleri, semptomlar, ruh hâli, akış yoğunluğu, cinsel aktivite, döngü ayarları | Cihazda **şifreli** (`SecureStore`) | Hayır |
 | Hassas kişisel | Yakınlık/cinsel istek seçimleri | Cihazda **şifreli** | Yalnızca kullanıcı açıkça eşleşirse partnerine |
 | Kişisel bilgi | Ad, e-posta, doğum tarihi | Cihazda **şifreli** | Hayır |
-| Tanımlayıcı | Anonim kullanıcı kimliği, partner kimliği | Cihaz + (Firebase açıksa) Firestore | Hayır |
-| Cihaz kimliği | FCM push token | Firebase açıksa Firestore | Hayır |
+| Tanımlayıcı | Anonim kullanıcı kimliği, partner kimliği — **yalnızca partner eşleşmesi başlatılırsa** | Cihaz + Firestore | Hayır |
+| Cihaz kimliği | Reklam SDK'sı (kişiselleştirilmemiş reklam) | Google AdMob | Hayır |
 | Satın alma | Abonelik durumu | RevenueCat açıksa | Hayır |
 
 **Önemli:** Firebase yapılandırma dosyası eklenmediği sürece uygulama
@@ -201,8 +201,11 @@ yukarıdaki "Firestore" satırları geçerli olur ve beyanı güncellemelisiniz.
 
 ### Apple — App Privacy
 - "Data Used to Track You": **Hayır** (reklamlar kişiselleştirilmiyor, ATT istenmiyor)
-- "Data Linked to You": Health & Fitness, Sensitive Info, Contact Info,
-  Identifiers, Purchases (Firebase açıksa)
+- "Data Linked to You": Health & Fitness (yalnızca partnerle paylaşılan
+  yakınlık durumu), Identifiers (anonim kimlik, partner eşleşmesi),
+  Purchases. Ad, e-posta ve doğum tarihi cihazdan çıkmıyor; Contact Info
+  beyan edilmemeli.
+- "Data Not Linked to You": Device ID (reklam)
 - "Data Not Collected": Firebase kapalıyken hepsi
 
 ### Hesap silme ✅
@@ -271,7 +274,7 @@ görünen adı (`CFBundleDisplayName`) güncellemek.
 
 | Ne | Neden gerekli | Nasıl |
 |---|---|---|
-| `GoogleService-Info.plist` | Partner senkronizasyonu ve push bildirim | `flutterfire configure` |
+| `GoogleService-Info.plist` | Partner eşleşmesi | `flutterfire configure` |
 | Firestore kuralları | Veri güvenliği | `firebase deploy --only firestore:rules` |
 | RevenueCat API anahtarı | Premium satın alma | [subscription_service.dart](lib/domain/services/subscription_service.dart) — şu an `appl_api_key_placeholder` |
 | Gerçek AdMob kimlikleri | Reklam alanının dolması | `Info.plist` → `GADApplicationIdentifier` ve [ads_datasource.dart](lib/data/datasources/ads_datasource.dart) — şu an Google'ın test kimlikleri |
@@ -321,14 +324,16 @@ Beyan edilenler koddan çıkarıldı:
 |---|---|
 | Yakınlık durumu (sağlık) | `intimacy/{uid}` — yalnızca partner paylaşımı açıkken |
 | Kullanıcı kimliği | Firebase anonim UID |
-| Cihaz kimliği | FCM jetonu (bildirim) ve reklam (üçüncü taraf reklam amacı beyan edildi) |
+| Cihaz kimliği | Reklam (AdMob; bağlantısız, üçüncü taraf reklam amacı) |
 | Satın alma geçmişi | RevenueCat |
 
-**Cihazdan çıkmayanlar:** günlük sağlık kayıtları (`saveDailyLog` tanımlı ama
-hiçbir yerden çağrılmıyor), ad, e-posta, doğum tarihi (hepsi `SecureStore`).
+**Cihazdan çıkmayanlar:** günlük sağlık kayıtları (sunucuya yazan kod
+kaldırıldı), ad, e-posta, doğum tarihi (hepsi `SecureStore`). Push jetonu
+toplanmıyor; FCM kaldırıldı.
 
-Gerekçeli API olarak yalnızca `UserDefaults` (CA92.1) beyan edildi —
-`shared_preferences` bunu kullanıyor.
+Gerekçeli API olarak yalnızca `UserDefaults` beyan edildi: CA92.1
+(`shared_preferences`) ve 1C8F.1 (widget ile paylaşılan App Group). Widget
+uzantısının kendi bildirimi var (`ios/CycleWidget/PrivacyInfo.xcprivacy`).
 
 > App Store Connect'teki "App Privacy" formunu da bu tabloya göre doldurun;
 > iki beyan tutarsız olursa inceleme takılır.

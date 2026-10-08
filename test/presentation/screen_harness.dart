@@ -94,7 +94,10 @@ Widget wrapWithProviders(
       create: (_) => IntimacyViewModel(),
       update: (_, userVM, intimacyVM) {
         final vm = intimacyVM ?? IntimacyViewModel();
-        vm.init(userVM.myId);
+        vm.init(
+          userVM.myId,
+          hasPartner: userVM.hasPartner && !userVM.isPartner,
+        );
         return vm;
       },
     ),
@@ -102,7 +105,7 @@ Widget wrapWithProviders(
       create: (_) => partnerViewModel ?? PartnerViewModel(),
       update: (_, userVM, partnerVM) {
         final vm = partnerVM ?? partnerViewModel ?? PartnerViewModel();
-        vm.init(userVM.partnerId);
+        vm.init(userVM.isPartner ? userVM.partnerId : null);
         return vm;
       },
     ),

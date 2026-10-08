@@ -7,6 +7,7 @@ import 'package:period_tracker/localization/app_localizations.dart';
 import 'package:period_tracker/presentation/calendar/calendar_screen.dart';
 import 'package:period_tracker/presentation/partner_match/partner_qr_gen_screen.dart';
 
+import '../support/fake_partner_remote.dart';
 import 'screen_harness.dart';
 
 /// Bir eylemin ardından çıkan bildirim, sıradaki eylemi engelliyor mu?
@@ -77,7 +78,7 @@ void main() {
   testWidgets('QR: kodu yeniledikten hemen sonra kopyalanabiliyor', (
     tester,
   ) async {
-    const screen = PartnerQrGenScreen();
+    final screen = PartnerQrGenScreen(remote: FakePartnerRemote());
     await pumpScreen(tester, screen, size: const Size(390, 844));
 
     final context = tester.element(find.byWidget(screen));

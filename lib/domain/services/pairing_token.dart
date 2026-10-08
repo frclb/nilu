@@ -64,4 +64,20 @@ class PairingToken {
   /// Kullanıcının elle yazdığı kodu kanonik hâle getirir.
   static String normalize(String input) =>
       input.replaceAll(RegExp(r'\s+'), '').toUpperCase();
+
+  /// İsteği gönderen cihazın dört haneli doğrulama kodu.
+  ///
+  /// Sahip onay listesinde yalnızca rastgele bir kimlik görüyordu
+  /// ("k3Jd9QzL…"); kodu başka biri okutmuşsa ayırt edemezdi. Aynı kod
+  /// partnerin ekranında da gösteriliyor: iki ekranda eşleşiyorsa onaylanan
+  /// kişi doğru kişi. Kriptografik değil — amaç karışıklığı önlemek.
+  static String confirmationCode(String uid) {
+    // FNV-1a, 32 bit.
+    var hash = 0x811c9dc5;
+    for (final unit in uid.codeUnits) {
+      hash ^= unit;
+      hash = (hash * 0x01000193) & 0xffffffff;
+    }
+    return (hash % 10000).toString().padLeft(4, '0');
+  }
 }

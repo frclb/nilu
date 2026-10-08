@@ -95,4 +95,13 @@ class IntimacyRepository {
 
   /// Çevrimdışı kuyruğu temizler.
   Future<void> clearOfflineQueue() => _store.remove(_offlineQueueKey);
+
+  // ─── Bekleyen işler ───
+
+  /// Basit bir bayrak (ör. sunucudan silinememiş durum).
+  Future<bool> getFlag(String key) async =>
+      await _store.getString(key) == 'true';
+
+  Future<void> setFlag(String key, bool value) =>
+      value ? _store.setString(key, 'true') : _store.remove(key);
 }

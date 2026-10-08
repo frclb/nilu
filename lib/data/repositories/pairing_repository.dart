@@ -8,6 +8,9 @@ import '../local/secure_store.dart';
 /// için paylaşılan kod kalıcı olarak geçerli kalıyordu — ayrılmak erişimi
 /// koparmıyordu. Kod artık döndürülebilir: yenilendiğinde daha önce
 /// paylaşılmış bütün QR'lar geçersiz oluyor.
+///
+/// Kod yalnızca sunucuda yayımlandıktan **sonra** saklanıyor: yayımlanmamış
+/// bir kodun QR'ı geçerli görünür ama okutan kişiye "geçersiz kod" derdi.
 class PairingRepository {
   static const String _tokenKey = 'pairing_token';
 
@@ -20,32 +23,36 @@ class PairingRepository {
   }) : _store = store,
        _remote = remote ?? FirestoreDataSource();
 
-  /// Mevcut kodu döndürür; yoksa üretip saklar.
-  Future<String> currentToken(String uid) async {
+  /// Daha önce yayımlanmış kod; yoksa `null`. Hiçbir şey üretmez.
+  ///
+  /// Partner sekmesini açmak tek başına kod üretip sunucuya yazmamalı.
+  Future<String?> existingToken() async {
     final existing = await _store.getString(_tokenKey);
-    if (existing != null && PairingToken.isWellFormed(existing)) {
-      return existing;
-    }
-    return rotate(uid);
+    return PairingToken.isWellFormed(existing) ? existing : null;
   }
 
-  /// Yeni bir kod üretir, saklar ve yayımlar.
-  ///
-  /// Eski kod sunucudan siliniyor: yenilemenin anlamı önceki QR'ların
-  /// çalışmayı bırakması.
-  Future<String> rotate(String uid) async {
-    final previous = await _store.getString(_tokenKey);
+  /// Mevcut kod; yoksa üretip yayımlar. Yayımlanamazsa `null`.
+  Future<String?> currentToken(String uid) async =>
+      await existingToken() ?? rotate(uid);
+
+  /// Yeni bir kod üretir ve yayımlar; eskisi sunucudan siliniyor.
+  /// Yayımlanamazsa `null` — eski kod yerinde kalıyor.
+  Future<String?> rotate(String uid) async {
+    final previous = await existingToken();
     final token = PairingToken.generate();
-
+    final ok = await _remote.publishPairingToken(
+      uid,
+      token,
+      previousToken: previous,
+    );
+    if (!ok) return null;
     await _store.setString(_tokenKey, token);
-    await _remote.publishPairingToken(uid, token, previousToken: previous);
-
     return token;
   }
 
-  /// Kodu tamamen iptal eder (hesap silme akışında).
+  /// Kodu tamamen iptal eder (veri silme akışında).
   Future<void> revoke() async {
-    final token = await _store.getString(_tokenKey);
+    final token = await existingToken();
     if (token == null) return;
     await _remote.revokePairingToken(token);
     await _store.remove(_tokenKey);
