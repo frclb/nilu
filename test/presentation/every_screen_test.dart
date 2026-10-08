@@ -25,7 +25,6 @@ import 'package:period_tracker/presentation/onboarding_welcome/onboarding_goal_s
 import 'package:period_tracker/presentation/pregnancy/past_pregnancies_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_period_length_screen.dart';
 import 'package:period_tracker/presentation/calendar/calendar_screen.dart';
-import 'package:period_tracker/presentation/exercise/exercise_detail_screen.dart';
 import 'package:period_tracker/presentation/home/home_screen.dart';
 import 'package:period_tracker/presentation/insights/insights_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_success_screen.dart';
@@ -76,7 +75,6 @@ void main() {
     'insights': const InsightsScreen(),
     'profile_settings': const ProfileSettingsScreen(),
     'recipe_detail': const RecipeDetailScreen(),
-    'exercise_detail': const ExerciseDetailScreen(),
     'onboarding_success': const OnboardingSuccessScreen(),
     'partner_dashboard': const PartnerDashboardScreen(),
     'partner_qr_gen': const PartnerQrGenScreen(),

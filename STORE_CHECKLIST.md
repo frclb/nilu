@@ -245,7 +245,7 @@ hangisinin geçerli olduğu belirsizleşir.
 
 ### Gizlilik etiketleri ⬜
 Politikanın 5. ve 6. bölümleri uygulamanın gerçekte kullandığı hizmetleri
-sayıyor: Firebase, Apple ile Giriş, RevenueCat, Google AdMob. App Store
+sayıyor: Firebase (anonim kimlik, partner eşleme), RevenueCat, Google AdMob. App Store
 gizlilik etiketleri bunlarla tutarlı olmalı — özellikle reklam kimliği ve
 kullanım verisi kalemleri. Partner paylaşımını "yakınlık durumu" olarak
 beyan edin; döngü verisi cihazdan çıkmıyor.
@@ -302,7 +302,7 @@ SDK'lara istek gitmiyor: RevenueCat anahtarsızken çağrı yapılsa süreç
 ```bash
 flutter analyze --fatal-infos && flutter test && dart run tool/check_localization.dart
 ```
-1049 test geçiyor.
+Üçü de temiz olmalı.
 
 **Derleme:**
 ```bash

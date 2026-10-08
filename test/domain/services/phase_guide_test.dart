@@ -13,7 +13,7 @@ void main() {
         expect(guidance.titleKey, isNotEmpty, reason: '$phase');
         expect(guidance.bodyKey, isNotEmpty, reason: '$phase');
         expect(guidance.tipKey, isNotEmpty, reason: '$phase');
-        expect(guidance.activityMinutes, greaterThan(0), reason: '$phase');
+        expect(guidance.activityTitleKey, isNotEmpty, reason: '$phase');
       }
     });
 

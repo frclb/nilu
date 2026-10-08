@@ -22,10 +22,9 @@ Dört harf, özel karakter yok, altı dilin hepsinde yazılıp okunabiliyor.
 > ve ilk kullanan üzerine kilitleniyor. Alınmışsa yedekler: *Nila*, *Ayla*,
 > *Neva*.
 
-Uygulamanın ana ekranda görünen adı (`CFBundleDisplayName`) hâlâ
-"Period Tracker" — karar kesinleşince o da değişmeli. Mağaza adı ile
-cihazdaki ad birebir aynı olmak zorunda değil ama birbirinden uzak
-düşmemeli.
+Uygulamanın ana ekranda görünen adı (`CFBundleDisplayName`) ve widget
+galerisindeki adı **Nilu**. Mağaza adı ile cihazdaki ad birebir aynı olmak
+zorunda değil ama birbirinden uzak düşmemeli.
 
 ### Ada eklenen açıklama dilden dile değişir
 
@@ -54,7 +53,8 @@ ağır dizinlediği yer ve tanınmayan bir markada keşfedilebilirlik metnin
 zarafetinden önce geliyor. Bu kategoride standart bir kalıp.
 
 Karşılığında anahtar kelimelerde yer açıldı: regl, adet ve takvim oradan
-çıktı, yerlerine **takip** ve **ağrı** girdi.
+çıktı, yerlerine **takip**, **ağrı**, **gebelik** ve **hamilelik** girdi.
+Gebelik modu uygulamanın ikinci büyük parçası; aranıyor ve ad alanında yok.
 
 Hangi terimin daha çok arandığını ölçemiyorum. Bedava bir sinyal var:
 App Store'un arama kutusuna "regl", "adet", "takvim", "takip" yazıp
@@ -80,7 +80,7 @@ Döngün sende kalır
 
 **Tanıtım metni**
 ```
-Bedenini tanımak için sakin bir yer. İşaretlediğin her şey telefonunda kalıyor — hesap yok, takip yok, kimseye gitmiyor.
+Bedenini tanımak için sakin bir yer. Döngün, gebeliğin ve notların telefonunda kalıyor — hesap yok, izleme yok.
 ```
 
 **Açıklama**
@@ -94,12 +94,22 @@ Regl uygulamalarının çoğu işaretlediğin günleri, belirtilerini ve notlar�
 GÜNLÜK HAYATINDA
 
 • Takvim — reglini işaretle, bir sonrakini ve doğurgan dönemini gör
-• Günlük — akış, ağrı, ruh hâli, uyku. Canın isterse iki kelime not
-• Analiz — döngün nasıl değişiyor, belirtilerin hangi evrede toplanıyor
+• Günlük — akış, ağrı, ruh hâli, belirtiler. Canın isterse iki kelime not
+• Geçmiş — bütün döngülerin, ortalaman, en kısa ve en uzun döngün
 • Kütüphane — hormonlar, beslenme, PMS ve ruh hâli üzerine kaynak gösterilen yazılar
-• Hareket — dönemine göre yoga akışları, esneme ve nefes egzersizleri
-• Apple Sağlık — kayıtlarını içeri al, işaretlediğin günleri geri yaz
+• Hareket — dönemine göre hafif yoga ve esneme akışları
+• Apple Sağlık — regl kayıtlarını içeri al; istersen işaretlediğin günleri geri yaz
 • Hatırlatıcılar — bildirimler telefonunda hazırlanır, içerikleri hiçbir yere gitmez
+• Ana ekran widget'ı — döngü günün, gebelik haftan ya da lohusalık günün bir bakışta
+
+GEBELİKTE VE DOĞUMDAN SONRA
+
+• Gebelik modu — hafta ve gün, ay ve trimester; tahmini doğum tarihi son reglinden ya da hekiminin verdiği tarihten
+• Sağlık Bakanlığı rehberine göre izlem ve tarama zamanları; kendi randevularını da ekleyebilirsin
+• Tehlike işaretleri — beklemeden başvurman gereken durumlar
+• Tansiyon ve kilo kaydı; muayenede ekrandan gösterebileceğin özet
+• Lohusalık — doğumdan sonraki 42 gün ve kanamanın seyri
+• Gebelik bitince regl takibine dönüş; geçmiş gebeliklerin saklanır
 
 GİZLİLİK SONRADAN EKLENMEDİ
 
@@ -110,7 +120,7 @@ Bir özellik listesine sıkıştırılmış bir madde değil; uygulama baştan b
 • Sağlık verin hiçbir koşulda reklam için kullanılmıyor
 • Ekran kilidi ücretsiz — Face ID ya da telefonunun şifresiyle
 • Yedeğini ve verinin okunabilir bir kopyasını istediğin an alabilirsin, ücretsiz
-• Hesabını ve her şeyini uygulamadan silebilirsin
+• Bütün verini uygulamanın içinden silebilirsin
 
 İSTERSEN PARTNERİNLE
 
@@ -120,22 +130,22 @@ Bazı günler anlatmak zor geliyor. Bu, anlatmanın sessiz bir yolu.
 
 PREMIUM
 
-• Tüm döngü geçmişin — ücretsiz sürüm son 3 döngüyü gösterir
+• Tüm geçmişle döngü trendi — trend grafiği ücretsiz sürümde son 3 döngüyü gösterir
 • Belirti–evre analizi — belirtilerin döngünün hangi evresinde yoğunlaşıyor
-• Hekime götürebileceğin özet ve tablo
+• Hekime götürebileceğin özet ve tabloyu dosya olarak paylaşma
 • Özel temalar
 • Reklamsız kullanım
 
-Ekran kilidi ve yedek alma premium'da değil. İkisi de herkese açık, öyle kalacak.
+Döngü geçmişinin listesi, gebelik modu, ekran kilidi ve yedek alma premium'da değil. Hepsi herkese açık, öyle kalacak.
 
 BİLMEN GEREKENLER
 
-Nilu tıbbi teşhis koymaz, tedavi önermez ve bir doğum kontrol yöntemi değildir. Tahminler geçmiş kayıtlarından hesaplanır, yani yaklaşıktır. Bedeninle ilgili bir endişen varsa bir hekime danış — uygulama onun yerini tutmaz.
+Nilu tıbbi teşhis koymaz, tedavi önermez ve bir doğum kontrol yöntemi değildir. Tahminler geçmiş kayıtlarından hesaplanır, yani yaklaşıktır. Gebelik modu hekim ve ebe izleminin yerini tutmaz. Bedeninle ilgili bir endişen varsa bir hekime danış.
 ```
 
 **Anahtar kelimeler**
 ```
-takip,döngü,ovulasyon,yumurtlama,doğurganlık,pms,semptom,kadın,periyot,gizlilik,günlük,ağrı
+takip,döngü,ovulasyon,yumurtlama,doğurganlık,gebelik,hamilelik,pms,semptom,kadın,ağrı
 ```
 
 ---
@@ -166,12 +176,22 @@ Most period apps move the days you log, your symptoms and your notes to their ow
 WHAT IT DOES
 
 • Calendar — mark your period, see predictions and your fertile window
-• Daily log — flow, pain, mood, sleep, notes
-• Insights — how your cycle length changes, which phase your symptoms cluster in
+• Daily log — flow, pain, mood, symptoms, notes
+• History — every cycle, your average, your shortest and longest cycle
 • Health library — sourced articles on hormones, nutrition, PMS and mood
-• Movement — yoga flows, stretches and breathing exercises matched to your phase
-• Apple Health — import your period records, write the days you mark back
+• Movement — gentle yoga and stretching flows matched to your phase
+• Apple Health — import your period records and, if you want, write the days you mark back
 • Reminders — notifications are built on your device and their contents go nowhere
+• Home Screen widget — your cycle day, pregnancy week or postnatal day at a glance
+
+PREGNANCY AND AFTER BIRTH
+
+• Pregnancy mode — weeks and days, month and trimester; due date from your last period or the date your clinician gave you
+• Add your checkups and appointments and get reminders
+• Warning signs — when to seek care without waiting
+• Blood pressure and weight log; a summary you can show at your appointment
+• Postnatal period — the 42 days after birth and how your bleeding changes
+• Back to cycle tracking when your pregnancy ends; past pregnancies are kept
 
 PRIVACY ISN'T A FEATURE HERE, IT'S THE ARCHITECTURE
 
@@ -180,7 +200,7 @@ PRIVACY ISN'T A FEATURE HERE, IT'S THE ARCHITECTURE
 • Your health data is never used for ad targeting
 • App lock is free — Face ID or your device passcode
 • You can export a backup and a machine-readable copy of your data at any time, free
-• You can delete your account and all your data from inside the app
+• You can delete all your data from inside the app
 
 PARTNER SHARING — IF YOU WANT IT
 
@@ -188,22 +208,22 @@ Only the closeness status you choose to share reaches your partner. Your cycle d
 
 PREMIUM
 
-• Your full cycle history — the free version shows the last 3 cycles
+• Cycle trend across your whole history — the free trend chart shows your last 3 cycles
 • Symptom–phase analysis — which phase your symptoms concentrate in
-• A summary and table you can take to your doctor
+• Share a summary and table for your doctor as a file
 • Custom themes
 • No ads
 
-App lock and backups are not behind the paywall. Both are free for everyone.
+Your cycle history list, pregnancy mode, app lock and backups are not behind the paywall. They are free for everyone.
 
 WHAT YOU SHOULD KNOW
 
-Nilu does not diagnose, does not prescribe treatment, and is not a contraceptive method. Predictions are calculated from your past entries and are approximate. If you're worried about your health, talk to a doctor.
+Nilu does not diagnose, does not prescribe treatment, and is not a contraceptive method. Predictions are calculated from your past entries and are approximate. Pregnancy mode does not replace care from your doctor or midwife. If you're worried about your health, talk to a doctor.
 ```
 
 **Keywords**
 ```
-menstrual,ovulation,fertility,pms,symptom,calendar,privacy,women,diary,mood,cramps,log
+menstrual,ovulation,fertility,pregnancy,pms,symptom,calendar,privacy,women,diary,cramps
 ```
 
 ---
@@ -234,12 +254,22 @@ Die meisten Perioden-Apps übertragen deine eingetragenen Tage, Symptome und Not
 WAS DIE APP KANN
 
 • Kalender — Periode eintragen, Vorhersagen und fruchtbare Tage sehen
-• Tägliches Protokoll — Blutung, Schmerzen, Stimmung, Schlaf, Notizen
-• Auswertung — wie sich deine Zykluslänge verändert, in welcher Phase sich Symptome häufen
+• Tägliches Protokoll — Blutung, Schmerzen, Stimmung, Symptome, Notizen
+• Verlauf — alle Zyklen, dein Durchschnitt, dein kürzester und längster Zyklus
 • Gesundheitsbibliothek — belegte Artikel zu Hormonen, Ernährung, PMS und Stimmung
-• Bewegung — Yoga, Dehnung und Atemübungen passend zur Zyklusphase
-• Apple Health — Periodendaten importieren und eingetragene Tage zurückschreiben
+• Bewegung — sanfte Yoga- und Dehnabläufe passend zur Zyklusphase
+• Apple Health — Periodendaten importieren und, wenn du willst, eingetragene Tage zurückschreiben
 • Erinnerungen — Mitteilungen entstehen auf deinem Gerät, ihre Inhalte gehen nirgendwohin
+• Widget für den Home-Bildschirm — Zyklustag, Schwangerschaftswoche oder Tag im Wochenbett auf einen Blick
+
+SCHWANGERSCHAFT UND NACH DER GEBURT
+
+• Schwangerschaftsmodus — Wochen und Tage, Monat und Trimester; errechneter Geburtstermin aus deiner letzten Periode oder der Termin, den dir deine Ärztin genannt hat
+• Vorsorgetermine eintragen und erinnert werden
+• Warnzeichen — wann du nicht warten solltest
+• Blutdruck und Gewicht eintragen; eine Übersicht zum Zeigen beim Termin
+• Wochenbett — die 42 Tage nach der Geburt und der Verlauf der Blutung
+• Nach der Schwangerschaft zurück zum Zyklus; frühere Schwangerschaften bleiben gespeichert
 
 DATENSCHUTZ IST HIER KEIN FEATURE, SONDERN DIE BAUWEISE
 
@@ -248,7 +278,7 @@ DATENSCHUTZ IST HIER KEIN FEATURE, SONDERN DIE BAUWEISE
 • Deine Gesundheitsdaten werden nie für Werbung genutzt
 • App-Sperre ist kostenlos — Face ID oder Gerätecode
 • Du kannst jederzeit ein Backup und eine maschinenlesbare Kopie deiner Daten exportieren, kostenlos
-• Du kannst Konto und Daten vollständig in der App löschen
+• Du kannst alle deine Daten in der App löschen
 
 PARTNER-FREIGABE — WENN DU WILLST
 
@@ -256,17 +286,17 @@ Bei deinem Partner kommt nur der Nähe-Status an, den du teilst. Zyklusdaten, Sy
 
 PREMIUM
 
-• Deine gesamte Zyklushistorie — die kostenlose Version zeigt die letzten 3 Zyklen
+• Zyklustrend über deinen ganzen Verlauf — kostenlos zeigt das Trenddiagramm die letzten 3 Zyklen
 • Symptom-Phasen-Analyse
-• Zusammenfassung und Tabelle für den Arztbesuch
-• Eigene Designs
-• Keine Werbung
+• Zusammenfassung und Tabelle für den Arztbesuch als Datei teilen
+• Eigene Themes
+• Ohne Werbung
 
-App-Sperre und Backup stehen nicht hinter der Bezahlschranke. Beides ist für alle kostenlos.
+Zyklusverlauf, Schwangerschaftsmodus, App-Sperre und Backup stehen nicht hinter der Bezahlschranke. Alles ist für alle kostenlos.
 
 WAS DU WISSEN SOLLTEST
 
-Nilu stellt keine Diagnose, empfiehlt keine Behandlung und ist kein Verhütungsmittel. Vorhersagen werden aus deinen früheren Einträgen berechnet und sind ungefähr. Bei gesundheitlichen Sorgen wende dich an eine Ärztin oder einen Arzt.
+Nilu stellt keine Diagnose, empfiehlt keine Behandlung und ist kein Verhütungsmittel. Vorhersagen werden aus deinen früheren Einträgen berechnet und sind ungefähr. Der Schwangerschaftsmodus ersetzt nicht die Betreuung durch Ärztin, Arzt oder Hebamme. Bei gesundheitlichen Sorgen wende dich an eine Ärztin oder einen Arzt.
 ```
 
 **Keywords**
@@ -302,12 +332,22 @@ La mayoría de las apps de regla llevan los días que registras, tus síntomas y
 QUÉ HACE
 
 • Calendario — marca tu regla y consulta las previsiones y los días fértiles
-• Registro diario — flujo, dolor, ánimo, sueño y notas
-• Análisis — cómo cambia la duración de tu ciclo y en qué fase se concentran tus síntomas
+• Registro diario — flujo, dolor, ánimo, síntomas y notas
+• Historial — todos tus ciclos, tu media, tu ciclo más corto y el más largo
 • Biblioteca de salud — artículos con fuentes sobre hormonas, alimentación, SPM y ánimo
-• Movimiento — yoga, estiramientos y respiración según la fase del ciclo
-• Apple Salud — importa tus registros y devuelve los días que marcas
+• Movimiento — yoga suave y estiramientos según la fase del ciclo
+• Apple Salud — importa tus registros de regla y, si quieres, guarda allí los días que marcas
 • Recordatorios — las notificaciones se crean en tu dispositivo y su contenido no va a ninguna parte
+• Widget de pantalla de inicio — tu día del ciclo, tu semana de embarazo o tu día de posparto de un vistazo
+
+EMBARAZO Y DESPUÉS DEL PARTO
+
+• Modo embarazo — semanas y días, mes y trimestre; fecha prevista de parto según tu última regla o la que te dio tu médico
+• Añade tus controles y citas y recibe recordatorios
+• Señales de alarma — cuándo acudir sin esperar
+• Registro de tensión y peso; un resumen para enseñar en la consulta
+• Posparto — los 42 días tras el parto y la evolución del sangrado
+• Al terminar el embarazo vuelves al seguimiento del ciclo; los embarazos anteriores se guardan
 
 AQUÍ LA PRIVACIDAD NO ES UNA FUNCIÓN, ES LA ESTRUCTURA
 
@@ -316,7 +356,7 @@ AQUÍ LA PRIVACIDAD NO ES UNA FUNCIÓN, ES LA ESTRUCTURA
 • Tus datos de salud nunca se usan para segmentar anuncios
 • El bloqueo de la app es gratis — con Face ID o el código del dispositivo
 • Puedes exportar una copia de seguridad y una copia legible por máquina cuando quieras, gratis
-• Puedes borrar tu cuenta y tus datos desde la propia app
+• Puedes borrar todos tus datos desde la propia app
 
 COMPARTIR CON TU PAREJA — SI QUIERES
 
@@ -324,17 +364,17 @@ A tu pareja solo le llega el estado de cercanía que decides compartir. Ni las f
 
 PREMIUM
 
-• Todo tu historial de ciclos — la versión gratuita muestra los 3 últimos
-• Análisis de síntomas por fase
-• Resumen y tabla para llevar al médico
-• Temas propios
+• Tendencia del ciclo con todo tu historial — gratis, el gráfico muestra los 3 últimos ciclos
+• Análisis síntoma–fase
+• Compartir como archivo un resumen y una tabla para tu médico
+• Temas personalizados
 • Sin anuncios
 
-El bloqueo de la app y las copias de seguridad no están detrás del muro de pago. Son gratis para todo el mundo.
+El historial de ciclos, el modo embarazo, el bloqueo de la app y las copias de seguridad no están detrás del muro de pago. Son gratis para todo el mundo.
 
 LO QUE DEBES SABER
 
-Nilu no diagnostica, no recomienda tratamientos y no es un método anticonceptivo. Las previsiones se calculan a partir de tus registros anteriores y son aproximadas. Si te preocupa tu salud, consulta a un profesional médico.
+Nilu no diagnostica, no recomienda tratamientos y no es un método anticonceptivo. Las previsiones se calculan a partir de tus registros anteriores y son aproximadas. El modo embarazo no sustituye el seguimiento de tu médico o matrona. Si te preocupa tu salud, consulta a un profesional médico.
 ```
 
 **Palabras clave**
@@ -370,12 +410,22 @@ La plupart des applis de règles envoient les jours que tu notes, tes symptômes
 CE QU'ELLE FAIT
 
 • Calendrier — note tes règles, vois les prévisions et ta période fertile
-• Journal quotidien — flux, douleurs, humeur, sommeil, notes
-• Analyses — comment la durée de ton cycle évolue, à quelle phase tes symptômes se concentrent
+• Journal quotidien — flux, douleurs, humeur, symptômes, notes
+• Historique — tous tes cycles, ta moyenne, ton cycle le plus court et le plus long
 • Bibliothèque santé — des articles sourcés sur les hormones, l'alimentation, le SPM et l'humeur
-• Mouvement — yoga, étirements et respiration adaptés à ta phase
-• Apple Santé — importe tes règles et réécris les jours que tu notes
+• Mouvement — yoga doux et étirements adaptés à ta phase
+• Apple Santé — importe tes règles et, si tu veux, enregistre-y les jours que tu notes
 • Rappels — les notifications sont créées sur ton appareil et leur contenu ne part nulle part
+• Widget d'écran d'accueil — ton jour du cycle, ta semaine de grossesse ou ton jour de post-partum en un coup d'œil
+
+GROSSESSE ET APRÈS LA NAISSANCE
+
+• Mode grossesse — semaines et jours, mois et trimestre ; terme calculé à partir de tes dernières règles ou de la date donnée par ton médecin
+• Ajoute tes consultations et rendez-vous et reçois des rappels
+• Signes d'alerte — quand consulter sans attendre
+• Suivi de la tension et du poids ; un résumé à montrer en consultation
+• Post-partum — les 42 jours après la naissance et l'évolution des saignements
+• Retour au suivi du cycle à la fin de la grossesse ; les grossesses passées sont conservées
 
 ICI LA CONFIDENTIALITÉ N'EST PAS UNE OPTION, C'EST L'ARCHITECTURE
 
@@ -384,7 +434,7 @@ ICI LA CONFIDENTIALITÉ N'EST PAS UNE OPTION, C'EST L'ARCHITECTURE
 • Tes données de santé ne servent jamais au ciblage publicitaire
 • Le verrouillage de l'app est gratuit — Face ID ou code de l'appareil
 • Tu peux exporter une sauvegarde et une copie lisible par machine quand tu veux, gratuitement
-• Tu peux supprimer ton compte et tes données depuis l'app
+• Tu peux supprimer toutes tes données depuis l'app
 
 PARTAGE AVEC UN PARTENAIRE — SI TU VEUX
 
@@ -392,17 +442,17 @@ Seul l'état de proximité que tu choisis de partager lui parvient. Ni tes dates
 
 PREMIUM
 
-• Tout ton historique de cycles — la version gratuite affiche les 3 derniers
-• Analyse symptômes–phase
-• Un résumé et un tableau à emporter chez le médecin
+• Tendance du cycle sur tout ton historique — en version gratuite, le graphique montre les 3 derniers cycles
+• Analyse symptôme–phase
+• Partager en fichier un résumé et un tableau pour ton médecin
 • Thèmes personnalisés
 • Sans publicité
 
-Le verrouillage et les sauvegardes ne sont pas derrière le paywall. Les deux sont gratuits pour tout le monde.
+L'historique des cycles, le mode grossesse, le verrouillage et les sauvegardes ne sont pas derrière le paywall. Tout cela est gratuit pour tout le monde.
 
 CE QU'IL FAUT SAVOIR
 
-Nilu ne pose pas de diagnostic, ne prescrit aucun traitement et n'est pas un moyen de contraception. Les prévisions sont calculées à partir de tes saisies passées et restent approximatives. En cas d'inquiétude, consulte un médecin.
+Nilu ne pose pas de diagnostic, ne prescrit aucun traitement et n'est pas un moyen de contraception. Les prévisions sont calculées à partir de tes saisies passées et restent approximatives. Le mode grossesse ne remplace pas le suivi par ton médecin ou ta sage-femme. En cas d'inquiétude, consulte un médecin.
 ```
 
 **Mots-clés**
@@ -421,61 +471,71 @@ Nilu · Ciclo Menstrual
 
 **Subtítulo**
 ```
-O teu ciclo fica no telemóvel
+Seu ciclo fica no seu celular
 ```
 
 **Texto promocional**
 ```
-Regista a menstruação e entende o teu ciclo. Os dados ficam no teu dispositivo, não num servidor — sem conta e sem rastreio.
+Registre a menstruação e entenda seu ciclo. Seus dados ficam no seu aparelho, não num servidor — sem conta e sem rastreamento.
 ```
 
 **Descrição**
 ```
-Os dados do teu ciclo não saem do telemóvel.
+Os dados do seu ciclo não saem do seu celular.
 
-A maioria das apps de menstruação leva os dias que registas, os sintomas e as notas para os seus próprios servidores. Nilu não. Fica tudo cifrado no teu dispositivo. Não precisas de criar conta.
+A maioria dos apps de menstruação leva os dias que você registra, seus sintomas e suas anotações para os próprios servidores. O Nilu não. Tudo fica criptografado no seu aparelho. Você não precisa criar conta.
 
-O QUE FAZ
+O QUE ELE FAZ
 
-• Calendário — marca a menstruação e vê as previsões e o período fértil
-• Registo diário — fluxo, dores, humor, sono e notas
-• Análises — como muda a duração do teu ciclo e em que fase se concentram os sintomas
-• Biblioteca de saúde — artigos com fontes sobre hormonas, alimentação, TPM e humor
-• Movimento — ioga, alongamentos e respiração conforme a fase do ciclo
-• Apple Saúde — importa os teus registos e devolve os dias que marcas
-• Lembretes — as notificações são criadas no teu dispositivo e o conteúdo não vai a lado nenhum
+• Calendário — marque a menstruação e veja as previsões e o período fértil
+• Registro diário — fluxo, dor, humor, sintomas e anotações
+• Histórico — todos os seus ciclos, sua média, seu ciclo mais curto e o mais longo
+• Biblioteca de saúde — artigos com fontes sobre hormônios, alimentação, TPM e humor
+• Movimento — ioga leve e alongamentos de acordo com a fase do ciclo
+• Apple Saúde — importe seus registros de menstruação e, se quiser, grave lá os dias que você marca
+• Lembretes — as notificações são criadas no seu aparelho e o conteúdo não vai para lugar nenhum
+• Widget da Tela de Início — seu dia do ciclo, sua semana de gravidez ou seu dia de pós-parto num relance
 
-AQUI A PRIVACIDADE NÃO É UMA FUNCIONALIDADE, É A ESTRUTURA
+GRAVIDEZ E DEPOIS DO PARTO
 
-• Os dados do teu ciclo não saem do dispositivo
-• Os anúncios não são personalizados; sem identificador de publicidade nem pedido de rastreio
-• Os teus dados de saúde nunca são usados para segmentar anúncios
-• O bloqueio da app é gratuito — Face ID ou código do dispositivo
-• Podes exportar uma cópia de segurança e uma cópia legível por máquina quando quiseres, grátis
-• Podes apagar a conta e os dados dentro da própria app
+• Modo gravidez — semanas e dias, mês e trimestre; data provável do parto pela última menstruação ou pela data que seu médico informou
+• Adicione suas consultas e exames e receba lembretes
+• Sinais de alerta — quando procurar atendimento sem esperar
+• Registro de pressão e peso; um resumo para mostrar na consulta
+• Pós-parto — os 42 dias depois do parto e a evolução do sangramento
+• Quando a gravidez termina, você volta a acompanhar o ciclo; as gestações anteriores ficam guardadas
 
-PARTILHA COM O PARCEIRO — SE QUISERES
+AQUI A PRIVACIDADE NÃO É UM RECURSO, É A ESTRUTURA
 
-Ao teu parceiro chega apenas o estado de proximidade que escolhes partilhar. As datas do ciclo, os sintomas e as notas não. Podes retirar o acesso quando quiseres; o código partilhado é anulável.
+• Os dados do seu ciclo não saem do aparelho
+• Os anúncios não são personalizados; sem identificador de publicidade e sem pedido de rastreamento
+• Seus dados de saúde nunca são usados para segmentar anúncios
+• O bloqueio do app é gratuito — com Face ID ou o código do aparelho
+• Você pode exportar um backup e uma cópia legível por máquina quando quiser, de graça
+• Você pode apagar todos os seus dados dentro do próprio app
+
+COMPARTILHAR COM SEU PARCEIRO — SE QUISER
+
+Ao seu parceiro chega apenas o status de proximidade que você escolhe compartilhar. As datas do ciclo, os sintomas e as anotações não. Você pode retirar o acesso quando quiser; o código compartilhado pode ser cancelado.
 
 PREMIUM
 
-• Todo o teu histórico de ciclos — a versão gratuita mostra os últimos 3
+• Tendência do ciclo com todo o seu histórico — na versão gratuita, o gráfico mostra os últimos 3 ciclos
 • Análise sintoma–fase
-• Um resumo e uma tabela para levar ao médico
-• Temas próprios
+• Compartilhar como arquivo um resumo e uma tabela para o seu médico
+• Temas personalizados
 • Sem anúncios
 
-O bloqueio da app e as cópias de segurança não estão atrás da barreira de pagamento. Ambos são gratuitos para toda a gente.
+O histórico de ciclos, o modo gravidez, o bloqueio do app e os backups não ficam atrás do paywall. São gratuitos para todo mundo.
 
-O QUE DEVES SABER
+O QUE VOCÊ PRECISA SABER
 
-Nilu não diagnostica, não receita tratamentos e não é um método contracetivo. As previsões são calculadas a partir dos teus registos anteriores e são aproximadas. Se estiveres preocupada com a tua saúde, fala com um médico.
+O Nilu não faz diagnóstico, não indica tratamento e não é um método contraceptivo. As previsões são calculadas a partir dos seus registros anteriores e são aproximadas. O modo gravidez não substitui o acompanhamento do seu médico ou da sua obstetriz. Se estiver preocupada com a sua saúde, fale com um médico.
 ```
 
 **Palavras-chave**
 ```
-menstruacao,periodo,ovulacao,fertilidade,tpm,sintomas,calendario,mulher,saude,privacidade,diario
+menstruacao,periodo,ovulacao,fertilidade,tpm,sintomas,calendario,gravidez,saude,privacidade
 ```
 
 ---
@@ -492,7 +552,16 @@ hem ret sebebi hem kötü bir yorum sebebi. Liste
 [STORE_CHECKLIST.md](STORE_CHECKLIST.md) §4'teki beyanlarla eşleşiyor.
 
 **Premium listesi paywall ile birebir aynı.** İkisi ayrışırsa kullanıcı
-ödediğini bulamaz. Kaynak: `premium_feature_*` anahtarları.
+ödediğini bulamaz. Kaynak: `premium_feature_*` anahtarları. Döngü
+geçmişinin listesi ücretsiz (`CycleHistoryCard`); Premium'un kattığı, tüm
+geçmişle trend grafiği.
+
+**Portekizce Brezilya Portekizcesi (pt-BR).** Uygulamanın `pt.json`'u da
+aynı lehçede: "você", "celular", "registro". App Store Connect'te dil
+**Portuguese (Brazil)** seçilmeli; Portekiz için ayrı yerelleştirme yok.
+
+**Uyku kaydı ve nefes egzersizi yazılmıyor.** Önceki metin ikisini de
+vaat ediyordu; uygulamada ikisi de yok. Sağlık'tan yalnızca regl okunuyor.
 
 **Tıbbi uyarı her dilde var.** İnceleme sağlık iddialarına bakıyor ve
 uygulama zaten Şartlar'da teşhis koymadığını söylüyor; mağaza metni de

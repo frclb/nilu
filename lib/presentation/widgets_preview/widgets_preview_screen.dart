@@ -1,113 +1,126 @@
 import 'package:flutter/material.dart';
-import '../../design_system/app_scrim.dart';
-import '../../design_system/app_tokens.dart';
-import '../../design_system/content_illustration.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:math' as math;
-import '../../localization/app_localizations.dart';
-import '../../design_system/app_layout.dart';
+import 'package:provider/provider.dart';
 
+import '../../design_system/app_layout.dart';
+import '../../design_system/app_tokens.dart';
+import '../../domain/models/home_widget_entry.dart';
+import '../../domain/view_models/pregnancy_view_model.dart';
+import '../../localization/app_localizations.dart';
+import '../calendar/view_models/calendar_view_model.dart';
+import 'home_widget_plan.dart';
+
+/// Ana ekran widget'ının tanıtımı.
+///
+/// Önceden örnek verilerle çizilmiş üç widget gösteriyordu: "14. gün",
+/// "8 gün kaldı", bir "günün önerisi" ve "Ayşe" adlı bir partnerin evresi.
+/// Uygulamada ne öneri widget'ı ne partner widget'ı vardı; gösterilen
+/// sayılar da kullanıcının değildi. Artık gerçek widget'ın bugün
+/// göstereceği içerik, aynı plandan (bkz. [HomeWidgetPlan]) çiziliyor.
 class WidgetsPreviewScreen extends StatelessWidget {
   const WidgetsPreviewScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final t = context.tokens;
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    // Base colors matching HTML
-    final bgColor = context.tokens.background;
-    final primaryColor = Theme.of(context).colorScheme.primary; // #551b26 HTML
-    final accentSoft = isDark
-        ? context.tokens.surfaceAlt
-        : context.tokens.brandTint;
-
-    final textMainColor = context.tokens.text;
-
-    // Card background
-    final cardBgColor = context.tokens.surface;
-    final borderColor = isDark
-        ? accentSoft.withValues(alpha: 0.1)
-        : accentSoft.withValues(alpha: 0.3);
+    final takvim = context.watch<CalendarViewModel>();
+    final gebelik = context.watch<PregnancyViewModel>();
+    final bugun = HomeWidgetPlan.entryFor(
+      context,
+      DateTime.now(),
+      cycle: takvim.cycleInfo,
+      pregnancies: gebelik.pregnancies,
+      afterPregnancy: takvim.cycleBreaks.isNotEmpty,
+    );
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: t.background,
       appBar: AppBar(
-        backgroundColor: context.tokens.surface,
+        backgroundColor: t.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: primaryColor),
+          icon: Icon(Icons.arrow_back, color: theme.colorScheme.primary),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => context.pop(),
         ),
         title: Text(
           context.tr('widgets_title'),
           style: TextStyle(
-            color: textMainColor,
+            color: t.text,
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            letterSpacing: -0.15,
           ),
         ),
-        actions: const [
-          SizedBox(width: 48), // For centering title accurately
-        ],
       ),
       body: AppContentWidth(
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 24.0,
-            ),
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildSmallWidgetSection(
-                  context,
-                  primaryColor,
-                  accentSoft,
-                  cardBgColor,
-                  borderColor,
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            children: [
+              _Baslik(context.tr('widgets_small_title')),
+              Center(
+                child: _Cerceve(
+                  key: const Key('widget_preview_small'),
+                  width: 160,
+                  height: 160,
+                  child: _KucukIcerik(entry: bugun),
                 ),
-                const SizedBox(height: 32),
-                _buildMediumWidgetSection(
-                  context,
-                  primaryColor,
-                  accentSoft,
-                  cardBgColor,
-                  borderColor,
-                ),
-                const SizedBox(height: 32),
-                _buildPartnerWidgetSection(
-                  context,
-                  primaryColor,
-                  accentSoft,
-                  cardBgColor,
-                  borderColor,
-                ),
-                const SizedBox(height: 32),
-              ],
-            ),
+              ),
+              const SizedBox(height: 32),
+              _Baslik(context.tr('widgets_medium_title')),
+              _Cerceve(
+                key: const Key('widget_preview_medium'),
+                height: 160,
+                child: _OrtaIcerik(entry: bugun),
+              ),
+              const SizedBox(height: 32),
+              _Not(
+                icon: Icons.add_to_home_screen_outlined,
+                text: context.tr('widgets_how_to_add'),
+              ),
+              const SizedBox(height: 12),
+              _Not(
+                icon: Icons.lock_outline,
+                text: context.tr('widgets_privacy_note'),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildSectionHeader(
-    BuildContext context,
-    String title,
-    Color primaryColor,
-  ) {
+/// `CycleWidget.swift`teki renklerin uygulama karşılığı.
+Color _renk(BuildContext context, String key) {
+  final t = context.tokens;
+  return switch (key) {
+    'menstruation' => t.flow,
+    'follicular' => t.phaseFollicular,
+    'ovulation' => t.ovulation,
+    'luteal' => t.phaseLuteal,
+    'suppressed' => t.phaseSuppressed,
+    'pregnancy' || 'postpartum' => t.accent,
+    _ => Theme.of(context).colorScheme.primary,
+  };
+}
+
+class _Baslik extends StatelessWidget {
+  const _Baslik(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0, left: 4.0),
+      padding: const EdgeInsets.only(bottom: 16, left: 4),
       child: Text(
-        context.upper(title),
+        context.upper(text),
         style: TextStyle(
-          color: primaryColor,
+          color: Theme.of(context).colorScheme.primary,
           fontSize: 14,
           fontWeight: FontWeight.w600,
           letterSpacing: 1.0,
@@ -115,391 +128,239 @@ class WidgetsPreviewScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildSmallWidgetSection(
-    BuildContext context,
-    Color primaryColor,
-    Color accentSoft,
-    Color cardBgColor,
-    Color borderColor,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader(
-          context,
-          context.tr('widgets_small_title'),
-          primaryColor,
-        ),
-        Center(
-          child: Container(
-            width: 160,
-            height: 160,
-            decoration: BoxDecoration(
-              color: cardBgColor,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: borderColor),
-              boxShadow: [
-                BoxShadow(
-                  color: primaryColor.withValues(alpha: 0.08),
-                  blurRadius: 20,
-                  offset: const Offset(0, 4),
-                  spreadRadius: -2,
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 96,
-                  width: 96,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Circular background progress
-                      Transform.rotate(
-                        angle: -math.pi / 2,
-                        child: CircularProgressIndicator(
-                          value: 1.0,
-                          strokeWidth: 6,
-                          color: accentSoft,
-                        ),
-                      ),
-                      // Circular actual progress
-                      Transform.rotate(
-                        angle: -math.pi / 2,
-                        child: CircularProgressIndicator(
-                          value: 14 / 28, // Example logic
-                          strokeWidth: 6,
-                          color: primaryColor,
-                          strokeCap: StrokeCap.round,
-                        ),
-                      ),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            "14",
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              height: 1.0,
-                            ),
-                          ),
-                          Text(
-                            context.tr('widgets_days_uppercase'),
-                            style: TextStyle(
-                              color: primaryColor.withValues(alpha: 0.6),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  context.tr('widgets_phase_example'),
-                  style: TextStyle(
-                    color: primaryColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
+class _Cerceve extends StatelessWidget {
+  const _Cerceve({
+    super.key,
+    this.width,
+    required this.height,
+    required this.child,
+  });
+
+  final double? width;
+  final double height;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: t.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: t.border),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: child,
     );
   }
+}
 
-  Widget _buildMediumWidgetSection(
-    BuildContext context,
-    Color primaryColor,
-    Color accentSoft,
-    Color cardBgColor,
-    Color borderColor,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader(
-          context,
-          context.tr('widgets_medium_title'),
-          primaryColor,
-        ),
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: cardBgColor,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: borderColor),
-            boxShadow: [
-              BoxShadow(
-                color: primaryColor.withValues(alpha: 0.08),
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-                spreadRadius: -2,
-              ),
-            ],
+class _Etiket extends StatelessWidget {
+  const _Etiket(this.entry);
+
+  final HomeWidgetEntry entry;
+
+  @override
+  Widget build(BuildContext context) => Text(
+    entry.label,
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,
+    style: TextStyle(
+      fontSize: 10,
+      fontWeight: FontWeight.w600,
+      letterSpacing: 1,
+      color: _renk(context, entry.colorKey),
+    ),
+  );
+}
+
+class _Bos extends StatelessWidget {
+  const _Bos(this.entry);
+
+  final HomeWidgetEntry entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.edit_calendar_outlined, color: t.textMuted, size: 28),
+          const SizedBox(height: 6),
+          Text(
+            entry.detail,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, color: t.textMuted),
           ),
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        context.tr('widgets_next_period_uppercase'),
-                        style: TextStyle(
-                          color: primaryColor.withValues(alpha: 0.6),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text(
-                            "8",
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              height: 1.1,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            context.tr('widgets_days_left'),
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+        ],
+      ),
+    );
+  }
+}
+
+class _KucukIcerik extends StatelessWidget {
+  const _KucukIcerik({required this.entry});
+
+  final HomeWidgetEntry entry;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!entry.hasData) return _Bos(entry);
+    final t = context.tokens;
+    final ikincil = TextStyle(fontSize: 11, color: t.textMuted);
+    return Semantics(
+      label: entry.spoken,
+      excludeSemantics: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _Etiket(entry),
+          const SizedBox(height: 4),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              entry.value,
+              style: TextStyle(
+                fontFamily: 'serif',
+                fontSize: 40,
+                height: 1.1,
+                fontWeight: FontWeight.bold,
+                color: t.text,
+              ),
+            ),
+          ),
+          const Spacer(),
+          if (entry.caption.isNotEmpty)
+            Text(
+              entry.caption,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: ikincil,
+            ),
+          if (entry.detail.isNotEmpty)
+            Text(
+              entry.detail,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: ikincil,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OrtaIcerik extends StatelessWidget {
+  const _OrtaIcerik({required this.entry});
+
+  final HomeWidgetEntry entry;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!entry.hasData) return _Bos(entry);
+    final t = context.tokens;
+    final renk = _renk(context, entry.colorKey);
+    return Semantics(
+      label: entry.spoken,
+      excludeSemantics: true,
+      child: Row(
+        children: [
+          SizedBox(
+            width: 84,
+            height: 84,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox.expand(
+                  child: CircularProgressIndicator(
+                    value: entry.progress ?? 0,
+                    strokeWidth: 8,
+                    strokeCap: StrokeCap.round,
+                    color: renk,
+                    backgroundColor: renk.withAlpha(51),
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: accentSoft.withValues(alpha: 0.4),
-                      borderRadius: BorderRadius.circular(8),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      entry.value,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'serif',
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: t.text,
+                      ),
                     ),
-                    child: Icon(
-                      Icons.calendar_today,
-                      color: primaryColor,
-                      size: 24,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _Etiket(entry),
+                if (entry.caption.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    entry.caption,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: t.text,
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 16),
-              Container(
-                height: 1,
-                width: double.infinity,
-                color: accentSoft.withValues(alpha: 0.5),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: accentSoft.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: context.tokens.surface,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(color: AppScrim.veil(13), blurRadius: 4),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.lightbulb,
-                        color: primaryColor,
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            context.tr('widgets_daily_tip_uppercase'),
-                            style: TextStyle(
-                              color: primaryColor.withValues(alpha: 0.6),
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          Text(
-                            context.tr('widgets_daily_tip_example'),
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              height: 1.2,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                if (entry.detail.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    entry.detail,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12, color: t.textMuted),
+                  ),
+                ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
+}
 
-  Widget _buildPartnerWidgetSection(
-    BuildContext context,
-    Color primaryColor,
-    Color accentSoft,
-    Color cardBgColor,
-    Color borderColor,
-  ) {
-    return Column(
+class _Not extends StatelessWidget {
+  const _Not({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionHeader(
-          context,
-          context.tr('widgets_partner_title'),
-          primaryColor,
-        ),
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: cardBgColor,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: borderColor),
-            boxShadow: [
-              BoxShadow(
-                color: primaryColor.withValues(alpha: 0.08),
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-                spreadRadius: -2,
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              SizedBox(
-                height: 56,
-                width: 56,
-                child: Stack(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: primaryColor.withValues(alpha: 0.2),
-                          width: 2,
-                        ),
-                      ),
-                      child: const InitialAvatar(name: null, size: 64),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        height: 20,
-                        width: 20,
-                        decoration: BoxDecoration(
-                          color: primaryColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: context.tokens.surface,
-                            width: 2,
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.favorite,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          size: 10,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Ayşe",
-                          style: TextStyle(
-                            color: primaryColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: accentSoft,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            context.tr('widgets_partner_phase_example'),
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      context.tr('widgets_partner_tip_example'),
-                      style: TextStyle(
-                        color: primaryColor.withValues(alpha: 0.8),
-                        fontSize: 14,
-                        fontStyle: FontStyle.italic,
-                        height: 1.2,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+        Icon(icon, size: 20, color: t.textMuted),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 14, height: 1.4, color: t.textMuted),
           ),
         ),
       ],

@@ -161,7 +161,7 @@ açılıyor; tanıtım görüntüsü için orası daha iyi duruyor.
 flutter test
 ```
 
-46 dosyada 561 test var. Çoğu saf mantığı ve depolamayı kapsar (döngü
+173 dosyada 1900'ü aşkın test var (Ekim 2026). Çoğu saf mantığı ve depolamayı kapsar (döngü
 hesabı, tahmin, şifreli depolama, eski veri kurtarma, abonelik korumaları).
 Yanına üç tür daha eklendi:
 

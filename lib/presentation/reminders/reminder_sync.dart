@@ -1,6 +1,7 @@
 import 'care_plan_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/navigation/navigation_service.dart';
 import '../../data/local/reminder_scheduler.dart';
@@ -50,16 +51,42 @@ class _ReminderSyncState extends State<ReminderSync> {
   /// Aynı anda birden fazla planlama çalışmasın.
   bool _running = false;
 
-  /// Bu oturumda izin sorusu kapandı mı?
+  /// İzin sorusu kapandı mı?
   ///
   /// "Şimdi değil" hiçbir iz bırakmıyordu: plan imzası uygulanmadığı için
   /// bir sonraki yeniden çizimde `_sync` baştan çalışıyor ve kutu geri
   /// geliyordu. Kullanıcı kapatıyor, ekran tazeleniyor, kutu yine açılıyor.
   ///
-  /// Oturumla sınırlı: uygulamayı yeniden açtığında tekrar sorulur. Kalıcı
-  /// olarak susturmuyoruz çünkü hatırlatıcılar ayarlarda hâlâ açık görünüyor;
-  /// bir daha hiç sormamak kullanıcıya çalışmayan bir anahtar bırakırdı.
+  /// Kalıcı. Önceden oturumla sınırlıydı: "Şimdi değil" diyen kullanıcıya
+  /// gerekçe her açılışta yeniden çıkıyordu. Sistem istemini reddetmiş
+  /// kullanıcıya da — iOS istemi ikinci kez göstermediği için "Devam"
+  /// hiçbir şey yapmıyordu. Artık bir kez soruluyor; sonrası kullanıcının
+  /// elinde: ayar ekranı izin yokken bunu baştan söylüyor ve izin isteme
+  /// düğmesi orada (bkz. `NotificationSettingsScreen`).
   bool _permissionSettledThisSession = false;
+
+  static const String _askedKey = 'reminder_permission_asked';
+
+  Future<bool> _askedBefore() async {
+    if (_permissionSettledThisSession) return true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return _permissionSettledThisSession = prefs.getBool(_askedKey) ?? false;
+    } catch (e) {
+      debugPrint('Reminder permission flag unreadable: $e');
+      return false;
+    }
+  }
+
+  Future<void> _settle() async {
+    _permissionSettledThisSession = true;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_askedKey, true);
+    } catch (e) {
+      debugPrint('Reminder permission flag not saved: $e');
+    }
+  }
 
   Future<void> _sync(CalendarViewModel viewModel) async {
     if (_running) return;
@@ -132,20 +159,20 @@ class _ReminderSyncState extends State<ReminderSync> {
         return;
       }
 
-      if (_permissionSettledThisSession || !mounted) return;
+      if (await _askedBefore() || !mounted) return;
 
       final wantsToBeAsked = await _explainReminders(care.stage);
       if (!wantsToBeAsked) {
-        _permissionSettledThisSession = true;
+        await _settle();
         return;
       }
       if (!mounted) return;
 
       final granted = await _scheduler.requestPermission();
+      await _settle();
       if (!granted) {
         // iOS sistem istemini ikinci kez göstermiyor; tekrar sormanın
         // karşılığı yok.
-        _permissionSettledThisSession = true;
         return;
       }
       if (!mounted) return;
@@ -161,7 +188,8 @@ class _ReminderSyncState extends State<ReminderSync> {
   ///
   /// "Şimdi değil" sistem istemini hiç açmıyor: iOS onu bir kez gösterip bir
   /// daha göstermediği için, kullanıcının hazır olmadığı anda yakmak kalıcı
-  /// bir kayıp olurdu. Sonraki açılışta yeniden sorulur.
+  /// bir kayıp olurdu. Kutu bir daha kendiliğinden açılmıyor; izin ayar
+  /// ekranındaki düğmeyle istenebilir.
   ///
   /// Gerekçe evreye göre: gebelikte ve lohusalıkta regl ve doğurganlık
   /// tahmini yok, hatırlatıcılar kontroller için. Önceden gebe kullanıcıya

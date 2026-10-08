@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../design_system/app_scrim.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
+import '../../../domain/services/session_plan.dart';
 import '../../../localization/app_localizations.dart';
 
 class YogaContentSection extends StatelessWidget {
@@ -67,7 +68,10 @@ class YogaContentSection extends StatelessWidget {
               Expanded(
                 child: _buildStatCard(
                   icon: Icons.schedule,
-                  value: context.tr('duration_minutes', params: {'n': '20'}),
+                  value: context.tr(
+                    'duration_minutes',
+                    params: {'n': '${SessionPlan.yoga.total.inMinutes}'},
+                  ),
                   label: context.tr('yoga_stat_duration'),
                   cardColor: cardColor,
                   borderColor: borderColor,

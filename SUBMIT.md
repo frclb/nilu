@@ -43,7 +43,7 @@ olarak okur.
 flutter analyze --fatal-infos && flutter test && dart run tool/check_localization.dart
 ```
 
-Üçü de temiz olmalı. Şu an 1049 test geçiyor.
+Üçü de temiz olmalı (Ekim 2026: 1900'ü aşkın test).
 
 ---
 
@@ -154,12 +154,12 @@ eksik simge boyutu ve yetki/profil uyuşmazlığı.
 
 Gerçek cihazda mutlaka denenecekler — simülatörde çıkmayanlar:
 
-1. **Apple ile Giriş** (yetki gerekiyor, simülatörde doğrulanamaz)
+1. **Partner eşleme** (Firebase yapılandırıldıktan sonra; iki cihaz gerekiyor)
 2. **Push bildirim** (APNs)
 3. **Satın alma**, Sandbox hesabıyla: satın al → kapat/aç → "Satın alımları
    geri yükle" → iptal et
 4. **Gerçek reklam** dolduruyor mu; iPad'de bant genişliği dolduruyor mu
-5. **HealthKit** okuma/yazma
+5. **HealthKit**: regl okuma ve (ayar açıkken) yazma
 6. **Ayarlara yönlendirme** düğmesi uygulamanın kendi sayfasını açıyor mu
    (simülatörde Ayarlar kökünde açılıyor)
 
@@ -206,8 +206,9 @@ ama satın alma çalışmaz; ürünler "Missing Metadata"da bekler.
 - İletişim bilgisi
 - Demo hesabı: uygulamada zorunlu hesap yok, **gerekmiyor**
 - Notes alanına yaz:
-  - Verinin cihazda kaldığını, Apple ile Giriş'in yalnızca partner
-    eşlemesi için ve isteğe bağlı olduğunu
+  - Verinin cihazda kaldığını; partner eşlemesinin isteğe bağlı olduğunu ve
+    yalnızca anonim bir kimlik ile paylaşılmayı seçilen yakınlık durumunun
+    sunucuya gittiğini
   - Premium'u denemeleri için Sandbox hesabı ya da promosyon kodu
   - Uygulamanın teşhis koymadığını, içeriğin bilgilendirme amaçlı olduğunu
 

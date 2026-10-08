@@ -1,7 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 
-import '../../domain/services/widget_snapshot.dart';
+import '../../domain/models/home_widget_entry.dart';
 
 /// Ana ekran widget'ına veri yazar.
 ///
@@ -16,18 +18,38 @@ class WidgetDatasource {
 
   const WidgetDatasource();
 
-  /// Özeti paylaşılan depoya yazar ve widget'ı yeniler.
+  /// Önceki sürümün yazdığı anahtarlar. Yeni widget onları okumuyor;
+  /// paylaşılan depoda sağlık bilgisi gereksiz yere kalmasın.
+  static const List<String> _eskiAnahtarlar = [
+    'cycleDay',
+    'daysUntilPeriod',
+    'phaseKey',
+    'hasData',
+  ];
+
+  /// Önümüzdeki günlerin girdilerini yazar ve widget'ı yeniler.
+  ///
+  /// [staleText]: girdiler bittiğinde (uygulama uzun süre açılmadıysa)
+  /// widget'ın göstereceği metin. Anahtar adları `CycleWidget.swift` ile
+  /// aynı olmalı.
   ///
   /// Sessizce başarısız olur: widget güncellenemezse uygulamanın kendisi
   /// çalışmaya devam etmeli.
-  Future<void> publish(WidgetSnapshot snapshot) async {
+  Future<void> publish(
+    List<HomeWidgetEntry> entries, {
+    required String staleText,
+  }) async {
     try {
       await HomeWidget.setAppGroupId(appGroupId);
-
-      for (final entry in snapshot.toMap().entries) {
-        await HomeWidget.saveWidgetData(entry.key, entry.value);
+      await HomeWidget.saveWidgetData(
+        'entries',
+        jsonEncode([for (final e in entries) e.toJson()]),
+      );
+      await HomeWidget.saveWidgetData('staleText', staleText);
+      for (final k in _eskiAnahtarlar) {
+        // `null` anahtarı siliyor.
+        await HomeWidget.saveWidgetData<Object>(k, null);
       }
-
       await HomeWidget.updateWidget(iOSName: iOSWidgetName);
     } on Exception catch (e) {
       debugPrint('Widget update failed: $e');

@@ -6,6 +6,7 @@ import '../../../localization/app_localizations.dart';
 import '../../../core/navigation/navigation_service.dart';
 import '../../../core/navigation/route_names.dart';
 import '../../../domain/services/phase_guide.dart';
+import '../../../domain/services/session_plan.dart';
 import '../../calendar/view_models/calendar_view_model.dart';
 
 class DailySuggestionCard extends StatelessWidget {
@@ -123,67 +124,74 @@ class DailySuggestionCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.schedule,
-                                size: 14,
-                                color: theme.colorScheme.onSurface.withAlpha(
-                                  153,
+                          // Süre seansın kendisinden: kart "10 dk" yazıp
+                          // 17 dakikalık akışı açıyordu.
+                          if (guidance.activity.hasSession)
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.schedule,
+                                  size: 14,
+                                  color: theme.colorScheme.onSurface.withAlpha(
+                                    153,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                context.tr(
-                                  'duration_minutes',
-                                  params: {'n': '${guidance.activityMinutes}'},
+                                const SizedBox(width: 4),
+                                Text(
+                                  context.tr(
+                                    'duration_minutes',
+                                    params: {
+                                      'n':
+                                          '${SessionPlan.yoga.total.inMinutes}',
+                                    },
+                                  ),
+                                  style: theme.textTheme.labelLarge?.copyWith(
+                                    fontSize: 10,
+                                  ),
                                 ),
-                                style: theme.textTheme.labelLarge?.copyWith(
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
                         ],
                       ),
                       const SizedBox(height: 8),
                       Text(
                         context.tr(guidance.activityDescKey),
-                        maxLines: 2,
+                        maxLines: guidance.activity.hasSession ? 2 : 4,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.labelLarge?.copyWith(
                           fontSize: 12,
                           height: 1.5,
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            NavigationService().push(
-                              detailRouteFor(guidance.activity),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.colorScheme.primary,
-                            foregroundColor: theme.colorScheme.onPrimary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                      if (guidance.activity.hasSession) ...[
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton.icon(
+                            key: const Key('suggestion_start'),
+                            onPressed: () {
+                              NavigationService().push(RouteNames.yogaDetail);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.colorScheme.primary,
+                              foregroundColor: theme.colorScheme.onPrimary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
                             ),
-                            elevation: 0,
-                          ),
-                          icon: const Icon(Icons.play_arrow, size: 20),
-                          label: Text(
-                            context.tr('home_start_button'),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                            icon: const Icon(Icons.play_arrow, size: 20),
+                            label: Text(
+                              context.tr('home_start_button'),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -207,19 +215,3 @@ class DailySuggestionCard extends StatelessWidget {
     PhaseActivity.gentle => Icons.favorite_border,
   };
 }
-
-/// Önerinin açacağı detay ekranı.
-///
-/// Düğme, öneri ne olursa olsun yoga ekranını açıyordu: kullanıcı "Kardiyo"
-/// okuyup "Başla"ya bastığında karşısına yoga çıkıyordu. Güç ve kardiyo
-/// egzersiz ekranına, yumuşak hareket türleri yogaya gidiyor.
-///
-/// Meditasyon da yogaya gidiyor: elde ayrı bir meditasyon içeriği yok ve
-/// yoga ekranı gevşeme odaklı. Uydurma bir ekrana yönlendirmektense en
-/// yakın gerçek içerik.
-String detailRouteFor(PhaseActivity activity) => switch (activity) {
-  PhaseActivity.strength || PhaseActivity.cardio => RouteNames.exerciseDetail,
-  PhaseActivity.yinYoga ||
-  PhaseActivity.gentle ||
-  PhaseActivity.meditation => RouteNames.yogaDetail,
-};

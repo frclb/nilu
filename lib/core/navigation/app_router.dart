@@ -46,7 +46,6 @@ import '../../presentation/partner_match/partner_scan_screen.dart';
 import '../../presentation/partner_match/partner_support_screen.dart';
 import '../../presentation/partner_match/partner_share_settings_screen.dart';
 import '../../presentation/widgets_preview/widgets_preview_screen.dart';
-import '../../presentation/exercise/exercise_detail_screen.dart';
 import '../../presentation/recipe/recipe_detail_screen.dart';
 import '../../presentation/yoga/yoga_detail_screen.dart';
 import '../../presentation/legal/privacy_policy_screen.dart';
@@ -393,12 +392,6 @@ GoRouter createAppRouter(
         path: '/partner',
         name: RouteNames.partner,
         builder: (context, state) => const PartnerMatchScreen(),
-      ),
-
-      GoRoute(
-        path: '/exercise_detail',
-        name: RouteNames.exerciseDetail,
-        builder: (context, state) => const ExerciseDetailScreen(),
       ),
 
       GoRoute(

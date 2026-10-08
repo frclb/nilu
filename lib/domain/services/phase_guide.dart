@@ -4,7 +4,23 @@ import '../models/cycle_info.dart';
 ///
 /// İkon seçimi sunum katmanının işi; bu servis `material` içe aktarmadan saf
 /// kalabilsin diye burada yalnızca tür var.
-enum PhaseActivity { yinYoga, strength, cardio, meditation, gentle }
+enum PhaseActivity {
+  yinYoga,
+  strength,
+  cardio,
+
+  /// Regl öncesi gevşeme. Adı eski: elde meditasyon içeriği yok, öneri
+  /// yavaş yoga akışı.
+  meditation,
+  gentle;
+
+  /// Uygulamada bu öneri için rehberli bir seans var mı?
+  ///
+  /// Yalnızca yoga akışı var (`SessionPlan.yoga`). Güç ve kardiyo kartı
+  /// "25 dk", "30 dk" yazıp "Başla"da regl dönemi yogasını açıyordu; artık
+  /// o ikisi seanssız bir öneri.
+  bool get hasSession => this != strength && this != cardio;
+}
 
 /// Bir döngü evresinde gösterilecek içeriğin çeviri anahtarları.
 ///
@@ -22,7 +38,6 @@ class PhaseGuidance {
 
   final String activityTitleKey;
   final String activityDescKey;
-  final int activityMinutes;
   final PhaseActivity activity;
 
   const PhaseGuidance({
@@ -31,7 +46,6 @@ class PhaseGuidance {
     required this.tipKey,
     required this.activityTitleKey,
     required this.activityDescKey,
-    required this.activityMinutes,
     required this.activity,
   });
 }
@@ -52,7 +66,6 @@ class PhaseGuide {
       tipKey: 'phase_tip_menstruation',
       activityTitleKey: 'suggestion_yin_yoga_title',
       activityDescKey: 'suggestion_yin_yoga_desc',
-      activityMinutes: 15,
       activity: PhaseActivity.yinYoga,
     ),
     CyclePhase.follicular: PhaseGuidance(
@@ -61,7 +74,6 @@ class PhaseGuide {
       tipKey: 'phase_tip_follicular',
       activityTitleKey: 'suggestion_energy_title',
       activityDescKey: 'suggestion_energy_desc',
-      activityMinutes: 25,
       activity: PhaseActivity.strength,
     ),
     CyclePhase.ovulation: PhaseGuidance(
@@ -70,7 +82,6 @@ class PhaseGuide {
       tipKey: 'phase_tip_ovulation',
       activityTitleKey: 'suggestion_hiit_title',
       activityDescKey: 'suggestion_hiit_desc',
-      activityMinutes: 30,
       activity: PhaseActivity.cardio,
     ),
     CyclePhase.luteal: PhaseGuidance(
@@ -79,7 +90,6 @@ class PhaseGuide {
       tipKey: 'phase_tip_luteal',
       activityTitleKey: 'suggestion_meditation_title',
       activityDescKey: 'suggestion_meditation_desc',
-      activityMinutes: 10,
       activity: PhaseActivity.meditation,
     ),
     CyclePhase.suppressed: PhaseGuidance(
@@ -88,7 +98,6 @@ class PhaseGuide {
       tipKey: 'phase_tip_suppressed',
       activityTitleKey: 'suggestion_wellness_title',
       activityDescKey: 'suggestion_wellness_desc',
-      activityMinutes: 15,
       activity: PhaseActivity.gentle,
     ),
     CyclePhase.unknown: PhaseGuidance(
@@ -97,7 +106,6 @@ class PhaseGuide {
       tipKey: 'phase_tip_unknown',
       activityTitleKey: 'suggestion_wellness_title',
       activityDescKey: 'suggestion_wellness_desc',
-      activityMinutes: 15,
       activity: PhaseActivity.gentle,
     ),
   };

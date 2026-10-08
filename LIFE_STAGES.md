@@ -197,8 +197,9 @@ yaş ve üstünde açıklanamayan menopoz sonrası kanamada endometrium kanseri
 şüphesiyle hızlı sevk öneriyor, 55 altında da düşünülmesini söylüyor.
 Gebelikteki korumanın aynısı: regl kaydı açılmaz, hekime yönlendirilir.
 
-Belirtiler: sıcak basması, gece terlemesi, uyku (HealthKit'ten uyku
-zaten okunuyor), ruh hali.
+Belirtiler: sıcak basması, gece terlemesi, uyku, ruh hali. (HealthKit'ten
+uyku okuma Ekim 2026'da kaldırıldı — hiçbir ekran kullanmıyordu; bu evre
+gelirse yeniden ve yalnızca gösterilecekse istenmeli.)
 
 ---
 

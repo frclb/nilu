@@ -11,11 +11,9 @@ import '../../../domain/services/cycle_intervals.dart';
 import '../../../domain/services/period_service.dart';
 import '../../../domain/services/prediction_service.dart';
 import '../../../data/repositories/period_repository.dart';
-import '../../../data/datasources/widget_datasource.dart';
 import '../../../data/repositories/cycle_settings_repository.dart';
 import '../../../data/repositories/health_write_back.dart';
 import '../../../data/repositories/pregnancy_repository.dart';
-import '../../../domain/services/widget_snapshot.dart';
 
 /// Takvim ekranının durumunu yöneten ve iş mantığını bağlayan ViewModel.
 class CalendarViewModel extends ChangeNotifier {
@@ -23,7 +21,6 @@ class CalendarViewModel extends ChangeNotifier {
   final PeriodService _periodService = PeriodService();
   final PredictionService _predictionService = PredictionService();
   final CycleSettingsRepository _settingsRepo = CycleSettingsRepository();
-  final WidgetDatasource _widget = const WidgetDatasource();
   final PregnancyRepository _pregnancyRepo = const PregnancyRepository();
   final HealthWriteBack _healthWriteBack;
 
@@ -438,14 +435,6 @@ class CalendarViewModel extends ChangeNotifier {
     );
   }
 
-  /// Ana ekran widget'ını günceller.
-  ///
-  /// Hesap her değiştiğinde çağrılır; kullanıcı uygulamayı açmadan da doğru
-  /// sayıyı görmeli.
-  void _publishWidget() {
-    _widget.publish(WidgetSnapshot.from(_cycleInfo));
-  }
-
   void _recalculate() {
     _cycleInfo = _predictionService.getCycleInfo(
       _periodLogs,
@@ -458,7 +447,6 @@ class CalendarViewModel extends ChangeNotifier {
       // `calendar_breaks_wiring_test` koruyor.
       breaks: _cycleBreaks,
     );
-    _publishWidget();
   }
 
   /// Belirli bir günün regl olup olmadığını kontrol eder.

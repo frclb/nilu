@@ -127,10 +127,11 @@ Sonra iki App ID:
 
 | App ID | Capability |
 |---|---|
-| `com.furkan.rcperiodtracker` | HealthKit, App Groups, Sign in with Apple, Push Notifications |
+| `com.furkan.rcperiodtracker` | HealthKit, App Groups, Push Notifications |
 | `com.furkan.rcperiodtracker.CycleWidget` | App Groups |
 
-Bu dördü `ios/Runner/Runner.entitlements` ile **eşleşmek zorunda**. Portalda
+Bunlar `ios/Runner/Runner.entitlements` ile **eşleşmek zorunda**. (Sign in with
+Apple kaldırıldı; portalda açıksa kapatılabilir.) Portalda
 kapalı bir yeteneği yetki dosyası isterse imzalama şu hatayla duruyor:
 
 ```
@@ -139,8 +140,9 @@ Provisioning profile "..." doesn't include the ... entitlement
 
 **HealthKit'te dikkat:** yalnızca "HealthKit" açılacak. Alt seçenek olan
 **"Verifiable Health Records" açılmayacak** — o klinik kayıtlar için ve Apple'ın
-takıma ayrıca atamasını gerektiriyor; açılırsa imzalama durur. Uygulama regl
-akışı, uyku ve dinlenme nabzı okuyor, hepsi normal HealthKit kapsamında.
+takıma ayrıca atamasını gerektiriyor; açılırsa imzalama durur. Uygulama
+yalnızca regl akışı okuyor ve kullanıcı açarsa yazıyor; normal HealthKit
+kapsamında.
 (Ayrıntısı `Runner.entitlements` içindeki yorumda.)
 
 **Push Notifications için** ayrıca bir APNs anahtarı gerekiyor: Keys → yeni
@@ -189,18 +191,33 @@ rozetini anlamlı kılıyor; ekran bu oranı kendisi hesaplıyor
 
 | Plan | Fiyat | Aylığa düşen | Ekrandaki rozet |
 |---|---|---|---|
-| Aylık | **99,99 TL** | 99,99 TL | — |
-| Yıllık | **599,99 TL** | 50,00 TL | %50 daha uygun |
+| Aylık | **59,99 TL** | 59,99 TL | — |
+| Yıllık | **349,99 TL** | 29,17 TL | %51 daha uygun |
 
-Yıllık, aylığın tam yarısına denk gelsin diye seçildi: rozet yuvarlak bir
-sayı gösteriyor ve "ayda 50 lira" anlatması kolay.
+**Ömür boyu (tek seferlik) ürün yok.** Karar verildi; uygulama da yalnızca
+abonelik sürelerini tanıyor.
+
+Neden bu seviye: Türkiye'de kategorinin aylık bandı ₺40–150, yıllık bandı
+₺100–640 (Ekim 2026; ayrıntı `reports/Nilu rakip ve eksik analizi.md`).
+Gündelik referans Spotify / YouTube Premium (~₺115–120); bunun üstündeki
+aylık fiyat pahalı algılanıyor. Flo'nun en düşük Premium basamağı da ₺59,99.
+
+Rozet "en pahalı aylık eşdeğere göre" hesaplanıyor
+(`SubscriptionPricing.savingPercent`): 1 − 349,99 / (12 × 59,99) = %51,4 →
+**%51**. Fiyat basamağı değişirse rozet kendiliğinden değişir.
+
+**Enflasyon:** TL fiyatları yılda en az iki kez gözden geçir (aylık
+~%2–2,5 reel değer kaybı). Apple vergi kaynaklı düzeltmelerde var olan
+otomatik yenilenen aboneliklerin fiyatını kendiliğinden artırmıyor; zam,
+App Store Connect'te "mevcut aboneleri koru / yeni fiyata geçir" seçimiyle
+yapılıyor.
 
 ### Diğer ülkelerin fiyatını ayrıca ver
 
 Apple bir para biriminde fiyat verip gerisini **otomatik çevirebiliyor**.
-Burada yapma: 99,99 TL yaklaşık 2,5 avro. Uygulama de/es/fr/pt ile
+Burada yapma: 59,99 TL yaklaşık 1,2 avro. Uygulama de/es/fr/pt ile
 yayınlanıyor ve o pazarlarda benzer uygulamalar aylık 5–10 avro bandında.
-Otomatik çeviri Avrupa'yı üçte bir fiyata satmak olur.
+Otomatik çeviri Avrupa'yı üçte bir fiyatın da altında satmak olur.
 
 Tersi de geçerli: taban fiyatı avro verip Türkiye'ye çevirtmek buradaki
 fiyatı erişilemez yapar.

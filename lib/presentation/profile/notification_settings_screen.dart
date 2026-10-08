@@ -13,43 +13,109 @@ import '../../design_system/app_tokens.dart';
 import '../../design_system/app_layout.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
-  const NotificationSettingsScreen({super.key});
+  const NotificationSettingsScreen({
+    super.key,
+    @visibleForTesting this.scheduler,
+  });
+
+  /// Testte izin durumunu taklit eden zamanlayıcı.
+  final ReminderScheduler? scheduler;
 
   @override
   State<NotificationSettingsScreen> createState() =>
       _NotificationSettingsScreenState();
 }
 
-class _NotificationSettingsScreenState
-    extends State<NotificationSettingsScreen> {
+class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
+    with WidgetsBindingObserver {
   final NotificationSettingsRepository _repository =
       NotificationSettingsRepository();
+  late final ReminderScheduler _scheduler =
+      widget.scheduler ?? ReminderScheduler();
 
   GeneralNotificationSettings _settings = const GeneralNotificationSettings();
   bool _isLoading = true;
 
-  /// Bildirim izni alınamadı mı?
+  /// Açık görünen hatırlatıcılar bildirim izni olmadığı için gelmiyor mu?
   ///
-  /// Eskiden bu bir snackbar'dı ve iki sorunu vardı: kullanıcıyı ekrandan
-  /// ekrana takip ediyor, süresi dolduğu hâlde kapanmıyordu. Üstelik mesajın
-  /// geçici olması da yanlıştı — anahtar geri kapandı, sebebi ekranda
-  /// kalmalı. Kullanıcı izni verip anahtarı tekrar açtığında kendiliğinden
-  /// kayboluyor.
+  /// Varsayılan olarak regl ve doğurganlık hatırlatıcıları açık. İzni
+  /// vermemiş (ya da "Şimdi değil" demiş) kullanıcı bu ekranda anahtarları
+  /// açık görüyor, hatırlatıcıların kurulduğunu sanıyordu; uyarı ancak bir
+  /// anahtara dokununca çıkıyordu. Artık ekran açılırken izne bakılıyor.
+  ///
+  /// Snackbar değil: sebep, izin verilene kadar ekranda kalmalı.
   bool _permissionBlocked = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _load();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Ayarlar'dan izin verip dönen kullanıcı için: uyarı kalkıyor ve
+  /// hatırlatıcılar hemen kuruluyor.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed || !_permissionBlocked) return;
+    _checkPermission();
+  }
+
+  Future<void> _checkPermission() async {
+    if (!await _scheduler.isPermissionGranted() || !mounted) return;
+    await _reschedule(_settings, askPermission: false);
   }
 
   Future<void> _load() async {
     final settings = await _repository.getGeneralSettings();
+    final granted = await _scheduler.isPermissionGranted();
     if (!mounted) return;
     setState(() {
       _settings = settings;
       _isLoading = false;
+      _permissionBlocked = !granted && _anyReminderOn(settings);
     });
+  }
+
+  /// Bildirim gerektiren bir hatırlatıcı açık mı? Gizli bildirim bir
+  /// hatırlatıcı değil, hepsinin görünüşü.
+  bool _anyReminderOn(GeneralNotificationSettings s) =>
+      s.periodReminders || s.fertileWindow || s.dailyLogs || s.careReminders;
+
+  /// [next] bir hatırlatıcıyı açıyor mu? İzin yalnızca o zaman isteniyor:
+  /// kapatmak için izin gerekmez. Önceden izin yokken bir anahtarı
+  /// **kapatmak** da izin istiyor, alınamayınca anahtar yeniden açılıyordu.
+  bool _turnsOn(
+    GeneralNotificationSettings previous,
+    GeneralNotificationSettings next,
+  ) =>
+      (!previous.periodReminders && next.periodReminders) ||
+      (!previous.fertileWindow && next.fertileWindow) ||
+      (!previous.dailyLogs && next.dailyLogs) ||
+      (!previous.careReminders && next.careReminders);
+
+  /// Uyarıdaki düğme: izni ister; iOS istemi bir kez gösterdiği için
+  /// alınamazsa uygulamanın Ayarlar sayfasını açar.
+  Future<void> _askPermission() async {
+    bool granted;
+    try {
+      granted = await _scheduler.requestPermission();
+    } catch (e) {
+      debugPrint('Notification permission request failed: $e');
+      granted = false;
+    }
+    if (!mounted) return;
+    if (granted) {
+      await _reschedule(_settings, askPermission: false);
+    } else if (AppSettingsLink.isSupported) {
+      await AppSettingsLink.open();
+    }
   }
 
   /// Her değişiklik anında kalıcılaştırılır ve **hatırlatıcılar yeniden
@@ -62,7 +128,10 @@ class _NotificationSettingsScreenState
     setState(() => _settings = next);
     await _repository.saveGeneralSettings(next);
 
-    final applied = await _reschedule(next);
+    final applied = await _reschedule(
+      next,
+      askPermission: _turnsOn(previous, next),
+    );
     if (!applied) {
       // İzin verilmedi: anahtar açık kalırsa kullanıcı hatırlatıcıların
       // kurulduğunu sanıyor ama hiçbir bildirim gelmiyor. Eski hâline
@@ -79,9 +148,12 @@ class _NotificationSettingsScreenState
   /// Hata da reddedilme gibi ele alınıyor: kullanıcı açısından ikisi de
   /// "hatırlatıcı kurulmadı" demek. Yakalanmazsa anahtar açık kalıyor ve
   /// kayıtlı kalıyordu — bildirim gelmediği hâlde ayar "açık" görünüyordu.
-  Future<bool> _reschedule(GeneralNotificationSettings settings) async {
+  Future<bool> _reschedule(
+    GeneralNotificationSettings settings, {
+    required bool askPermission,
+  }) async {
     try {
-      return await _applyPlan(settings);
+      return await _applyPlan(settings, askPermission: askPermission);
     } catch (e) {
       debugPrint('Reminder scheduling failed: $e');
       if (mounted) setState(() => _permissionBlocked = true);
@@ -89,11 +161,14 @@ class _NotificationSettingsScreenState
     }
   }
 
-  Future<bool> _applyPlan(GeneralNotificationSettings settings) async {
+  Future<bool> _applyPlan(
+    GeneralNotificationSettings settings, {
+    required bool askPermission,
+  }) async {
     final cycleInfo = context.read<CalendarViewModel>().cycleInfo;
     final localize = context.tr;
 
-    final scheduler = ReminderScheduler();
+    final scheduler = _scheduler;
 
     // Gebelik/lohusalık hatırlatıcıları da plana giriyor. `apply` önce
     // hepsini iptal ediyor; bu girdi olmasaydı bir döngü anahtarını
@@ -111,7 +186,13 @@ class _NotificationSettingsScreenState
         // sessizce kurulamazdı.
         (settings.careReminders &&
             (care.events.isNotEmpty || care.conception != null));
-    if (wantsReminders) {
+    if (wantsReminders && !await scheduler.isPermissionGranted()) {
+      if (!askPermission) {
+        // Kapatma ya da gizli bildirim: ayar kaydediliyor, uyarı duruyor.
+        // Plan kurulmuyor — izin verilince kurulacak.
+        if (mounted) setState(() => _permissionBlocked = true);
+        return true;
+      }
       final granted = await scheduler.requestPermission();
       if (!granted) {
         if (!mounted) return false;
@@ -177,6 +258,7 @@ class _NotificationSettingsScreenState
             : ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
+                  if (_permissionBlocked) _buildPermissionNotice(),
                   Container(
                     decoration: BoxDecoration(
                       color: context.tokens.surface,
@@ -258,17 +340,17 @@ class _NotificationSettingsScreenState
                           _update(_settings.copyWith(discreet: val)),
                     ),
                   ),
-                  if (_permissionBlocked) _buildPermissionNotice(),
                 ],
               ),
       ),
     );
   }
 
-  /// İzin alınamadığında anahtarların altında kalan açıklama.
+  /// İzin yokken anahtarların üstünde duran açıklama.
   Widget _buildPermissionNotice() {
     return Container(
-      margin: const EdgeInsets.only(top: 16),
+      key: const Key('notif_permission_notice'),
+      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: context.tokens.surface,
@@ -289,32 +371,32 @@ class _NotificationSettingsScreenState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.tr('notif_permission_denied'),
+                  context.tr('notif_permission_off'),
                   style: TextStyle(
                     fontSize: 12,
                     height: 1.5,
                     color: context.tokens.textMuted,
                   ),
                 ),
-                // iOS sistem istemini ikinci kez göstermiyor; tarif etmek
-                // yerine kullanıcıyı oraya götürüyoruz.
-                if (AppSettingsLink.isSupported)
-                  TextButton(
-                    onPressed: AppSettingsLink.open,
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      minimumSize: const Size(0, 44),
-                      visualDensity: VisualDensity.standard,
-                    ),
-                    child: Text(
-                      context.tr('open_settings'),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                // iOS sistem istemini ikinci kez göstermiyor; o zaman düğme
+                // kullanıcıyı Ayarlar'a götürüyor (bkz. [_askPermission]).
+                TextButton(
+                  key: const Key('notif_permission_allow'),
+                  onPressed: _askPermission,
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: const Size(0, 44),
+                    visualDensity: VisualDensity.standard,
+                  ),
+                  child: Text(
+                    context.tr('notif_permission_allow'),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
+                ),
               ],
             ),
           ),

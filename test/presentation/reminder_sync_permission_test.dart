@@ -166,6 +166,38 @@ void main() {
     expect(z.uygulama, 2);
   });
 
+  testWidgets('"Şimdi değil" kalıcı: sonraki açılışta kutu çıkmıyor', (
+    tester,
+  ) async {
+    // Önceden oturumla sınırlıydı: kutu her açılışta yeniden çıkıyordu.
+    // Sistem istemini reddetmiş kullanıcıya da — iOS istemi ikinci kez
+    // göstermediği için "Devam" hiçbir şey yapmıyordu.
+    final z = _Zamanlayici(izinli: false);
+    final ctx = await kur(tester, z);
+    final baslik = find.text(ctx.tr('reminder_permission_title'));
+    expect(baslik, findsOneWidget);
+    await tester.tap(find.text(ctx.tr('reminder_permission_later')));
+    await bekle(tester);
+    expect(z.istek, 0);
+
+    // Uygulama yeniden açılıyor: yeni bir `ReminderSync`, aynı depo.
+    await tester.pumpWidget(const SizedBox.shrink());
+    await pumpScreen(
+      tester,
+      ReminderSync(
+        scheduler: z,
+        child: const Scaffold(body: SizedBox(key: Key('kok'))),
+      ),
+      size: const Size(390, 844),
+      navigatorKey: NavigationService().navigatorKey,
+    );
+    await bekle(tester);
+
+    expect(baslik, findsNothing, reason: 'Kutu yeniden açıldı');
+    expect(z.istek, 0);
+    expect(z.uygulama, 0, reason: 'İzin yokken plan kurulmamalı');
+  });
+
   testWidgets('gebelikte gerekçe regli değil kontrolleri anlatıyor', (
     tester,
   ) async {
