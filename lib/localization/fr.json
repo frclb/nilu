@@ -515,7 +515,7 @@
   "premium_feature_phase_title": "Analyse symptôme–phase",
   "premium_feature_phase_desc": "Vois à quelle phase de ton cycle tes symptômes se concentrent.",
   "premium_feature_export_title": "Export des données",
-  "premium_feature_export_desc": "Un résumé lisible et un tableau à emporter en consultation. La sauvegarde restaurable est gratuite pour tout le monde.",
+  "premium_feature_export_desc": "Partage le résumé médical et le tableau en fichiers. Le résumé à l’écran et la sauvegarde sont gratuits.",
   "premium_feature_themes_title": "Thèmes personnalisés",
   "premium_feature_themes_desc": "Choisis la couleur de l’app ; les couleurs du calendrier ne changent pas.",
   "premium_period_weekly": "Hebdomadaire",
@@ -1056,5 +1056,9 @@
   "preg_delete_title": "Supprimer cet enregistrement de grossesse ?",
   "preg_delete_body": "L’enregistrement de grossesse, ses rendez-vous et rappels sont supprimés. Tes saisies quotidiennes (symptômes, mesures, notes) sont conservées. C’est irréversible.",
   "preg_delete_confirm": "Supprimer",
-  "preg_delete_mistake": "Ajouté par erreur ? Supprimer l’enregistrement"
+  "preg_delete_mistake": "Ajouté par erreur ? Supprimer l’enregistrement",
+  "cycle_summary_title": "Résumé pour ton médecin",
+  "cycle_summary_entry_desc": "À montrer en consultation : durée des cycles, règles, douleurs et symptômes.",
+  "cycle_summary_intro": "Tu peux montrer cet écran en consultation. Il est calculé uniquement à partir de tes saisies ; le partager en fichier fait partie de Premium.",
+  "cycle_summary_share": "Partager en fichier"
 }

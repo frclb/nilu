@@ -515,7 +515,7 @@
   "premium_feature_phase_title": "Análisis síntoma–fase",
   "premium_feature_phase_desc": "Descubre en qué fase del ciclo se concentran tus síntomas.",
   "premium_feature_export_title": "Exportación de datos",
-  "premium_feature_export_desc": "Un resumen legible y una tabla para llevar a consulta. La copia restaurable es gratuita para todos.",
+  "premium_feature_export_desc": "Comparte el resumen médico y la tabla como archivos. El resumen en pantalla y la copia son gratis.",
   "premium_feature_themes_title": "Temas personalizados",
   "premium_feature_themes_desc": "Elige el color de la app; los colores del calendario no cambian.",
   "premium_period_weekly": "Semanal",
@@ -1056,5 +1056,9 @@
   "preg_delete_title": "¿Borrar este registro de embarazo?",
   "preg_delete_body": "Se borran el registro de embarazo, sus citas y recordatorios. Tus registros diarios (síntomas, mediciones, notas) se conservan. No se puede deshacer.",
   "preg_delete_confirm": "Borrar",
-  "preg_delete_mistake": "¿Lo añadiste por error? Borra el registro"
+  "preg_delete_mistake": "¿Lo añadiste por error? Borra el registro",
+  "cycle_summary_title": "Resumen para tu médico",
+  "cycle_summary_entry_desc": "Muéstralo en la consulta: duración de los ciclos, regla, dolor y síntomas.",
+  "cycle_summary_intro": "Puedes enseñar esta pantalla en la consulta. Se calcula solo con tus propios registros; compartirla como archivo forma parte de Premium.",
+  "cycle_summary_share": "Compartir como archivo"
 }

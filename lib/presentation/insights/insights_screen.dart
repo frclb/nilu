@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../design_system/app_tokens.dart';
+import 'cycle_summary_screen.dart';
 import 'widgets/insights_app_bar.dart';
 import 'widgets/cycle_alert_card.dart';
 import 'widgets/cycle_history_card.dart';
@@ -41,6 +42,9 @@ class InsightsScreen extends StatelessWidget {
               // Döngülerin listesi herkese açık; tam genişlikte, çünkü uzun
               // geçmişte satır satır okunuyor.
               CycleHistoryCard(),
+              SizedBox(height: 16),
+              // Muayenede gösterilecek özet: ekranda ücretsiz.
+              CycleSummaryLink(),
             ],
           ),
         ),

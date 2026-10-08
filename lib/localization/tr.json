@@ -515,7 +515,7 @@
   "premium_feature_phase_title": "Belirti–evre analizi",
   "premium_feature_phase_desc": "Belirtilerinin döngünün hangi evresinde yoğunlaştığını gör.",
   "premium_feature_export_title": "Veri dışa aktarma",
-  "premium_feature_export_desc": "Hekime götürebileceğin okunabilir özet ve tablo. Geri yüklenebilir yedek herkese açık.",
+  "premium_feature_export_desc": "Hekim özetini ve tabloyu dosya olarak paylaş. Ekrandaki özet ve yedek herkese açık.",
   "premium_feature_themes_title": "Özel temalar",
   "premium_feature_themes_desc": "Uygulamanın rengini seç; takvim renkleri her temada aynı kalır.",
   "premium_period_weekly": "Haftalık",
@@ -1056,5 +1056,9 @@
   "preg_delete_title": "Bu gebelik kaydı silinsin mi?",
   "preg_delete_body": "Gebelik kaydı, randevuları ve hatırlatıcıları silinir. Günlük kayıtların (belirtiler, ölçümler, notlar) silinmez. Bu işlem geri alınamaz.",
   "preg_delete_confirm": "Sil",
-  "preg_delete_mistake": "Yanlışlıkla mı ekledin? Kaydı sil"
+  "preg_delete_mistake": "Yanlışlıkla mı ekledin? Kaydı sil",
+  "cycle_summary_title": "Hekim özeti",
+  "cycle_summary_entry_desc": "Muayenede ekrandan göster: döngü süreleri, regl, ağrı ve belirtiler.",
+  "cycle_summary_intro": "Muayenede bu ekranı gösterebilirsin. Yalnızca senin kayıtlarından hesaplanır; dosya olarak paylaşmak Premium'a dahil.",
+  "cycle_summary_share": "Dosya olarak paylaş"
 }

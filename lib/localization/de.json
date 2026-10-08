@@ -515,7 +515,7 @@
   "premium_feature_phase_title": "Symptom-Phasen-Analyse",
   "premium_feature_phase_desc": "Sieh, in welcher Zyklusphase sich deine Symptome häufen.",
   "premium_feature_export_title": "Datenexport",
-  "premium_feature_export_desc": "Eine lesbare Zusammenfassung und eine Tabelle für den Arztbesuch. Das wiederherstellbare Backup ist für alle kostenlos.",
+  "premium_feature_export_desc": "Arztübersicht und Tabelle als Datei teilen. Bildschirmübersicht und Backup sind kostenlos.",
   "premium_feature_themes_title": "Eigene Themes",
   "premium_feature_themes_desc": "Wähle die App-Farbe; Kalenderfarben bleiben in jedem Theme gleich.",
   "premium_period_weekly": "Wöchentlich",
@@ -1056,5 +1056,9 @@
   "preg_delete_title": "Diesen Schwangerschaftseintrag löschen?",
   "preg_delete_body": "Der Schwangerschaftseintrag, seine Termine und Erinnerungen werden gelöscht. Deine Tageseinträge (Symptome, Messwerte, Notizen) bleiben. Das lässt sich nicht rückgängig machen.",
   "preg_delete_confirm": "Löschen",
-  "preg_delete_mistake": "Versehentlich angelegt? Eintrag löschen"
+  "preg_delete_mistake": "Versehentlich angelegt? Eintrag löschen",
+  "cycle_summary_title": "Übersicht für den Arztbesuch",
+  "cycle_summary_entry_desc": "Beim Termin vorzeigen: Zykluslängen, Periode, Schmerzen und Symptome.",
+  "cycle_summary_intro": "Du kannst diesen Bildschirm beim Termin zeigen. Er wird nur aus deinen eigenen Einträgen berechnet; als Datei teilen ist Teil von Premium.",
+  "cycle_summary_share": "Als Datei teilen"
 }

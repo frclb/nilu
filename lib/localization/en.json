@@ -515,7 +515,7 @@
   "premium_feature_phase_title": "Symptom–phase analysis",
   "premium_feature_phase_desc": "See which phase of your cycle your symptoms cluster in.",
   "premium_feature_export_title": "Data export",
-  "premium_feature_export_desc": "A readable summary and a table you can take to a clinician. The restorable backup is free for everyone.",
+  "premium_feature_export_desc": "Share the doctor summary and table as files. The on-screen summary and backup are free.",
   "premium_feature_themes_title": "Custom themes",
   "premium_feature_themes_desc": "Choose the app colour; calendar colours stay the same in every theme.",
   "premium_period_weekly": "Weekly",
@@ -1056,5 +1056,9 @@
   "preg_delete_title": "Delete this pregnancy record?",
   "preg_delete_body": "The pregnancy record, its appointments and reminders are deleted. Your daily logs (symptoms, measurements, notes) are kept. This can’t be undone.",
   "preg_delete_confirm": "Delete",
-  "preg_delete_mistake": "Added by mistake? Delete the record"
+  "preg_delete_mistake": "Added by mistake? Delete the record",
+  "cycle_summary_title": "Summary for your doctor",
+  "cycle_summary_entry_desc": "Show it at your appointment: cycle lengths, periods, pain and symptoms.",
+  "cycle_summary_intro": "You can show this screen at your appointment. It is calculated only from your own entries; sharing it as a file is part of Premium.",
+  "cycle_summary_share": "Share as a file"
 }

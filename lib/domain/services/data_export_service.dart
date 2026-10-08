@@ -17,13 +17,14 @@ import 'insights_service.dart';
 class DataExportService {
   const DataExportService._();
 
-  /// Doktora götürülebilecek özet.
+  /// Özetin toplu bölümleri: muayene özeti (veri varsa) ve döngüler.
   ///
-  /// CSV değil düz metin: hasta bunu muayenede telefondan okuyabilmeli.
-  static String buildSummary({
+  /// Ekrandaki ücretsiz özet (`CycleSummaryScreen`) ve paylaşılan dosya
+  /// ([buildSummary]) aynı listeden üretiliyor: ikisi ayrı yazılsaydı
+  /// ekranda görülenle hekime giden belge zamanla ayrışırdı.
+  static List<SummarySection> summarySections({
     required List<PeriodLog> periodLogs,
     required List<DailyLog> dailyLogs,
-    required DateTime generatedAt,
     required String Function(String key, {Map<String, String>? params})
     translate,
     required List<DateSpan> breaks,
@@ -40,26 +41,16 @@ class DataExportService {
       dailyLogs: dailyLogs,
       breaks: breaks,
     );
-
-    final buffer = StringBuffer()
-      ..writeln(translate('export_title'))
-      ..writeln(
-        translate(
-          'export_generated_at',
-          params: {'date': _formatDate(generatedAt)},
-        ),
-      )
-      ..writeln();
+    final sections = <SummarySection>[];
 
     // ── Muayene özeti ──
     //
     // En başta duruyor: altmış satırlık gün günlüğü muayenede kimsenin
     // okuyacağı bir şey değil. Hekimin sorduğu şey toplu.
     if (clinical.hasData) {
-      buffer.writeln(translate('export_section_clinical'));
-
+      final lines = <String>[];
       void line(String key, Map<String, String> params) =>
-          buffer.writeln('  ${translate(key, params: params)}');
+          lines.add(translate(key, params: params));
 
       if (clinical.firstLoggedDay != null && clinical.lastLoggedDay != null) {
         line('export_clinical_range', {
@@ -134,35 +125,85 @@ class DataExportService {
             .join(', ');
         line('export_clinical_symptoms', {'list': names});
       }
-      for (final alert in clinical.alerts) {
-        buffer.writeln('  ! ${translate(CycleAlertService.titleKey(alert))}');
-      }
-      buffer.writeln();
+      sections.add(
+        SummarySection(
+          title: translate('export_section_clinical'),
+          lines: lines,
+          alerts: [
+            for (final alert in clinical.alerts)
+              translate(CycleAlertService.titleKey(alert)),
+          ],
+        ),
+      );
     }
 
     // ── Döngü özeti ──
-    buffer.writeln(translate('export_section_cycles'));
+    final cycleLines = <String>[];
     if (cycles.isEmpty) {
-      buffer.writeln('  ${translate('export_no_cycles')}');
+      cycleLines.add(translate('export_no_cycles'));
     } else {
       if (average != null) {
-        buffer.writeln(
-          '  ${translate('export_average', params: {'days': '$average'})}',
+        cycleLines.add(
+          translate('export_average', params: {'days': '$average'}),
         );
       }
       if (variation != null) {
-        buffer.writeln(
-          '  ${translate('export_variation', params: {'days': '$variation'})}',
+        cycleLines.add(
+          translate('export_variation', params: {'days': '$variation'}),
         );
       }
       for (final cycle in cycles) {
-        buffer.writeln(
-          '  ${_formatDate(cycle.startDate)} — ${cycle.lengthInDays} '
+        cycleLines.add(
+          '${_formatDate(cycle.startDate)} — ${cycle.lengthInDays} '
           '${translate('export_days')}',
         );
       }
     }
-    buffer.writeln();
+    sections.add(
+      SummarySection(
+        title: translate('export_section_cycles'),
+        lines: cycleLines,
+      ),
+    );
+    return sections;
+  }
+
+  /// Doktora götürülebilecek özet.
+  ///
+  /// CSV değil düz metin: hasta bunu muayenede telefondan okuyabilmeli.
+  static String buildSummary({
+    required List<PeriodLog> periodLogs,
+    required List<DailyLog> dailyLogs,
+    required DateTime generatedAt,
+    required String Function(String key, {Map<String, String>? params})
+    translate,
+    required List<DateSpan> breaks,
+  }) {
+    final buffer = StringBuffer()
+      ..writeln(translate('export_title'))
+      ..writeln(
+        translate(
+          'export_generated_at',
+          params: {'date': _formatDate(generatedAt)},
+        ),
+      )
+      ..writeln();
+
+    for (final section in summarySections(
+      periodLogs: periodLogs,
+      dailyLogs: dailyLogs,
+      translate: translate,
+      breaks: breaks,
+    )) {
+      buffer.writeln(section.title);
+      for (final line in section.lines) {
+        buffer.writeln('  $line');
+      }
+      for (final alert in section.alerts) {
+        buffer.writeln('  ! $alert');
+      }
+      buffer.writeln();
+    }
 
     // ── Kayıtlı günler ──
     final logged = dailyLogs.where((l) => l.hasContent).toList()
@@ -314,4 +355,17 @@ class DataExportService {
       '${date.year.toString().padLeft(4, '0')}-'
       '${date.month.toString().padLeft(2, '0')}-'
       '${date.day.toString().padLeft(2, '0')}';
+}
+
+/// Özetin bir bölümü: başlık, satırlar ve uyarılar.
+class SummarySection {
+  final String title;
+  final List<String> lines;
+  final List<String> alerts;
+
+  const SummarySection({
+    required this.title,
+    required this.lines,
+    this.alerts = const [],
+  });
 }

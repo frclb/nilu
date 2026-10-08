@@ -51,6 +51,7 @@ import '../../presentation/yoga/yoga_detail_screen.dart';
 import '../../presentation/legal/privacy_policy_screen.dart';
 import '../../presentation/legal/terms_of_service_screen.dart';
 import '../../presentation/premium/premium_screen.dart';
+import '../../presentation/insights/cycle_summary_screen.dart';
 
 /// Onboarding tamamlanmadan da erişilebilen yollar.
 ///
@@ -470,6 +471,12 @@ GoRouter createAppRouter(
       ),
 
       // Premium
+      GoRoute(
+        path: '/cycle-summary',
+        name: RouteNames.cycleSummary,
+        builder: (context, state) => const CycleSummaryScreen(),
+      ),
+
       GoRoute(
         path: '/premium',
         name: RouteNames.premium,
