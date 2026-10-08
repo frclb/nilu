@@ -7,6 +7,8 @@ import '../../../domain/models/daily_log.dart';
 import '../../../domain/models/log_vocabulary.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../design_system/app_snack.dart';
+import '../../../core/navigation/navigation_service.dart';
+import '../../../core/navigation/route_names.dart';
 
 /// Gün detay sayfasını açar.
 ///
@@ -172,6 +174,24 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
     return context.tr('day_detail_fertility_low');
   }
 
+  bool get _gelecekGun {
+    final n = DateTime.now();
+    return widget.date.isAfter(DateTime(n.year, n.month, n.day));
+  }
+
+  void _olcumEkle() {
+    final d = widget.date;
+    final tarih =
+        '${d.year.toString().padLeft(4, '0')}-'
+        '${d.month.toString().padLeft(2, '0')}-'
+        '${d.day.toString().padLeft(2, '0')}';
+    Navigator.pop(context);
+    NavigationService().push(
+      RouteNames.logEntry,
+      queryParameters: {'date': tarih},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -263,12 +283,27 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                   // Regl Durumu — yalnızca regl kaydının tutulduğu evrede.
                   // Gebelikte anahtar basılınca koruma reddediyor ve ekran
                   // "gelecek bir tarihe regl girilemez" diyordu.
-                  if (!viewModel.lifeStage.recordsPeriods)
+                  if (!viewModel.lifeStage.recordsPeriods) ...[
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: StageBleedingNote(stage: viewModel.lifeStage),
-                    )
-                  else
+                    ),
+                    // Tansiyon ve kilo yalnızca kayıt ekranında; o ekran
+                    // önceden yalnızca bugünü açıyordu. Geçmiş güne ölçüm
+                    // buradan.
+                    if (!_gelecekGun)
+                      ListTile(
+                        key: const Key('day_detail_measure'),
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.monitor_heart_outlined),
+                        title: Text(
+                          context.tr('day_detail_add_measurement'),
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: _olcumEkle,
+                      ),
+                  ] else
                     ListTile(
                       contentPadding: EdgeInsets.zero,
                       title: Text(

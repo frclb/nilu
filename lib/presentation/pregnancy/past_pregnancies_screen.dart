@@ -9,6 +9,7 @@ import '../../domain/models/pregnancy.dart';
 import '../../domain/view_models/pregnancy_view_model.dart';
 import '../../localization/app_localizations.dart';
 import '../../localization/date_names.dart';
+import 'delete_pregnancy.dart';
 
 /// Geçmiş gebelikler.
 ///
@@ -132,6 +133,12 @@ class _Kart extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
+              IconButton(
+                key: Key('past_preg_delete_${gebelik.id}'),
+                tooltip: context.tr('preg_delete_title'),
+                icon: Icon(Icons.delete_outline, color: t.textFaint),
+                onPressed: () => confirmDeletePregnancy(context, gebelik.id),
+              ),
               Icon(Icons.chevron_right, color: t.textFaint),
             ],
           ),

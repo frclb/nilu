@@ -9,6 +9,7 @@ import '../../domain/models/pregnancy.dart';
 import '../../domain/view_models/pregnancy_view_model.dart';
 import '../../localization/app_localizations.dart';
 import '../../localization/date_names.dart';
+import 'delete_pregnancy.dart';
 
 /// Gebeliği sonlandırma.
 ///
@@ -63,6 +64,15 @@ class _EndPregnancyScreenState extends State<EndPregnancyScreen> {
     await context.read<PregnancyViewModel>().end(sonuc, at: _tarih);
     if (!mounted) return;
     context.goNamed(RouteNames.home);
+  }
+
+  Future<void> _sil() async {
+    final g = context.read<PregnancyViewModel>().current;
+    if (g == null) return;
+    final router = GoRouter.of(context);
+    if (await confirmDeletePregnancy(context, g.id)) {
+      router.goNamed(RouteNames.home);
+    }
   }
 
   @override
@@ -131,6 +141,18 @@ class _EndPregnancyScreenState extends State<EndPregnancyScreen> {
                 key: const Key('preg_end_confirm'),
                 onPressed: _sonuc == null || _kaydediliyor ? null : _onayla,
                 child: Text(context.tr('preg_end_confirm')),
+              ),
+              const SizedBox(height: 16),
+              // Yanlışlıkla eklenmiş kayıt bir sonuç değil; sonlandırmak
+              // yerine silinebilmeli.
+              TextButton(
+                key: const Key('preg_delete'),
+                onPressed: _kaydediliyor ? null : _sil,
+                child: Text(
+                  context.tr('preg_delete_mistake'),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: t.danger),
+                ),
               ),
             ],
           ),

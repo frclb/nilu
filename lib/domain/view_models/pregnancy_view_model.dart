@@ -167,6 +167,26 @@ class PregnancyViewModel extends ChangeNotifier {
     await _reload();
   }
 
+  /// Yanlışlıkla eklenmiş bir gebeliği ve bakım kalemlerini siler.
+  ///
+  /// Önceden gebelik yalnızca sonlandırılabiliyordu: yanlışlıkla
+  /// "Hamileyim" diyen kullanıcı, olmayan bir gebeliği "belirtmek
+  /// istemiyorum" diye bitirmek ve geçmiş gebelikler listesinde taşımak
+  /// zorundaydı. Günlük kayıtlar (belirti, ölçüm, not) güne bağlı ve
+  /// silinmiyor.
+  Future<void> deletePregnancy(String id) async {
+    if (!_pregnancies.any((p) => p.id == id)) return;
+    await _pregnancyRepo.saveAll([
+      for (final p in _pregnancies)
+        if (p.id != id) p,
+    ]);
+    await _careRepo.saveAll([
+      for (final e in _events)
+        if (e.pregnancyId != id) e,
+    ]);
+    await _reload();
+  }
+
   /// Lohusalığı erken bitirip regl takibine döner.
   ///
   /// Doğum kaydı ve randevular kalıyor; lohusa hatırlatıcıları evreden

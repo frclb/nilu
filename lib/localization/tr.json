@@ -1050,5 +1050,11 @@
   "partner_guide_status_2": "Her zaman sorarak ilerleyin; rıza her an değişebilir.",
   "partner_guide_doctor_title": "Ne zaman hekime",
   "partner_guide_doctor_1": "Ağrı günlük hayatı durduracak kadar şiddetliyse, 1–2 saatte bir ped ya da tampon değiştirecek kadar kanama, bayılma ya da ateş varsa bir sağlık kuruluşuna başvurmasını öner.",
-  "intimacy_selected_count": "{n} seçili"
+  "intimacy_selected_count": "{n} seçili",
+  "log_date_other": "{day} {month} {year}",
+  "day_detail_add_measurement": "Tansiyon ve kilo ekle",
+  "preg_delete_title": "Bu gebelik kaydı silinsin mi?",
+  "preg_delete_body": "Gebelik kaydı, randevuları ve hatırlatıcıları silinir. Günlük kayıtların (belirtiler, ölçümler, notlar) silinmez. Bu işlem geri alınamaz.",
+  "preg_delete_confirm": "Sil",
+  "preg_delete_mistake": "Yanlışlıkla mı ekledin? Kaydı sil"
 }

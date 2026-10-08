@@ -137,7 +137,9 @@ List<RouteBase> pregnancyRoutes(Widget first) => [
   GoRoute(
     path: '/log-entry',
     name: RouteNames.logEntry,
-    builder: (_, _) => const LogEntryScreen(),
+    builder: (_, s) => LogEntryScreen(
+      date: DateTime.tryParse(s.uri.queryParameters['date'] ?? ''),
+    ),
   ),
   GoRoute(
     path: '/pregnancy/months',

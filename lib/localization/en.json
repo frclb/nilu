@@ -1050,5 +1050,11 @@
   "partner_guide_status_2": "Always check in with each other; consent can change at any moment.",
   "partner_guide_doctor_title": "When to see a doctor",
   "partner_guide_doctor_1": "If the pain is bad enough to stop daily life, the bleeding needs a new pad or tampon every 1–2 hours, or there is fainting or fever, suggest seeing a healthcare provider.",
-  "intimacy_selected_count": "{n} selected"
+  "intimacy_selected_count": "{n} selected",
+  "log_date_other": "{month} {day}, {year}",
+  "day_detail_add_measurement": "Add blood pressure and weight",
+  "preg_delete_title": "Delete this pregnancy record?",
+  "preg_delete_body": "The pregnancy record, its appointments and reminders are deleted. Your daily logs (symptoms, measurements, notes) are kept. This can’t be undone.",
+  "preg_delete_confirm": "Delete",
+  "preg_delete_mistake": "Added by mistake? Delete the record"
 }

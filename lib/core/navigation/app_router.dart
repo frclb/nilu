@@ -299,7 +299,10 @@ GoRouter createAppRouter(
         name: RouteNames.logEntry,
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
-          child: const LogEntryScreen(),
+          // `?date=2026-10-05`: takvimden geçmiş bir güne kayıt.
+          child: LogEntryScreen(
+            date: DateTime.tryParse(state.uri.queryParameters['date'] ?? ''),
+          ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             const begin = Offset(0.0, 1.0);
             const end = Offset.zero;

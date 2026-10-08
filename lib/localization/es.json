@@ -1050,5 +1050,11 @@
   "partner_guide_status_2": "Preguntad siempre; el consentimiento puede cambiar en cualquier momento.",
   "partner_guide_doctor_title": "Cuándo ir al médico",
   "partner_guide_doctor_1": "Si el dolor impide hacer vida normal, el sangrado obliga a cambiar la compresa o el tampón cada 1–2 horas, o hay desmayos o fiebre, sugiere acudir a un centro de salud.",
-  "intimacy_selected_count": "{n} seleccionadas"
+  "intimacy_selected_count": "{n} seleccionadas",
+  "log_date_other": "{day} de {month} de {year}",
+  "day_detail_add_measurement": "Añadir tensión y peso",
+  "preg_delete_title": "¿Borrar este registro de embarazo?",
+  "preg_delete_body": "Se borran el registro de embarazo, sus citas y recordatorios. Tus registros diarios (síntomas, mediciones, notas) se conservan. No se puede deshacer.",
+  "preg_delete_confirm": "Borrar",
+  "preg_delete_mistake": "¿Lo añadiste por error? Borra el registro"
 }

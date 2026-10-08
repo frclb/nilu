@@ -23,7 +23,13 @@ import '../../design_system/app_layout.dart';
 import '../../domain/models/log_vocabulary.dart';
 
 class LogEntryScreen extends StatefulWidget {
-  const LogEntryScreen({super.key});
+  const LogEntryScreen({super.key, this.date});
+
+  /// Kaydedilecek gün; verilmezse bugün. Gelecek gün bugüne çekiliyor.
+  ///
+  /// Önceden ekran yalnızca bugünü kaydediyordu: dün akşam ölçülen tansiyon
+  /// ya da muayenede tartılan kilo hiç girilemiyordu.
+  final DateTime? date;
 
   @override
   State<LogEntryScreen> createState() => _LogEntryScreenState();
@@ -52,12 +58,24 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
   List<String> _moods = [];
   PainEntry _pain = const PainEntry();
 
+  late final DateTime _gun = () {
+    final n = DateTime.now();
+    final bugun = DateTime(n.year, n.month, n.day);
+    final d = widget.date;
+    if (d == null) return bugun;
+    final gun = DateTime(d.year, d.month, d.day);
+    return gun.isAfter(bugun) ? bugun : gun;
+  }();
+
+  bool get _bugunMu {
+    final n = DateTime.now();
+    return _gun == DateTime(n.year, n.month, n.day);
+  }
+
   @override
   void initState() {
     super.initState();
-    _mevcut = context.read<CalendarViewModel>().getDailyLogForDate(
-      DateTime.now(),
-    );
+    _mevcut = context.read<CalendarViewModel>().getDailyLogForDate(_gun);
     _flowIntensity = _mevcut.flowIntensity;
     _symptoms = List.of(_mevcut.symptoms);
     _moods = List.of(_mevcut.moods);
@@ -160,7 +178,11 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
     // Yalnızca regl kaydının tutulduğu evrede: gebelikte ya da lohusalıkta
     // koruma zaten reddediyor, ama sessiz bir reddetmeye yaslanmak yerine
     // niyet burada açık.
-    if (stage.recordsPeriods &&
+    //
+    // Geçmiş bir gün için açıldıysa dönem başlatılmıyor: o günün regli
+    // takvimden işaretleniyor.
+    if (_bugunMu &&
+        stage.recordsPeriods &&
         LogVocabulary.startsPeriod(_flowIntensity) &&
         !viewModel.isPeriodDay(today)) {
       await viewModel.startPeriodToday();
@@ -354,7 +376,7 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const LogEntryHeader(),
+                  LogEntryHeader(date: _gun),
                   FlowIntensitySection(
                     initialValue: _flowIntensity,
                     onChanged: (value) {

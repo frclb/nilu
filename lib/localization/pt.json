@@ -1050,5 +1050,11 @@
   "partner_guide_status_2": "Conversem sempre; o consentimento pode mudar a qualquer momento.",
   "partner_guide_doctor_title": "Quando procurar um médico",
   "partner_guide_doctor_1": "Se a dor impede a rotina, se o sangramento exige trocar o absorvente a cada 1–2 horas, ou se houver desmaio ou febre, sugira procurar atendimento de saúde.",
-  "intimacy_selected_count": "{n} selecionadas"
+  "intimacy_selected_count": "{n} selecionadas",
+  "log_date_other": "{day} de {month} de {year}",
+  "day_detail_add_measurement": "Adicionar pressão e peso",
+  "preg_delete_title": "Apagar este registro de gravidez?",
+  "preg_delete_body": "O registro de gravidez, as consultas e os lembretes são apagados. Seus registros diários (sintomas, medições, anotações) são mantidos. Isso não pode ser desfeito.",
+  "preg_delete_confirm": "Apagar",
+  "preg_delete_mistake": "Adicionou por engano? Apague o registro"
 }

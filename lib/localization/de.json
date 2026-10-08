@@ -1050,5 +1050,11 @@
   "partner_guide_status_2": "Fragt immer nach; Einverständnis kann sich jederzeit ändern.",
   "partner_guide_doctor_title": "Wann zum Arzt",
   "partner_guide_doctor_1": "Wenn die Schmerzen den Alltag lahmlegen, die Blutung alle 1–2 Stunden eine neue Binde oder einen neuen Tampon erfordert oder es zu Ohnmacht oder Fieber kommt, rate zu ärztlicher Hilfe.",
-  "intimacy_selected_count": "{n} ausgewählt"
+  "intimacy_selected_count": "{n} ausgewählt",
+  "log_date_other": "{day}. {month} {year}",
+  "day_detail_add_measurement": "Blutdruck und Gewicht eintragen",
+  "preg_delete_title": "Diesen Schwangerschaftseintrag löschen?",
+  "preg_delete_body": "Der Schwangerschaftseintrag, seine Termine und Erinnerungen werden gelöscht. Deine Tageseinträge (Symptome, Messwerte, Notizen) bleiben. Das lässt sich nicht rückgängig machen.",
+  "preg_delete_confirm": "Löschen",
+  "preg_delete_mistake": "Versehentlich angelegt? Eintrag löschen"
 }
