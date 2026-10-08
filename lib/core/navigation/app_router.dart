@@ -126,7 +126,7 @@ String? resolveRedirect({
 /// ⚠️ Bu fonksiyon uygulama ömrü boyunca **bir kez** çağrılmalıdır
 /// (bkz. `main.dart`). Her build'de yeniden çağrılırsa yeni bir GoRouter
 /// üretilir; gezinme yığını sıfırlanır ve kullanıcı bulunduğu ekrandan
-/// koparılır — çıkış yaptıktan sonra ana ekrana geri sıçramasının sebebi buydu.
+/// koparılır — durum değişince ana ekrana geri sıçramasının sebebi buydu.
 ///
 /// [navigatorKey] yalnızca testler için vardır: `NavigationService` bir
 /// singleton olduğu için aynı `GlobalKey`'i paylaşan iki router aynı süreçte

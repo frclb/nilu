@@ -22,9 +22,8 @@ class OnboardingGoalScreen extends StatelessWidget {
   const OnboardingGoalScreen({super.key});
 
   void _hamileyim(BuildContext context) {
-    // Süren bir gebelik zaten kayıtlıysa (çıkış yapıp kurulumdan yeniden
-    // geçen kullanıcı ya da gebeliği başlatıp son ekranda uygulamayı
-    // kapatan) tarihleri yeniden sormak anlamsız: ikinci gebelik açılmıyor,
+    // Süren bir gebelik zaten kayıtlıysa (gebeliği başlatıp son ekranda
+    // uygulamayı kapatan kullanıcı) tarihleri yeniden sormak anlamsız: ikinci gebelik açılmıyor,
     // girilenler sessizce yok sayılırdı (bkz. `PregnancyViewModel._start`).
     if (context.read<PregnancyViewModel>().stage == LifeStage.pregnancy) {
       context.goNamed(RouteNames.onboardingSuccess);

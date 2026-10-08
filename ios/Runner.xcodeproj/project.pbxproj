@@ -19,6 +19,7 @@
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		C81D191668008287E18124F0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B0B9FFC3F31F29B9371F64F /* Foundation.framework */; };
 		CB27998D8FCAAC660B89996D /* CycleWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61F912228E0701259224729 /* CycleWidget.swift */; };
+		5C3A9E7D21B84F06A1D2E3F4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6D4B0F8E32C95017B2E3F405 /* PrivacyInfo.xcprivacy */; };
 		E4006791DDDFE2442E7D94C8 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = FBF76B7A6A40FC455710E8B2 /* PrivacyInfo.xcprivacy */; };
 		F2075069CCB81AF1734E9D89 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F6748D7F56E1E1D685F4C1A /* Pods_Runner.framework */; };
 /* End PBXBuildFile section */
@@ -96,6 +97,7 @@
 		BB6E7B4E1217E708159106FC /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		D054EAB5FCAA21225C9BBE77 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		D61F912228E0701259224729 /* CycleWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CycleWidget.swift; sourceTree = "<group>"; };
+		6D4B0F8E32C95017B2E3F405 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		DD7CAB6EEC820F89A1A16E6E /* Runner.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		ED68CC53B90EB2F4D1E2879C /* tr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		F30700D042F2AD609BA69759 /* es */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -229,6 +231,7 @@
 				D61F912228E0701259224729 /* CycleWidget.swift */,
 				39657BCD99671C13576E541A /* Info.plist */,
 				2A5C5DBB05CD1F42319337E9 /* CycleWidget.entitlements */,
+				6D4B0F8E32C95017B2E3F405 /* PrivacyInfo.xcprivacy */,
 			);
 			name = CycleWidget;
 			path = CycleWidget;
@@ -355,6 +358,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C3A9E7D21B84F06A1D2E3F4 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

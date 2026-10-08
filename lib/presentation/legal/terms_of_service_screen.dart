@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../core/app_info.dart';
 import '../../design_system/app_theme.dart';
 import '../../design_system/app_tokens.dart';
 import '../../localization/app_localizations.dart';
@@ -51,7 +53,10 @@ class TermsOfServiceScreen extends StatelessWidget {
                   textColor,
                   mutedColor,
                   title: context.tr('terms_section${i}_title'),
-                  content: context.tr('terms_section${i}_content'),
+                  content: context.tr(
+                    'terms_section${i}_content',
+                    params: {'email': _email(context)},
+                  ),
                 ),
               const SizedBox(height: 32),
             ],
@@ -96,3 +101,7 @@ class TermsOfServiceScreen extends StatelessWidget {
     );
   }
 }
+
+/// Destek adresi; henüz verilmediyse dilin yer tutucusu.
+String _email(BuildContext context) =>
+    AppInfo.supportEmail ?? context.tr('legal_email_placeholder');

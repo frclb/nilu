@@ -15,7 +15,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// anahtar bir tercih ya da durum. Düğme kaldırıldı.
 ///
 /// Bu test çağrının geri gelmesini engelliyor: her şeyi silmek yalnızca
-/// "Hesabımı Sil" akışının işi, ve orası ne yaptığını söylüyor.
+/// "Tüm verilerimi sil" akışının işi, ve orası ne yaptığını söylüyor.
 void main() {
   test('prefs.clear() yalnızca hesap silmede', () {
     const izinli = 'lib/data/repositories/privacy_settings_repository.dart';

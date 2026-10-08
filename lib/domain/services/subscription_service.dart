@@ -36,7 +36,9 @@ class SubscriptionService {
 
   static Future<void> init() async {
     try {
-      await Purchases.setLogLevel(LogLevel.debug);
+      // Ayrıntılı günlük yalnızca geliştirirken: yayında konsola satın alma
+      // ve kullanıcı kimliği ayrıntısı yazılmasın.
+      await Purchases.setLogLevel(kDebugMode ? LogLevel.debug : LogLevel.warn);
 
       late StoreConfig storeConfig;
       if (defaultTargetPlatform == TargetPlatform.iOS) {

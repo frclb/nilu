@@ -79,37 +79,6 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Oturumu kapatır.
-  ///
-  /// Uzak oturumu (Firebase, RevenueCat) sonlandırır, oturuma ait yerel
-  /// bayrakları sıfırlar ve kullanıcıyı onboarding'e döndürür.
-  ///
-  /// **Sağlık verisini silmez** — o, Profil → Gizlilik → "Hesabımı Sil"
-  /// akışının işidir. Çıkış yalnızca oturumu bitirir.
-  Future<void> signOut() async {
-    try {
-      await _authDS.signOut();
-      await SubscriptionService.logout();
-    } catch (e) {
-      // Uzak taraf başarısız olsa da yerel oturum kapatılmalı.
-      debugPrint('Sign out (remote) failed: $e');
-    }
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('onboarding_complete', false);
-    await prefs.setBool('isPartner', false);
-    await prefs.setBool('hasPartner', false);
-    await prefs.remove('partnerId');
-    await prefs.remove('myId');
-
-    _onboardingComplete = false;
-    _isPartner = false;
-    _hasPartner = false;
-    _partnerId = null;
-    _myId = null;
-    notifyListeners();
-  }
-
   /// Kullanıcı kimliğini **tek bir yerden** üretir ve kalıcılaştırır.
   ///
   /// Öncelik sırası:
@@ -217,9 +186,9 @@ class UserViewModel extends ChangeNotifier {
 
   /// Hesabın uzak verisini siler.
   ///
-  /// "Hesabımı Sil" yalnızca cihazdaki veriyi siliyordu; Firestore'daki profil,
-  /// loglar ve yakınlık dokümanı yerinde kalıyordu — bağlı partner hesap
-  /// silindikten sonra da veriyi okumaya devam edebiliyordu.
+  /// "Tüm verilerimi sil" yalnızca cihazdaki veriyi siliyordu; Firestore'daki
+  /// profil, loglar ve yakınlık dokümanı yerinde kalıyordu — bağlı partner
+  /// hesap silindikten sonra da veriyi okumaya devam edebiliyordu.
   ///
   /// Yerel silmeden **önce** çağrılmalı: `_myId` temizlendikten sonra hangi
   /// dokümanın silineceği bilinemez.
@@ -263,7 +232,7 @@ class UserViewModel extends ChangeNotifier {
   }
 
   /// Yerel veri tamamen silindikten sonra durumu sıfırdan okur.
-  /// (Profil → "Hesabımı Sil" akışı bunu çağırır.)
+  /// (Profil → "Tüm verilerimi sil" akışı bunu çağırır.)
   Future<void> reloadAfterDataWipe() async {
     _onboardingComplete = false;
     _isPartner = false;

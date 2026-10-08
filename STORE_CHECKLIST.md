@@ -213,28 +213,19 @@ profil, loglar ve yakınlık dokümanı da siliniyor, ardından kimliğin kendis
 kaldırılıyor. (Önceden yalnızca cihazdaki veri siliniyordu — bağlı partner
 hesap silindikten sonra da veriyi okuyabiliyordu.)
 
-### Şartlardaki hukuk seçimi ⬜ — **engelleyici**
-Kullanım şartlarının 12. bölümü üç yer tutucu içeriyor ve bunlar bir
-**karar**, doldurulacak boşluk değil:
+### Destek e-postası ⬜ — **engelleyici**
+Politikanın 9. bölümü (haklar) ve Şartların 12. bölümü (iletişim) aynı
+adresi gösteriyor; adres `lib/core/app_info.dart` → `AppInfo.supportEmail`.
+Boşken ekranda dilin köşeli parantezli yer tutucusu görünüyor
+(`legal_email_placeholder`) — bilerek: gözden kaçmasın.
 
-- `[UYGULANACAK HUKUK]` — hangi ülkenin hukuku?
-- `[YETKİLİ MAHKEME VE İCRA DAİRELERİ]` — uyuşmazlıklar nerede görülecek?
-- `[E-POSTA ADRESİ]` — politikadakiyle aynı adres olmalı.
+Kullanıcı erişim, düzeltme, silme, taşınabilirlik ve itiraz haklarını bu
+adresten kullanacak; adres olmadan bu haklar fiilen kullanılamaz.
 
-Bu seçim şirketin nerede kurulu olduğuna ve kullanıcıların nerede olduğuna
-bağlı; bir avukata sorulması gereken kısım burası.
-
-### Politikadaki iki boşluk ⬜ — **engelleyici**
-Politikanın 9. bölümü iki yer tutucu içeriyor ve bunlar sizden başkası
-tarafından doldurulamaz:
-
-- `[E-POSTA ADRESİ]` — kullanıcı erişim, düzeltme, silme, taşınabilirlik
-  ve itiraz haklarını buradan kullanacak. Adres olmadan bu haklar fiilen
-  kullanılamaz.
-- `[ŞİRKET VEYA KİŞİ ADI, ADRES]` — veri sorumlusu kim?
-
-Altı dilde de aynı yer tutucular var (`privacy_policy_section9_content`).
-Köşeli parantezler bilerek bırakıldı: ekranda gözle görülür duruyorlar.
+### Hukuk seçimi ve veri sorumlusu ✅ (gözden geçirilmeli)
+Şartlar: Türkiye Cumhuriyeti hukuku, İstanbul Mahkemeleri ve İcra
+Daireleri. Politika: veri sorumlusu Hürkan Çelebi, Bağcılar/İstanbul.
+Yayından önce bir avukatın okuması önerilir.
 
 ### Gizlilik politikası URL'si ⬜
 App Store **herkese açık bir URL** ister. Uygulama içindeki gizlilik metni

@@ -238,7 +238,7 @@ class FirestoreDataSource {
 
   /// Kullanıcının uzak verisini kalıcı olarak siler.
   ///
-  /// "Hesabımı Sil" akışı yalnızca cihazdaki veriyi siliyordu; Firestore'daki
+  /// "Tüm verilerimi sil" akışı yalnızca cihazdaki veriyi siliyordu; Firestore'daki
   /// `users/{uid}`, günlük logları ve `intimacy/{uid}` dokümanı yerinde
   /// kalıyordu. İki sonucu vardı: bağlı partner, hesap silindikten sonra da
   /// yakınlık verisini okumaya devam ediyordu; ve hem App Store hem Play

@@ -7,7 +7,6 @@ import 'package:period_tracker/data/repositories/period_repository.dart';
 import 'package:period_tracker/data/repositories/privacy_settings_repository.dart';
 import 'package:period_tracker/domain/models/daily_log.dart';
 import 'package:period_tracker/domain/models/period_log.dart';
-import 'package:period_tracker/domain/view_models/user_view_model.dart';
 
 /// Geri alınamaz işlemlerin tam olarak söylediklerini yapması.
 ///
@@ -46,45 +45,6 @@ void main() {
     // Ekran kilidi: kullanıcının verisini korumak için açtığı ayar.
     await prefs.setBool('privacy_biometric_enabled', true);
   }
-
-  group('çıkış', () {
-    test('sağlık verisine dokunmuyor', () async {
-      await veriKur();
-      await UserViewModel().signOut();
-
-      expect(
-        (await periodRepo.getPeriodLogs()).length,
-        1,
-        reason: 'çıkış dönem kaydını sildi — diyalog kalacağını söylüyor',
-      );
-      expect((await periodRepo.getDailyLogs()).length, 1);
-      expect(await ayarlar.getCycleLength(), 30);
-      expect(await ayarlar.getPeriodLength(), 6);
-    });
-
-    test('ekran kilidini kapatmıyor', () async {
-      await veriKur();
-      await UserViewModel().signOut();
-
-      final prefs = await SharedPreferences.getInstance();
-      expect(
-        prefs.getBool('privacy_biometric_enabled'),
-        isTrue,
-        reason: 'çıkış kullanıcının kilidini sessizce kapattı',
-      );
-    });
-
-    test('oturumu ve partner bağını bitiriyor', () async {
-      await veriKur();
-      await UserViewModel().signOut();
-
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getBool('onboarding_complete'), isFalse);
-      expect(prefs.getString('partnerId'), isNull);
-      expect(prefs.getString('myId'), isNull);
-      expect(prefs.getBool('hasPartner'), isFalse);
-    });
-  });
 
   group('hesabı sil', () {
     test('sağlık verisinin tamamını siliyor', () async {

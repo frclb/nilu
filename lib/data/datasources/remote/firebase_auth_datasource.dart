@@ -32,7 +32,7 @@ class FirebaseAuthDataSource {
   /// Kimlik hesabını **kalıcı olarak** siler.
   ///
   /// App Store 5.1.1(v): hesap oluşturmayı destekleyen uygulama, hesabın
-  /// silinmesini de sunmak zorunda. "Hesabımı Sil" yalnızca Firestore
+  /// silinmesini de sunmak zorunda. "Tüm verilerimi sil" yalnızca Firestore
   /// verisini siliyor ve oturumu kapatıyordu; Apple hesabıyla girmiş bir
   /// kullanıcının kimliği Firebase'de duruyordu — yeniden giriş yaptığında
   /// aynı uid ile geri geliyordu, yani hesap silinmemişti.

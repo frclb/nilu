@@ -196,7 +196,7 @@ void main() {
 
   group('çıkış davranışı', () {
     test('çıkış sonrası korumalı ekran kapanır', () {
-      // signOut() onboardingComplete'i false yapar; aynı konum artık
+      // Veriler silinince onboardingComplete false olur; aynı konum artık
       // onboarding'e yönlendirilmelidir.
       const location = '/home';
 

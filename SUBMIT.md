@@ -20,16 +20,17 @@ Yükleme bunlardan birini atlarsa ya derleme durur ya inceleme reddeder.
 | | Durum | Nerede |
 |---|---|---|
 | Apple Developer Program üyeliği | ⬜ **engelleyici** | [SETUP_KEYS.md §1](SETUP_KEYS.md) |
-| Şartlardaki hukuk seçimi (`[UYGULANACAK HUKUK]`) | ⬜ **engelleyici** | [STORE_CHECKLIST.md](STORE_CHECKLIST.md) |
-| Politikadaki e-posta ve veri sorumlusu | ⬜ **engelleyici** | aynı |
+| Destek e-postası: `AppInfo.supportEmail` | ⬜ **engelleyici** | `lib/core/app_info.dart` |
+| Şartlar ve politikanın hukuki gözden geçirilmesi | ⬜ | [STORE_CHECKLIST.md](STORE_CHECKLIST.md) |
 | Gizlilik politikası yayında bir URL'de | ⬜ | zorunlu alan |
 | Gerçek AdMob kimlikleri | ⬜ | [SETUP_KEYS.md §6](SETUP_KEYS.md) |
 | RevenueCat anahtarı + `premium` entitlement | ⬜ | [SETUP_KEYS.md §5](SETUP_KEYS.md) |
 | `GoogleService-Info.plist` | ⬜ | `flutterfire configure` |
 
-**Köşeli parantezler özellikle tehlikeli.** İnceleyen kişi Şartlar ekranını
-açtığında `[UYGULANACAK HUKUK]` yazısını görür; bu "tamamlanmamış uygulama"
-sayılır.
+**Köşeli parantezler özellikle tehlikeli.** `AppInfo.supportEmail` boşken
+politika ve Şartlar `[E-POSTA ADRESİ]` gösteriyor; inceleyen kişi bunu
+"tamamlanmamış uygulama" sayar. Adres tek satırda verilince altı dilin
+hepsinde görünüyor.
 
 **Test reklam kimlikleriyle gönderme.** Google'ın test kimlikleri reklamın
 üstüne "Test mode" rozeti basıyor. İnceleyen bunu bozuk ya da yarım bir ekran

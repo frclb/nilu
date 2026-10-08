@@ -13,7 +13,7 @@ import 'package:period_tracker/presentation/profile/privacy_security_screen.dart
 import 'pregnancy_fixtures.dart';
 import 'screen_harness.dart';
 
-/// "Hesabımı Sil" bellekteki kopyaları da silmeli.
+/// "Tüm verilerimi sil" bellekteki kopyaları da silmeli.
 ///
 /// Silme depoyu tamamen temizliyordu ama ardından yalnızca kullanıcı
 /// durumu yeniden okunuyordu. Gebelik ve takvim ViewModel'leri eski

@@ -157,7 +157,7 @@ void main() {
     expect(find.byType(OnboardingWelcomeScreen), findsOneWidget);
   });
 
-  testWidgets('gebelik zaten kayıtlıysa (çıkış yapıp dönen) tarih yeniden '
+  testWidgets('gebelik zaten kayıtlıysa (yarıda kalan kurulum) tarih yeniden '
       'sorulmuyor', (tester) async {
     await seedPregnancy();
     await ac(tester);

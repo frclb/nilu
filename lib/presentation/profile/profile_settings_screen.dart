@@ -4,7 +4,6 @@ import '../../localization/date_names.dart';
 import '../../domain/view_models/pregnancy_view_model.dart';
 import '../../domain/models/life_stage.dart';
 import 'package:flutter/material.dart';
-import '../../design_system/app_theme.dart';
 import '../health_check/heavy_bleeding_screen.dart';
 import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
@@ -229,33 +228,6 @@ class ProfileSettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 32),
 
-              // Logout Button
-              TextButton.icon(
-                onPressed: () => _confirmAndSignOut(context),
-                // Kırmızıydı. Çıkış yıkıcı bir işlem değil — oturum kapanıyor,
-                // kayıtlı veri cihazda kalıyor. Kırmızı, hesap silmeye ait.
-                icon: Icon(Icons.logout, size: 20, color: context.tokens.text),
-                label: Text(
-                  context.tr('profile_logout'),
-                  style: TextStyle(
-                    color: context.tokens.text,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  backgroundColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
               // Version Info
               Text(
                 "v1.0.0",
@@ -267,46 +239,6 @@ class ProfileSettingsScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  /// Onay alır ve gerçekten oturumu kapatır.
-  ///
-  /// Eskiden bu düğme yalnızca `/onboarding`'e gidiyordu: uzak oturum açık
-  /// kalıyor, `onboarding_complete` bayrağı true kalıyordu. Sonuç olarak
-  /// uygulama yeniden açıldığında doğruca ana ekrana dönülüyor, hatta durum
-  /// her değiştiğinde kullanıcı ana ekrana geri sıçrıyordu.
-  Future<void> _confirmAndSignOut(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        // Başlık ve gövde biçimleri `dialogTheme`'den geliyor; burada elle
-        // beyaz/siyah ve gri tonlar yazılıydı, tema değişse de sabit
-        // kalıyorlardı.
-        title: Text(dialogContext.tr('logout_confirm_title')),
-        content: Text(dialogContext.tr('logout_confirm_desc')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(dialogContext.tr('cancel')),
-          ),
-          // Ham `Colors.red` idi. Çıkış yıkıcı bir işlem değil — metnin
-          // kendisi "kayıtlı sağlık verileriniz cihazda kalır" diyor. Kırmızı
-          // burada olduğundan ağır bir uyarı veriyordu; hesap silmeye
-          // saklandı.
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            style: AppTheme.dialogAction(),
-            child: Text(dialogContext.tr('profile_logout')),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true || !context.mounted) return;
-
-    // Oturumu kapat. Router `refreshListenable` üzerinden durumu görüp
-    // kullanıcıyı onboarding'e yönlendirir — elle gezinmeye gerek yok.
-    await context.read<UserViewModel>().signOut();
   }
 }
 

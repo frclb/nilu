@@ -12,4 +12,14 @@ class AppInfo {
   const AppInfo._();
 
   static const String displayName = 'Nilu';
+
+  /// Kullanıcının haklarını kullanacağı ve soru soracağı adres.
+  ///
+  /// Gizlilik politikası (9. bölüm) ve Şartlar (12. bölüm) bu adresi
+  /// gösteriyor. Önceden altı dilde on iki ayrı yerde köşeli parantezli bir
+  /// yer tutucu vardı; adres gelince hepsini tek tek değiştirmek gerekecekti.
+  ///
+  /// `null` iken metinde dilin yer tutucusu görünür (`legal_email_placeholder`).
+  /// **Yayından önce doldurulmalı** — bkz. SUBMIT.md.
+  static const String? supportEmail = null;
 }
