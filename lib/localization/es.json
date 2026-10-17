@@ -1094,5 +1094,13 @@
   "day_detail_preg_test_positive_body": "Una prueba casera positiva suele indicar embarazo. Puedes consultar a un médico para confirmarlo.",
   "day_detail_preg_test_start": "Iniciar seguimiento del embarazo",
   "home_late_note": "A veces los ciclos se desplazan unos días. Si es posible un embarazo, una prueba casera puede orientarte; puedes añadir el resultado al registro de hoy.",
-  "home_late_log_today": "Registrar hoy"
+  "home_late_log_today": "Registrar hoy",
+  "past_periods_title": "Periodos anteriores",
+  "past_periods_intro": "Toca los días en que empezaron tus periodos anteriores. Cada uno se añade como un periodo de {n} días; puedes ajustarlo después en el calendario. Cuantos más ciclos añadas, mejores serán las estimaciones.",
+  "past_periods_add": "Añadir ({n})",
+  "past_periods_added": "Periodos añadidos: {n}",
+  "past_periods_entry": "Añadir periodos anteriores",
+  "past_periods_entry_body": "Más ciclos, mejores estimaciones",
+  "past_periods_day_recorded": "día de periodo registrado",
+  "cycle_settings_days": "{n} días"
 }

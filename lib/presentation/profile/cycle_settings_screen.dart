@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../data/repositories/cycle_settings_repository.dart';
 import '../../presentation/calendar/view_models/calendar_view_model.dart';
+import '../../core/navigation/route_names.dart';
 import '../../localization/app_localizations.dart';
 import '../../design_system/app_layout.dart';
 
@@ -104,7 +105,10 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                   _buildSliderSetting(
                     context,
                     context.tr('cycle_settings_length'),
-                    '$_cycleLength Gün',
+                    context.tr(
+                      'cycle_settings_days',
+                      params: {'n': '$_cycleLength'},
+                    ),
                     _cycleLength.toDouble(),
                     min: CycleSettingsRepository.minCycleLength.toDouble(),
                     max: CycleSettingsRepository.maxCycleLength.toDouble(),
@@ -119,7 +123,10 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                   _buildSliderSetting(
                     context,
                     context.tr('cycle_settings_period'),
-                    '$_periodLength Gün',
+                    context.tr(
+                      'cycle_settings_days',
+                      params: {'n': '$_periodLength'},
+                    ),
                     _periodLength.toDouble(),
                     min: CycleSettingsRepository.minPeriodLength.toDouble(),
                     max: CycleSettingsRepository.maxPeriodLength.toDouble(),
@@ -178,6 +185,51 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+
+                  // Geçmiş başlangıçlar: ortalama ve aralık tahmini ancak
+                  // birkaç döngüyle çıkıyor. Regl kaydı tutulmayan evrede
+                  // (gebelik, lohusalık) yok.
+                  if (context
+                      .watch<CalendarViewModel>()
+                      .lifeStage
+                      .recordsPeriods) ...[
+                    Material(
+                      color: context.tokens.surface,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(color: context.tokens.border),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: ListTile(
+                        key: const Key('cycle_settings_past_periods'),
+                        leading: Icon(
+                          Icons.history,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        title: Text(
+                          context.tr('past_periods_entry'),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: context.tokens.text,
+                          ),
+                        ),
+                        subtitle: Text(
+                          context.tr('past_periods_entry_body'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: context.tokens.textMuted,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.chevron_right,
+                          color: context.tokens.textMuted,
+                        ),
+                        onTap: () => context.pushNamed(RouteNames.pastPeriods),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
 
                   // Bilgi notu
                   Container(

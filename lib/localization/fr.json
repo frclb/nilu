@@ -1094,5 +1094,13 @@
   "day_detail_preg_test_positive_body": "Un test maison positif indique généralement une grossesse. Tu peux consulter un médecin pour la confirmer.",
   "day_detail_preg_test_start": "Commencer le suivi de grossesse",
   "home_late_note": "Les cycles se décalent parfois de quelques jours. Si une grossesse est possible, un test maison peut t'éclairer ; tu peux noter le résultat aujourd'hui.",
-  "home_late_log_today": "Noter aujourd'hui"
+  "home_late_log_today": "Noter aujourd'hui",
+  "past_periods_title": "Règles passées",
+  "past_periods_intro": "Touche les jours où tes règles passées ont commencé. Chacune est ajoutée comme une période de {n} jours ; tu pourras l'ajuster ensuite dans le calendrier. Plus tu ajoutes de cycles, meilleures sont les estimations.",
+  "past_periods_add": "Ajouter ({n})",
+  "past_periods_added": "Règles ajoutées : {n}",
+  "past_periods_entry": "Ajouter des règles passées",
+  "past_periods_entry_body": "Plus de cycles, meilleures estimations",
+  "past_periods_day_recorded": "jour de règles noté",
+  "cycle_settings_days": "{n} jours"
 }

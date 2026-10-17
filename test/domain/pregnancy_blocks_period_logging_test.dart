@@ -84,6 +84,11 @@ void main() {
     expect(await vm.endPeriodToday(), isFalse);
     expect(await vm.undoPeriodStart(), isFalse);
     expect(await vm.reopenPeriodToday(), isFalse);
+    expect(
+      await vm.addPastPeriodStarts([bugun.subtract(const Duration(days: 400))]),
+      0,
+      reason: 'Toplu geçmiş girişi de aynı korumadan geçmeli',
+    );
 
     expect(
       vm.periodLogs.map((l) => l.toJson()).toList(),
@@ -157,6 +162,7 @@ void main() {
       'endPeriodToday',
       'undoPeriodStart',
       'reopenPeriodToday',
+      'addPastPeriodStarts',
       '_loadData', // yükleme: depodan okuyor, kullanıcı girişi değil
     };
 

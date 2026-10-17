@@ -1094,5 +1094,13 @@
   "day_detail_preg_test_positive_body": "Ein positiver Heimtest bedeutet meist eine Schwangerschaft. Zur Bestätigung kannst du ärztlichen Rat suchen.",
   "day_detail_preg_test_start": "Schwangerschaftsbegleitung starten",
   "home_late_note": "Zyklen verschieben sich manchmal um ein paar Tage. Wenn eine Schwangerschaft möglich ist, kann ein Heimtest Klarheit geben; das Ergebnis kannst du heute eintragen.",
-  "home_late_log_today": "Heute eintragen"
+  "home_late_log_today": "Heute eintragen",
+  "past_periods_title": "Frühere Perioden",
+  "past_periods_intro": "Tippe auf die Tage, an denen frühere Perioden begonnen haben. Jede wird als {n}-tägige Periode eingetragen; im Kalender kannst du sie später anpassen. Je mehr Zyklen, desto besser die Schätzungen.",
+  "past_periods_add": "Hinzufügen ({n})",
+  "past_periods_added": "Hinzugefügte Perioden: {n}",
+  "past_periods_entry": "Frühere Perioden eintragen",
+  "past_periods_entry_body": "Mehr Zyklen, bessere Schätzungen",
+  "past_periods_day_recorded": "eingetragener Periodentag",
+  "cycle_settings_days": "{n} Tage"
 }

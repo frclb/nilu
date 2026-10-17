@@ -41,6 +41,9 @@ class CalendarViewModel extends ChangeNotifier {
   List<DateSpan> _cycleBreaks = const [];
   int _pregnancyRevision = -1;
 
+  /// Kullanıcının regl süresi ayarı (toplu girişte her dönemin uzunluğu).
+  int get periodLength => _userPeriodLength;
+
   /// Hormonal doğum kontrolü açıkken doğurganlık tahmini gösterilmez.
   bool get hormonalContraception => _hormonalContraception;
 
@@ -230,6 +233,31 @@ class CalendarViewModel extends ChangeNotifier {
     await _persistPeriods();
     return true;
   }
+
+  /// Hatırlanan geçmiş başlangıçları ekler; eklenen dönem sayısını döner.
+  ///
+  /// Kurallar `PeriodService.addStarts`'ta; burada yalnızca evre ve
+  /// gebelik/lohusalık aralıkları uygulanıyor: o günlerdeki kanama regl
+  /// değil (bkz. `LifeStage.bleedingMeaning`).
+  Future<int> addPastPeriodStarts(Iterable<DateTime> starts) async {
+    if (!_canRecordPeriods) return 0;
+    final now = DateTime.now();
+    final sonuc = _periodService.addStarts(
+      _periodLogs,
+      starts,
+      today: DateTime(now.year, now.month, now.day),
+      expectedLength: _userPeriodLength,
+      blocked: _inBreak,
+    );
+    if (sonuc.added == 0) return 0;
+    _periodLogs = sonuc.logs;
+    await _persistPeriods();
+    return sonuc.added;
+  }
+
+  /// [date] gebelik ya da lohusalık aralığında mı? Toplu giriş ekranı o
+  /// günleri seçtirmiyor.
+  bool isInPregnancyBreak(DateTime date) => _inBreak(date);
 
   /// Takvimin "tahmin" olarak boyadığı gün.
   ///

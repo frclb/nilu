@@ -250,6 +250,71 @@ class PeriodService {
     );
   }
 
+  /// Hatırlanan geçmiş başlangıçları toplu ekler.
+  ///
+  /// Yeni kullanıcının elinde tek bir başlangıç oluyordu ve ortalama
+  /// döngü, aralık tahmini, trend için aylarca beklemesi gerekiyordu. Her
+  /// başlangıç [expectedLength] günlük bir dönem olarak ekleniyor; bitiş
+  /// kuralı [recordFromStart] ile aynı.
+  ///
+  /// Atlananlar sessizce atlanıyor ama sayılıyor (dönen `added`):
+  /// - gelecek günler,
+  /// - zaten kayıtlı bir dönemin içine düşen günler,
+  /// - [blocked] dediği günler (gebelik ve lohusalık aralığı).
+  ///
+  /// Yeni dönem bir sonraki başlangıca taşmıyor: bitişi o başlangıcın bir
+  /// gün öncesine çekiliyor. Aynı milisaniyede kurulan kayıtlar aynı
+  /// kimliği almasın diye kimliğe sıra ekleniyor.
+  ({List<PeriodLog> logs, int added}) addStarts(
+    List<PeriodLog> logs,
+    Iterable<DateTime> starts, {
+    required DateTime today,
+    int expectedLength = PeriodLog.defaultOngoingLength,
+    bool Function(DateTime day)? blocked,
+  }) {
+    DateTime gun(DateTime d) => DateTime(d.year, d.month, d.day);
+    final cleanToday = gun(today);
+    final result = List<PeriodLog>.from(logs);
+    final sirali = {for (final s in starts) gun(s)}.toList()..sort();
+    final damga = DateTime.now().millisecondsSinceEpoch;
+
+    var added = 0;
+    for (final bas in sirali) {
+      if (bas.isAfter(cleanToday)) continue;
+      if (blocked?.call(bas) ?? false) continue;
+      if (result.any((l) => l.containsRecorded(bas, today: cleanToday))) {
+        continue;
+      }
+
+      final yeni = recordFromStart(
+        bas,
+        today: cleanToday,
+        expectedLength: expectedLength,
+      );
+
+      DateTime? sonraki;
+      for (final l in result) {
+        final f = l.firstDay;
+        if (f.isAfter(bas) && (sonraki == null || f.isBefore(sonraki))) {
+          sonraki = f;
+        }
+      }
+      var bitis = yeni.endDate;
+      if (sonraki != null) {
+        final sinir = sonraki.plusDays(-1);
+        if (bitis == null || bitis.isAfter(sinir)) bitis = sinir;
+      }
+
+      result.add(
+        PeriodLog(id: '${damga}_$added', startDate: bas, endDate: bitis),
+      );
+      added++;
+    }
+
+    result.sort((a, b) => a.startDate.compareTo(b.startDate));
+    return (logs: result, added: added);
+  }
+
   /// Belirli bir tarihten önceki en son regl başlangıcını bulur.
   DateTime? getLastPeriodStartBefore(List<PeriodLog> logs, DateTime date) {
     if (logs.isEmpty) return null;

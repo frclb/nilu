@@ -21,6 +21,7 @@ import 'package:period_tracker/presentation/profile/notification_settings_screen
 import 'package:period_tracker/presentation/profile/personal_info_screen.dart';
 import 'package:period_tracker/presentation/profile/privacy_security_screen.dart';
 import 'package:period_tracker/presentation/widgets_preview/widgets_preview_screen.dart';
+import 'package:period_tracker/presentation/calendar/past_periods_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_birth_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_conception_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_goal_screen.dart';
@@ -62,6 +63,7 @@ void main() {
     'privacy_security': const PrivacySecurityScreen(),
     'notification_settings': const NotificationSettingsScreen(),
     'cycle_settings': const CycleSettingsScreen(),
+    'past_periods': const PastPeriodsScreen(),
     'personal_info': const PersonalInfoScreen(),
     'appearance': const AppearanceScreen(),
     'health_sync': const HealthSyncScreen(),

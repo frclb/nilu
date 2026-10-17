@@ -277,15 +277,38 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Beklemek yerine hatırlananları girmek: trend iki başlangıçla çıkıyor.
+    final kayitTutuluyor = context.select<CalendarViewModel, bool>(
+      (vm) => vm.lifeStage.recordsPeriods,
+    );
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(Icons.insights_outlined, size: 20, color: subtitleColor),
         const SizedBox(width: 12),
         Expanded(
-          child: Text(
-            context.tr('insights_trend_empty'),
-            style: TextStyle(fontSize: 13, height: 1.5, color: subtitleColor),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                context.tr('insights_trend_empty'),
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.5,
+                  color: subtitleColor,
+                ),
+              ),
+              if (kayitTutuluyor)
+                TextButton(
+                  key: const Key('insights_add_past_periods'),
+                  onPressed: () => context.pushNamed(RouteNames.pastPeriods),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    minimumSize: const Size(0, 44),
+                  ),
+                  child: Text(context.tr('past_periods_entry')),
+                ),
+            ],
           ),
         ),
       ],

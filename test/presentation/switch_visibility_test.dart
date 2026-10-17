@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:period_tracker/design_system/app_flavor.dart';
 import 'package:period_tracker/design_system/app_theme.dart';
 import 'package:period_tracker/localization/app_localizations.dart';
+import 'package:period_tracker/presentation/calendar/view_models/calendar_view_model.dart';
 import 'package:period_tracker/presentation/profile/cycle_settings_screen.dart';
 
 /// Anahtarların açık hâlinde topuz görünüyor mu?
@@ -103,7 +105,12 @@ void main() {
               ],
               locale: const Locale('tr'),
               supportedLocales: const [Locale('tr')],
-              home: const CycleSettingsScreen(),
+              // Ekran evreyi takvimden okuyor (geçmiş regl girişi yalnızca
+              // döngü evresinde).
+              home: ChangeNotifierProvider(
+                create: (_) => CalendarViewModel(),
+                child: const CycleSettingsScreen(),
+              ),
             ),
           );
           await Future<void>.delayed(const Duration(milliseconds: 300));

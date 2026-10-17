@@ -1094,5 +1094,13 @@
   "day_detail_preg_test_positive_body": "A positive home test usually means pregnancy. You can see a doctor to confirm it.",
   "day_detail_preg_test_start": "Start pregnancy tracking",
   "home_late_note": "Cycles sometimes shift by a few days. If pregnancy is possible, a home test can help; you can add the result to today's log.",
-  "home_late_log_today": "Log today"
+  "home_late_log_today": "Log today",
+  "past_periods_title": "Past periods",
+  "past_periods_intro": "Tap the days your past periods started. Each is added as a {n}-day period; you can adjust it later in the calendar. The more cycles you add, the better the estimates.",
+  "past_periods_add": "Add ({n})",
+  "past_periods_added": "Periods added: {n}",
+  "past_periods_entry": "Add past periods",
+  "past_periods_entry_body": "More cycles, better estimates",
+  "past_periods_day_recorded": "logged period day",
+  "cycle_settings_days": "{n} days"
 }

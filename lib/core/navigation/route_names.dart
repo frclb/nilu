@@ -24,6 +24,7 @@ class RouteNames {
   static const String notificationSettings = 'notification_settings';
   static const String personalInfo = 'personal_info';
   static const String cycleSettings = 'cycle_settings';
+  static const String pastPeriods = 'past_periods';
   static const String privacySecurity = 'privacy_security';
   static const String partnerQrGen = 'partner_qr_gen';
   static const String partnerScan = 'partner_scan';

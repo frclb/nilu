@@ -1094,5 +1094,13 @@
   "day_detail_preg_test_positive_body": "Pozitif bir ev testi çoğu zaman gebeliği gösterir. Doğrulamak için hekimine başvurabilirsin.",
   "day_detail_preg_test_start": "Gebelik takibini başlat",
   "home_late_note": "Döngüler zaman zaman birkaç gün kayar. Gebelik olasılığı varsa bir ev testi fikir verebilir; sonucunu bugünün kaydına ekleyebilirsin.",
-  "home_late_log_today": "Bugünü kaydet"
+  "home_late_log_today": "Bugünü kaydet",
+  "past_periods_title": "Geçmiş regller",
+  "past_periods_intro": "Hatırladığın regl başlangıç günlerine dokun. Her biri {n} günlük bir dönem olarak eklenir; sonra takvimden düzeltebilirsin. Ne kadar çok döngü girersen tahminler o kadar iyileşir.",
+  "past_periods_add": "Ekle ({n})",
+  "past_periods_added": "Eklenen dönem: {n}",
+  "past_periods_entry": "Geçmiş reglleri ekle",
+  "past_periods_entry_body": "Daha çok döngü, daha iyi tahmin",
+  "past_periods_day_recorded": "kayıtlı regl günü",
+  "cycle_settings_days": "{n} gün"
 }
