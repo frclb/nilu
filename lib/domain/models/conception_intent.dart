@@ -9,6 +9,10 @@ class ConceptionIntent {
   /// Denemeye başlanan gün.
   final DateTime since;
 
+  /// Başlangıç olarak seçilebilecek en eski yıl sayısı. Daha eskisi öneriyi
+  /// değiştirmiyor: bir yılı geçen herkese "danış" deniyor.
+  static const int maxYearsBack = 5;
+
   ConceptionIntent({required DateTime since})
     : since = DateTime(since.year, since.month, since.day);
 

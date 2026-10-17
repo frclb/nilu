@@ -1070,5 +1070,21 @@
   "notif_late_setting": "Bei Verspätung nachfragen",
   "notif_late_setting_body": "Fragt einmal, {n} Tage nach dem erwarteten Tag.",
   "notif_late_title": "Hat deine Periode begonnen?",
-  "notif_late_body": "Der erwartete Tag ist ein paar Tage her. Wenn sie begonnen hat, kannst du sie eintragen; ein paar Tage Verschiebung sind häufig."
+  "notif_late_body": "Der erwartete Tag ist ein paar Tage her. Wenn sie begonnen hat, kannst du sie eintragen; ein paar Tage Verschiebung sind häufig.",
+  "onb_goal_ttc": "Ich möchte schwanger werden",
+  "onb_goal_ttc_body": "Geschätzte fruchtbare Tage, Folsäure und wann du ärztlichen Rat suchen solltest",
+  "onb_goal_postpartum": "Ich habe vor Kurzem entbunden",
+  "onb_goal_postpartum_body": "Wochenbett-Untersuchungen und Wochenfluss",
+  "onb_ttc_title": "Wie lange versuchst du es schon?",
+  "onb_ttc_desc": "Danach richtet sich die Erinnerung, wann du ärztlichen Rat suchen solltest. Du kannst es später im Profil ändern.",
+  "onb_ttc_now": "Ich fange gerade an",
+  "onb_ttc_now_body": "Ab heute",
+  "onb_ttc_since": "Ich versuche es schon eine Weile",
+  "onb_ttc_since_body": "Wähle, wann du angefangen hast",
+  "onb_birth_title": "Wann wurde dein Baby geboren?",
+  "onb_birth_desc": "Das Wochenbett umfasst die 42 Tage nach der Geburt. Deine Untersuchungen und dein Blutungsprotokoll richten sich nach diesem Datum.",
+  "onb_birth_older": "Liegt die Geburt mehr als 42 Tage zurück, geh zurück und wähle „Ich möchte meinen Zyklus verfolgen“.",
+  "onboarding_success_desc_postpartum": "Deine Wochenbett-Begleitung ist bereit. Untersuchungen und Blutungsprotokoll findest du auf dem Startbildschirm.",
+  "onboarding_success_desc_conception": "Dein Zyklus ist eingerichtet. Deine geschätzten fruchtbaren Tage siehst du auf dem Startbildschirm; wir erinnern dich an Folsäure und daran, wann du ärztlichen Rat suchen solltest.",
+  "profile_preg_ttc_since": "Angefangen am"
 }

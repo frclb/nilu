@@ -1070,5 +1070,21 @@
   "notif_late_setting": "Demander en cas de retard",
   "notif_late_setting_body": "Demande une fois, {n} jours après le jour prévu.",
   "notif_late_title": "Tes règles ont-elles commencé ?",
-  "notif_late_body": "Le jour prévu est passé de quelques jours. Si elles ont commencé, tu peux les noter ; un décalage de quelques jours est fréquent."
+  "notif_late_body": "Le jour prévu est passé de quelques jours. Si elles ont commencé, tu peux les noter ; un décalage de quelques jours est fréquent.",
+  "onb_goal_ttc": "Je souhaite tomber enceinte",
+  "onb_goal_ttc_body": "Fenêtre fertile estimée, acide folique et quand consulter",
+  "onb_goal_postpartum": "J'ai accouché récemment",
+  "onb_goal_postpartum_body": "Suivi post-partum et saignements après l'accouchement",
+  "onb_ttc_title": "Depuis combien de temps essaies-tu ?",
+  "onb_ttc_desc": "Cela sert à te rappeler quand consulter. Tu pourras le modifier plus tard dans Profil.",
+  "onb_ttc_now": "Je commence tout juste",
+  "onb_ttc_now_body": "À partir d'aujourd'hui",
+  "onb_ttc_since": "J'essaie depuis un moment",
+  "onb_ttc_since_body": "Choisis la date à laquelle tu as commencé",
+  "onb_birth_title": "Quand ton bébé est-il né ?",
+  "onb_birth_desc": "Le post-partum correspond aux 42 jours après l'accouchement. Tes contrôles et ton suivi des saignements sont calés sur cette date.",
+  "onb_birth_older": "Si l'accouchement date de plus de 42 jours, reviens en arrière et choisis « Je veux suivre mon cycle ».",
+  "onboarding_success_desc_postpartum": "Ton suivi post-partum est prêt. Tes contrôles et ton suivi des saignements sont sur l'écran d'accueil.",
+  "onboarding_success_desc_conception": "Ton cycle est configuré. Ta fenêtre fertile estimée est sur l'écran d'accueil ; nous te rappellerons l'acide folique et quand consulter.",
+  "profile_preg_ttc_since": "J'ai commencé le"
 }

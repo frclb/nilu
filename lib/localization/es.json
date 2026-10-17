@@ -1070,5 +1070,21 @@
   "notif_late_setting": "Preguntar si se retrasa",
   "notif_late_setting_body": "Pregunta una vez, {n} días después del día esperado.",
   "notif_late_title": "¿Te ha bajado el periodo?",
-  "notif_late_body": "Han pasado unos días desde la fecha esperada. Si ya empezó, puedes registrarlo; es habitual que el ciclo se desplace unos días."
+  "notif_late_body": "Han pasado unos días desde la fecha esperada. Si ya empezó, puedes registrarlo; es habitual que el ciclo se desplace unos días.",
+  "onb_goal_ttc": "Quiero quedarme embarazada",
+  "onb_goal_ttc_body": "Ventana fértil estimada, ácido fólico y cuándo consultar",
+  "onb_goal_postpartum": "He dado a luz hace poco",
+  "onb_goal_postpartum_body": "Controles posparto y sangrado después del parto",
+  "onb_ttc_title": "¿Cuánto tiempo llevas intentándolo?",
+  "onb_ttc_desc": "Lo usamos para recordarte cuándo consultar. Puedes cambiarlo más tarde en Perfil.",
+  "onb_ttc_now": "Acabo de empezar",
+  "onb_ttc_now_body": "Desde hoy",
+  "onb_ttc_since": "Llevo un tiempo intentándolo",
+  "onb_ttc_since_body": "Elige la fecha en que empezaste",
+  "onb_birth_title": "¿Cuándo nació tu bebé?",
+  "onb_birth_desc": "El posparto son los 42 días después del parto. Tus controles y el registro de sangrado se ajustan a esta fecha.",
+  "onb_birth_older": "Si el parto fue hace más de 42 días, vuelve atrás y elige «Quiero seguir mi ciclo».",
+  "onboarding_success_desc_postpartum": "Tu seguimiento posparto está listo. Tus controles y el registro de sangrado están en la pantalla de inicio.",
+  "onboarding_success_desc_conception": "Tu ciclo está configurado. Tu ventana fértil estimada está en la pantalla de inicio; te recordaremos el ácido fólico y cuándo consultar.",
+  "profile_preg_ttc_since": "Empecé a intentarlo el"
 }

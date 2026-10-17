@@ -243,5 +243,74 @@ void main() {
       await vm.setConception(true);
       expect(vm.conception?.since, DateTime(2026, 1, 1));
     });
+
+    test('başlangıç tarihi verilebiliyor ve düzeltilebiliyor', () async {
+      await vm.setConceptionSince(DateTime(2025, 9, 15));
+      expect(vm.conception?.since, DateTime(2025, 9, 15));
+      expect(
+        (await const ConceptionRepository().get())?.since,
+        DateTime(2025, 9, 15),
+      );
+
+      await vm.setConceptionSince(DateTime(2025, 11, 2));
+      expect(vm.conception?.since, DateTime(2025, 11, 2));
+    });
+
+    test('gelecek tarih bugüne çekiliyor', () async {
+      await vm.setConceptionSince(DateTime(2026, 8, 1));
+      expect(vm.conception?.since, bugun);
+    });
+  });
+
+  group('doğumdan sonra gelen kullanıcı', () {
+    test('doğum kaydediliyor, evre lohusalık', () async {
+      await vm.recordBirth(birthDate: DateTime(2026, 5, 20));
+
+      expect(vm.stage, LifeStage.postpartum);
+      final g = (await const PregnancyRepository().getAll()).single;
+      expect(g.outcome, PregnancyOutcome.birth);
+      expect(g.endedAt, DateTime(2026, 5, 20));
+      expect(
+        g.dueDateFromClinician,
+        isFalse,
+        reason: 'Tarih hekimden gelmedi; öyle gösterilmemeli',
+      );
+    });
+
+    test('Türkiye şablonunda yalnızca lohusa izlemleri', () async {
+      await vm.recordBirth(
+        birthDate: DateTime(2026, 5, 20),
+        careTemplate: 'tr',
+      );
+
+      final kalemler = await const CareRepository().getAll();
+      expect(kalemler, isNotEmpty);
+      expect(
+        kalemler.every((e) => e.anchor == CareAnchor.postpartum),
+        isTrue,
+        reason: 'Gebelik izlemleri geçmişte kalmış; "kaçırıldı" görünürdü',
+      );
+    });
+
+    test('süren gebelik varsa ikinci kayıt açılmıyor, o bitiyor', () async {
+      await vm.startFromLmp(lmp: DateTime(2025, 9, 1), cycleLength: 28);
+      await vm.recordBirth(birthDate: DateTime(2026, 5, 28));
+
+      final hepsi = await const PregnancyRepository().getAll();
+      expect(hepsi, hasLength(1));
+      expect(hepsi.single.endedAt, DateTime(2026, 5, 28));
+      expect(vm.stage, LifeStage.postpartum);
+    });
+
+    test('gelecek tarih bugüne çekiliyor', () async {
+      await vm.recordBirth(birthDate: DateTime(2026, 7, 1));
+      expect(vm.current?.endedAt, bugun);
+    });
+
+    test('planlama niyeti kapanıyor', () async {
+      await vm.setConception(true);
+      await vm.recordBirth(birthDate: DateTime(2026, 5, 20));
+      expect(vm.conception, isNull);
+    });
   });
 }

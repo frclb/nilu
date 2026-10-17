@@ -2,6 +2,7 @@ import '../pregnancy/return_to_cycle.dart';
 import '../pregnancy/due_date_sheet.dart';
 import '../../localization/date_names.dart';
 import '../../domain/view_models/pregnancy_view_model.dart';
+import '../../domain/models/conception_intent.dart';
 import '../../domain/models/life_stage.dart';
 import 'package:flutter/material.dart';
 import '../health_check/heavy_bleeding_screen.dart';
@@ -274,6 +275,28 @@ class _GebelikBolumu extends StatelessWidget {
             onChanged: vm.setConception,
           ),
         ),
+        // Hekime danışma önerisi bu günden sayılıyor; yanlış girildiyse
+        // düzeltilebilmeli.
+        if (vm.conception case final niyet?)
+          SettingsItem(
+            title: context.tr('profile_preg_ttc_since'),
+            subtitle:
+                '${niyet.since.day} ${context.monthName(niyet.since.month)} '
+                '${niyet.since.year}',
+            icon: Icons.event_outlined,
+            iconColor: renk,
+            iconBgColor: zemin,
+            onTap: () async {
+              final bugun = DateTime.now();
+              final secilen = await showDatePicker(
+                context: context,
+                initialDate: niyet.since,
+                firstDate: DateTime(bugun.year - ConceptionIntent.maxYearsBack),
+                lastDate: bugun,
+              );
+              if (secilen != null) await vm.setConceptionSince(secilen);
+            },
+          ),
       ],
       LifeStage.pregnancy => [
         SettingsItem(

@@ -1070,5 +1070,21 @@
   "notif_late_setting": "Gecikirse sor",
   "notif_late_setting_body": "Beklenen günden {n} gün sonra bir kez sorar.",
   "notif_late_title": "Reglin başladı mı?",
-  "notif_late_body": "Beklenen günden birkaç gün geçti. Başladıysa kaydedebilirsin; döngünün birkaç gün kayması sık görülür."
+  "notif_late_body": "Beklenen günden birkaç gün geçti. Başladıysa kaydedebilirsin; döngünün birkaç gün kayması sık görülür.",
+  "onb_goal_ttc": "Bebek istiyorum",
+  "onb_goal_ttc_body": "Tahmini doğurganlık penceresi, folik asit ve hekime danışma zamanı",
+  "onb_goal_postpartum": "Yakın zamanda doğum yaptım",
+  "onb_goal_postpartum_body": "Lohusalık kontrolleri ve doğum sonrası kanama",
+  "onb_ttc_title": "Ne zamandır deniyorsunuz?",
+  "onb_ttc_desc": "Hekime danışma zamanı buna göre hatırlatılır. Sonradan Profil'den değiştirebilirsiniz.",
+  "onb_ttc_now": "Yeni başlıyorum",
+  "onb_ttc_now_body": "Bugünden itibaren",
+  "onb_ttc_since": "Bir süredir deniyorum",
+  "onb_ttc_since_body": "Başladığınız tarihi seçin",
+  "onb_birth_title": "Bebeğiniz ne zaman doğdu?",
+  "onb_birth_desc": "Lohusalık doğumdan sonraki 42 gündür. Kontrolleriniz ve kanama kaydınız bu tarihe göre ayarlanır.",
+  "onb_birth_older": "Doğumunuz 42 günden eskiyse geri dönüp \"Döngümü takip etmek istiyorum\"u seçin.",
+  "onboarding_success_desc_postpartum": "Lohusalık takibiniz hazır. Kontrolleriniz ve doğum sonrası kanama kaydı ana ekranda.",
+  "onboarding_success_desc_conception": "Döngünüz ayarlandı. Tahmini doğurganlık pencereniz ana ekranda; folik asit ve hekime danışma zamanını hatırlatacağız.",
+  "profile_preg_ttc_since": "Denemeye başladığım tarih"
 }

@@ -1070,5 +1070,21 @@
   "notif_late_setting": "Ask if it's late",
   "notif_late_setting_body": "Asks once, {n} days after the expected day.",
   "notif_late_title": "Has your period started?",
-  "notif_late_body": "It's a few days past the expected day. If it has started, you can log it; cycles shifting by a few days is common."
+  "notif_late_body": "It's a few days past the expected day. If it has started, you can log it; cycles shifting by a few days is common.",
+  "onb_goal_ttc": "I'm trying to conceive",
+  "onb_goal_ttc_body": "Estimated fertile window, folic acid and when to see a doctor",
+  "onb_goal_postpartum": "I recently gave birth",
+  "onb_goal_postpartum_body": "Postpartum check-ups and bleeding after birth",
+  "onb_ttc_title": "How long have you been trying?",
+  "onb_ttc_desc": "We use this to remind you when to see a doctor. You can change it later in Profile.",
+  "onb_ttc_now": "I'm just starting",
+  "onb_ttc_now_body": "From today",
+  "onb_ttc_since": "I've been trying for a while",
+  "onb_ttc_since_body": "Pick the date you started",
+  "onb_birth_title": "When was your baby born?",
+  "onb_birth_desc": "The postpartum period is the 42 days after birth. Your check-ups and bleeding log are set from this date.",
+  "onb_birth_older": "If the birth was more than 42 days ago, go back and choose \"I want to track my cycle\".",
+  "onboarding_success_desc_postpartum": "Your postpartum tracking is ready. Your check-ups and bleeding log are on the home screen.",
+  "onboarding_success_desc_conception": "Your cycle is set up. Your estimated fertile window is on the home screen; we'll remind you about folic acid and when to see a doctor.",
+  "profile_preg_ttc_since": "Started trying on"
 }

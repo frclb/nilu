@@ -187,6 +187,38 @@ class PregnancyViewModel extends ChangeNotifier {
     await _reload();
   }
 
+  /// Doğumdan sonra gelen kullanıcının doğumunu kaydeder.
+  ///
+  /// Süren bir gebelik varsa o doğumla bitiriliyor; ikinci bir kayıt açılsa
+  /// evre çözümlemesi iki gebelik arasında kalırdı. Gelecek tarih bugüne
+  /// çekiliyor.
+  Future<void> recordBirth({
+    required DateTime birthDate,
+    String? careTemplate,
+  }) async {
+    final bugun = _clock();
+    final gun = birthDate.isAfter(bugun) ? bugun : birthDate;
+
+    if (_pregnancies.any((p) => p.isActive)) {
+      await end(PregnancyOutcome.birth, at: gun);
+      return;
+    }
+
+    final dogum = Pregnancy.fromBirth(
+      birthDate: gun,
+      confirmedAt: bugun,
+      careTemplate: careTemplate,
+    );
+    await _pregnancyRepo.upsert(dogum);
+    if (careTemplate == 'tr') {
+      await _careRepo.addMissing(
+        CareTemplates.generate(dogum, CareTemplates.turkeyPostnatal),
+      );
+    }
+    await _conceptionRepo.set(null);
+    await _reload();
+  }
+
   /// Lohusalığı erken bitirip regl takibine döner.
   ///
   /// Doğum kaydı ve randevular kalıyor; lohusa hatırlatıcıları evreden
@@ -243,6 +275,20 @@ class PregnancyViewModel extends ChangeNotifier {
   Future<void> setConception(bool on) async {
     if (on && _conception != null) return;
     await _conceptionRepo.set(on ? ConceptionIntent(since: _clock()) : null);
+    await _reload();
+  }
+
+  /// Denemeye başlanan günü kaydeder (ya da düzeltir).
+  ///
+  /// Kurulumda "Bir süredir deniyorum" diyen kullanıcı için: hekime danışma
+  /// önerisi (ASRM 6/12 ay) bu günden sayılıyor. [setConception] yalnızca
+  /// bugünle açabiliyordu; bir yıldır deneyen kullanıcıya öneri bir yıl
+  /// gecikirdi. Gelecek tarih bugüne çekiliyor.
+  Future<void> setConceptionSince(DateTime since) async {
+    final bugun = _clock();
+    await _conceptionRepo.set(
+      ConceptionIntent(since: since.isAfter(bugun) ? bugun : since),
+    );
     await _reload();
   }
 

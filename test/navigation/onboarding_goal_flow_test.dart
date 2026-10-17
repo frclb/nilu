@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:period_tracker/core/navigation/app_router.dart';
+import 'package:period_tracker/data/repositories/conception_repository.dart';
 import 'package:period_tracker/data/repositories/cycle_settings_repository.dart';
 import 'package:period_tracker/data/repositories/period_repository.dart';
 import 'package:period_tracker/data/repositories/pregnancy_repository.dart';
+import 'package:period_tracker/domain/models/life_stage.dart';
+import 'package:period_tracker/domain/models/pregnancy.dart';
 import 'package:period_tracker/domain/view_models/user_view_model.dart';
 import 'package:period_tracker/localization/app_localizations.dart';
+import 'package:period_tracker/presentation/onboarding_welcome/onboarding_birth_screen.dart';
+import 'package:period_tracker/presentation/onboarding_welcome/onboarding_conception_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_goal_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_last_period_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_success_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_welcome_screen.dart';
+import 'package:period_tracker/presentation/pregnancy/postpartum_home_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/pregnancy_home_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/pregnancy_setup_screen.dart';
 
@@ -175,6 +181,137 @@ void main() {
     expect(find.byType(PregnancyHomeScreen), findsOneWidget);
     await tester.runAsync(() async {
       expect(await const PregnancyRepository().getAll(), hasLength(1));
+    });
+  });
+
+  testWidgets('"Yakın zamanda doğum yaptım": gebelik ve regl sorusu yok, '
+      'lohusa panosuyla bitiyor', (tester) async {
+    await ac(tester);
+    await hedefeGit(tester);
+
+    await dokun(tester, find.byKey(const Key('onboarding_goal_postpartum')));
+    expect(find.byType(OnboardingBirthScreen), findsOneWidget);
+    expect(find.byType(PregnancySetupScreen), findsNothing);
+    expect(find.byType(OnboardingLastPeriodScreen), findsNothing);
+
+    // Seçim lohusalık süresiyle sınırlı: daha eski bir doğumla evre hiç
+    // başlamazdı.
+    final takvim = tester.widget<CalendarDatePicker>(
+      find.byKey(const Key('onboarding_birth_calendar')),
+    );
+    final bugun = DateTime(today.year, today.month, today.day);
+    expect(takvim.lastDate, bugun);
+    expect(
+      takvim.firstDate,
+      DateTime(
+        bugun.year,
+        bugun.month,
+        bugun.day - LifeStage.postpartumDays + 1,
+      ),
+    );
+
+    await dokun(tester, find.byKey(const Key('onboarding_birth_continue')));
+    expect(find.byType(OnboardingSuccessScreen), findsOneWidget);
+    expect(
+      find.text(tr(tester, 'onboarding_success_desc_postpartum')),
+      findsOneWidget,
+    );
+    expect(find.text(tr(tester, 'onboarding_success_desc')), findsNothing);
+
+    await dokun(tester, find.text(tr(tester, 'onboarding_success_cta')));
+    expect(find.byType(PostpartumHomeScreen), findsOneWidget);
+    expect(kullanici.onboardingComplete, isTrue);
+
+    await tester.runAsync(() async {
+      final g = (await const PregnancyRepository().getAll()).single;
+      expect(g.outcome, PregnancyOutcome.birth);
+      expect(g.endedAt, bugun);
+      expect(await const PeriodRepository().getPeriodLogs(), isEmpty);
+      expect(await const CycleSettingsRepository().hasCycleLength(), isFalse);
+    });
+  });
+
+  testWidgets('"Bebek istiyorum" → "Yeni başlıyorum": niyet bugünle, sonra '
+      'regl soruları; geri dönüp döngüyü seçince niyet kalkıyor', (
+    tester,
+  ) async {
+    await ac(tester);
+    await hedefeGit(tester);
+
+    await dokun(tester, find.byKey(const Key('onboarding_goal_ttc')));
+    expect(find.byType(OnboardingConceptionScreen), findsOneWidget);
+
+    await dokun(tester, find.byKey(const Key('onboarding_ttc_now')));
+    expect(find.byType(OnboardingLastPeriodScreen), findsOneWidget);
+    await tester.runAsync(() async {
+      expect(
+        (await const ConceptionRepository().get())?.since,
+        DateTime(today.year, today.month, today.day),
+      );
+    });
+
+    // Geri: önce niyet ekranı, sonra hedef.
+    await dokun(tester, find.byIcon(Icons.arrow_back));
+    expect(find.byType(OnboardingConceptionScreen), findsOneWidget);
+    await dokun(tester, find.byIcon(Icons.arrow_back));
+    expect(find.byType(OnboardingGoalScreen), findsOneWidget);
+
+    await dokun(tester, find.byKey(const Key('onboarding_goal_cycle')));
+    expect(find.byType(OnboardingLastPeriodScreen), findsOneWidget);
+    await tester.runAsync(() async {
+      expect(
+        await const ConceptionRepository().get(),
+        isNull,
+        reason: 'İstenmeyen folik asit hatırlatması kurulurdu',
+      );
+    });
+  });
+
+  testWidgets('"Bebek istiyorum" → "Bir süredir": seçilen tarih saklanıyor, '
+      'kurulum döngüyle bitiyor', (tester) async {
+    await ac(tester);
+    await hedefeGit(tester);
+
+    await dokun(tester, find.byKey(const Key('onboarding_goal_ttc')));
+    await tester.tap(find.byKey(const Key('onboarding_ttc_since')));
+    await tester.pumpAndSettle();
+
+    // Takvim yerine elle giriş: tarih bugüne göre değişiyor.
+    final baslangic = daysAgo(200);
+    await tester.tap(find.byIcon(Icons.edit_outlined));
+    await tester.pumpAndSettle();
+    String iki(int n) => n.toString().padLeft(2, '0');
+    await tester.enterText(
+      find.byType(TextField),
+      '${iki(baslangic.day)}.${iki(baslangic.month)}.${baslangic.year}',
+    );
+    final tamam = MaterialLocalizations.of(
+      tester.element(find.byType(OnboardingConceptionScreen)),
+    ).okButtonLabel;
+    await tester.tap(find.text(tamam));
+    await settleAsync(tester);
+
+    expect(find.byType(OnboardingLastPeriodScreen), findsOneWidget);
+    await tester.runAsync(() async {
+      expect(
+        (await const ConceptionRepository().get())?.since,
+        DateTime(baslangic.year, baslangic.month, baslangic.day),
+      );
+    });
+
+    // Döngü soruları: son regl (bugün), süre ve uzunluk varsayılanla.
+    await dokun(tester, find.text(tr(tester, 'onb_continue')));
+    await dokun(tester, find.text(tr(tester, 'onb_continue')));
+    await dokun(tester, find.text(tr(tester, 'onb_finish_setup')));
+
+    expect(find.byType(OnboardingSuccessScreen), findsOneWidget);
+    expect(
+      find.text(tr(tester, 'onboarding_success_desc_conception')),
+      findsOneWidget,
+    );
+    await tester.runAsync(() async {
+      expect(await const PeriodRepository().getPeriodLogs(), hasLength(1));
+      expect(await const PregnancyRepository().getAll(), isEmpty);
     });
   });
 }

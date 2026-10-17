@@ -153,6 +153,30 @@ class Pregnancy {
     careTemplate: careTemplate,
   );
 
+  /// Uygulamaya doğumdan sonra gelen kullanıcı için: gebelik kaydı yok,
+  /// yalnızca doğum günü biliniyor.
+  ///
+  /// Tahmini doğum tarihi doğum günü sayılıyor. Erken ya da geç doğumda
+  /// birkaç hafta şaşar; tek etkisi, döngü istatistiğinden dışlanan gebelik
+  /// aralığının başının biraz kayması. Tarih hekimden gelmediği için
+  /// [dueDateFromClinician] `false`.
+  factory Pregnancy.fromBirth({
+    required DateTime birthDate,
+    DateTime? confirmedAt,
+    String? id,
+    String? careTemplate,
+  }) {
+    final dogum = _day(birthDate);
+    return Pregnancy(
+      id: id ?? _id(confirmedAt ?? DateTime.now()),
+      estimatedDueDate: dogum,
+      confirmedAt: _day(confirmedAt ?? DateTime.now()),
+      outcome: PregnancyOutcome.birth,
+      endedAt: dogum,
+      careTemplate: careTemplate,
+    );
+  }
+
   /// Tahmini doğum tarihini değiştirir.
   ///
   /// Hekim ilk trimester ultrasonuyla tarihi düzelttiğinde kullanılıyor.

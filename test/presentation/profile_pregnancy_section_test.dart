@@ -103,6 +103,44 @@ void main() {
     expect(vm.conception, isNull);
   });
 
+  testWidgets('denemeye başlama tarihi yalnızca niyet açıkken, '
+      'düzeltilebiliyor', (tester) async {
+    await seedCycles();
+    await pumpRouter(
+      tester,
+      routes: pregnancyRoutes(const ProfileSettingsScreen()),
+    );
+    final ctx = tester.element(find.byType(ProfileSettingsScreen));
+    final vm = ctx.read<PregnancyViewModel>();
+    final satir = find.text(ctx.tr('profile_preg_ttc_since'));
+    expect(satir, findsNothing, reason: 'Niyet yokken tarih anlamsız');
+
+    final anahtar = find.byKey(const Key('profile_ttc_switch'));
+    await tester.scrollUntilVisible(anahtar, 300);
+    await tester.tap(anahtar);
+    await settleAsync(tester);
+
+    await tester.scrollUntilVisible(satir, 300);
+    await tester.tap(satir);
+    await tester.pumpAndSettle();
+
+    final baslangic = daysAgo(90);
+    await tester.tap(find.byIcon(Icons.edit_outlined));
+    await tester.pumpAndSettle();
+    String iki(int n) => n.toString().padLeft(2, '0');
+    await tester.enterText(
+      find.byType(TextField),
+      '${iki(baslangic.day)}.${iki(baslangic.month)}.${baslangic.year}',
+    );
+    await tester.tap(find.text(MaterialLocalizations.of(ctx).okButtonLabel));
+    await settleAsync(tester);
+
+    expect(
+      vm.conception?.since,
+      DateTime(baslangic.year, baslangic.month, baslangic.day),
+    );
+  });
+
   testWidgets('gebeliğimi işaretle kurulum ekranını açıyor', (tester) async {
     await seedCycles();
     await pumpRouter(

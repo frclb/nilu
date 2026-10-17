@@ -3,6 +3,8 @@ class RouteNames {
   static const String onboarding = 'onboarding_welcome';
   static const String onboardingGoal = 'onboarding_goal';
   static const String onboardingPregnancy = 'onboarding_pregnancy';
+  static const String onboardingConception = 'onboarding_conception';
+  static const String onboardingBirth = 'onboarding_birth';
   static const String onboardingLastPeriod = 'onboarding_last_period';
   static const String onboardingPeriodLength = 'onboarding_period_length';
   static const String onboardingCycleLength = 'onboarding_cycle_length';

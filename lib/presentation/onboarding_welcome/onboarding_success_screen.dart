@@ -41,9 +41,18 @@ class OnboardingSuccessScreen extends StatelessWidget {
     final primaryColor =
         theme.colorScheme.primary; // Often #f04299 based on provided HTML
     final subtlePink = context.tokens.brandTint;
-    // Kurulumda "Hamileyim" seçildiyse ayarlanan bir döngü yok.
-    final gebe =
-        context.watch<PregnancyViewModel>().stage == LifeStage.pregnancy;
+    // Açıklama seçilen yola göre: "Hamileyim" ve "doğum yaptım" yollarında
+    // ayarlanan bir döngü yok; "bebek istiyorum" yolunda var, ayrıca
+    // planlama hatırlatıcıları.
+    final gebelik = context.watch<PregnancyViewModel>();
+    final aciklama = switch (gebelik.stage) {
+      LifeStage.pregnancy => 'onboarding_success_desc_pregnancy',
+      LifeStage.postpartum => 'onboarding_success_desc_postpartum',
+      LifeStage.cycle =>
+        gebelik.conception != null
+            ? 'onboarding_success_desc_conception'
+            : 'onboarding_success_desc',
+    };
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -224,11 +233,7 @@ class OnboardingSuccessScreen extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 16),
                                     Text(
-                                      context.tr(
-                                        gebe
-                                            ? 'onboarding_success_desc_pregnancy'
-                                            : 'onboarding_success_desc',
-                                      ),
+                                      context.tr(aciklama),
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontSize: 16,

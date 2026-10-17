@@ -1070,5 +1070,21 @@
   "notif_late_setting": "Perguntar se atrasar",
   "notif_late_setting_body": "Pergunta uma vez, {n} dias após o dia esperado.",
   "notif_late_title": "Sua menstruação começou?",
-  "notif_late_body": "Já se passaram alguns dias da data esperada. Se começou, você pode registrar; é comum o ciclo variar alguns dias."
+  "notif_late_body": "Já se passaram alguns dias da data esperada. Se começou, você pode registrar; é comum o ciclo variar alguns dias.",
+  "onb_goal_ttc": "Quero engravidar",
+  "onb_goal_ttc_body": "Período fértil estimado, ácido fólico e quando procurar um médico",
+  "onb_goal_postpartum": "Tive bebê recentemente",
+  "onb_goal_postpartum_body": "Consultas pós-parto e sangramento após o parto",
+  "onb_ttc_title": "Há quanto tempo você está tentando?",
+  "onb_ttc_desc": "Usamos isso para lembrar você de quando procurar um médico. Você pode mudar depois no Perfil.",
+  "onb_ttc_now": "Estou começando agora",
+  "onb_ttc_now_body": "A partir de hoje",
+  "onb_ttc_since": "Estou tentando há algum tempo",
+  "onb_ttc_since_body": "Escolha a data em que começou",
+  "onb_birth_title": "Quando seu bebê nasceu?",
+  "onb_birth_desc": "O pós-parto são os 42 dias após o nascimento. Suas consultas e o registro de sangramento seguem esta data.",
+  "onb_birth_older": "Se o parto foi há mais de 42 dias, volte e escolha \"Quero acompanhar meu ciclo\".",
+  "onboarding_success_desc_postpartum": "Seu acompanhamento pós-parto está pronto. Suas consultas e o registro de sangramento estão na tela inicial.",
+  "onboarding_success_desc_conception": "Seu ciclo está configurado. Seu período fértil estimado está na tela inicial; vamos lembrar você do ácido fólico e de quando procurar um médico.",
+  "profile_preg_ttc_since": "Comecei a tentar em"
 }

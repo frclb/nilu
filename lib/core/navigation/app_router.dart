@@ -23,6 +23,8 @@ import '../../presentation/partner_match/partner_dashboard_screen.dart';
 import '../../presentation/splash/splash_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_welcome_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_goal_screen.dart';
+import '../../presentation/onboarding_welcome/onboarding_conception_screen.dart';
+import '../../presentation/onboarding_welcome/onboarding_birth_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_last_period_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_period_length_screen.dart';
 import '../../presentation/onboarding_welcome/onboarding_cycle_length_screen.dart';
@@ -62,6 +64,8 @@ const Set<String> preOnboardingPaths = {
   '/onboarding',
   '/onboarding_goal',
   '/onboarding_pregnancy',
+  '/onboarding_conception',
+  '/onboarding_birth',
   '/onboarding_last_period',
   '/onboarding_period_length',
   '/onboarding_cycle_length',
@@ -177,6 +181,18 @@ GoRouter createAppRouter(
         name: RouteNames.onboardingPregnancy,
         builder: (context, state) =>
             const PregnancySetupScreen(fromOnboarding: true),
+      ),
+      // "Bebek istiyorum": ne zamandır denendiği, sonra döngü soruları.
+      GoRoute(
+        path: '/onboarding_conception',
+        name: RouteNames.onboardingConception,
+        builder: (context, state) => const OnboardingConceptionScreen(),
+      ),
+      // "Yakın zamanda doğum yaptım": doğum günü, sonra son ekran.
+      GoRoute(
+        path: '/onboarding_birth',
+        name: RouteNames.onboardingBirth,
+        builder: (context, state) => const OnboardingBirthScreen(),
       ),
       GoRoute(
         path: '/onboarding_last_period',

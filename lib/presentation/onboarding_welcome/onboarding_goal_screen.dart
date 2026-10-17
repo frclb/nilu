@@ -9,15 +9,18 @@ import '../../domain/models/life_stage.dart';
 import '../../domain/view_models/pregnancy_view_model.dart';
 import '../../localization/app_localizations.dart';
 import 'onboarding_progress.dart';
+import 'widgets/onboarding_option.dart';
 
-/// Kurulumun yol ayrımı: döngü takibi mi, gebelik mi?
+/// Kurulumun yol ayrımı: döngü, gebe kalmaya çalışma, gebelik, lohusalık.
 ///
 /// Uygulamayı zaten hamileyken indiren kullanıcı önce üç regl sorusundan
 /// geçip sonra Profil'den gebeliğini işaretlemek zorundaydı: kendisine
-/// uymayan sorular, ardından bir süre regl tahminli bir ana ekran.
+/// uymayan sorular, ardından bir süre regl tahminli bir ana ekran. Yeni
+/// doğum yapmış kullanıcı için durum daha da kötüydü: lohusalık ancak bir
+/// gebelik açıp "doğum" diye bitirerek kurulabiliyordu.
 ///
-/// Seçenekler dokununca ilerliyor; iki seçenekli bir soruda ayrı bir "Devam"
-/// düğmesi yalnızca fazladan bir dokunuş olurdu.
+/// Seçenekler dokununca ilerliyor; ayrı bir "Devam" düğmesi yalnızca
+/// fazladan bir dokunuş olurdu.
 class OnboardingGoalScreen extends StatelessWidget {
   const OnboardingGoalScreen({super.key});
 
@@ -30,6 +33,25 @@ class OnboardingGoalScreen extends StatelessWidget {
       return;
     }
     context.pushNamed(RouteNames.onboardingPregnancy);
+  }
+
+  /// Yalnızca döngü takibi. "Bebek istiyorum"dan geri dönüp bunu seçen
+  /// kullanıcının niyeti kalmasın: folik asit hatırlatması istemediği
+  /// hâlde gelirdi.
+  Future<void> _dongu(BuildContext context) async {
+    final vm = context.read<PregnancyViewModel>();
+    if (vm.conception != null) await vm.setConception(false);
+    if (context.mounted) context.pushNamed(RouteNames.onboardingLastPeriod);
+  }
+
+  void _dogumYaptim(BuildContext context) {
+    // Doğum zaten kayıtlıysa (son ekranda uygulamayı kapatan kullanıcı)
+    // tarihi yeniden sormuyoruz.
+    if (context.read<PregnancyViewModel>().stage == LifeStage.postpartum) {
+      context.goNamed(RouteNames.onboardingSuccess);
+      return;
+    }
+    context.pushNamed(RouteNames.onboardingBirth);
   }
 
   @override
@@ -86,105 +108,43 @@ class OnboardingGoalScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      _Secenek(
+                      OnboardingOption(
                         key: const Key('onboarding_goal_cycle'),
                         icon: Icons.water_drop_outlined,
                         title: context.tr('onb_goal_cycle'),
                         body: context.tr('onb_goal_cycle_body'),
-                        onTap: () =>
-                            context.pushNamed(RouteNames.onboardingLastPeriod),
+                        onTap: () => _dongu(context),
                       ),
                       const SizedBox(height: 16),
-                      _Secenek(
+                      OnboardingOption(
+                        key: const Key('onboarding_goal_ttc'),
+                        icon: Icons.spa_outlined,
+                        title: context.tr('onb_goal_ttc'),
+                        body: context.tr('onb_goal_ttc_body'),
+                        onTap: () =>
+                            context.pushNamed(RouteNames.onboardingConception),
+                      ),
+                      const SizedBox(height: 16),
+                      OnboardingOption(
                         key: const Key('onboarding_goal_pregnancy'),
                         icon: Icons.pregnant_woman,
                         title: context.tr('onb_goal_pregnancy'),
                         body: context.tr('onb_goal_pregnancy_body'),
                         onTap: () => _hamileyim(context),
                       ),
+                      const SizedBox(height: 16),
+                      OnboardingOption(
+                        key: const Key('onboarding_goal_postpartum'),
+                        icon: Icons.child_friendly_outlined,
+                        title: context.tr('onb_goal_postpartum'),
+                        body: context.tr('onb_goal_postpartum_body'),
+                        onTap: () => _dogumYaptim(context),
+                      ),
                     ],
                   ),
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Secenek extends StatelessWidget {
-  const _Secenek({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.body,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String body;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.tokens;
-    final renk = Theme.of(context).colorScheme.primary;
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 420),
-      child: Material(
-        color: t.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: t.border),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(18),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: t.brandTint,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(icon, color: renk),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                          color: t.text,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        body,
-                        style: TextStyle(
-                          fontSize: 14,
-                          height: 1.4,
-                          color: t.textMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Icon(Icons.chevron_right, color: t.textFaint),
-              ],
-            ),
           ),
         ),
       ),
