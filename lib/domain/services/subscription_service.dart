@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
+import '../../core/release_config.dart';
+
 class SubscriptionService {
-  // RevenueCat API keys
-  static const _appleApiKey =
-      'appl_api_key_placeholder'; // TODO: Gerçek Apple API anahtarınızı girin
+  /// Anahtar `ReleaseConfig`'te. Doldurulmamışsa SDK hiç başlatılmıyor:
+  /// yer tutucu anahtarla yapılandırmak her açılışta ağ hatası üretiyor ve
+  /// paywall'u boş bir teklif listesiyle bekletiyordu.
+  static const _appleApiKey = ReleaseConfig.revenueCatAppleApiKey;
 
   static final Completer<void> _readyCompleter = Completer<void>();
 
@@ -35,6 +38,11 @@ class SubscriptionService {
   static Future<void> get ready => _readyCompleter.future;
 
   static Future<void> init() async {
+    if (!ReleaseConfig.isSet(_appleApiKey)) {
+      debugPrint('RevenueCat key not set; subscriptions unavailable.');
+      if (!_readyCompleter.isCompleted) _readyCompleter.complete();
+      return;
+    }
     try {
       // Ayrıntılı günlük yalnızca geliştirirken: yayında konsola satın alma
       // ve kullanıcı kimliği ayrıntısı yazılmasın.

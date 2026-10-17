@@ -1,3 +1,5 @@
+import 'release_config.dart';
+
 /// Uygulamanın görünen adı.
 ///
 /// Tek kaynak: `MaterialApp.title`, onboarding başlığı ve mağaza adı aynı
@@ -20,6 +22,6 @@ class AppInfo {
   /// yer tutucu vardı; adres gelince hepsini tek tek değiştirmek gerekecekti.
   ///
   /// `null` iken metinde dilin yer tutucusu görünür (`legal_email_placeholder`).
-  /// **Yayından önce doldurulmalı** — bkz. SUBMIT.md.
-  static const String? supportEmail = null;
+  /// Değer [ReleaseConfig.supportEmail]'de; **yayından önce doldurulmalı**.
+  static const String? supportEmail = ReleaseConfig.supportEmail;
 }

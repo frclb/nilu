@@ -142,4 +142,34 @@ void main() {
       expect(await store.getString(key), isNull, reason: '$key silinmeliydi');
     }
   });
+
+  group('yeniden kurulum', () {
+    // iOS'ta Anahtar Zinciri uygulama silinince silinmiyor: yeniden kuran
+    // kullanıcı eski regl ve gebelik kayıtlarını geri görüyordu.
+    test('taze kurulumda eski şifreli kayıtlar siliniyor', () async {
+      FlutterSecureStorage.setMockInitialValues({
+        'period_logs': '["eski"]',
+        'pregnancies': '["eski"]',
+      });
+      SharedPreferences.setMockInitialValues({});
+      expect(await store.clearIfFreshInstall(), isTrue);
+      expect(await store.getString('period_logs'), isNull);
+      expect(await store.getString('pregnancies'), isNull);
+    });
+
+    test('güncellenen kurulumda (tercihler dolu) silinmiyor', () async {
+      FlutterSecureStorage.setMockInitialValues({'period_logs': '["kayit"]'});
+      SharedPreferences.setMockInitialValues({'onboarding_complete': true});
+      expect(await store.clearIfFreshInstall(), isFalse);
+      expect(await store.getString('period_logs'), '["kayit"]');
+    });
+
+    test('işaret konunca ikinci açılışta hiçbir şey silinmiyor', () async {
+      SharedPreferences.setMockInitialValues({});
+      expect(await store.clearIfFreshInstall(), isTrue);
+      await store.setString('period_logs', '["yeni"]');
+      expect(await store.clearIfFreshInstall(), isFalse);
+      expect(await store.getString('period_logs'), '["yeni"]');
+    });
+  });
 }

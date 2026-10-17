@@ -39,6 +39,10 @@ void main() async {
     debugPrint('FlutterError: ${details.exceptionAsString()}');
   };
 
+  // Uygulama silinip yeniden kurulduysa Anahtar Zinciri'nde kalan eski
+  // kayıtlar silinir (iOS onları uygulamayla birlikte silmiyor).
+  await const SecureStore().clearIfFreshInstall();
+
   // Mevcut kullanıcıların şifresiz kayıtlı sağlık verisini şifreli depoya
   // taşı. Repository'ler okumadan önce, yani runApp'ten önce çalışmalı.
   await const SecureStore().migrateFromSharedPreferences(

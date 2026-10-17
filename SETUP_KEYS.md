@@ -5,6 +5,14 @@ AdMob, Firebase. Uygulama tarafı hazır; eksik olan tek şey kimlikler.
 
 Yayın öncesi kontrol listesi ayrı dosyada: [STORE_CHECKLIST.md](STORE_CHECKLIST.md).
 
+**Uygulamaya girilecek her değer tek dosyada:**
+[`lib/core/release_config.dart`](lib/core/release_config.dart). Neyin eksik
+kaldığını şu komut söylüyor; eksik varsa 1 ile çıkar:
+
+```bash
+dart run tool/check_release.dart
+```
+
 > **Anahtarları sen giriyorsun.** Hiçbir hesaba benim adıma giriş yapılmıyor,
 > sertifika ve API anahtarları sende kalıyor. Aşağıda nereye yapıştırılacağı
 > yazılı; üretmesi ve saklaması sana ait.
@@ -31,7 +39,9 @@ Birbirine bağlılar, atlama:
 4. Abonelik ürünleri            → RevenueCat bunları okuyor
 5. RevenueCat                   → premium
 6. AdMob                        → reklam
-7. Firebase                     → partner senkronizasyonu, bildirim
+7. Firebase                     → partner eşleşmesi
+8. Site (GitHub Pages)          → gizlilik, şartlar, destek adresleri
+9. Son denetim                  → dart run tool/check_release.dart
 ```
 
 ---
@@ -294,15 +304,14 @@ işaretlenmiş** offering gösteriliyor.
 **5.5 Anahtar:** Project settings → API keys → **Public app-specific key**
 (`appl_` ile başlar; `sk_` ile başlayan gizli anahtarı **uygulamaya koyma**).
 
-Yapıştırılacak yer — `lib/domain/services/subscription_service.dart`:
+Yapıştırılacak yer — `lib/core/release_config.dart`:
 
 ```dart
-static const _appleApiKey = 'appl_api_key_placeholder';
+static const String revenueCatAppleApiKey = 'appl_…';
 ```
 
-Anahtar girilene kadar uygulama çalışıyor ama premium ekranı satın alma
-yapmıyor; altı giriş noktası korumalı (anahtarsız çağrı SDK'yı `fatalError` ile
-çökertiyordu).
+Anahtar girilene kadar SDK hiç başlatılmıyor; uygulama çalışıyor, premium
+ekranı "şu an kullanılamıyor" diyor.
 
 **5.6 Sandbox testi:** App Store Connect → Users and Access → **Sandbox
 Testers** → test hesabı. Cihazda Ayarlar → App Store → Sandbox Account ile giriş
@@ -322,16 +331,19 @@ reklam alıyor, yani gelir düşük kalıyor.
 
 **6.2 App ID:** `ca-app-pub-XXXXXXXX~YYYYYYYY` (tilde ile).
 
-`ios/Runner/Info.plist`:
+İki yere, aynı değer (denetleyici karşılaştırıyor):
 
-```xml
-<key>GADApplicationIdentifier</key>
-<string>ca-app-pub-3940256099942544~1458002511</string>
-```
+- `lib/core/release_config.dart` → `admobAppIdIos`
+- `ios/Runner/Info.plist` → `GADApplicationIdentifier` (şu an Google'ın test
+  kimliği `ca-app-pub-3940256099942544~1458002511`)
 
 **6.3 Reklam birimi:** Ad units → Banner. Çıkan `ca-app-pub-XXXXXXXX/ZZZZZZZZ`
-(eğik çizgi ile) →
-`lib/data/datasources/ads_datasource.dart` içindeki `_testBannerIOS`.
+(eğik çizgi ile) → `lib/core/release_config.dart` → `admobBannerUnitIos`.
+
+Geliştirme derlemesi her zaman Google'ın test birimini kullanıyor (kendi
+reklamına tıklamak hesabı kapattırır). Release derlemede birim girilmemişse
+reklam alanı hiç çizilmiyor — test reklamları "Test mode" rozetiyle yayına
+çıkmıyor.
 
 İki kimliği karıştırmak kolay: **tilde = uygulama**, **eğik çizgi = birim**.
 
@@ -345,9 +357,18 @@ geçerli. Uygulama de/es/fr/pt ile çıkıyor: altı pazarın dördü. Uygulama 
 hazır (`ad_consent.dart`), ama panelde mesaj tanımlı değilse gösterilecek bir
 şey yok ve o trafikte reklam servisi kısıtlanır.
 
-**6.5 `app-ads.txt`:** App Store Connect'teki geliştirici web sitesinin **kök
-dizinine** konur (`https://alanadin.com/app-ads.txt`). İçeriği AdMob'un verdiği
-tek satır. Programatik talebin büyük kısmı bu dosyayı arıyor; yoksa eCPM düşer.
+**6.5 `app-ads.txt`:** Site oluşturucusu App ID'den kendiliğinden üretiyor
+(`google.com, pub-…, DIRECT, f08c47fec0942fa0`). Ama dosya geliştirici
+sitesinin **alan adının kökünde** olmalı: `https://alanadin.com/app-ads.txt`.
+GitHub'ın proje sitesi (`kullanici.github.io/nilu/`) kök değil. İki yol:
+
+- **Kullanıcı sitesi:** `kullanici.github.io` adlı bir depo; dosya onun
+  köküne (`kullanici.github.io/app-ads.txt`). App Store Connect'te geliştirici
+  sitesi olarak `https://kullanici.github.io` girilir.
+- **Özel alan adı:** Pages'e bir alan adı bağlanınca site kökte yayımlanır ve
+  dosya kendiliğinden doğru yerde olur.
+
+Programatik talebin büyük kısmı bu dosyayı arıyor; yoksa eCPM düşer.
 
 **6.6 Test cihazı:** Settings → Test devices → cihazını ekle. **Kendi reklamına
 tıklama** — geçersiz trafik hesabı kapattırıyor ve geri dönüşü zor.
@@ -356,23 +377,103 @@ tıklama** — geçersiz trafik hesabı kapattırıyor ve geri dönüşü zor.
 
 ## 7. Firebase
 
+Partner eşleşmesi için. Uygulamanın geri kalanı Firebase'siz çalışıyor;
+yapılandırılmazsa partner ekranı eşleşmenin kullanılamadığını söylüyor.
+
+**7.1 Proje:** [console.firebase.google.com](https://console.firebase.google.com)
+→ yeni proje (Analytics **kapalı**: uygulama analiz kullanmıyor ve gizlilik
+politikası bunu söylüyor). Konum: `eur3` (Avrupa) — KVKK ve GDPR açısından
+Türkiye'ye en yakın seçenek; politika §5 sunucuların yurt dışında olabileceğini
+zaten söylüyor.
+
+**7.2 iOS uygulaması ve yapılandırma dosyası:**
+
 ```bash
-flutterfire configure
+dart pub global activate flutterfire_cli
+flutterfire configure --platforms=ios
 ```
 
-`ios/Runner/GoogleService-Info.plist` üretilir. Sonra:
+`ios/Runner/GoogleService-Info.plist` üretilir ve Runner hedefine eklenir
+(denetleyici ikisini de kontrol ediyor). Uygulama `Firebase.initializeApp()`'i
+seçeneksiz çağırıyor, yani `firebase_options.dart` gerekmiyor.
 
-- **Authentication → Sign-in method → Anonymous** açık olmalı: partner
-  eşleşmesi anonim bir kimlikle çalışıyor (e-posta, ad, hesap yok).
-- **Firestore kuralları:**
+**7.3 Anonim giriş:** Authentication → Sign-in method → **Anonymous** → aç.
+Partner eşleşmesi anonim bir kimlikle çalışıyor (e-posta, ad, hesap yok);
+kimlik yalnızca eşleşme başlatılınca açılıyor.
 
-  ```bash
-  firebase deploy --only firestore:rules
-  ```
+**7.4 Firestore ve kurallar:**
 
-Partner eşleşmesi bunlara bağlı. Yapılandırılmazsa uygulama çalışıyor ve
-partner ekranı eşleşmenin şu an kullanılamadığını söylüyor (geçerli görünen
-bir QR göstermiyor).
+```bash
+npm install -g firebase-tools   # ya da: npx firebase-tools …
+firebase login
+firebase use --add              # .firebaserc oluşur; commit'lenebilir
+firebase deploy --only firestore
+```
+
+Kurallar (`firestore.rules`) ve indeksler (`firestore.indexes.json`) birlikte
+yüklenir. Kurallar yüklenmeden uygulama yayına çıkmamalı: varsayılan kurallar
+ya her şeyi kapatır ya her şeyi açar.
+
+**7.5 Kuralların testi (hesap gerekmez):**
+
+```bash
+cd firebase_tests && npm install && npm test
+```
+
+Emülatörde gerçek kural motoruyla 20 senaryo: partnerin kendini listeye
+ekleyemediği, yalnızca kendini çıkarabildiği, onaysız okuyamadığı, davet
+kodunun yalnızca sahibince iptal edildiği… CI'da da koşuyor.
+
+**7.6 İsteğe bağlı sertleştirme — App Check:** Firestore'a yalnızca gerçek
+uygulamanın erişmesini sağlar (App Attest). Yeni bir paket ve App Attest
+yeteneği gerekiyor; eklenirse önce "izleme" modunda açılmalı ki eski
+sürümler kesilmesin.
+
+---
+
+## 8. Site (GitHub Pages)
+
+App Store **gizlilik politikası adresi** ve **destek adresi** istiyor.
+Site `site/` ve `tool/build_site.dart`'tan üretiliyor; gizlilik politikası ve
+şartlar **uygulamanın sözlüğünden** geliyor, yani uygulamadakiyle hep aynı.
+Altı dil, çerez/analiz/harici kaynak yok.
+
+**8.1 Depo:** GitHub'da depo oluştur (ör. `nilu`), bu projeyi gönder.
+
+**8.2 Pages'i aç:** Depo → Settings → Pages → Source: **GitHub Actions**.
+`.github/workflows/pages.yml` her gönderimde siteyi üretip yayımlıyor.
+
+**8.3 Adres:** `site/site.json` → `baseUrl`, ör.
+`https://kullanici.github.io/nilu`. Uygulama yayına çıkınca `appStoreUrl`
+de girilirse ana sayfadaki "Yakında" düğmesi indirme bağlantısına dönüşür.
+
+**8.4 App Store Connect'e girilecek adresler** (her dilin kendi sayfası):
+
+| | Türkçe | English |
+|---|---|---|
+| Gizlilik politikası | `…/tr/privacy/` | `…/en/privacy/` |
+| Destek | `…/tr/support/` | `…/en/support/` |
+
+Diğer diller: `de`, `es`, `fr`, `pt` aynı düzende.
+
+**8.5 Yerelde önizleme:**
+
+```bash
+dart run tool/build_site.dart && python3 -m http.server 8765 --directory build/site
+```
+
+---
+
+## 9. Son denetim
+
+```bash
+dart run tool/check_release.dart
+```
+
+Hesaplara bağlı her değeri denetler: RevenueCat anahtarı, AdMob kimlikleri
+(Google test kimlikleri reddedilir, Info.plist ile karşılaştırılır), destek
+e-postası, `GoogleService-Info.plist` (Runner hedefinde mi, doğru uygulamaya mı
+ait), `.firebaserc`, site adresi. Eksik yoksa "Yayına hazır" der.
 
 ---
 

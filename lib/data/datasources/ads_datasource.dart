@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import '../../core/release_config.dart';
 import 'ad_consent.dart';
 
 /// Reklam kurulumu.
@@ -16,17 +17,33 @@ import 'ad_consent.dart';
 class AdsDatasource {
   const AdsDatasource._();
 
-  /// Kendi AdMob birim kimliklerin gelene kadar Google'ın test kimlikleri.
-  ///
-  /// Bunlar gerçek reklam göstermez ve gelir üretmez; yerlerine kendi
-  /// kimliklerini koymadan yayına çıkarsan reklam alanı boş kalır.
+  /// Google'ın test birimleri. Geliştirirken **her zaman** bunlar: kendi
+  /// reklamına tıklamak AdMob politikasına aykırı ve hesabı kapattırabilir.
   static const String _testBannerIOS = 'ca-app-pub-3940256099942544/2934735716';
   static const String _testBannerAndroid =
       'ca-app-pub-3940256099942544/6300978111';
 
-  /// Banner reklam birimi.
-  static String get bannerUnitId =>
-      Platform.isIOS ? _testBannerIOS : _testBannerAndroid;
+  /// Banner reklam birimi; gösterilmeyecekse `null`.
+  ///
+  /// Release derlemede gerçek birim (`ReleaseConfig.admobBannerUnitIos`).
+  /// O doldurulmamışsa reklam hiç istenmiyor: test reklamları "Test mode"
+  /// rozetiyle yayına çıkarsa inceleme uygulamayı yarım sayar.
+  static String? get bannerUnitId => unitFor(
+    release: kReleaseMode,
+    ios: Platform.isIOS,
+    configured: ReleaseConfig.admobBannerUnitIos,
+  );
+
+  @visibleForTesting
+  static String? unitFor({
+    required bool release,
+    required bool ios,
+    required String configured,
+  }) {
+    if (!release) return ios ? _testBannerIOS : _testBannerAndroid;
+    if (!ios || !ReleaseConfig.isSet(configured)) return null;
+    return configured;
+  }
 
   /// Reklamlar için istek. Kişiselleştirme kapalı.
   static const AdRequest request = AdRequest(nonPersonalizedAds: true);

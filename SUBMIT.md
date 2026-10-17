@@ -20,31 +20,44 @@ Yükleme bunlardan birini atlarsa ya derleme durur ya inceleme reddeder.
 | | Durum | Nerede |
 |---|---|---|
 | Apple Developer Program üyeliği | ⬜ **engelleyici** | [SETUP_KEYS.md §1](SETUP_KEYS.md) |
-| Destek e-postası: `AppInfo.supportEmail` | ⬜ **engelleyici** | `lib/core/app_info.dart` |
-| Şartlar ve politikanın hukuki gözden geçirilmesi | ⬜ | [STORE_CHECKLIST.md](STORE_CHECKLIST.md) |
-| Gizlilik politikası yayında bir URL'de | ⬜ | zorunlu alan |
-| Gerçek AdMob kimlikleri | ⬜ | [SETUP_KEYS.md §6](SETUP_KEYS.md) |
+| Destek e-postası | ⬜ **engelleyici** | `lib/core/release_config.dart` |
 | RevenueCat anahtarı + `premium` entitlement | ⬜ | [SETUP_KEYS.md §5](SETUP_KEYS.md) |
-| `GoogleService-Info.plist` | ⬜ | `flutterfire configure` |
+| Gerçek AdMob kimlikleri (+ Info.plist) | ⬜ | [SETUP_KEYS.md §6](SETUP_KEYS.md) |
+| Firebase: `GoogleService-Info.plist`, anonim giriş, kurallar | ⬜ | [SETUP_KEYS.md §7](SETUP_KEYS.md) |
+| Site yayında (gizlilik ve destek adresleri) | ⬜ | [SETUP_KEYS.md §8](SETUP_KEYS.md) |
+| Şartlar ve politikanın hukuki gözden geçirilmesi | ⬜ | [STORE_CHECKLIST.md](STORE_CHECKLIST.md) |
 
-**Köşeli parantezler özellikle tehlikeli.** `AppInfo.supportEmail` boşken
+Hesaplara bağlı olanların hepsini tek komut denetliyor:
+
+```bash
+dart run tool/check_release.dart
+```
+
+**Köşeli parantezler özellikle tehlikeli.** Destek e-postası boşken
 politika ve Şartlar `[E-POSTA ADRESİ]` gösteriyor; inceleyen kişi bunu
 "tamamlanmamış uygulama" sayar. Adres tek satırda verilince altı dilin
 hepsinde görünüyor.
 
 **Test reklam kimlikleriyle gönderme.** Google'ın test kimlikleri reklamın
-üstüne "Test mode" rozeti basıyor. İnceleyen bunu bozuk ya da yarım bir ekran
-olarak okur.
+üstüne "Test mode" rozeti basıyor. Release derleme birim girilmemişse reklam
+alanını hiç çizmiyor; ama Info.plist'teki test App ID'si yine de denetleyiciden
+geçmez.
 
 ---
 
 ## 1. Yüklemeden önce koş
 
 ```bash
-flutter analyze --fatal-infos && flutter test && dart run tool/check_localization.dart
+dart run tool/check_release.dart \
+  && flutter analyze --fatal-infos \
+  && flutter test \
+  && dart run tool/check_localization.dart \
+  && python3 tool/check_store_listing.py \
+  && (cd firebase_tests && npm test)
 ```
 
-Üçü de temiz olmalı (Ekim 2026: 1900'ü aşkın test).
+Hepsi temiz olmalı. Simülatördeki uçtan uca testler ayrıca:
+[TESTING.md §5](TESTING.md).
 
 ---
 

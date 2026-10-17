@@ -75,6 +75,39 @@ class SecureStore {
 
   Future<void> remove(String key) => _storage.delete(key: key);
 
+  // ─── Yeniden kurulum ───
+
+  /// Kurulumun işareti (SharedPreferences'ta). Uygulama silinince o da
+  /// siliniyor; Anahtar Zinciri silinmiyor.
+  static const String installMarkerKey = 'install_marker_v1';
+
+  /// Uygulama silinip yeniden kurulduysa eski şifreli kayıtları siler.
+  ///
+  /// iOS'ta Anahtar Zinciri öğeleri uygulama silinince **silinmiyor**.
+  /// Uygulamayı silen kullanıcı sağlık kayıtlarının da gittiğini
+  /// düşünüyor; yeniden kurduğunda kurulum ekranından sonra eski regl ve
+  /// gebelik kayıtları karşısına çıkıyordu — telefonu başkasına devrederken
+  /// uygulamayı silen biri için bu bir mahremiyet açığı.
+  ///
+  /// Taze kurulum: işaret yok **ve** SharedPreferences tamamen boş. Önceki
+  /// bir sürümden güncellenen kurulumda tercihler dolu olduğundan veri
+  /// silinmiyor; cihazın yedekten geri yüklenmesinde de iki depo birlikte
+  /// geri geliyor. `runApp`'ten ve [migrateFromSharedPreferences]'tan önce
+  /// çağrılmalı. Silme yapıldıysa `true`.
+  Future<bool> clearIfFreshInstall() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.containsKey(installMarkerKey)) return false;
+      final fresh = prefs.getKeys().isEmpty;
+      if (fresh) await _storage.deleteAll();
+      await prefs.setBool(installMarkerKey, true);
+      return fresh;
+    } catch (e) {
+      debugPrint('SecureStore: fresh-install check failed — $e');
+      return false;
+    }
+  }
+
   // ─── Migration ───
 
   /// [keys] altındaki değerleri `SharedPreferences`'tan şifreli depoya taşır

@@ -73,13 +73,17 @@ class _AdBannerState extends State<AdBanner> {
     try {
       // Rıza alınamadıysa reklam istenmiyor: AEA'da rızasız istek hem Google
       // politikasına hem ePrivacy'ye aykırı.
+      // Gösterilecek birim yoksa (release derlemede kimlik girilmemiş)
+      // rıza da sorulmuyor: reklamı olmayan bir ekranda rıza formu anlamsız.
+      final unit = AdsDatasource.bannerUnitId;
+      if (unit == null) return;
       if (!await AdsDatasource.ensureReady(mayShowForm: true)) return;
       if (!mounted || generation != _generation) return;
 
       final requested = AdsDatasource.bannerSize(maxWidth);
 
       final ad = BannerAd(
-        adUnitId: AdsDatasource.bannerUnitId,
+        adUnitId: unit,
         size: requested,
         request: AdsDatasource.request,
         listener: BannerAdListener(

@@ -1,0 +1,260 @@
+{
+  "tr": {
+    "lang_name": "Türkçe",
+    "nav_home": "Ana sayfa",
+    "nav_privacy": "Gizlilik",
+    "nav_terms": "Şartlar",
+    "nav_support": "Destek",
+    "language": "Dil",
+    "hero_title": "Döngün sende kalır",
+    "hero_body": "Regl, gebelik ve lohusalık için sakin bir takip uygulaması. İşaretlediğin her şey telefonunda, şifreli duruyor — hesap yok, izleme yok.",
+    "download": "App Store'dan indir",
+    "coming_soon": "Yakında App Store'da",
+    "features_title": "Neler yapar",
+    "features": [
+      "Takvim ve tahminler: reglini işaretle, bir sonrakini ve tahmini doğurgan dönemi gör.",
+      "Günlük kayıt: akış, ağrı, ruh hâli, belirtiler ve notlar.",
+      "Bütün döngü geçmişin ve muayenede gösterebileceğin hekim özeti — ücretsiz.",
+      "Gebelik ve lohusalık: hafta ve gün, Sağlık Bakanlığı rehberine göre izlemler, tehlike işaretleri.",
+      "Ana ekran widget'ı ve hatırlatıcılar; hepsi cihazında hazırlanır.",
+      "İstersen partnerinle: yalnızca seçtiğin yakınlık durumu, açık rızanla."
+    ],
+    "privacy_title": "Gizlilik sonradan eklenmedi",
+    "privacy_points": [
+      "Kayıtların telefonunda, şifreli. Hesap açmak gerekmiyor.",
+      "Reklamlar kişiselleştirilmez; reklam kimliğin kullanılmaz, izleme izni istenmez.",
+      "Sağlık verin reklam için kullanılmaz ve satılmaz.",
+      "Ekran kilidi ve yedek alma ücretsiz.",
+      "Bütün verini uygulamanın içinden silebilirsin."
+    ],
+    "medical": "Nilu tıbbi teşhis koymaz, tedavi önermez ve bir doğum kontrol yöntemi değildir. Tahminler geçmiş kayıtlarından hesaplanır ve yaklaşıktır.",
+    "footer_tracking": "Bu site çerez, analiz ya da takip kullanmaz.",
+    "support_title": "Destek",
+    "support_intro": "Bir sorun mu yaşıyorsun, bir önerin mi var? Bize yaz.",
+    "support_contact": "E-posta: {email}",
+    "faq_title": "Sık sorulanlar",
+    "faq": [
+      {"q": "Verilerim nerede saklanıyor?", "a": "Telefonunda, şifreli olarak. Partner özelliğini kullanmıyorsan hiçbir sağlık kaydın cihazından çıkmaz. Ayrıntılar Gizlilik Politikası'nda."},
+      {"q": "Telefon değiştireceğim; kayıtlarımı nasıl taşırım?", "a": "Eski telefonda {{nav_profile}} → {{profile_privacy_security}} → {{privacy_export}} ile bir yedek al. Yeni telefonda aynı ekrandan {{privacy_import}} ile geri yükle."},
+      {"q": "Verilerimi nasıl silerim?", "a": "{{nav_profile}} → {{profile_privacy_security}} → {{privacy_delete_account}}. Partnerinle eşleştiysen sunucudaki eşleşme bilgilerin ve paylaştığın durum da silinir. Uygulama silinip yeniden kurulduğunda eski kayıtlar geri gelmez."},
+      {"q": "Aboneliğimi nasıl iptal ederim?", "a": "Abonelikleri Apple yönetir: iPhone'da Ayarlar → adın → Abonelikler → Nilu. İptal, dönem sonuna kadar geçerli kalır."},
+      {"q": "Satın aldığım Premium görünmüyor.", "a": "Premium ekranında {{premium_restore_purchases}} düğmesine dokun. Aynı Apple Kimliği ile giriş yapmış olman gerekir."},
+      {"q": "Partner modu ne paylaşıyor?", "a": "Yalnızca paylaşmayı açık rızanla seçtiğin yakınlık durumu (istek düzeyi ve sevgi ihtiyaçları). Döngü tarihlerin, belirtilerin ve notların paylaşılmaz. Paylaşımı kapatınca sunucudaki durumun silinir."}
+    ]
+  },
+  "en": {
+    "lang_name": "English",
+    "nav_home": "Home",
+    "nav_privacy": "Privacy",
+    "nav_terms": "Terms",
+    "nav_support": "Support",
+    "language": "Language",
+    "hero_title": "Your cycle stays with you",
+    "hero_body": "A calm tracker for periods, pregnancy and the postnatal weeks. Everything you log stays on your phone, encrypted — no account, no tracking.",
+    "download": "Download on the App Store",
+    "coming_soon": "Coming soon to the App Store",
+    "features_title": "What it does",
+    "features": [
+      "Calendar and predictions: mark your period, see the next one and your estimated fertile window.",
+      "Daily log: flow, pain, mood, symptoms and notes.",
+      "Your full cycle history and a summary to show your doctor — free.",
+      "Pregnancy and postnatal weeks: weeks and days, appointments and reminders, warning signs.",
+      "Home Screen widget and reminders, all prepared on your device.",
+      "If you want, with your partner: only the closeness status you choose, with your explicit consent."
+    ],
+    "privacy_title": "Privacy isn't an add-on",
+    "privacy_points": [
+      "Your entries stay on your phone, encrypted. No account needed.",
+      "Ads are not personalised; no advertising identifier, no tracking prompt.",
+      "Your health data is never used for ads and never sold.",
+      "App lock and backups are free.",
+      "You can delete all your data from inside the app."
+    ],
+    "medical": "Nilu does not diagnose, does not prescribe treatment and is not a contraceptive method. Predictions are calculated from your past entries and are approximate.",
+    "footer_tracking": "This site uses no cookies, analytics or tracking.",
+    "support_title": "Support",
+    "support_intro": "Having a problem or have a suggestion? Write to us.",
+    "support_contact": "Email: {email}",
+    "faq_title": "Frequently asked",
+    "faq": [
+      {"q": "Where is my data stored?", "a": "On your phone, encrypted. If you don't use the partner feature, none of your health entries leave your device. Details are in the Privacy Policy."},
+      {"q": "I'm changing phones; how do I move my entries?", "a": "On your old phone, create a backup with {{nav_profile}} → {{profile_privacy_security}} → {{privacy_export}}. On the new phone, restore it from the same screen with {{privacy_import}}."},
+      {"q": "How do I delete my data?", "a": "{{nav_profile}} → {{profile_privacy_security}} → {{privacy_delete_account}}. If you paired with a partner, your pairing details and shared status are deleted from the server too. Reinstalling the app does not bring old entries back."},
+      {"q": "How do I cancel my subscription?", "a": "Apple manages subscriptions: on your iPhone, Settings → your name → Subscriptions → Nilu. A cancellation stays active until the end of the period."},
+      {"q": "My Premium purchase doesn't show.", "a": "On the Premium screen, tap {{premium_restore_purchases}}. You need to be signed in with the same Apple ID."},
+      {"q": "What does partner mode share?", "a": "Only the closeness status you choose to share with your explicit consent (desire level and affection needs). Your cycle dates, symptoms and notes are not shared. Turning sharing off deletes your status from the server."}
+    ]
+  },
+  "de": {
+    "lang_name": "Deutsch",
+    "nav_home": "Start",
+    "nav_privacy": "Datenschutz",
+    "nav_terms": "Bedingungen",
+    "nav_support": "Support",
+    "language": "Sprache",
+    "hero_title": "Dein Zyklus bleibt bei dir",
+    "hero_body": "Ein ruhiger Tracker für Periode, Schwangerschaft und Wochenbett. Alles, was du einträgst, bleibt verschlüsselt auf deinem Handy — ohne Konto, ohne Tracking.",
+    "download": "Im App Store laden",
+    "coming_soon": "Bald im App Store",
+    "features_title": "Was die App kann",
+    "features": [
+      "Kalender und Vorhersagen: Periode eintragen, die nächste und das geschätzte fruchtbare Fenster sehen.",
+      "Tägliches Protokoll: Blutung, Schmerzen, Stimmung, Symptome und Notizen.",
+      "Dein ganzer Zyklusverlauf und eine Übersicht für den Arztbesuch — kostenlos.",
+      "Schwangerschaft und Wochenbett: Wochen und Tage, Termine und Erinnerungen, Warnzeichen.",
+      "Widget für den Home-Bildschirm und Erinnerungen, alles auf deinem Gerät erstellt.",
+      "Wenn du willst, mit deinem Partner: nur der Nähe-Status, den du wählst, mit deiner ausdrücklichen Einwilligung."
+    ],
+    "privacy_title": "Datenschutz ist kein Zusatz",
+    "privacy_points": [
+      "Deine Einträge bleiben verschlüsselt auf deinem Handy. Kein Konto nötig.",
+      "Werbung wird nicht personalisiert; keine Werbe-ID, keine Tracking-Abfrage.",
+      "Deine Gesundheitsdaten werden nie für Werbung genutzt und nie verkauft.",
+      "App-Sperre und Backup sind kostenlos.",
+      "Du kannst alle deine Daten in der App löschen."
+    ],
+    "medical": "Nilu stellt keine Diagnose, empfiehlt keine Behandlung und ist kein Verhütungsmittel. Vorhersagen werden aus deinen früheren Einträgen berechnet und sind ungefähr.",
+    "footer_tracking": "Diese Website verwendet keine Cookies, keine Analyse und kein Tracking.",
+    "support_title": "Support",
+    "support_intro": "Ein Problem oder ein Vorschlag? Schreib uns.",
+    "support_contact": "E-Mail: {email}",
+    "faq_title": "Häufige Fragen",
+    "faq": [
+      {"q": "Wo werden meine Daten gespeichert?", "a": "Verschlüsselt auf deinem Handy. Wenn du die Partnerfunktion nicht nutzt, verlassen keine Gesundheitseinträge dein Gerät. Details in der Datenschutzerklärung."},
+      {"q": "Ich wechsle das Handy — wie nehme ich meine Einträge mit?", "a": "Erstelle auf dem alten Handy ein Backup über {{nav_profile}} → {{profile_privacy_security}} → {{privacy_export}}. Stelle es auf dem neuen Handy im selben Bildschirm mit {{privacy_import}} wieder her."},
+      {"q": "Wie lösche ich meine Daten?", "a": "{{nav_profile}} → {{profile_privacy_security}} → {{privacy_delete_account}}. Wenn du mit einem Partner verbunden bist, werden auch deine Verbindungsdaten und der geteilte Status vom Server gelöscht. Nach einer Neuinstallation kommen alte Einträge nicht zurück."},
+      {"q": "Wie kündige ich mein Abo?", "a": "Abos verwaltet Apple: auf dem iPhone Einstellungen → dein Name → Abonnements → Nilu. Eine Kündigung gilt bis zum Ende des Zeitraums."},
+      {"q": "Mein Premium-Kauf wird nicht angezeigt.", "a": "Tippe im Premium-Bildschirm auf {{premium_restore_purchases}}. Du musst mit derselben Apple-ID angemeldet sein."},
+      {"q": "Was teilt der Partner-Modus?", "a": "Nur den Nähe-Status, den du mit deiner ausdrücklichen Einwilligung teilst (Lustlevel und Bedürfnisse nach Zuwendung). Zyklusdaten, Symptome und Notizen werden nicht geteilt. Wenn du das Teilen ausschaltest, wird dein Status vom Server gelöscht."}
+    ]
+  },
+  "es": {
+    "lang_name": "Español",
+    "nav_home": "Inicio",
+    "nav_privacy": "Privacidad",
+    "nav_terms": "Condiciones",
+    "nav_support": "Soporte",
+    "language": "Idioma",
+    "hero_title": "Tu ciclo se queda contigo",
+    "hero_body": "Un registro tranquilo para la regla, el embarazo y el posparto. Todo lo que anotas se queda cifrado en tu móvil — sin cuenta y sin rastreo.",
+    "download": "Descargar en el App Store",
+    "coming_soon": "Próximamente en el App Store",
+    "features_title": "Qué hace",
+    "features": [
+      "Calendario y previsiones: marca tu regla y consulta la siguiente y la ventana fértil estimada.",
+      "Registro diario: flujo, dolor, ánimo, síntomas y notas.",
+      "Todo tu historial de ciclos y un resumen para enseñar en la consulta — gratis.",
+      "Embarazo y posparto: semanas y días, citas y recordatorios, señales de alarma.",
+      "Widget de pantalla de inicio y recordatorios, todo preparado en tu dispositivo.",
+      "Si quieres, con tu pareja: solo el estado de cercanía que elijas, con tu consentimiento explícito."
+    ],
+    "privacy_title": "La privacidad no es un añadido",
+    "privacy_points": [
+      "Tus registros se quedan cifrados en tu móvil. No hace falta cuenta.",
+      "Los anuncios no se personalizan; sin identificador publicitario ni permiso de rastreo.",
+      "Tus datos de salud nunca se usan para anuncios ni se venden.",
+      "El bloqueo de la app y las copias de seguridad son gratis.",
+      "Puedes borrar todos tus datos desde la propia app."
+    ],
+    "medical": "Nilu no diagnostica, no recomienda tratamientos y no es un método anticonceptivo. Las previsiones se calculan a partir de tus registros anteriores y son aproximadas.",
+    "footer_tracking": "Este sitio no usa cookies, analítica ni rastreo.",
+    "support_title": "Soporte",
+    "support_intro": "¿Tienes un problema o una sugerencia? Escríbenos.",
+    "support_contact": "Correo: {email}",
+    "faq_title": "Preguntas frecuentes",
+    "faq": [
+      {"q": "¿Dónde se guardan mis datos?", "a": "En tu móvil, cifrados. Si no usas la función de pareja, ningún registro de salud sale de tu dispositivo. Los detalles están en la Política de Privacidad."},
+      {"q": "Voy a cambiar de móvil, ¿cómo paso mis registros?", "a": "En el móvil antiguo, crea una copia con {{nav_profile}} → {{profile_privacy_security}} → {{privacy_export}}. En el nuevo, restáurala desde la misma pantalla con {{privacy_import}}."},
+      {"q": "¿Cómo borro mis datos?", "a": "{{nav_profile}} → {{profile_privacy_security}} → {{privacy_delete_account}}. Si te vinculaste con tu pareja, también se borran del servidor los datos de vinculación y el estado compartido. Al reinstalar la app, los registros antiguos no vuelven."},
+      {"q": "¿Cómo cancelo mi suscripción?", "a": "Las suscripciones las gestiona Apple: en el iPhone, Ajustes → tu nombre → Suscripciones → Nilu. La cancelación sigue vigente hasta el final del periodo."},
+      {"q": "No aparece mi compra Premium.", "a": "En la pantalla Premium, toca {{premium_restore_purchases}}. Debes haber iniciado sesión con el mismo ID de Apple."},
+      {"q": "¿Qué comparte el modo pareja?", "a": "Solo el estado de cercanía que decidas compartir con tu consentimiento explícito (nivel de deseo y necesidades de afecto). Las fechas de tu ciclo, tus síntomas y tus notas no se comparten. Al desactivar el uso compartido, tu estado se borra del servidor."}
+    ]
+  },
+  "fr": {
+    "lang_name": "Français",
+    "nav_home": "Accueil",
+    "nav_privacy": "Confidentialité",
+    "nav_terms": "Conditions",
+    "nav_support": "Assistance",
+    "language": "Langue",
+    "hero_title": "Ton cycle reste avec toi",
+    "hero_body": "Un suivi serein des règles, de la grossesse et du post-partum. Tout ce que tu notes reste chiffré sur ton téléphone — sans compte, sans pistage.",
+    "download": "Télécharger dans l'App Store",
+    "coming_soon": "Bientôt sur l'App Store",
+    "features_title": "Ce qu'elle fait",
+    "features": [
+      "Calendrier et prévisions : note tes règles, vois les prochaines et ta période fertile estimée.",
+      "Journal quotidien : flux, douleurs, humeur, symptômes et notes.",
+      "Tout l'historique de tes cycles et un résumé à montrer en consultation — gratuit.",
+      "Grossesse et post-partum : semaines et jours, rendez-vous et rappels, signes d'alerte.",
+      "Widget d'écran d'accueil et rappels, tout est préparé sur ton appareil.",
+      "Si tu veux, avec ton partenaire : seulement l'état de proximité que tu choisis, avec ton consentement explicite."
+    ],
+    "privacy_title": "La confidentialité n'est pas une option",
+    "privacy_points": [
+      "Tes saisies restent chiffrées sur ton téléphone. Aucun compte nécessaire.",
+      "Les publicités ne sont pas personnalisées ; aucun identifiant publicitaire, aucune demande de pistage.",
+      "Tes données de santé ne servent jamais à la publicité et ne sont jamais vendues.",
+      "Le verrouillage de l'app et les sauvegardes sont gratuits.",
+      "Tu peux supprimer toutes tes données depuis l'app."
+    ],
+    "medical": "Nilu ne pose pas de diagnostic, ne prescrit aucun traitement et n'est pas un moyen de contraception. Les prévisions sont calculées à partir de tes saisies passées et restent approximatives.",
+    "footer_tracking": "Ce site n'utilise ni cookies, ni outils d'analyse, ni pistage.",
+    "support_title": "Assistance",
+    "support_intro": "Un problème ou une suggestion ? Écris-nous.",
+    "support_contact": "E-mail : {email}",
+    "faq_title": "Questions fréquentes",
+    "faq": [
+      {"q": "Où sont stockées mes données ?", "a": "Sur ton téléphone, chiffrées. Si tu n'utilises pas la fonction partenaire, aucune de tes données de santé ne quitte ton appareil. Détails dans la Politique de confidentialité."},
+      {"q": "Je change de téléphone : comment transférer mes données ?", "a": "Sur l'ancien téléphone, crée une sauvegarde avec {{nav_profile}} → {{profile_privacy_security}} → {{privacy_export}}. Sur le nouveau, restaure-la depuis le même écran avec {{privacy_import}}."},
+      {"q": "Comment supprimer mes données ?", "a": "{{nav_profile}} → {{profile_privacy_security}} → {{privacy_delete_account}}. Si tu es associée à un partenaire, tes données d'association et l'état partagé sont aussi supprimés du serveur. Après une réinstallation, les anciennes données ne reviennent pas."},
+      {"q": "Comment résilier mon abonnement ?", "a": "Apple gère les abonnements : sur l'iPhone, Réglages → ton nom → Abonnements → Nilu. La résiliation reste active jusqu'à la fin de la période."},
+      {"q": "Mon achat Premium n'apparaît pas.", "a": "Sur l'écran Premium, touche {{premium_restore_purchases}}. Tu dois être connectée avec le même identifiant Apple."},
+      {"q": "Que partage le mode partenaire ?", "a": "Uniquement l'état de proximité que tu choisis de partager avec ton consentement explicite (niveau de désir et besoins d'affection). Tes dates de cycle, symptômes et notes ne sont pas partagés. Désactiver le partage supprime ton état du serveur."}
+    ]
+  },
+  "pt": {
+    "lang_name": "Português (Brasil)",
+    "nav_home": "Início",
+    "nav_privacy": "Privacidade",
+    "nav_terms": "Termos",
+    "nav_support": "Suporte",
+    "language": "Idioma",
+    "hero_title": "Seu ciclo fica com você",
+    "hero_body": "Um app tranquilo para menstruação, gravidez e pós-parto. Tudo o que você registra fica criptografado no seu celular — sem conta e sem rastreamento.",
+    "download": "Baixar na App Store",
+    "coming_soon": "Em breve na App Store",
+    "features_title": "O que ele faz",
+    "features": [
+      "Calendário e previsões: marque a menstruação e veja a próxima e a janela fértil estimada.",
+      "Registro diário: fluxo, dor, humor, sintomas e anotações.",
+      "Todo o seu histórico de ciclos e um resumo para mostrar na consulta — grátis.",
+      "Gravidez e pós-parto: semanas e dias, consultas e lembretes, sinais de alerta.",
+      "Widget da Tela de Início e lembretes, tudo preparado no seu aparelho.",
+      "Se quiser, com seu parceiro: só o status de proximidade que você escolher, com seu consentimento explícito."
+    ],
+    "privacy_title": "Privacidade não é um extra",
+    "privacy_points": [
+      "Seus registros ficam criptografados no seu celular. Não precisa criar conta.",
+      "Os anúncios não são personalizados; sem identificador de publicidade e sem pedido de rastreamento.",
+      "Seus dados de saúde nunca são usados para anúncios nem vendidos.",
+      "O bloqueio do app e os backups são gratuitos.",
+      "Você pode apagar todos os seus dados dentro do próprio app."
+    ],
+    "medical": "O Nilu não faz diagnóstico, não indica tratamento e não é um método contraceptivo. As previsões são calculadas a partir dos seus registros anteriores e são aproximadas.",
+    "footer_tracking": "Este site não usa cookies, análise nem rastreamento.",
+    "support_title": "Suporte",
+    "support_intro": "Teve algum problema ou tem uma sugestão? Escreva para nós.",
+    "support_contact": "E-mail: {email}",
+    "faq_title": "Perguntas frequentes",
+    "faq": [
+      {"q": "Onde meus dados ficam armazenados?", "a": "No seu celular, criptografados. Se você não usa o recurso de parceiro, nenhum registro de saúde sai do seu aparelho. Os detalhes estão na Política de Privacidade."},
+      {"q": "Vou trocar de celular; como levo meus registros?", "a": "No celular antigo, faça um backup em {{nav_profile}} → {{profile_privacy_security}} → {{privacy_export}}. No novo, restaure pela mesma tela com {{privacy_import}}."},
+      {"q": "Como apago meus dados?", "a": "{{nav_profile}} → {{profile_privacy_security}} → {{privacy_delete_account}}. Se você se conectou com seu parceiro, os dados da conexão e o status compartilhado também são apagados do servidor. Ao reinstalar o app, os registros antigos não voltam."},
+      {"q": "Como cancelo minha assinatura?", "a": "As assinaturas são gerenciadas pela Apple: no iPhone, Ajustes → seu nome → Assinaturas → Nilu. O cancelamento vale até o fim do período."},
+      {"q": "Minha compra Premium não aparece.", "a": "Na tela Premium, toque em {{premium_restore_purchases}}. Você precisa estar com o mesmo ID Apple."},
+      {"q": "O que o modo parceiro compartilha?", "a": "Só o status de proximidade que você escolher compartilhar com seu consentimento explícito (nível de desejo e necessidades de carinho). As datas do seu ciclo, sintomas e anotações não são compartilhados. Ao desativar o compartilhamento, seu status é apagado do servidor."}
+    ]
+  }
+}

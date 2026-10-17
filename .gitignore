@@ -54,3 +54,9 @@ app.*.map.json
 /ios/Runner/GoogleService-Info.plist
 /macos/Runner/GoogleService-Info.plist
 /lib/firebase_options.dart
+
+# Firebase
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+firebase_tests/node_modules/

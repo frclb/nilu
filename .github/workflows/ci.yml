@@ -1,3 +1,9 @@
+# Her gönderimde: biçim, analiz, birim/arayüz testleri, sözlük ve mağaza
+# metni denetimleri, site üretimi ve Firestore kurallarının emülatör testleri.
+#
+# Simülatörde koşan uçtan uca testler (integration_test/) macOS ve iOS
+# simülatörü istediği için burada değil; yerelde:
+#   flutter test integration_test -d <simülatör>
 name: CI
 
 on:
@@ -15,6 +21,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
+          flutter-version: 3.38.7
           channel: stable
           cache: true
 
@@ -22,7 +29,7 @@ jobs:
         run: flutter pub get
 
       - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed lib test
+        run: dart format --output=none --set-exit-if-changed lib test tool
 
       - name: Analyze
         run: flutter analyze --fatal-infos
@@ -32,3 +39,29 @@ jobs:
 
       - name: Check localization key parity
         run: dart run tool/check_localization.dart
+
+      - name: Check store listing limits
+        run: python3 tool/check_store_listing.py
+
+      - name: Build site
+        run: dart run tool/build_site.dart build/site
+
+  firestore-rules:
+    name: Firestore rules (emulator)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: firebase_tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: firebase_tests/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm test
