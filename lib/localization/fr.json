@@ -1086,5 +1086,13 @@
   "onb_birth_older": "Si l'accouchement date de plus de 42 jours, reviens en arrière et choisis « Je veux suivre mon cycle ».",
   "onboarding_success_desc_postpartum": "Ton suivi post-partum est prêt. Tes contrôles et ton suivi des saignements sont sur l'écran d'accueil.",
   "onboarding_success_desc_conception": "Ton cycle est configuré. Ta fenêtre fertile estimée est sur l'écran d'accueil ; nous te rappellerons l'acide folique et quand consulter.",
-  "profile_preg_ttc_since": "J'ai commencé le"
+  "profile_preg_ttc_since": "J'ai commencé le",
+  "day_detail_pregnancy_test": "Test de grossesse",
+  "log_preg_test_negative": "Négatif",
+  "log_preg_test_positive": "Positif",
+  "log_preg_test_unclear": "Pas clair",
+  "day_detail_preg_test_positive_body": "Un test maison positif indique généralement une grossesse. Tu peux consulter un médecin pour la confirmer.",
+  "day_detail_preg_test_start": "Commencer le suivi de grossesse",
+  "home_late_note": "Les cycles se décalent parfois de quelques jours. Si une grossesse est possible, un test maison peut t'éclairer ; tu peux noter le résultat aujourd'hui.",
+  "home_late_log_today": "Noter aujourd'hui"
 }

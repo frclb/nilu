@@ -9,6 +9,8 @@ import '../../../design_system/phase_colors.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../localization/date_names.dart';
 import '../../calendar/view_models/calendar_view_model.dart';
+import '../../calendar/widgets/day_detail_bottom_sheet.dart';
+import '../../../domain/models/calendar_day.dart';
 import '../../../domain/models/cycle_info.dart';
 import '../../../domain/services/cycle_agenda.dart';
 import 'cycle_ring.dart';
@@ -128,7 +130,12 @@ class CycleMasthead extends StatelessWidget {
             ),
           ],
         ),
-        footer: agenda.isEmpty
+        // Gecikmede ajanda boş (tahmin zinciri kaçırılmış bir başlangıca
+        // dayanıyor). Yerine bir sebep öne sürmeyen kısa bir not: kayma sık,
+        // gebelik olasılığı varsa test sonucu bugüne kaydedilebilir.
+        footer: daysLate > 0
+            ? const _LateNote()
+            : agenda.isEmpty
             ? null
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,3 +303,35 @@ Color _entryColor(AgendaKind kind, AppTokens t) => switch (kind) {
   AgendaKind.fertileStart => t.ovulation,
   AgendaKind.ovulation => t.ovulation,
 };
+
+/// Gecikmedeki not ve bugünün kaydını açan düğme.
+class _LateNote extends StatelessWidget {
+  const _LateNote();
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Column(
+      key: const Key('home_late_note'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 14),
+        Text(
+          context.tr('home_late_note'),
+          style: TextStyle(fontSize: 14, height: 1.45, color: t.textMuted),
+        ),
+        const SizedBox(height: 4),
+        TextButton(
+          key: const Key('home_late_log_today'),
+          onPressed: () =>
+              showDayDetailSheet(context, DateTime.now().plusDays(0)),
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            minimumSize: const Size(0, 44),
+          ),
+          child: Text(context.tr('home_late_log_today')),
+        ),
+      ],
+    );
+  }
+}

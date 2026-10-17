@@ -1086,5 +1086,13 @@
   "onb_birth_older": "Doğumunuz 42 günden eskiyse geri dönüp \"Döngümü takip etmek istiyorum\"u seçin.",
   "onboarding_success_desc_postpartum": "Lohusalık takibiniz hazır. Kontrolleriniz ve doğum sonrası kanama kaydı ana ekranda.",
   "onboarding_success_desc_conception": "Döngünüz ayarlandı. Tahmini doğurganlık pencereniz ana ekranda; folik asit ve hekime danışma zamanını hatırlatacağız.",
-  "profile_preg_ttc_since": "Denemeye başladığım tarih"
+  "profile_preg_ttc_since": "Denemeye başladığım tarih",
+  "day_detail_pregnancy_test": "Gebelik testi",
+  "log_preg_test_negative": "Negatif",
+  "log_preg_test_positive": "Pozitif",
+  "log_preg_test_unclear": "Belirsiz",
+  "day_detail_preg_test_positive_body": "Pozitif bir ev testi çoğu zaman gebeliği gösterir. Doğrulamak için hekimine başvurabilirsin.",
+  "day_detail_preg_test_start": "Gebelik takibini başlat",
+  "home_late_note": "Döngüler zaman zaman birkaç gün kayar. Gebelik olasılığı varsa bir ev testi fikir verebilir; sonucunu bugünün kaydına ekleyebilirsin.",
+  "home_late_log_today": "Bugünü kaydet"
 }

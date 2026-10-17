@@ -1086,5 +1086,13 @@
   "onb_birth_older": "If the birth was more than 42 days ago, go back and choose \"I want to track my cycle\".",
   "onboarding_success_desc_postpartum": "Your postpartum tracking is ready. Your check-ups and bleeding log are on the home screen.",
   "onboarding_success_desc_conception": "Your cycle is set up. Your estimated fertile window is on the home screen; we'll remind you about folic acid and when to see a doctor.",
-  "profile_preg_ttc_since": "Started trying on"
+  "profile_preg_ttc_since": "Started trying on",
+  "day_detail_pregnancy_test": "Pregnancy test",
+  "log_preg_test_negative": "Negative",
+  "log_preg_test_positive": "Positive",
+  "log_preg_test_unclear": "Unclear",
+  "day_detail_preg_test_positive_body": "A positive home test usually means pregnancy. You can see a doctor to confirm it.",
+  "day_detail_preg_test_start": "Start pregnancy tracking",
+  "home_late_note": "Cycles sometimes shift by a few days. If pregnancy is possible, a home test can help; you can add the result to today's log.",
+  "home_late_log_today": "Log today"
 }

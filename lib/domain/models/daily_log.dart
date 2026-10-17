@@ -42,6 +42,9 @@ class DailyLog {
   /// bunların hiçbirini yakalamıyordu.
   final List<String> painContexts;
 
+  /// Ev gebelik testi sonucu kodu (bkz. `LogVocabulary.pregnancyTests`).
+  final String? pregnancyTest;
+
   /// Evde ölçülen kilo (kg). Gebelik ve lohusalıkta, isteğe bağlı.
   final double? weightKg;
 
@@ -56,6 +59,7 @@ class DailyLog {
     this.flowIntensity,
     this.moods = const [],
     this.sexualActivity,
+    this.pregnancyTest,
     this.painLevel,
     this.painLimitedActivity = false,
     this.painLocations = const [],
@@ -84,6 +88,9 @@ class DailyLog {
     bool clearFlow = false,
     List<String>? moods,
     String? sexualActivity,
+    bool clearSexualActivity = false,
+    String? pregnancyTest,
+    bool clearPregnancyTest = false,
     String? painLevel,
     bool clearPain = false,
     bool? painLimitedActivity,
@@ -100,7 +107,12 @@ class DailyLog {
     notes: clearNotes ? null : (notes ?? this.notes),
     flowIntensity: clearFlow ? null : (flowIntensity ?? this.flowIntensity),
     moods: moods ?? this.moods,
-    sexualActivity: sexualActivity ?? this.sexualActivity,
+    sexualActivity: clearSexualActivity
+        ? null
+        : (sexualActivity ?? this.sexualActivity),
+    pregnancyTest: clearPregnancyTest
+        ? null
+        : (pregnancyTest ?? this.pregnancyTest),
     painLevel: clearPain ? null : (painLevel ?? this.painLevel),
     painLimitedActivity: clearPain
         ? false
@@ -133,6 +145,7 @@ class DailyLog {
       moods.isNotEmpty ||
       flowIntensity != null ||
       sexualActivity != null ||
+      pregnancyTest != null ||
       painLevel != null ||
       painLimitedActivity ||
       painLocations.isNotEmpty ||
@@ -149,6 +162,7 @@ class DailyLog {
       'flowIntensity': flowIntensity,
       'moods': moods,
       'sexualActivity': sexualActivity,
+      'pregnancyTest': pregnancyTest,
       'painLevel': painLevel,
       'painLimitedActivity': painLimitedActivity,
       'painLocations': painLocations,
@@ -164,6 +178,7 @@ class DailyLog {
   factory DailyLog.fromMap(Map<String, dynamic> map) {
     final rawFlow = map['flowIntensity'] as String?;
     final rawSexualActivity = map['sexualActivity'] as String?;
+    final rawPregnancyTest = map['pregnancyTest'] as String?;
 
     // Ölçümler aralık dışındaysa düşüyor: bozuk bir yedek ya da elle
     // düzenlenmiş bir dosya hekime giden özete "1205 mmHg" koymasın.
@@ -210,6 +225,14 @@ class DailyLog {
           : LogVocabulary.normalize(
               rawSexualActivity,
               LogVocabulary.sexualActivities,
+            ),
+      // Tanınmayan değer düşüyor: bozuk bir yedek "pozitif" diye okunup
+      // gebelik önerisi göstermesin.
+      pregnancyTest: rawPregnancyTest == null
+          ? null
+          : LogVocabulary.normalize(
+              rawPregnancyTest,
+              LogVocabulary.pregnancyTests,
             ),
       weightKg: kilo != null && Vitals.isPlausibleWeight(kilo) ? kilo : null,
       systolic: tansiyonGecerli ? buyuk : null,

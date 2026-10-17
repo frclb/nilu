@@ -4,6 +4,7 @@ import '../../../design_system/app_tokens.dart';
 import 'package:provider/provider.dart';
 import '../view_models/calendar_view_model.dart';
 import '../../../domain/models/daily_log.dart';
+import '../../../domain/models/life_stage.dart';
 import '../../../domain/models/log_vocabulary.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../design_system/app_snack.dart';
@@ -85,6 +86,11 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
     String? flowIntensity,
     List<String>? moods,
     String? sexualActivity,
+    // Seçili çipe yeniden dokunmak seçimi kaldırmalı. `sexualActivity: null`
+    // "dokunma" demek olduğu için seçim önceden hiç geri alınamıyordu.
+    bool clearSexualActivity = false,
+    String? pregnancyTest,
+    bool clearPregnancyTest = false,
     // Ağrı seviyesi kaldırılabilmeli: `clearPain` olmadan `painLevel: null`
     // "değiştirme" anlamına gelirdi ve seçim geri alınamazdı.
     String? painLevel,
@@ -104,6 +110,9 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
         clearFlow: clearFlow,
         moods: moods,
         sexualActivity: sexualActivity,
+        clearSexualActivity: clearSexualActivity,
+        pregnancyTest: pregnancyTest,
+        clearPregnancyTest: clearPregnancyTest,
         painLevel: painLevel,
         clearPain: clearPain,
         painLimitedActivity: painLimitedActivity,
@@ -190,6 +199,14 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
       RouteNames.logEntry,
       queryParameters: {'date': tarih},
     );
+  }
+
+  /// Pozitif testten gebelik takibine: karar kullanıcının. Test tek başına
+  /// evreyi değiştirmiyor; yanlış pozitif ya da erken kayıp mümkün ve
+  /// gebelik kurulumu tarihleri zaten soruyor.
+  void _gebelikBaslat() {
+    Navigator.pop(context);
+    NavigationService().push(RouteNames.pregnancySetup);
   }
 
   @override
@@ -575,11 +592,45 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                         onSelected: (selected) {
                           _updateCurrentLog(
                             sexualActivity: selected ? code : null,
+                            clearSexualActivity: !selected,
                           );
                         },
                       );
                     }).toList(),
                   ),
+
+                  // Gebelik testi — yalnızca döngü evresinde ve geçmiş/bugün
+                  // için. Gebelikte ve lohusalıkta anlamsız; gelecek güne
+                  // test sonucu girilemez.
+                  if (viewModel.lifeStage == LifeStage.cycle &&
+                      !_gelecekGun) ...[
+                    const SizedBox(height: 24),
+                    Text(
+                      context.tr('day_detail_pregnancy_test'),
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      children: LogVocabulary.pregnancyTests.map((code) {
+                        final isSelected = _currentLog.pregnancyTest == code;
+                        return ChoiceChip(
+                          key: Key('day_detail_preg_test_$code'),
+                          label: Text(
+                            context.tr(LogVocabulary.pregnancyTestKey(code)),
+                          ),
+                          selected: isSelected,
+                          onSelected: (selected) => _updateCurrentLog(
+                            pregnancyTest: selected ? code : null,
+                            clearPregnancyTest: !selected,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    if (_currentLog.pregnancyTest ==
+                        LogVocabulary.pregnancyTestPositive)
+                      _PositiveTestCard(onStart: _gebelikBaslat),
+                  ],
 
                   const SizedBox(height: 24),
 
@@ -606,6 +657,48 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                 ],
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Pozitif test sonucunun altındaki not: doğrulama önerisi ve isteğe bağlı
+/// gebelik takibi.
+class _PositiveTestCard extends StatelessWidget {
+  const _PositiveTestCard({required this.onStart});
+
+  final VoidCallback onStart;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      key: const Key('day_detail_preg_test_positive_card'),
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: t.brandTint,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.tr('day_detail_preg_test_positive_body'),
+            style: TextStyle(fontSize: 14, height: 1.45, color: t.text),
+          ),
+          const SizedBox(height: 8),
+          TextButton.icon(
+            key: const Key('day_detail_preg_test_start'),
+            onPressed: onStart,
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              minimumSize: const Size(0, 44),
+            ),
+            icon: const Icon(Icons.pregnant_woman, size: 20),
+            label: Text(context.tr('day_detail_preg_test_start')),
           ),
         ],
       ),

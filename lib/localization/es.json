@@ -1086,5 +1086,13 @@
   "onb_birth_older": "Si el parto fue hace más de 42 días, vuelve atrás y elige «Quiero seguir mi ciclo».",
   "onboarding_success_desc_postpartum": "Tu seguimiento posparto está listo. Tus controles y el registro de sangrado están en la pantalla de inicio.",
   "onboarding_success_desc_conception": "Tu ciclo está configurado. Tu ventana fértil estimada está en la pantalla de inicio; te recordaremos el ácido fólico y cuándo consultar.",
-  "profile_preg_ttc_since": "Empecé a intentarlo el"
+  "profile_preg_ttc_since": "Empecé a intentarlo el",
+  "day_detail_pregnancy_test": "Prueba de embarazo",
+  "log_preg_test_negative": "Negativo",
+  "log_preg_test_positive": "Positivo",
+  "log_preg_test_unclear": "No está claro",
+  "day_detail_preg_test_positive_body": "Una prueba casera positiva suele indicar embarazo. Puedes consultar a un médico para confirmarlo.",
+  "day_detail_preg_test_start": "Iniciar seguimiento del embarazo",
+  "home_late_note": "A veces los ciclos se desplazan unos días. Si es posible un embarazo, una prueba casera puede orientarte; puedes añadir el resultado al registro de hoy.",
+  "home_late_log_today": "Registrar hoy"
 }

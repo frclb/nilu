@@ -269,6 +269,13 @@ class DataExportService {
             '${translate(LogVocabulary.sexualActivityKey(activity))}',
           );
         }
+        final test = log.pregnancyTest;
+        if (test != null) {
+          buffer.writeln(
+            '    ${translate('day_detail_pregnancy_test')}: '
+            '${translate(LogVocabulary.pregnancyTestKey(test))}',
+          );
+        }
         final notes = log.notes;
         if (notes != null && notes.isNotEmpty) {
           buffer.writeln('    ${translate('log_notes')}: $notes');
@@ -310,7 +317,8 @@ class DataExportService {
     // klinik özetin üzerine kurulduğu veri, tablodan tamamen eksikti.
     final rows = <String>[
       'date,is_period,flow,pain,pain_limited,pain_locations,pain_contexts,'
-          'symptoms,moods,sexual_activity,weight_kg,systolic,diastolic,notes',
+          'symptoms,moods,sexual_activity,pregnancy_test,weight_kg,systolic,'
+          'diastolic,notes',
     ];
 
     final logged = dailyLogs.where((l) => l.hasContent).toList()
@@ -330,6 +338,7 @@ class DataExportService {
           log.symptoms.join('; '),
           log.moods.join('; '),
           log.sexualActivity ?? '',
+          log.pregnancyTest ?? '',
           // Gebelik ve lohusalıkta, isteğe bağlı. Not en sonda kalıyor:
           // serbest metin, tablo programında en çok yer kaplayan sütun.
           log.weightKg?.toString() ?? '',

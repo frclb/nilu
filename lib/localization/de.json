@@ -1086,5 +1086,13 @@
   "onb_birth_older": "Liegt die Geburt mehr als 42 Tage zurück, geh zurück und wähle „Ich möchte meinen Zyklus verfolgen“.",
   "onboarding_success_desc_postpartum": "Deine Wochenbett-Begleitung ist bereit. Untersuchungen und Blutungsprotokoll findest du auf dem Startbildschirm.",
   "onboarding_success_desc_conception": "Dein Zyklus ist eingerichtet. Deine geschätzten fruchtbaren Tage siehst du auf dem Startbildschirm; wir erinnern dich an Folsäure und daran, wann du ärztlichen Rat suchen solltest.",
-  "profile_preg_ttc_since": "Angefangen am"
+  "profile_preg_ttc_since": "Angefangen am",
+  "day_detail_pregnancy_test": "Schwangerschaftstest",
+  "log_preg_test_negative": "Negativ",
+  "log_preg_test_positive": "Positiv",
+  "log_preg_test_unclear": "Unklar",
+  "day_detail_preg_test_positive_body": "Ein positiver Heimtest bedeutet meist eine Schwangerschaft. Zur Bestätigung kannst du ärztlichen Rat suchen.",
+  "day_detail_preg_test_start": "Schwangerschaftsbegleitung starten",
+  "home_late_note": "Zyklen verschieben sich manchmal um ein paar Tage. Wenn eine Schwangerschaft möglich ist, kann ein Heimtest Klarheit geben; das Ergebnis kannst du heute eintragen.",
+  "home_late_log_today": "Heute eintragen"
 }

@@ -166,6 +166,19 @@ class LogVocabulary {
     'unprotected',
   ];
 
+  /// Ev gebelik testi sonucu.
+  ///
+  /// "Belirsiz" ayrı bir seçenek: soluk çizgi ya da okunamayan sonuç sık
+  /// görülüyor ve kullanıcıyı negatif ile pozitif arasında seçime zorlamak
+  /// kaydı yanlışlardı.
+  static const List<String> pregnancyTests = [
+    'negative',
+    'positive',
+    'unclear',
+  ];
+
+  static const String pregnancyTestPositive = 'positive';
+
   // ─── Lokalizasyon anahtarları ───
 
   static String symptomKey(String code) => 'log_symptom_$code';
@@ -176,6 +189,7 @@ class LogVocabulary {
   static String moodKey(String code) => 'log_mood_$code';
   static String flowKey(String code) => 'log_flow_$code';
   static String sexualActivityKey(String code) => 'log_sex_$code';
+  static String pregnancyTestKey(String code) => 'log_preg_test_$code';
 
   // ─── Geriye dönük uyumluluk ───
 

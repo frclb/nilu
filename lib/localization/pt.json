@@ -1086,5 +1086,13 @@
   "onb_birth_older": "Se o parto foi há mais de 42 dias, volte e escolha \"Quero acompanhar meu ciclo\".",
   "onboarding_success_desc_postpartum": "Seu acompanhamento pós-parto está pronto. Suas consultas e o registro de sangramento estão na tela inicial.",
   "onboarding_success_desc_conception": "Seu ciclo está configurado. Seu período fértil estimado está na tela inicial; vamos lembrar você do ácido fólico e de quando procurar um médico.",
-  "profile_preg_ttc_since": "Comecei a tentar em"
+  "profile_preg_ttc_since": "Comecei a tentar em",
+  "day_detail_pregnancy_test": "Teste de gravidez",
+  "log_preg_test_negative": "Negativo",
+  "log_preg_test_positive": "Positivo",
+  "log_preg_test_unclear": "Inconclusivo",
+  "day_detail_preg_test_positive_body": "Um teste caseiro positivo geralmente indica gravidez. Você pode procurar um médico para confirmar.",
+  "day_detail_preg_test_start": "Iniciar acompanhamento da gravidez",
+  "home_late_note": "Às vezes os ciclos variam alguns dias. Se houver chance de gravidez, um teste caseiro pode ajudar; você pode adicionar o resultado ao registro de hoje.",
+  "home_late_log_today": "Registrar hoje"
 }
