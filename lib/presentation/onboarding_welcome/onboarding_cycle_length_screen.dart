@@ -25,9 +25,11 @@ class _OnboardingCycleLengthScreenState
     extends State<OnboardingCycleLengthScreen> {
   final FixedExtentScrollController _scrollController =
       FixedExtentScrollController(
-        initialItem: 27 - CycleSettingsRepository.minCycleLength,
+        initialItem: 28 - CycleSettingsRepository.minCycleLength,
       );
-  int _selectedDays = 27;
+  // "Bilmiyorum" ile aynı başlangıç: ikisi farklı sayı verince tekerleğe
+  // dokunmayan kullanıcı 27, "bilmiyorum" diyen 28 alıyordu.
+  int _selectedDays = 28;
 
   @override
   void dispose() {

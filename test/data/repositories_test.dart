@@ -83,15 +83,21 @@ void main() {
       expect(updatedAt!.year, greaterThan(2000));
     });
 
-    test(
-      'saveInitialSettings geçmiş bir tarih yazar (tüm tahminler yeni ayarla)',
-      () async {
-        await repo.saveInitialSettings(cycleLength: 30, periodLength: 4);
+    test('kurulum değeri ayar tarihi yazmıyor: kayıtlar biriktikçe tahmin '
+        'onlardan öğreniyor', () async {
+      await repo.saveInitialSettings(cycleLength: 30, periodLength: 4);
 
-        expect(await repo.getCycleLength(), 30);
-        expect(await repo.getSettingsUpdatedAt(), DateTime(2000, 1, 1));
-      },
-    );
+      expect(await repo.getCycleLength(), 30);
+      expect(await repo.getSettingsUpdatedAt(), isNull);
+    });
+
+    test('eski sürümün 2000 işareti yok sayılıyor', () async {
+      SharedPreferences.setMockInitialValues({});
+      FlutterSecureStorage.setMockInitialValues({
+        'settings_updated_at': DateTime(2000, 1, 1).toIso8601String(),
+      });
+      expect(await repo.getSettingsUpdatedAt(), isNull);
+    });
   });
 
   group('IntimacyRepository (şifreli)', () {

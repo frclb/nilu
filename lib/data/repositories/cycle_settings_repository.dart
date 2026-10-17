@@ -47,20 +47,23 @@ class CycleSettingsRepository {
   }
 
   /// İlk kurulumda (onboarding) ayarları kaydeder.
-  /// `settingsUpdatedAt` alanı çok eski bir tarihe ayarlanır,
-  /// böylece tüm gelecek tahminler bu ayarlarla hesaplanır.
+  ///
+  /// Bu değerler bir **başlangıç tahmini**: kayıt yokken kullanılıyor,
+  /// kayıtlar biriktikçe yerini kullanıcının gerçek döngülerine bırakıyor.
+  ///
+  /// Önceden `settingsUpdatedAt` 2000 yılına yazılıyordu: "her döngü bu
+  /// ayardan sonra başladı" demek. Sonuç, tahminin kayıtlardan hiç
+  /// öğrenmemesiydi — kurulumda tekerleğe dokunmadan geçen kullanıcının
+  /// varsayılan değeri yıllarca "senin döngün" diye kullanılıyordu, geçmiş
+  /// reglleri toplu girmek de hiçbir şeyi değiştirmiyordu. Tarih artık
+  /// yazılmıyor (önceden kalmışsa siliniyor).
   Future<void> saveInitialSettings({
     required int cycleLength,
     required int periodLength,
   }) async {
     await _store.setInt(_cycleLengthKey, cycleLength);
     await _store.setInt(_periodLengthKey, periodLength);
-    // Onboarding'de tüm tahminler bu değerlerle olmalı,
-    // bu yüzden çok eski bir tarih set ediyoruz.
-    await _store.setString(
-      _settingsUpdatedAtKey,
-      DateTime(2000, 1, 1).toIso8601String(),
-    );
+    await _store.remove(_settingsUpdatedAtKey);
   }
 
   /// Kayıtlı döngü uzunluğunu döndürür (varsayılan: 28).
@@ -96,9 +99,18 @@ class CycleSettingsRepository {
   }
 
   /// Ayarların en son değiştirildiği tarihi döndürür.
+  ///
+  /// Eski sürümlerin kurulumda yazdığı 2000 yılı bir tarih değil, "kurulum
+  /// değeri her şeyi ezsin" işaretiydi (bkz. [saveInitialSettings]); yok
+  /// sayılıyor.
   Future<DateTime?> getSettingsUpdatedAt() async {
     final dateStr = await _store.getString(_settingsUpdatedAtKey);
     if (dateStr == null) return null;
-    return DateTime.tryParse(dateStr);
+    final date = DateTime.tryParse(dateStr);
+    if (date == null || date.year <= _legacyInitialYear) return null;
+    return date;
   }
+
+  /// Eski kurulum işaretinin yılı.
+  static const int _legacyInitialYear = 2000;
 }

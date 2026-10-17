@@ -39,6 +39,10 @@ void main() {
         'day_detail_fertility_peak',
         'day_detail_fertility_high',
         'day_detail_fertility_low',
+        // Ana ekran ajandası: "Doğurgan dönem başlıyor" kesin bir takvim
+        // olayı gibi okunuyordu.
+        'agenda_fertile_start',
+        'agenda_ovulation',
       ]) {
         expect(s[k], contains(tahmin[dil]), reason: '$dil $k');
       }

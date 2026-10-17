@@ -153,4 +153,28 @@ void main() {
     expect(find.text(ctx.tr('prediction_info_fertile_off')), findsOneWidget);
     expect(find.text(ctx.tr('prediction_info_fertile')), findsNothing);
   });
+
+  testWidgets('kurulumdaki değer kayıtlar varken tahmini ezmiyor', (
+    tester,
+  ) async {
+    // Kurulumda 27 seçildi (ya da tekerleğe dokunulmadı); kayıtlar 28
+    // günlük. Önceden kurulum değeri "2000'den beri geçerli" yazılıyor ve
+    // tahmin kayıtlardan hiç öğrenmiyordu.
+    await tester.runAsync(
+      () => const CycleSettingsRepository().saveInitialSettings(
+        cycleLength: 27,
+        periodLength: 5,
+      ),
+    );
+    await seedCycles(lastStartAgo: 10);
+    final ctx = await bilgi(tester);
+    final info = ctx.read<CalendarViewModel>().cycleInfo;
+    expect(info.averageCycleLength, 28);
+    expect(
+      find.text(
+        ctx.tr('prediction_info_history_avg', params: {'k': '2', 'n': '28'}),
+      ),
+      findsOneWidget,
+    );
+  });
 }
