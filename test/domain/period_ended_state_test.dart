@@ -63,7 +63,10 @@ void main() {
     });
 
     test('dün bitirilen dönemde bugün regl günü değil', () {
-      expect(info(endedYesterday()).currentPhase, isNot(CyclePhase.menstruation));
+      expect(
+        info(endedYesterday()).currentPhase,
+        isNot(CyclePhase.menstruation),
+      );
     });
   });
 

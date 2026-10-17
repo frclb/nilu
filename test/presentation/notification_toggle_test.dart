@@ -106,9 +106,7 @@ void main() {
     );
   });
 
-  testWidgets('doğurganlık izlenmiyorsa anahtar gösterilmiyor', (
-    tester,
-  ) async {
+  testWidgets('doğurganlık izlenmiyorsa anahtar gösterilmiyor', (tester) async {
     // Hormonal doğum kontrolünde doğurganlık verisi kaynakta hiç
     // üretilmiyor; anahtar açılsa bile hiçbir bildirim planlanamaz.
     // Çalışmayan bir düğme bırakmak, kullanıcıya bildirimin gelmemesini

@@ -165,6 +165,5 @@ void main() {
       expect(s.periodReminders, isFalse);
       expect(s.dailyLogs, isTrue);
     });
-
   });
 }

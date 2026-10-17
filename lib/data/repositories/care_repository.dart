@@ -68,7 +68,8 @@ class CareRepository {
   }
 
   Future<void> remove(String id) async {
-    final hepsi = await getAll()..removeWhere((e) => e.id == id);
+    final hepsi = await getAll()
+      ..removeWhere((e) => e.id == id);
     await saveAll(hepsi);
   }
 }

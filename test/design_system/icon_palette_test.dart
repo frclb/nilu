@@ -21,12 +21,15 @@ import 'package:period_tracker/design_system/app_palette.dart';
 ///   çalıştırılmayı unutmuş mu.
 const _script = 'tool/generate_icon.py';
 const _master = 'assets/icon/app_icon.png';
-const _store = 'ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png';
+const _store =
+    'ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png';
 
 /// Betikteki `NAME = (0x.., 0x.., 0x..)` üçlüsü.
 (int, int, int) _constant(String src, String name) {
-  final m = RegExp('$name = ' r'\((0x[0-9A-Fa-f]{2}), (0x[0-9A-Fa-f]{2}), (0x[0-9A-Fa-f]{2})\)')
-      .firstMatch(src);
+  final m = RegExp(
+    '$name = '
+    r'\((0x[0-9A-Fa-f]{2}), (0x[0-9A-Fa-f]{2}), (0x[0-9A-Fa-f]{2})\)',
+  ).firstMatch(src);
   expect(m, isNotNull, reason: '$_script içinde $name bulunamadı.');
   return (
     int.parse(m!.group(1)!),
@@ -81,15 +84,23 @@ void main() {
       final px = await _pixels(path);
       expect(px.width, 1024, reason: '$path 1024 değil.');
 
-      const regenerate = 'python3 tool/generate_icon.py && '
+      const regenerate =
+          'python3 tool/generate_icon.py && '
           'dart run flutter_launcher_icons';
 
       // Yaprakların içi düz dolgu: 4x küçültmeden sonra da tam değer.
-      expect(px.at(512, 560), _constant(src, 'PETAL'),
-          reason: '$path merkez yaprağı ${_hex(px.at(512, 560))} — betik '
-              'güncellenmiş ama ikon yeniden üretilmemiş. Çalıştırın: $regenerate');
-      expect(px.at(380, 600), _constant(src, 'PETAL_SIDE'),
-          reason: '$path yan yaprağı ${_hex(px.at(380, 600))}. $regenerate');
+      expect(
+        px.at(512, 560),
+        _constant(src, 'PETAL'),
+        reason:
+            '$path merkez yaprağı ${_hex(px.at(512, 560))} — betik '
+            'güncellenmiş ama ikon yeniden üretilmemiş. Çalıştırın: $regenerate',
+      );
+      expect(
+        px.at(380, 600),
+        _constant(src, 'PETAL_SIDE'),
+        reason: '$path yan yaprağı ${_hex(px.at(380, 600))}. $regenerate',
+      );
 
       // Degradenin uçları: kenarlarda yeniden örnekleme birkaç birim kaydırır.
       void near((int, int, int) got, (int, int, int) want, String where) {
@@ -98,9 +109,13 @@ void main() {
           (got.$2, want.$2),
           (got.$3, want.$3),
         ]) {
-          expect((a - b).abs(), lessThanOrEqualTo(3),
-              reason: '$path $where ${_hex(got)}, beklenen ${_hex(want)}. '
-                  '$regenerate');
+          expect(
+            (a - b).abs(),
+            lessThanOrEqualTo(3),
+            reason:
+                '$path $where ${_hex(got)}, beklenen ${_hex(want)}. '
+                '$regenerate',
+          );
         }
       }
 
@@ -113,8 +128,11 @@ void main() {
     // App Store 1024'lük ikonu alfa kanalıyla reddediyor. PNG başlığındaki
     // renk tipi: 2 = RGB, 6 = RGBA.
     final colorType = File(_store).readAsBytesSync()[25];
-    expect(colorType, isNot(6),
-        reason: 'Mağaza ikonunda alfa kanalı var; yükleme reddedilir.');
+    expect(
+      colorType,
+      isNot(6),
+      reason: 'Mağaza ikonunda alfa kanalı var; yükleme reddedilir.',
+    );
   });
 
   test('tüm iOS boyutları üretilmiş', () {

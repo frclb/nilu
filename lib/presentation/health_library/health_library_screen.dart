@@ -76,8 +76,7 @@ class _HealthLibraryScreenState extends State<HealthLibraryScreen> {
                 selected: _category,
                 onSelected: (category) => setState(() => _category = category),
               ),
-              if (showFeatured)
-                HealthLibraryFeaturedArticle(article: featured),
+              if (showFeatured) HealthLibraryFeaturedArticle(article: featured),
               HealthLibraryArticleList(
                 articles: showFeatured
                     ? results.where((a) => !a.isFeatured).toList()

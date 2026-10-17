@@ -19,11 +19,7 @@ import 'intimacy_consent.dart';
 /// Önceki modelde okuyan taraf kendini doğrudan bağlıyordu; erişimi verenin
 /// sahip olmaması, ayrılıktan sonra erişimin kesilememesinin de sebebiydi.
 class PairingRequestsSection extends StatefulWidget {
-  const PairingRequestsSection({
-    super.key,
-    this.remote,
-    this.pairing,
-  });
+  const PairingRequestsSection({super.key, this.remote, this.pairing});
 
   final FirestoreDataSource? remote;
   final PairingRepository? pairing;

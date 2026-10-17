@@ -71,11 +71,7 @@ void main() {
     // Açılışta veri asenkron geldiği için çelenk bir kez yenileniyor;
     // sıraya başlamadan önce onun bitmesi gerekiyor.
     await tester.pump(const Duration(milliseconds: 2000));
-    expect(
-      progress(tester),
-      1.0,
-      reason: 'Başlangıçta çelenk durmuş olmalı',
-    );
+    expect(progress(tester), 1.0, reason: 'Başlangıçta çelenk durmuş olmalı');
 
     Future<void> bas(String etiket, String adim) async {
       expect(

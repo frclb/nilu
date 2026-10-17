@@ -171,7 +171,10 @@ class _LotusPainter extends CustomPainter {
     final bounds = _lotusBounds();
     if (bounds.isEmpty) return;
 
-    final scale = math.min(size.width / bounds.width, size.height / bounds.height);
+    final scale = math.min(
+      size.width / bounds.width,
+      size.height / bounds.height,
+    );
     canvas.save();
     canvas.translate(size.width / 2, size.height / 2);
     canvas.scale(scale);
@@ -186,8 +189,18 @@ class _LotusPainter extends CustomPainter {
     for (final p in side.skip(1)) {
       merged = Path.combine(PathOperation.union, merged, p);
     }
-    canvas.drawPath(merged, Paint()..color = sideColor..isAntiAlias = true);
-    canvas.drawPath(middle, Paint()..color = color..isAntiAlias = true);
+    canvas.drawPath(
+      merged,
+      Paint()
+        ..color = sideColor
+        ..isAntiAlias = true,
+    );
+    canvas.drawPath(
+      middle,
+      Paint()
+        ..color = color
+        ..isAntiAlias = true,
+    );
     canvas.restore();
   }
 

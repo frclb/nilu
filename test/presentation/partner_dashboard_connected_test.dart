@@ -135,7 +135,10 @@ void main() {
         partnerViewModel: PartnerViewModel(
           firestore: _YayinKaynagi([
             for (var i = 5; i > 0; i--)
-              _durum(desire: 'passionate', age: Duration(hours: i)),
+              _durum(
+                desire: 'passionate',
+                age: Duration(hours: i),
+              ),
           ]),
         ),
       );

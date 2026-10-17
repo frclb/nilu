@@ -72,10 +72,8 @@ void main() {
   ///
   /// "Hafif" ve "Orta" hem akış yoğunluğunun hem ağrı şiddetinin kademesi;
   /// ekranın tamamında aramak yanlış çipe dokundurur.
-  Finder inPain(String label) => find.descendant(
-    of: find.byType(PainSection),
-    matching: find.text(label),
-  );
+  Finder inPain(String label) =>
+      find.descendant(of: find.byType(PainSection), matching: find.text(label));
 
   Future<void> tapInPain(WidgetTester tester, String label) async {
     await tester.ensureVisible(inPain(label).first);
@@ -185,11 +183,7 @@ void main() {
           );
         }
 
-        expect(
-          tester.takeException(),
-          isNull,
-          reason: '$locale: düzen hatası',
-        );
+        expect(tester.takeException(), isNull, reason: '$locale: düzen hatası');
       });
     }
   });

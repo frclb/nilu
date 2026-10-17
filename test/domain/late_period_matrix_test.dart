@@ -20,7 +20,9 @@ void main() {
   final today = DateTime(now.year, now.month, now.day);
 
   /// 28 günlük döngü, 5 günlük regl; [late] gün gecikmiş.
-  ({List<AgendaEntry> agenda, int daysLate, int? daysUntil}) stateFor(int late) {
+  ({List<AgendaEntry> agenda, int daysLate, int? daysUntil}) stateFor(
+    int late,
+  ) {
     final start = today.subtract(Duration(days: 28 + late));
     final info = PredictionService().getCycleInfo([
       PeriodLog(

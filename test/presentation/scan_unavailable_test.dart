@@ -45,7 +45,9 @@ void main() {
     return tester.element(find.byWidget(widget));
   }
 
-  testWidgets('izin reddedildiğinde ayarlara götüren düğme var', (tester) async {
+  testWidgets('izin reddedildiğinde ayarlara götüren düğme var', (
+    tester,
+  ) async {
     final context = await pumpFor(
       tester,
       MobileScannerErrorCode.permissionDenied,
@@ -67,10 +69,7 @@ void main() {
   });
 
   testWidgets('kamera yoksa ayar düğmesi gösterilmiyor', (tester) async {
-    final context = await pumpFor(
-      tester,
-      MobileScannerErrorCode.unsupported,
-    );
+    final context = await pumpFor(tester, MobileScannerErrorCode.unsupported);
 
     expect(
       find.text(context.tr('partner_scan_camera_missing')),

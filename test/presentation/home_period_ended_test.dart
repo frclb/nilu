@@ -92,7 +92,9 @@ void main() {
   String headline(WidgetTester tester) {
     final ring = find.byType(CycleMasthead);
     final texts = tester
-        .widgetList<Text>(find.descendant(of: ring, matching: find.byType(Text)))
+        .widgetList<Text>(
+          find.descendant(of: ring, matching: find.byType(Text)),
+        )
         .map((t) => t.data)
         .whereType<String>()
         .toList();
@@ -118,7 +120,8 @@ void main() {
     expect(
       headline(tester),
       isNot(contains(s('home_headline_period_day').replaceAll('{n}', '3'))),
-      reason: 'dönem bittiği hâlde "3. gün" yazıyor — devam ediyor gibi okunuyor',
+      reason:
+          'dönem bittiği hâlde "3. gün" yazıyor — devam ediyor gibi okunuyor',
     );
   });
 
@@ -143,7 +146,9 @@ void main() {
     // Bitiş cümlesi yalnızca o güne ait; ertesi gün döngü sayacı devam eder.
     expect(
       headline(tester),
-      isNot(contains(s('home_headline_period_finished').replaceAll('{n}', '2'))),
+      isNot(
+        contains(s('home_headline_period_finished').replaceAll('{n}', '2')),
+      ),
     );
   });
 
@@ -177,8 +182,7 @@ void main() {
           expect(
             ongoing,
             findsOneWidget,
-            reason:
-                '${entry.key}: çark "3. gün" diyor ama dönem devam etmiyor',
+            reason: '${entry.key}: çark "3. gün" diyor ama dönem devam etmiyor',
           );
         }
       });

@@ -444,7 +444,8 @@ class _Hero extends StatelessWidget {
     // Degradenin koyu ucu birincil rengin kendisinden: hangi tema seçiliyse
     // o rengin koyusu.
     final hsl = HSLColor.fromColor(primary);
-    final deep = hsl.withLightness((hsl.lightness * 0.6).clamp(0.0, 1.0))
+    final deep = hsl
+        .withLightness((hsl.lightness * 0.6).clamp(0.0, 1.0))
         .toColor();
 
     return Container(

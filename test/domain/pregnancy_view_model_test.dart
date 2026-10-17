@@ -57,7 +57,10 @@ void main() {
         cycleLength: 28,
         careTemplate: 'tr',
       );
-      expect(vm.currentEvents.where((e) => e.code == 'tr_visit_1'), hasLength(1));
+      expect(
+        vm.currentEvents.where((e) => e.code == 'tr_visit_1'),
+        hasLength(1),
+      );
       expect(
         await const CareRepository().forPregnancy(vm.current!.id),
         hasLength(vm.currentEvents.length),
@@ -114,20 +117,23 @@ void main() {
   });
 
   group('sonlandırma', () {
-    test('doğumda lohusalığa geçiliyor ve lohusa izlemleri üretiliyor', () async {
-      await vm.startFromLmp(
-        lmp: DateTime(2025, 9, 1),
-        cycleLength: 28,
-        careTemplate: 'tr',
-      );
-      await vm.end(PregnancyOutcome.birth, at: bugun);
+    test(
+      'doğumda lohusalığa geçiliyor ve lohusa izlemleri üretiliyor',
+      () async {
+        await vm.startFromLmp(
+          lmp: DateTime(2025, 9, 1),
+          cycleLength: 28,
+          careTemplate: 'tr',
+        );
+        await vm.end(PregnancyOutcome.birth, at: bugun);
 
-      expect(vm.stage, LifeStage.postpartum);
-      expect(
-        vm.currentEvents.map((e) => e.code),
-        containsAll(['tr_pp_visit_4', 'tr_pp_visit_5', 'tr_pp_visit_6']),
-      );
-    });
+        expect(vm.stage, LifeStage.postpartum);
+        expect(
+          vm.currentEvents.map((e) => e.code),
+          containsAll(['tr_pp_visit_4', 'tr_pp_visit_5', 'tr_pp_visit_6']),
+        );
+      },
+    );
 
     test('kendi randevularında doğum sonrası şablon üretilmiyor', () async {
       await vm.startFromLmp(lmp: DateTime(2025, 9, 1), cycleLength: 28);

@@ -191,11 +191,7 @@ class PeriodService {
         (l) => !identical(l, affected) && l.firstDay.isAfter(affected.firstDay),
       );
       if (!hasLaterPeriod &&
-          _couldStillBeRunning(
-            affected.firstDay,
-            cleanToday,
-            expectedLength,
-          )) {
+          _couldStillBeRunning(affected.firstDay, cleanToday, expectedLength)) {
         affected.endDate = null;
       }
     }

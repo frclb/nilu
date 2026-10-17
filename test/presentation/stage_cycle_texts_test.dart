@@ -143,10 +143,7 @@ void main() {
       ]);
       final ctx = await ac(tester);
       expect(find.text(sure(ctx, 30)), findsOneWidget);
-      expect(
-        find.text(ctx.tr('home_ring_cycle_length_unknown')),
-        findsNothing,
-      );
+      expect(find.text(ctx.tr('home_ring_cycle_length_unknown')), findsNothing);
     });
 
     testWidgets('kayıtlardan çıkan süre yazılıyor', (tester) async {

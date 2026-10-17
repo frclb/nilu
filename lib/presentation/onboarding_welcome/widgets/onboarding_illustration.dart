@@ -93,8 +93,7 @@ class _Calendar extends StatelessWidget {
   }
 
   Widget _cell(AppTokens t, Color primary, int row, int col) {
-    final inBand =
-        row == _bandRow && col >= _bandStart && col <= _bandEnd;
+    final inBand = row == _bandRow && col >= _bandStart && col <= _bandEnd;
     // Bandın uçları yuvarlak, ortası düz: takvimdeki bandın aynısı.
     final first = col == _bandStart;
     final last = col == _bandEnd;
@@ -202,7 +201,11 @@ class _Partner extends StatelessWidget {
           children: [
             _ring(primary, filled: true, child: BrandLotus(color: t.surface)),
             // Bağ: iki halkanın arasını dolduran çizgi.
-            Container(width: 34, height: 4, color: primary.withValues(alpha: 0.35)),
+            Container(
+              width: 34,
+              height: 4,
+              color: primary.withValues(alpha: 0.35),
+            ),
             _ring(
               primary,
               filled: false,

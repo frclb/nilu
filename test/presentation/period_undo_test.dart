@@ -128,7 +128,10 @@ void main() {
     });
 
     testWidgets('bugün başlatılan dönemde var', (tester) async {
-      await pump(tester, logs: [PeriodLog(id: 'p', startDate: today)]);
+      await pump(
+        tester,
+        logs: [PeriodLog(id: 'p', startDate: today)],
+      );
 
       expect(
         undoButton('tr'),
@@ -149,14 +152,20 @@ void main() {
         ],
       );
 
-      expect(find.text(tr['home_period_ended_today'] as String), findsOneWidget);
+      expect(
+        find.text(tr['home_period_ended_today'] as String),
+        findsOneWidget,
+      );
       expect(undoButton('tr'), findsOneWidget);
     });
   });
 
   group('geri alma gerçekten çalışıyor', () {
     testWidgets('bugün başlatılan kayıt tamamen siliniyor', (tester) async {
-      await pump(tester, logs: [PeriodLog(id: 'p', startDate: today)]);
+      await pump(
+        tester,
+        logs: [PeriodLog(id: 'p', startDate: today)],
+      );
 
       await tester.tap(undoButton('tr'));
       await tester.pump();
@@ -196,7 +205,10 @@ void main() {
     testWidgets('geri alma sonrası düğme yeniden kullanılabilir', (
       tester,
     ) async {
-      await pump(tester, logs: [PeriodLog(id: 'p', startDate: today)]);
+      await pump(
+        tester,
+        logs: [PeriodLog(id: 'p', startDate: today)],
+      );
 
       await tester.tap(undoButton('tr'));
       await tester.pump();
@@ -289,11 +301,7 @@ void main() {
         );
 
         expect(undoButton(locale), findsOneWidget);
-        expect(
-          tester.takeException(),
-          isNull,
-          reason: '$locale: düzen hatası',
-        );
+        expect(tester.takeException(), isNull, reason: '$locale: düzen hatası');
       });
     }
   });

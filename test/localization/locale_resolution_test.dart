@@ -54,10 +54,7 @@ void main() {
     for (final locale in appSupportedLocales) {
       final file = File('lib/localization/${locale.languageCode}.json');
       expect(file.existsSync(), isTrue, reason: '${file.path} yok');
-      expect(
-        (jsonDecode(file.readAsStringSync()) as Map).isNotEmpty,
-        isTrue,
-      );
+      expect((jsonDecode(file.readAsStringSync()) as Map).isNotEmpty, isTrue);
     }
   });
 
@@ -86,8 +83,9 @@ void main() {
     for (final locale in appSupportedLocales) {
       final sozluk =
           jsonDecode(
-                File('lib/localization/${locale.languageCode}.json')
-                    .readAsStringSync(),
+                File(
+                  'lib/localization/${locale.languageCode}.json',
+                ).readAsStringSync(),
               )
               as Map<String, dynamic>;
 

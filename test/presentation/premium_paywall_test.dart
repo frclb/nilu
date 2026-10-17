@@ -53,7 +53,10 @@ void main() {
 
   String s(String key) => dictionary[key] as String;
 
-  Future<void> open(WidgetTester tester, {required Brightness brightness}) async {
+  Future<void> open(
+    WidgetTester tester, {
+    required Brightness brightness,
+  }) async {
     tester.view.physicalSize = const Size(1320, 2868);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.resetPhysicalSize);

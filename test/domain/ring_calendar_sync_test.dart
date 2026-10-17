@@ -145,7 +145,11 @@ void main() {
     );
 
     eslenik('en kısa regl ayarı (2)', logs: [log(g(24))], userPeriodLength: 2);
-    eslenik('en uzun regl ayarı (10)', logs: [log(g(24))], userPeriodLength: 10);
+    eslenik(
+      'en uzun regl ayarı (10)',
+      logs: [log(g(24))],
+      userPeriodLength: 10,
+    );
     eslenik(
       'regl ayarı döngüden uzun',
       logs: [log(g(24))],

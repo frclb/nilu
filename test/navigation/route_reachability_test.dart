@@ -22,11 +22,12 @@ void main() {
   };
 
   test('her rotanın bir giriş noktası var', () {
-    final router = File('lib/core/navigation/app_router.dart').readAsStringSync();
-    final registered = RegExp(r'name:\s*RouteNames\.(\w+)')
-        .allMatches(router)
-        .map((m) => m.group(1)!)
-        .toSet();
+    final router = File(
+      'lib/core/navigation/app_router.dart',
+    ).readAsStringSync();
+    final registered = RegExp(
+      r'name:\s*RouteNames\.(\w+)',
+    ).allMatches(router).map((m) => m.group(1)!).toSet();
     expect(registered, isNotEmpty, reason: 'rota tablosu okunamadı');
 
     // Kayıt satırları (`name: RouteNames.x`) ve yorumlar sayılmıyor:
@@ -62,8 +63,11 @@ void main() {
     // Liste sessizce büyümesin: bir ekranı "başka yolla açılıyor" saymak
     // nasıl açıldığını yazmayı gerektiriyor.
     for (final entry in reachedOtherwise.entries) {
-      expect(entry.value.length, greaterThan(25),
-          reason: '${entry.key} için gerekçe yazılmamış.');
+      expect(
+        entry.value.length,
+        greaterThan(25),
+        reason: '${entry.key} için gerekçe yazılmamış.',
+      );
     }
   });
 }

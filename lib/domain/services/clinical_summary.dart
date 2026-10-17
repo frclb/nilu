@@ -157,7 +157,6 @@ class ClinicalSummary {
     );
   }
 
-
   /// Kod listelerinden gün sayısı çıkarır; hiç kaydedilmemiş kodlar düşer.
   ///
   /// En çok kaydedilen önce; eşitlik [order] sırasıyla çözülüyor.

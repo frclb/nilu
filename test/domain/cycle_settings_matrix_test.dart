@@ -53,11 +53,7 @@ void main() {
       test('$length günlük döngü ayarı', () {
         final info = infoFor(single, cycleLength: length);
 
-        expect(
-          info.averageCycleLength,
-          length,
-          reason: 'çark ayarı almamış',
-        );
+        expect(info.averageCycleLength, length, reason: 'çark ayarı almamış');
 
         final agenda = CycleAgenda.upcoming(info, now: now);
         final nextPeriod = agenda.where(
@@ -85,11 +81,7 @@ void main() {
         updatedAt: today,
       );
 
-      expect(
-        info.averageCycleLength,
-        30,
-        reason: 'kayıtlı ortalama korunmalı',
-      );
+      expect(info.averageCycleLength, 30, reason: 'kayıtlı ortalama korunmalı');
       expect(info.averagePeriodLength, 5);
     });
 
@@ -106,11 +98,7 @@ void main() {
     });
 
     test('aynı gün değişen ayar geçerli', () {
-      final info = infoFor(
-        withHistory,
-        cycleLength: 45,
-        updatedAt: start,
-      );
+      final info = infoFor(withHistory, cycleLength: 45, updatedAt: start);
 
       expect(info.averageCycleLength, 45);
     });

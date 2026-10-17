@@ -17,22 +17,30 @@ class PartnerSupportScreen extends StatelessWidget {
   const PartnerSupportScreen({super.key});
 
   static const List<(IconData, String, List<String>)> _sections = [
-    (Icons.water_drop_outlined, 'partner_guide_period_title', [
-      'partner_guide_period_1',
-      'partner_guide_period_2',
-      'partner_guide_period_3',
-    ]),
-    (Icons.cloud_outlined, 'partner_guide_pms_title', [
-      'partner_guide_pms_1',
-      'partner_guide_pms_2',
-    ]),
-    (Icons.favorite_border, 'partner_guide_status_title', [
-      'partner_guide_status_1',
-      'partner_guide_status_2',
-    ]),
-    (Icons.local_hospital_outlined, 'partner_guide_doctor_title', [
-      'partner_guide_doctor_1',
-    ]),
+    (
+      Icons.water_drop_outlined,
+      'partner_guide_period_title',
+      [
+        'partner_guide_period_1',
+        'partner_guide_period_2',
+        'partner_guide_period_3',
+      ],
+    ),
+    (
+      Icons.cloud_outlined,
+      'partner_guide_pms_title',
+      ['partner_guide_pms_1', 'partner_guide_pms_2'],
+    ),
+    (
+      Icons.favorite_border,
+      'partner_guide_status_title',
+      ['partner_guide_status_1', 'partner_guide_status_2'],
+    ),
+    (
+      Icons.local_hospital_outlined,
+      'partner_guide_doctor_title',
+      ['partner_guide_doctor_1'],
+    ),
   ];
 
   @override

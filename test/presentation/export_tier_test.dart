@@ -35,9 +35,8 @@ void main() {
   setUpAll(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-          const MethodChannel('plugins.flutter.io/local_auth'), (
-            call,
-          ) async {
+          const MethodChannel('plugins.flutter.io/local_auth'),
+          (call) async {
             switch (call.method) {
               case 'getAvailableBiometrics':
                 return <String>[];

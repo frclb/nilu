@@ -36,10 +36,7 @@ void main() {
       for (final k in [
         ...CareTemplates.turkeyAntenatal,
         ...CareTemplates.turkeyPostnatal,
-      ]) ...{
-        'care_${k.code}_title',
-        ?k.conditionKey,
-      },
+      ]) ...{'care_${k.code}_title', ?k.conditionKey},
     };
     return {...sabit, ...sablon};
   }

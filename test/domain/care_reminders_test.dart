@@ -168,12 +168,7 @@ void main() {
 
     test('ana anahtar kapalıysa hiçbiri', () {
       expect(
-        bakim(
-          plan(
-            care: girdi,
-            settings: ayar.copyWith(careReminders: false),
-          ),
-        ),
+        bakim(plan(care: girdi, settings: ayar.copyWith(careReminders: false))),
         isEmpty,
       );
     });
@@ -325,7 +320,10 @@ void main() {
 
     test('kapalıyken içerik görünüyor', () {
       final p = bakim(plan(care: girdi));
-      expect(p.map((r) => r.titleKey), contains('care_tr_screen_anomaly_title'));
+      expect(
+        p.map((r) => r.titleKey),
+        contains('care_tr_screen_anomaly_title'),
+      );
     });
 
     test('gizlilik ayarı imzaya giriyor', () {
@@ -338,7 +336,8 @@ void main() {
       expect(
         imza(true),
         isNot(imza(false)),
-        reason: 'Ayarı açınca zaten kurulmuş açık metinli bildirimler '
+        reason:
+            'Ayarı açınca zaten kurulmuş açık metinli bildirimler '
             'yeniden yazılmalı',
       );
     });

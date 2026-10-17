@@ -52,8 +52,11 @@ void main() {
     // Liste büyüyüp gerekçesiz hâle gelmesin: yeni bir hedef eklemek,
     // neden yığını temizlemesi gerektiğini yazmayı gerektiriyor.
     for (final entry in allowed.entries) {
-      expect(entry.value.length, greaterThan(20),
-          reason: '${entry.key} için gerekçe yazılmamış.');
+      expect(
+        entry.value.length,
+        greaterThan(20),
+        reason: '${entry.key} için gerekçe yazılmamış.',
+      );
     }
   });
 }

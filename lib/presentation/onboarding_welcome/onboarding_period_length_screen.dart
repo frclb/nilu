@@ -110,10 +110,7 @@ class _OnboardingPeriodLengthScreenState
             ),
             child: Text(
               context.tr('onb_continue'),
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
         ),

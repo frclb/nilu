@@ -62,9 +62,7 @@ void main() {
       // Uzun liste kaydırılabilir; maddeleri sırayla görünür kıl.
       var gorulen = 0;
       for (var i = 0; i < 12 && gorulen < liste.length; i++) {
-        gorulen = tester
-            .widgetList(find.byIcon(Icons.error_outline))
-            .length;
+        gorulen = tester.widgetList(find.byIcon(Icons.error_outline)).length;
         await tester.drag(find.byType(ListView), const Offset(0, -300));
         await tester.pump();
       }

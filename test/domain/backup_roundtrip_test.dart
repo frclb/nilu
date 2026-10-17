@@ -81,11 +81,23 @@ void main() {
     expect(g.notes, gunluk.notes, reason: 'not kayboldu');
     expect(g.flowIntensity, gunluk.flowIntensity);
     expect(g.moods, gunluk.moods);
-    expect(g.sexualActivity, gunluk.sexualActivity, reason: 'cinsel aktivite kayboldu');
+    expect(
+      g.sexualActivity,
+      gunluk.sexualActivity,
+      reason: 'cinsel aktivite kayboldu',
+    );
     expect(g.painLevel, gunluk.painLevel, reason: 'ağrı düzeyi kayboldu');
     expect(g.painLimitedActivity, gunluk.painLimitedActivity);
-    expect(g.painLocations, gunluk.painLocations, reason: 'ağrı yerleri kayboldu');
-    expect(g.painContexts, gunluk.painContexts, reason: 'ağrı bağlamı kayboldu');
+    expect(
+      g.painLocations,
+      gunluk.painLocations,
+      reason: 'ağrı yerleri kayboldu',
+    );
+    expect(
+      g.painContexts,
+      gunluk.painContexts,
+      reason: 'ağrı bağlamı kayboldu',
+    );
   });
 
   test('boş alanlar boş dönüyor, uydurulmuyor', () async {

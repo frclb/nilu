@@ -44,7 +44,10 @@ void main() {
       of: find.text(etiket),
       matching: find.byType(Row),
     );
-    final nokta = find.descendant(of: satir.first, matching: find.byType(Container));
+    final nokta = find.descendant(
+      of: satir.first,
+      matching: find.byType(Container),
+    );
     final box = nokta.first.evaluate().first.widget as Container;
     final dec = box.decoration! as BoxDecoration;
     return dec.color!;
@@ -79,11 +82,7 @@ void main() {
       userPeriodLength: 7,
       today: today,
     );
-    final halka = CycleRingData.from(
-      info: info,
-      currentDay: 3,
-      tokens: tokens,
-    );
+    final halka = CycleRingData.from(info: info, currentDay: 3, tokens: tokens);
 
     expect(
       halka.colors[2].toARGB32(),

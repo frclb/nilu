@@ -24,21 +24,22 @@ const _generator = 'tool/generate_launch_image.py';
 
 /// Varlık kataloğunun yazdığı biçim: `{"red": "0xFB", …}`.
 Map<String, String> _asComponents(Color c) => {
-      'red': _byte(c.r),
-      'green': _byte(c.g),
-      'blue': _byte(c.b),
-    };
+  'red': _byte(c.r),
+  'green': _byte(c.g),
+  'blue': _byte(c.b),
+};
 
 String _byte(double channel) =>
     '0x${(channel * 255).round().toRadixString(16).toUpperCase().padLeft(2, '0')}';
 
 /// Katalogtaki renk girdisini okur. [dark] koyu görünüm varyantını seçer.
 Map<String, String> _catalogColor({required bool dark}) {
-  final json = jsonDecode(File('$_colorset/Contents.json').readAsStringSync())
-      as Map<String, dynamic>;
-  final entry = (json['colors'] as List).cast<Map<String, dynamic>>().firstWhere(
-        (e) => (e['appearances'] != null) == dark,
-      );
+  final json =
+      jsonDecode(File('$_colorset/Contents.json').readAsStringSync())
+          as Map<String, dynamic>;
+  final entry = (json['colors'] as List)
+      .cast<Map<String, dynamic>>()
+      .firstWhere((e) => (e['appearances'] != null) == dark);
   final parts = (entry['color'] as Map)['components'] as Map<String, dynamic>;
   return {
     for (final k in ['red', 'green', 'blue']) k: parts[k] as String,
@@ -48,7 +49,8 @@ Map<String, String> _catalogColor({required bool dark}) {
 /// PNG başlığındaki IHDR alanından ölçüyü okur — kod çözmeye gerek yok.
 (int, int) _pngSize(String path) {
   final b = File(path).readAsBytesSync();
-  int be32(int o) => (b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3];
+  int be32(int o) =>
+      (b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3];
   return (be32(16), be32(20));
 }
 
@@ -57,7 +59,8 @@ void main() {
     expect(
       _catalogColor(dark: false),
       _asComponents(AppTokens.light.background),
-      reason: 'Açık temada açılış ekranı ilk kareden farklı renkte açılıyor. '
+      reason:
+          'Açık temada açılış ekranı ilk kareden farklı renkte açılıyor. '
           '$_colorset güncellenmemiş — `python3 $_generator` çalıştırın.',
     );
     expect(
@@ -71,13 +74,18 @@ void main() {
     // Açılış ekranı statik: kullanıcının hangi çeşidi seçtiğini bilemez.
     // Bu ancak zemin tüm çeşitlerde aynıysa doğru olur.
     for (final flavor in AppFlavor.values) {
-      expect(AppTokens.of(flavor, Brightness.light).background,
-          AppTokens.light.background,
-          reason: '${flavor.name} açık temada zemini değiştiriyor: statik '
-              'açılış ekranı bu çeşitte yanlış renkte kalır.');
-      expect(AppTokens.of(flavor, Brightness.dark).background,
-          AppTokens.dark.background,
-          reason: '${flavor.name} koyu temada zemini değiştiriyor.');
+      expect(
+        AppTokens.of(flavor, Brightness.light).background,
+        AppTokens.light.background,
+        reason:
+            '${flavor.name} açık temada zemini değiştiriyor: statik '
+            'açılış ekranı bu çeşitte yanlış renkte kalır.',
+      );
+      expect(
+        AppTokens.of(flavor, Brightness.dark).background,
+        AppTokens.dark.background,
+        reason: '${flavor.name} koyu temada zemini değiştiriyor.',
+      );
     }
   });
 
@@ -85,8 +93,10 @@ void main() {
     final src = File(_generator).readAsStringSync();
 
     Map<String, String> constant(String name) {
-      final m = RegExp('$name = ' r'\((0x[0-9A-Fa-f]{2}), (0x[0-9A-Fa-f]{2}), (0x[0-9A-Fa-f]{2})\)')
-          .firstMatch(src);
+      final m = RegExp(
+        '$name = '
+        r'\((0x[0-9A-Fa-f]{2}), (0x[0-9A-Fa-f]{2}), (0x[0-9A-Fa-f]{2})\)',
+      ).firstMatch(src);
       expect(m, isNotNull, reason: '$_generator içinde $name bulunamadı.');
       // Yalnızca basamaklar büyütülüyor; `0x` öneki katalogdaki gibi kalmalı.
       String norm(String v) => '0x${v.substring(2).toUpperCase()}';
@@ -105,8 +115,9 @@ void main() {
   });
 
   test('açılış görseli yer tutucu değil', () {
-    final json = jsonDecode(File('$_imageset/Contents.json').readAsStringSync())
-        as Map<String, dynamic>;
+    final json =
+        jsonDecode(File('$_imageset/Contents.json').readAsStringSync())
+            as Map<String, dynamic>;
     final images = (json['images'] as List).cast<Map<String, dynamic>>();
 
     // Her ölçek, her görünüm için gerçek bir dosya: 1x/2x/3x × açık/koyu.
@@ -119,19 +130,29 @@ void main() {
       expect(File(file).existsSync(), isTrue, reason: '$name eksik.');
 
       final (width, height) = _pngSize(file);
-      expect(width, greaterThan(1),
-          reason: '$name hâlâ 1x1 yer tutucu: açılış ekranı boş görünür.');
+      expect(
+        width,
+        greaterThan(1),
+        reason: '$name hâlâ 1x1 yer tutucu: açılış ekranı boş görünür.',
+      );
       expect(height, greaterThan(1), reason: '$name hâlâ 1x1 yer tutucu.');
       // Storyboard görseli doğal boyutunda ortalıyor; ölçekler tutmazsa
       // işaret cihazdan cihaza büyüyüp küçülür.
-      expect(width, 120 * scale,
-          reason: '$name ${scale}x için yanlış ölçekte.');
+      expect(
+        width,
+        120 * scale,
+        reason: '$name ${scale}x için yanlış ölçekte.',
+      );
     }
 
     final dark = images.where((i) => i['appearances'] != null);
-    expect(dark, hasLength(3),
-        reason: 'Koyu görünüm varyantı eksik: koyu temada erik lotus '
-            'gece zemininde kaybolur.');
+    expect(
+      dark,
+      hasLength(3),
+      reason:
+          'Koyu görünüm varyantı eksik: koyu temada erik lotus '
+          'gece zemininde kaybolur.',
+    );
   });
 
   test('storyboard zemini sabit yazmıyor', () {
@@ -151,8 +172,11 @@ void main() {
     expect(preview, isNotNull, reason: 'namedColor tanımı eksik.');
     final light = AppTokens.light.background;
     for (final (i, channel) in [light.r, light.g, light.b].indexed) {
-      expect(double.parse(preview!.group(i + 1)!), closeTo(channel, 0.001),
-          reason: 'Storyboard önizlemesi katalogtaki renkten farklı.');
+      expect(
+        double.parse(preview!.group(i + 1)!),
+        closeTo(channel, 0.001),
+        reason: 'Storyboard önizlemesi katalogtaki renkten farklı.',
+      );
     }
   });
 }

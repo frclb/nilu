@@ -107,18 +107,24 @@ void main() {
     await open(tester);
 
     expect(find.text(s('onb_period_length_title')), findsOneWidget);
-    expect(find.text(days(5)), findsOneWidget,
-        reason: 'Çark varsayılan olarak 5 günde durmalı.');
+    expect(
+      find.text(days(5)),
+      findsOneWidget,
+      reason: 'Çark varsayılan olarak 5 günde durmalı.',
+    );
   });
 
   testWidgets('gün sayısı sabit yazılmamış, çeviriden geliyor', (tester) async {
     await open(tester);
     // Ekranda "5 Gün" gibi bir metin var ama kaynağı sözlük olmalı:
     // İngilizce sözlükteki karşılığı Türkçede görünmemeli.
-    final en = jsonDecode(File('lib/localization/en.json').readAsStringSync())
-        as Map<String, dynamic>;
-    expect(find.text((en['onb_days_count'] as String).replaceAll('{n}', '5')),
-        findsNothing);
+    final en =
+        jsonDecode(File('lib/localization/en.json').readAsStringSync())
+            as Map<String, dynamic>;
+    expect(
+      find.text((en['onb_days_count'] as String).replaceAll('{n}', '5')),
+      findsNothing,
+    );
   });
 
   testWidgets('seçilen süre kurulumun sonuna taşınıyor', (tester) async {
@@ -147,8 +153,11 @@ void main() {
     await tapAsync(tester, find.text(s('onb_finish_setup')));
 
     final saved = await CycleSettingsRepository().getPeriodLength();
-    expect(saved, 7,
-        reason: 'Kurulum kullanıcının cevabını değil sabit 5 yazıyordu.');
+    expect(
+      saved,
+      7,
+      reason: 'Kurulum kullanıcının cevabını değil sabit 5 yazıyordu.',
+    );
   });
 
   testWidgets('girilen son regl tarihi seçilen süreye göre kaydediliyor', (
@@ -174,7 +183,8 @@ void main() {
     expect(
       logs.single.isOngoing,
       isTrue,
-      reason: '7 günlük regl 6 gün önce başladıysa bugün hâlâ sürüyor. '
+      reason:
+          '7 günlük regl 6 gün önce başladıysa bugün hâlâ sürüyor. '
           'Sabit 5 ile bu dönem kapanmış sayılıyordu.',
     );
   });
@@ -186,8 +196,10 @@ void main() {
       expect(onboardingIdleDotAlpha(true), greaterThan(0));
       expect(onboardingHighlightAlpha(true), greaterThan(0));
       // Koyu tema açıktan daha belirgin olmalı; niyet buydu.
-      expect(onboardingIdleDotAlpha(true),
-          greaterThan(onboardingIdleDotAlpha(false)));
+      expect(
+        onboardingIdleDotAlpha(true),
+        greaterThan(onboardingIdleDotAlpha(false)),
+      );
     });
 
     test('adım sayısı hiçbir ekranda sabit yazılmamış', () {
@@ -203,9 +215,13 @@ void main() {
           offenders.add('${file.path.split('/').last}: ${m.group(0)}');
         }
       }
-      expect(offenders, isEmpty,
-          reason: 'Adım sayısı kopyalandığında araya ekran eklemek '
-              'göstergeleri birbirinden ayırır.');
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'Adım sayısı kopyalandığında araya ekran eklemek '
+            'göstergeleri birbirinden ayırır.',
+      );
     });
 
     test('soru adımları art arda ve son nokta son adım', () {
@@ -220,9 +236,13 @@ void main() {
       for (var i = 1; i < adimlar.length; i++) {
         expect(adimlar[i], adimlar[i - 1] + 1);
       }
-      expect(adimlar.last, onboardingStepCount - 1,
-          reason: 'Araya adım eklenip sayı artırılmazsa son ekranın '
-              'noktası dizinin dışına düşer: hiçbir nokta etkin görünmez.');
+      expect(
+        adimlar.last,
+        onboardingStepCount - 1,
+        reason:
+            'Araya adım eklenip sayı artırılmazsa son ekranın '
+            'noktası dizinin dışına düşer: hiçbir nokta etkin görünmez.',
+      );
     });
   });
 }

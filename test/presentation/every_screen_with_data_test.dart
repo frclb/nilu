@@ -108,7 +108,10 @@ void main() {
     // Süregelen regl: bitiş tarihi yok. Halka ve takvim bunu ayrı ele alıyor.
     _Profile(
       'süregelen regl',
-      periods: [..._cycles([30, 28, 28]), _log('acik', 2, null)],
+      periods: [
+        ..._cycles([30, 28, 28]),
+        _log('acik', 2, null),
+      ],
     ),
 
     // Bol semptom: en uzun içerik, taşma için en elverişli zemin.
@@ -148,124 +151,121 @@ void main() {
   for (final profile in profiles) {
     for (final screen in screens.entries) {
       for (final size in screenSizes.entries) {
-        testWidgets(
-          '${profile.name} · ${screen.key} — ${size.key}',
-          (tester) async {
-            FlutterSecureStorage.setMockInitialValues({});
-            SharedPreferences.setMockInitialValues({
-              'onboarding_complete': true,
-            });
+        testWidgets('${profile.name} · ${screen.key} — ${size.key}', (
+          tester,
+        ) async {
+          FlutterSecureStorage.setMockInitialValues({});
+          SharedPreferences.setMockInitialValues({'onboarding_complete': true});
 
-            // Döngü ayarları da **şifreli** depoda (bkz.
-            // `SecureStore.sensitiveKeys`). Bunları `SharedPreferences`'a
-            // yazıyordum ve uygulama oradan okumadığı için profillerin
-            // uzunlukları hiç etki etmiyordu: "düzensiz döngüler" ile
-            // "on günlük regl" profilleri aslında varsayılan ayarlarla
-            // koşuyordu.
-            await CycleSettingsRepository().saveCycleSettings(
-              cycleLength: profile.cycleLength,
-              periodLength: profile.periodLength,
-            );
+          // Döngü ayarları da **şifreli** depoda (bkz.
+          // `SecureStore.sensitiveKeys`). Bunları `SharedPreferences`'a
+          // yazıyordum ve uygulama oradan okumadığı için profillerin
+          // uzunlukları hiç etki etmiyordu: "düzensiz döngüler" ile
+          // "on günlük regl" profilleri aslında varsayılan ayarlarla
+          // koşuyordu.
+          await CycleSettingsRepository().saveCycleSettings(
+            cycleLength: profile.cycleLength,
+            periodLength: profile.periodLength,
+          );
 
-            // Veriyi deponun ham biçimini taklit etmek yerine repository
-            // üzerinden yazıyoruz: serileştirme uygulamadaki ile aynı olsun.
-            // Ad hassas veri: şifreli depoda tutuluyor. Önce bunu
-            // `SharedPreferences`'a yazıyordum; uygulama oradan okumadığı için
-            // adlı selamlama yolu hiç sınanmıyordu.
-            await const ProfileRepository().save(name: 'Deniz');
+          // Veriyi deponun ham biçimini taklit etmek yerine repository
+          // üzerinden yazıyoruz: serileştirme uygulamadaki ile aynı olsun.
+          // Ad hassas veri: şifreli depoda tutuluyor. Önce bunu
+          // `SharedPreferences`'a yazıyordum; uygulama oradan okumadığı için
+          // adlı selamlama yolu hiç sınanmıyordu.
+          await const ProfileRepository().save(name: 'Deniz');
 
-            final repo = const PeriodRepository();
-            await repo.savePeriodLogs(profile.periods);
-            if (profile.daily.isNotEmpty) {
-              await repo.saveDailyLogs(profile.daily);
-            }
+          final repo = const PeriodRepository();
+          await repo.savePeriodLogs(profile.periods);
+          if (profile.daily.isNotEmpty) {
+            await repo.saveDailyLogs(profile.daily);
+          }
 
-            final widget = screen.value();
-            await pumpScreen(tester, widget, size: size.value);
+          final widget = screen.value();
+          await pumpScreen(tester, widget, size: size.value);
 
-            // Boş ağaçta `takeException` da null döner; ekranın gerçekten
-            // çizildiğini önce doğrulamak gerekiyor.
-            expect(
-              find.byWidget(widget),
-              findsOneWidget,
-              reason: '${screen.key}: ekran çizilmedi — iddia boşa gider',
-            );
-            expect(
-              tester.takeException(),
-              isNull,
-              reason:
-                  '${profile.name} · ${screen.key} · ${size.key}: düzen hatası',
-            );
+          // Boş ağaçta `takeException` da null döner; ekranın gerçekten
+          // çizildiğini önce doğrulamak gerekiyor.
+          expect(
+            find.byWidget(widget),
+            findsOneWidget,
+            reason: '${screen.key}: ekran çizilmedi — iddia boşa gider',
+          );
+          expect(
+            tester.takeException(),
+            isNull,
+            reason:
+                '${profile.name} · ${screen.key} · ${size.key}: düzen hatası',
+          );
 
-            // Verinin ekrana **ulaştığı**. Bu iddia olmadan tarama, veriyi
-            // hiç okumayan bir ekranda da geçerdi: depo anahtarı değişse ya
-            // da yükleme sessizce başarısız olsa 90 test yine yeşil kalır,
-            // kullanıcı ise dolu bir kaydın üstünde "Henüz kayıt yok"
-            // görürdü. Metinler ekranın kendi bağlamından okunuyor, böylece
-            // kopya değiştiğinde test kırılmıyor.
-            final context = tester.element(find.byWidget(widget));
+          // Verinin ekrana **ulaştığı**. Bu iddia olmadan tarama, veriyi
+          // hiç okumayan bir ekranda da geçerdi: depo anahtarı değişse ya
+          // da yükleme sessizce başarısız olsa 90 test yine yeşil kalır,
+          // kullanıcı ise dolu bir kaydın üstünde "Henüz kayıt yok"
+          // görürdü. Metinler ekranın kendi bağlamından okunuyor, böylece
+          // kopya değiştiğinde test kırılmıyor.
+          final context = tester.element(find.byWidget(widget));
 
-            if (screen.key == 'home') {
-              // Geçmiş yokken döngü uzunluğu **ayardan** geliyor; birden çok
-              // kayıt varsa ortalama kayıtlardan hesaplandığı için ayarı
-              // yalnızca burada doğrulayabiliyoruz. Bu iddia olmadan
-              // profillerin `cycleLength` değeri hiçbir şeyi etkilemiyordu:
-              // ayarları okumayı tamamen bozsam da tarama yeşil kalıyordu.
-              if (profile.periods.length == 1) {
-                expect(
-                  find.text(
-                    context.tr(
-                      'home_ring_cycle_length',
-                      params: {'n': '${profile.cycleLength}'},
-                    ),
-                  ),
-                  findsOneWidget,
-                  reason:
-                      '${profile.name}: halka ${profile.cycleLength} günlük '
-                      'döngü yazmalı — ayar ekrana ulaşmıyor',
-                );
-              }
+          if (screen.key == 'home') {
+            // Geçmiş yokken döngü uzunluğu **ayardan** geliyor; birden çok
+            // kayıt varsa ortalama kayıtlardan hesaplandığı için ayarı
+            // yalnızca burada doğrulayabiliyoruz. Bu iddia olmadan
+            // profillerin `cycleLength` değeri hiçbir şeyi etkilemiyordu:
+            // ayarları okumayı tamamen bozsam da tarama yeşil kalıyordu.
+            if (profile.periods.length == 1) {
               expect(
-                find.text('Deniz'),
+                find.text(
+                  context.tr(
+                    'home_ring_cycle_length',
+                    params: {'n': '${profile.cycleLength}'},
+                  ),
+                ),
                 findsOneWidget,
                 reason:
-                    'Profilde ad kayıtlı; ana ekran yine de nötr hitap '
-                    'gösteriyor — ad ekrana ulaşmıyor',
+                    '${profile.name}: halka ${profile.cycleLength} günlük '
+                    'döngü yazmalı — ayar ekrana ulaşmıyor',
               );
+            }
+            expect(
+              find.text('Deniz'),
+              findsOneWidget,
+              reason:
+                  'Profilde ad kayıtlı; ana ekran yine de nötr hitap '
+                  'gösteriyor — ad ekrana ulaşmıyor',
+            );
+            expect(
+              find.text(context.tr('home_headline_no_data')),
+              findsNothing,
+              reason:
+                  '${profile.name}: kayıt varken ana ekran boş durum '
+                  'gösteriyor — veri ekrana ulaşmıyor',
+            );
+          }
+
+          if (screen.key == 'insights') {
+            // En az iki regl başlangıcı varsa eğilim çizilebilir.
+            if (profile.periods.length >= 2) {
               expect(
-                find.text(context.tr('home_headline_no_data')),
+                find.text(context.tr('insights_trend_empty')),
                 findsNothing,
                 reason:
-                    '${profile.name}: kayıt varken ana ekran boş durum '
-                    'gösteriyor — veri ekrana ulaşmıyor',
+                    '${profile.name}: ${profile.periods.length} regl '
+                    'başlangıcı var, eğilim yine de boş',
               );
             }
-
-            if (screen.key == 'insights') {
-              // En az iki regl başlangıcı varsa eğilim çizilebilir.
-              if (profile.periods.length >= 2) {
-                expect(
-                  find.text(context.tr('insights_trend_empty')),
-                  findsNothing,
-                  reason:
-                      '${profile.name}: ${profile.periods.length} regl '
-                      'başlangıcı var, eğilim yine de boş',
-                );
-              }
-              // Belirti kaydı yalnızca bir profilde var; ötekilerde boş
-              // durum **doğru** olan, o yüzden koşullu.
-              if (profile.daily.isNotEmpty) {
-                expect(
-                  find.text(context.tr('insights_symptoms_empty')),
-                  findsNothing,
-                  reason:
-                      '${profile.name}: ${profile.daily.length} günlük kayıt '
-                      'var, belirti analizi yine de boş',
-                );
-              }
+            // Belirti kaydı yalnızca bir profilde var; ötekilerde boş
+            // durum **doğru** olan, o yüzden koşullu.
+            if (profile.daily.isNotEmpty) {
+              expect(
+                find.text(context.tr('insights_symptoms_empty')),
+                findsNothing,
+                reason:
+                    '${profile.name}: ${profile.daily.length} günlük kayıt '
+                    'var, belirti analizi yine de boş',
+              );
             }
-          },
-        );
+          }
+        });
       }
     }
   }

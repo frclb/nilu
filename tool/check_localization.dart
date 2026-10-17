@@ -206,9 +206,11 @@ void main() {
     'profile_notification_settings',
   };
 
-  final unused = reference
-      .where((key) => !isUsed(key) && !intentionallyUnused.contains(key))
-      .toList()..sort();
+  final unused =
+      reference
+          .where((key) => !isUsed(key) && !intentionallyUnused.contains(key))
+          .toList()
+        ..sort();
   if (unused.isNotEmpty) {
     stdout.writeln('WARN  ${unused.length} key(s) defined but never used:');
     for (final key in unused.take(20)) {

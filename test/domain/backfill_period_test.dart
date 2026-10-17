@@ -45,11 +45,17 @@ void main() {
       final logs = mark([daysAgo(4)]);
 
       expect(logs, hasLength(1));
-      expect(logs.single.isOngoing, isTrue,
-          reason: 'Beklenen regl süresi dolmadan dönem kapatılmamalı.');
+      expect(
+        logs.single.isOngoing,
+        isTrue,
+        reason: 'Beklenen regl süresi dolmadan dönem kapatılmamalı.',
+      );
       for (var d = 4; d >= 0; d--) {
-        expect(covers(logs, daysAgo(d)), isTrue,
-            reason: '$d gün önceki gün takvimde dolu olmalı.');
+        expect(
+          covers(logs, daysAgo(d)),
+          isTrue,
+          reason: '$d gün önceki gün takvimde dolu olmalı.',
+        );
       }
     });
 
@@ -57,8 +63,11 @@ void main() {
       final logs = mark([today]);
 
       expect(logs.single.isOngoing, isTrue);
-      expect(PredictionService().getCycleInfo(logs).periodEndedToday, isFalse,
-          reason: 'Takvimde bugüne dokunmak dönemi bitirmiş sayılıyordu.');
+      expect(
+        PredictionService().getCycleInfo(logs).periodEndedToday,
+        isFalse,
+        reason: 'Takvimde bugüne dokunmak dönemi bitirmiş sayılıyordu.',
+      );
     });
 
     test('ilk güne dokunmak aradaki günleri zaten dolduruyor', () {
@@ -98,8 +107,11 @@ void main() {
     test('süresi dolmuş bir gün bugüne uzanmıyor', () {
       final logs = mark([daysAgo(20)]);
 
-      expect(logs.single.isOngoing, isFalse,
-          reason: 'Aylar önceki bir gün dönemi bugüne kadar uzatmamalı.');
+      expect(
+        logs.single.isOngoing,
+        isFalse,
+        reason: 'Aylar önceki bir gün dönemi bugüne kadar uzatmamalı.',
+      );
       expect(covers(logs, today), isFalse);
     });
 
@@ -121,8 +133,11 @@ void main() {
       final viaButton = service.startPeriod(<PeriodLog>[], daysAgo(4));
 
       expect(viaCalendar.single.firstDay, viaButton.single.firstDay);
-      expect(viaCalendar.single.isOngoing, viaButton.single.isOngoing,
-          reason: 'Aynı olgu iki arayüzde farklı kaydediliyordu.');
+      expect(
+        viaCalendar.single.isOngoing,
+        viaButton.single.isOngoing,
+        reason: 'Aynı olgu iki arayüzde farklı kaydediliyordu.',
+      );
     });
 
     test('ana ekran döngü gününü doğru sayıyor', () {
@@ -160,8 +175,11 @@ void main() {
     test('takvimle aynı sonucu veriyor', () {
       // İki yol, tek kural: biri değişip diğeri unutulmasın.
       for (final ago in [0, 2, 4, 5, 30]) {
-        expect(fromStart(ago).isOngoing, mark([daysAgo(ago)]).single.isOngoing,
-            reason: '$ago gün önce: form ile takvim ayrışıyor.');
+        expect(
+          fromStart(ago).isOngoing,
+          mark([daysAgo(ago)]).single.isOngoing,
+          reason: '$ago gün önce: form ile takvim ayrışıyor.',
+        );
       }
     });
   });

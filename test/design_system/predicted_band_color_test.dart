@@ -16,7 +16,10 @@ import 'package:period_tracker/presentation/calendar/widgets/calendar_grid.dart'
 /// güvenilir biçimde ayırt edilemeyecek kadar sönük — asıl tehlike çizgi
 /// değil, karışımın yanlış zemine yapılıp bandın renginin kayması.
 void main() {
-  for (final entry in {'açık': AppTokens.light, 'koyu': AppTokens.dark}.entries) {
+  for (final entry in {
+    'açık': AppTokens.light,
+    'koyu': AppTokens.dark,
+  }.entries) {
     final t = entry.value;
     final isDark = entry.key == 'koyu';
 
@@ -41,18 +44,23 @@ void main() {
       test('dikiş bandın incelmiş hâli, başka bir renk değil', () {
         // Dikiş zemine doğru çekiliyor ama bandın rengiyle zemin arasında
         // kalmalı: dışına çıkarsa iki gün arasında yabancı bir ton belirir.
-        double lum(Color c) =>
-            0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
+        double lum(Color c) => 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
 
         final band = lum(predictedBandColor(t, isDark));
         final seam = lum(predictedSeamColor(t, isDark));
         final surface = lum(t.surface);
 
-        expect((seam - band).abs(), greaterThan(0.005),
-            reason: 'Dikiş banttan hiç ayrışmıyor: geçiş yok.');
+        expect(
+          (seam - band).abs(),
+          greaterThan(0.005),
+          reason: 'Dikiş banttan hiç ayrışmıyor: geçiş yok.',
+        );
         // Zemine doğru, ama yolun çok azını gidiyor: "hafif" olan bu.
-        expect((seam - band) / (surface - band), inInclusiveRange(0.05, 0.25),
-            reason: 'Dikiş ya görünmüyor ya bandı ikiye bölüyor.');
+        expect(
+          (seam - band) / (surface - band),
+          inInclusiveRange(0.05, 0.25),
+          reason: 'Dikiş ya görünmüyor ya bandı ikiye bölüyor.',
+        );
       });
     });
   }

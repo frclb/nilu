@@ -27,29 +27,32 @@ void main() {
     );
   });
 
-  test('şablon yeniden uygulanınca kullanıcının işaretleri korunuyor', () async {
-    final olaylar = CareTemplates.generate(
-      gebelik,
-      CareTemplates.turkeyAntenatal,
-    );
-    await repo.addMissing(olaylar);
+  test(
+    'şablon yeniden uygulanınca kullanıcının işaretleri korunuyor',
+    () async {
+      final olaylar = CareTemplates.generate(
+        gebelik,
+        CareTemplates.turkeyAntenatal,
+      );
+      await repo.addMissing(olaylar);
 
-    final ilk = olaylar.first;
-    await repo.upsert(
-      ilk.copyWith(done: true, note: 'Yapıldı, sonuç normal'),
-    );
+      final ilk = olaylar.first;
+      await repo.upsert(
+        ilk.copyWith(done: true, note: 'Yapıldı, sonuç normal'),
+      );
 
-    // Uygulama yeniden kuruldu, şablon tekrar uygulanıyor.
-    await repo.addMissing(
-      CareTemplates.generate(gebelik, CareTemplates.turkeyAntenatal),
-    );
+      // Uygulama yeniden kuruldu, şablon tekrar uygulanıyor.
+      await repo.addMissing(
+        CareTemplates.generate(gebelik, CareTemplates.turkeyAntenatal),
+      );
 
-    final hepsi = await repo.forPregnancy('g1');
-    expect(hepsi, hasLength(olaylar.length), reason: 'Kopya oluşmamalı');
-    final geri = hepsi.singleWhere((e) => e.id == ilk.id);
-    expect(geri.done, isTrue, reason: '"Yapıldı" işareti sıfırlanmamalı');
-    expect(geri.note, 'Yapıldı, sonuç normal');
-  });
+      final hepsi = await repo.forPregnancy('g1');
+      expect(hepsi, hasLength(olaylar.length), reason: 'Kopya oluşmamalı');
+      final geri = hepsi.singleWhere((e) => e.id == ilk.id);
+      expect(geri.done, isTrue, reason: '"Yapıldı" işareti sıfırlanmamalı');
+      expect(geri.note, 'Yapıldı, sonuç normal');
+    },
+  );
 
   test('bozuk satır ötekileri düşürmüyor', () async {
     await repo.addMissing(

@@ -98,9 +98,11 @@ class CycleInfo {
     final end = currentPeriodEnd;
     if (end == null) return false;
     final now = DateTime.now();
-    return DateTime(end.year, end.month, end.day).isAtSameMomentAs(
-      DateTime(now.year, now.month, now.day),
-    );
+    return DateTime(
+      end.year,
+      end.month,
+      end.day,
+    ).isAtSameMomentAs(DateTime(now.year, now.month, now.day));
   }
 
   /// Bugünkü döngü gününü hesaplar.

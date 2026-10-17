@@ -99,7 +99,8 @@ void main() {
       expect(
         data.colors[gun - 1],
         tokens.flowSoft,
-        reason: '$gun. gün: tam tonlu yumuşak renk beklenir, soluklaştırılmış '
+        reason:
+            '$gun. gün: tam tonlu yumuşak renk beklenir, soluklaştırılmış '
             'hâli değil',
       );
     }

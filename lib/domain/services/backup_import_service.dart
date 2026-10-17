@@ -140,7 +140,11 @@ class BackupImportService {
     }
 
     final limit = _day(today ?? DateTime.now());
-    final earliest = DateTime(limit.year - maxHistoryYears, limit.month, limit.day);
+    final earliest = DateTime(
+      limit.year - maxHistoryYears,
+      limit.month,
+      limit.day,
+    );
     var alreadyPresent = 0;
     var invalid = 0;
 

@@ -101,8 +101,7 @@ class ArticleScreen extends StatelessWidget {
                     AppCard(
                       padding: const EdgeInsets.all(14),
                       child: InkWell(
-                        onTap: () =>
-                            context.pushNamed(RouteNames.recipeDetail),
+                        onTap: () => context.pushNamed(RouteNames.recipeDetail),
                         child: Row(
                           children: [
                             Container(
@@ -125,12 +124,11 @@ class ArticleScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     context.tr('article_try_recipe'),
-                                    style: theme.textTheme.labelLarge
-                                        ?.copyWith(
-                                          fontSize: 12,
-                                          letterSpacing: 0.5,
-                                          color: t.textMuted,
-                                        ),
+                                    style: theme.textTheme.labelLarge?.copyWith(
+                                      fontSize: 12,
+                                      letterSpacing: 0.5,
+                                      color: t.textMuted,
+                                    ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
@@ -141,10 +139,7 @@ class ArticleScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            Icon(
-                              Icons.chevron_right,
-                              color: t.textFaint,
-                            ),
+                            Icon(Icons.chevron_right, color: t.textFaint),
                           ],
                         ),
                       ),

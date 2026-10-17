@@ -38,8 +38,7 @@ void main() {
       expect(
         n.consultAt(birthDate: otuzDortBucuk),
         DateTime(2026, 7, 10),
-        reason:
-            '6. ayda (Temmuz 2026) zaten 35 yaşında; 6 aylık eşik geçerli',
+        reason: '6. ayda (Temmuz 2026) zaten 35 yaşında; 6 aylık eşik geçerli',
       );
     });
 

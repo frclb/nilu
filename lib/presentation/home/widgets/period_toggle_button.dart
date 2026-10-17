@@ -193,43 +193,41 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
           SizedBox(
             height: 52,
             child: switch (action) {
-          PeriodAction.start => FilledButton.icon(
-            onPressed: _busy
-                ? null
-                : () async {
-                    if (!await _confirmEarlyStart(viewModel)) return;
-                    if (!mounted) return;
-                    await _run(viewModel.startPeriodToday);
-                  },
-            icon: const Icon(Icons.water_drop_outlined, size: 20),
-            label: Text(context.tr('home_period_start')),
-            style: FilledButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+              PeriodAction.start => FilledButton.icon(
+                onPressed: _busy
+                    ? null
+                    : () async {
+                        if (!await _confirmEarlyStart(viewModel)) return;
+                        if (!mounted) return;
+                        await _run(viewModel.startPeriodToday);
+                      },
+                icon: const Icon(Icons.water_drop_outlined, size: 20),
+                label: Text(context.tr('home_period_start')),
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
               ),
-            ),
-          ),
 
-          // Bitirme yıkıcı bir eylem değil ama geri alınabilir olduğu belli
-          // olsun diye daha sakin duruyor.
-          PeriodAction.end => OutlinedButton.icon(
-            onPressed: _busy
-                ? null
-                : () => _run(viewModel.endPeriodToday),
-            icon: const Icon(Icons.stop_circle_outlined, size: 20),
-            label: Text(context.tr('home_period_end')),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: theme.colorScheme.primary,
-              side: BorderSide(color: t.border),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+              // Bitirme yıkıcı bir eylem değil ama geri alınabilir olduğu belli
+              // olsun diye daha sakin duruyor.
+              PeriodAction.end => OutlinedButton.icon(
+                onPressed: _busy ? null : () => _run(viewModel.endPeriodToday),
+                icon: const Icon(Icons.stop_circle_outlined, size: 20),
+                label: Text(context.tr('home_period_end')),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: theme.colorScheme.primary,
+                  side: BorderSide(color: t.border),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
               ),
-            ),
-          ),
 
-          // Basılacak bir şey kalmadı. Düğme bırakmak, basınca hiçbir şey
-          // olmayacağı için uygulamayı bozuk gösterirdi.
-          PeriodAction.endedToday => const _EndedToday(),
+              // Basılacak bir şey kalmadı. Düğme bırakmak, basınca hiçbir şey
+              // olmayacağı için uygulamayı bozuk gösterirdi.
+              PeriodAction.endedToday => const _EndedToday(),
             },
           ),
 

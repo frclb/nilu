@@ -56,10 +56,16 @@ void main() {
       }
     });
 
-    expect(size.height, greaterThan(0),
-        reason: 'Çiçek yüksekliksiz kaldı: kutusuna sığmıyor.');
-    expect(painted, greaterThan(1000),
-        reason: 'Çiçek hiç çizilmedi ($painted piksel).');
+    expect(
+      size.height,
+      greaterThan(0),
+      reason: 'Çiçek yüksekliksiz kaldı: kutusuna sığmıyor.',
+    );
+    expect(
+      painted,
+      greaterThan(1000),
+      reason: 'Çiçek hiç çizilmedi ($painted piksel).',
+    );
   });
 
   testWidgets('Dart çizimi üretilmiş görselle örtüşüyor', (tester) async {
@@ -122,14 +128,22 @@ void main() {
     final iou = intersection / union;
     final meanDiff = diff / want.length;
 
-    expect(iou, greaterThan(0.97),
-        reason: 'Şekiller örtüşmüyor (IoU ${iou.toStringAsFixed(3)}): '
-            'tool/lotus.py ile brand_lotus.dart ayrışmış. Birini '
-            'değiştirdiyseniz diğerini de güncelleyin.');
+    expect(
+      iou,
+      greaterThan(0.97),
+      reason:
+          'Şekiller örtüşmüyor (IoU ${iou.toStringAsFixed(3)}): '
+          'tool/lotus.py ile brand_lotus.dart ayrışmış. Birini '
+          'değiştirdiyseniz diğerini de güncelleyin.',
+    );
 
     // Yan yaprakların saydamlığı da tutmalı; yalnızca siluet değil.
-    expect(meanDiff, lessThan(12),
-        reason: 'Yaprak tonları ayrışmış (ortalama alfa farkı '
-            '${meanDiff.toStringAsFixed(1)}).');
+    expect(
+      meanDiff,
+      lessThan(12),
+      reason:
+          'Yaprak tonları ayrışmış (ortalama alfa farkı '
+          '${meanDiff.toStringAsFixed(1)}).',
+    );
   });
 }

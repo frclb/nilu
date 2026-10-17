@@ -146,7 +146,9 @@ class PrivacySettingsRepository {
     if (await _conceptionRepository.get() != null) return;
     try {
       final root = jsonDecode(json);
-      final raw = root is Map<String, dynamic> ? root['conceptionIntent'] : null;
+      final raw = root is Map<String, dynamic>
+          ? root['conceptionIntent']
+          : null;
       if (raw is! Map<String, dynamic>) return;
       final niyet = ConceptionIntent.fromMap(raw);
       // Gelecek tarihli bir niyet elle bozulmuş demek.
