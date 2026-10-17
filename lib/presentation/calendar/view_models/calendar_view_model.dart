@@ -474,6 +474,7 @@ class CalendarViewModel extends ChangeNotifier {
       // unutulursa lohusa anneye eski SAT'tan tahmin yapılır. Bunu
       // `calendar_breaks_wiring_test` koruyor.
       breaks: _cycleBreaks,
+      cycleLengthFromUser: _cycleLengthSaved,
     );
   }
 

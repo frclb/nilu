@@ -1,5 +1,6 @@
 import '../models/calendar_day.dart';
 import '../models/cycle_info.dart';
+import '../models/prediction_basis.dart';
 import 'cycle_intervals.dart';
 import '../models/period_log.dart';
 import 'cycle_service.dart';
@@ -39,6 +40,9 @@ class PredictionService {
     bool hormonalContraception = false,
     DateTime? today,
     List<DateSpan> breaks = const [],
+    // Kullanıcı döngü süresini kendisi girdi mi? Girmediyse 28 bir
+    // varsayım; açıklama ekranı bunu "senin döngün" diye sunmamalı.
+    bool cycleLengthFromUser = true,
   }) {
     final avgLength = _cycleService.calculateAverageCycleLength(
       logs,
@@ -55,6 +59,7 @@ class PredictionService {
     // yeni kullanıcı ayarlarını kullan; değilse hesaplanan ortalamayı kullan.
     int effectiveCycleLength = avgLength;
     int effectivePeriodLength = avgPeriodLength;
+    var settingsOverride = false;
 
     if (settingsUpdatedAt != null && lastStart != null) {
       final cleanUpdatedAt = DateTime(
@@ -72,6 +77,7 @@ class PredictionService {
           cleanLastStart.isAfter(cleanUpdatedAt)) {
         effectiveCycleLength = userCycleLength;
         effectivePeriodLength = userPeriodLength;
+        settingsOverride = true;
       }
     }
 
@@ -112,6 +118,17 @@ class PredictionService {
     }
 
     final nextPeriod = lastStart.plusDays(effectiveCycleLength);
+    final basis = _basis(
+      CycleIntervals.of(
+        logs,
+        breaks: breaks,
+      ).map((p) => p.lengthInDays).toList(),
+      lastStart: lastStart,
+      nextPeriod: nextPeriod,
+      cycleLength: effectiveCycleLength,
+      settingsOverride: settingsOverride,
+      cycleLengthFromUser: cycleLengthFromUser,
+    );
 
     // Yumurtlama luteal faza göre hesaplanır: bir sonraki reglden 14 gün önce,
     // yani döngü başlangıcından `uzunluk - 14` gün sonra. Luteal faz kişiden
@@ -170,6 +187,64 @@ class PredictionService {
       plannedPeriodLength: userPeriodLength,
       currentPeriodEnd: currentPeriodEnd,
       fertilityTracked: tracksFertility,
+      basis: basis,
+    );
+  }
+
+  /// Tahminin aralığı ve dayanağı (bkz. [PredictionBasis]).
+  static PredictionBasis _basis(
+    List<int> lengths, {
+    required DateTime lastStart,
+    required DateTime nextPeriod,
+    required int cycleLength,
+    required bool settingsOverride,
+    required bool cycleLengthFromUser,
+  }) {
+    final source = settingsOverride
+        ? PredictionSource.settings
+        : lengths.isNotEmpty
+        ? PredictionSource.history
+        : cycleLengthFromUser
+        ? PredictionSource.settings
+        : PredictionSource.assumed;
+
+    final son = lengths.length > PredictionBasis.rangeCycles
+        ? lengths.sublist(lengths.length - PredictionBasis.rangeCycles)
+        : lengths;
+    final kisa = son.length >= 2 ? son.reduce((a, b) => a < b ? a : b) : null;
+    final uzun = son.length >= 2 ? son.reduce((a, b) => a > b ? a : b) : null;
+
+    DateTime erken;
+    DateTime gec;
+    if (source == PredictionSource.history &&
+        son.length >= PredictionBasis.minCyclesForRange) {
+      // Kendi geçmişi: en kısa ve en uzun döngü. En olası gün aralığın
+      // içinde kalsın ve tamamen düzenli döngüde de bir gün pay olsun.
+      erken = lastStart.plusDays(
+        kisa! < cycleLength - 1 ? kisa : cycleLength - 1,
+      );
+      gec = lastStart.plusDays(
+        uzun! > cycleLength + 1 ? uzun : cycleLength + 1,
+      );
+    } else {
+      final pay = source == PredictionSource.assumed
+          ? PredictionBasis.assumedMargin
+          : PredictionBasis.fewCyclesMargin;
+      erken = nextPeriod.plusDays(-pay);
+      gec = nextPeriod.plusDays(pay);
+    }
+
+    return PredictionBasis(
+      source: source,
+      cycleLength: cycleLength,
+      cyclesAveraged: lengths.length < PredictionBasis.averagedCycles
+          ? lengths.length
+          : PredictionBasis.averagedCycles,
+      cyclesConsidered: son.length,
+      shortest: kisa,
+      longest: uzun,
+      earliest: erken,
+      latest: gec,
     );
   }
 

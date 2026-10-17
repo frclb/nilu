@@ -40,6 +40,7 @@ import '../../presentation/profile/notification_settings_screen.dart';
 import '../../presentation/profile/personal_info_screen.dart';
 import '../../presentation/profile/cycle_settings_screen.dart';
 import '../../presentation/calendar/past_periods_screen.dart';
+import '../../presentation/insights/prediction_info_screen.dart';
 import '../../presentation/profile/privacy_security_screen.dart';
 import '../../presentation/health_library/health_library_screen.dart';
 import '../../presentation/profile/profile_settings_screen.dart';
@@ -467,6 +468,12 @@ GoRouter createAppRouter(
         path: '/past_periods',
         name: RouteNames.pastPeriods,
         builder: (context, state) => const PastPeriodsScreen(),
+      ),
+
+      GoRoute(
+        path: '/prediction_info',
+        name: RouteNames.predictionInfo,
+        builder: (context, state) => const PredictionInfoScreen(),
       ),
 
       GoRoute(

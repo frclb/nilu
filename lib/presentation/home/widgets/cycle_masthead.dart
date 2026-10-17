@@ -152,8 +152,28 @@ class CycleMasthead extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   for (var i = 0; i < agenda.length; i++)
-                    _AgendaRow(entry: agenda[i], divided: i > 0),
-                  const SizedBox(height: 6),
+                    _AgendaRow(
+                      entry: agenda[i],
+                      divided: i > 0,
+                      // Sonraki regl tek gün değil aralık: kesinlik iddia
+                      // etmesin (bkz. `PredictionBasis`).
+                      range:
+                          agenda[i].kind == AgendaKind.periodStart &&
+                              info.basis != null &&
+                              agenda[i].date == info.predictedNextPeriod
+                          ? (info.basis!.earliest, info.basis!.latest)
+                          : null,
+                    ),
+                  TextButton(
+                    key: const Key('home_prediction_how'),
+                    onPressed: () =>
+                        NavigationService().push(RouteNames.predictionInfo),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: const Size(0, 44),
+                    ),
+                    child: Text(context.tr('home_prediction_how')),
+                  ),
                 ],
               ),
       ),
@@ -224,9 +244,12 @@ String _formatDate(BuildContext context, DateTime date) =>
 
 /// Ajandadaki tek satır: tarih, olay, kalan gün.
 class _AgendaRow extends StatelessWidget {
-  const _AgendaRow({required this.entry, required this.divided});
+  const _AgendaRow({required this.entry, required this.divided, this.range});
 
   final AgendaEntry entry;
+
+  /// Tahmin aralığı; verilirse tarih yerine o yazılıyor.
+  final (DateTime, DateTime)? range;
 
   /// İlk satırın üstünde çizgi olmuyor: kartın kendi bölüm ayrımı yeterli.
   final bool divided;
@@ -261,8 +284,11 @@ class _AgendaRow extends StatelessWidget {
             SizedBox(
               width: 96,
               child: Text(
-                _formatDate(context, entry.date),
-                maxLines: 1,
+                switch (range) {
+                  (final a, final b) => context.dayRange(a, b),
+                  null => _formatDate(context, entry.date),
+                },
+                maxLines: range == null ? 1 : 2,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.labelLarge?.copyWith(
                   fontSize: 14,

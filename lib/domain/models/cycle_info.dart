@@ -1,4 +1,5 @@
 import 'calendar_day.dart';
+import 'prediction_basis.dart';
 
 /// Döngü fazlarını temsil eden enum.
 enum CyclePhase {
@@ -75,6 +76,9 @@ class CycleInfo {
   /// okuyan hiçbir yüzey ikisini ayırt edemiyordu.
   final DateTime? currentPeriodEnd;
 
+  /// Sonraki regl tahmininin aralığı ve dayanağı; tahmin yoksa `null`.
+  final PredictionBasis? basis;
+
   CycleInfo({
     this.averageCycleLength = 28,
     this.averagePeriodLength = 5,
@@ -87,6 +91,7 @@ class CycleInfo {
     this.fertilityTracked = true,
     this.currentPeriodLength,
     this.currentPeriodEnd,
+    this.basis,
     int? plannedPeriodLength,
   }) : plannedPeriodLength = plannedPeriodLength ?? averagePeriodLength;
 

@@ -32,6 +32,17 @@ extension DateNames on BuildContext {
     return names[month - 1];
   }
 
+  /// İki gün arası: aynı ayda "20–23 Ekim", ay değişiyorsa kısa adlarla
+  /// "30 Eyl – 2 Eki". Aynı günse tek tarih.
+  String dayRange(DateTime a, DateTime b) {
+    if (a.year == b.year && a.month == b.month) {
+      if (a.day == b.day) return '${a.day} ${monthName(a.month)}';
+      return '${a.day}–${b.day} ${monthName(a.month)}';
+    }
+    return '${a.day} ${shortMonthName(a.month)} – '
+        '${b.day} ${shortMonthName(b.month)}';
+  }
+
   /// [DateTime.weekday] (1 = Pazartesi) için gün adı.
   String weekdayName(int weekday) {
     final names = weekdayNames;
