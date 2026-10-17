@@ -12,7 +12,7 @@
     "coming_soon": "Yakında App Store'da",
     "features_title": "Neler yapar",
     "features": [
-      "Takvim ve tahminler: reglini işaretle, bir sonrakini ve tahmini doğurgan dönemi gör.",
+      "Takvim ve tahminler: reglini işaretle; bir sonrakini bir aralıkla ve nasıl hesaplandığıyla gör, tahmini doğurgan dönemi de.",
       "Günlük kayıt: akış, ağrı, ruh hâli, belirtiler ve notlar.",
       "Bütün döngü geçmişin ve muayenede gösterebileceğin hekim özeti — ücretsiz.",
       "Gebelik ve lohusalık: hafta ve gün, Sağlık Bakanlığı rehberine göre izlemler, tehlike işaretleri.",
@@ -24,7 +24,7 @@
       "Kayıtların telefonunda, şifreli. Hesap açmak gerekmiyor.",
       "Reklamlar kişiselleştirilmez; reklam kimliğin kullanılmaz, izleme izni istenmez.",
       "Sağlık verin reklam için kullanılmaz ve satılmaz.",
-      "Ekran kilidi ve yedek alma ücretsiz.",
+      "Ekran kilidi, gizli bildirim, sade ana ekran simgesi ve parolalı yedek — hepsi ücretsiz.",
       "Bütün verini uygulamanın içinden silebilirsin."
     ],
     "medical": "Nilu tıbbi teşhis koymaz, tedavi önermez ve bir doğum kontrol yöntemi değildir. Tahminler geçmiş kayıtlarından hesaplanır ve yaklaşıktır.",
@@ -55,7 +55,7 @@
     "coming_soon": "Coming soon to the App Store",
     "features_title": "What it does",
     "features": [
-      "Calendar and predictions: mark your period, see the next one and your estimated fertile window.",
+      "Calendar and predictions: mark your period and see the next one as a range, with how it was calculated, plus your estimated fertile window.",
       "Daily log: flow, pain, mood, symptoms and notes.",
       "Your full cycle history and a summary to show your doctor — free.",
       "Pregnancy and postnatal weeks: weeks and days, appointments and reminders, warning signs.",
@@ -67,7 +67,7 @@
       "Your entries stay on your phone, encrypted. No account needed.",
       "Ads are not personalised; no advertising identifier, no tracking prompt.",
       "Your health data is never used for ads and never sold.",
-      "App lock and backups are free.",
+      "App lock, discreet notifications, a plain home-screen icon and password-protected backups — all free.",
       "You can delete all your data from inside the app."
     ],
     "medical": "Nilu does not diagnose, does not prescribe treatment and is not a contraceptive method. Predictions are calculated from your past entries and are approximate.",
@@ -98,7 +98,7 @@
     "coming_soon": "Bald im App Store",
     "features_title": "Was die App kann",
     "features": [
-      "Kalender und Vorhersagen: Periode eintragen, die nächste und das geschätzte fruchtbare Fenster sehen.",
+      "Kalender und Vorhersagen: Periode eintragen und die nächste als Zeitraum sehen – mit der Erklärung, wie er berechnet wurde – sowie das geschätzte fruchtbare Fenster.",
       "Tägliches Protokoll: Blutung, Schmerzen, Stimmung, Symptome und Notizen.",
       "Dein ganzer Zyklusverlauf und eine Übersicht für den Arztbesuch — kostenlos.",
       "Schwangerschaft und Wochenbett: Wochen und Tage, Termine und Erinnerungen, Warnzeichen.",
@@ -110,7 +110,7 @@
       "Deine Einträge bleiben verschlüsselt auf deinem Handy. Kein Konto nötig.",
       "Werbung wird nicht personalisiert; keine Werbe-ID, keine Tracking-Abfrage.",
       "Deine Gesundheitsdaten werden nie für Werbung genutzt und nie verkauft.",
-      "App-Sperre und Backup sind kostenlos.",
+      "App-Sperre, diskrete Mitteilungen, ein schlichtes Home-Bildschirm-Symbol und passwortgeschützte Backups – alles kostenlos.",
       "Du kannst alle deine Daten in der App löschen."
     ],
     "medical": "Nilu stellt keine Diagnose, empfiehlt keine Behandlung und ist kein Verhütungsmittel. Vorhersagen werden aus deinen früheren Einträgen berechnet und sind ungefähr.",
@@ -141,7 +141,7 @@
     "coming_soon": "Próximamente en el App Store",
     "features_title": "Qué hace",
     "features": [
-      "Calendario y previsiones: marca tu regla y consulta la siguiente y la ventana fértil estimada.",
+      "Calendario y previsiones: marca tu regla y consulta la siguiente como un rango, con cómo se calculó, además de la ventana fértil estimada.",
       "Registro diario: flujo, dolor, ánimo, síntomas y notas.",
       "Todo tu historial de ciclos y un resumen para enseñar en la consulta — gratis.",
       "Embarazo y posparto: semanas y días, citas y recordatorios, señales de alarma.",
@@ -153,7 +153,7 @@
       "Tus registros se quedan cifrados en tu móvil. No hace falta cuenta.",
       "Los anuncios no se personalizan; sin identificador publicitario ni permiso de rastreo.",
       "Tus datos de salud nunca se usan para anuncios ni se venden.",
-      "El bloqueo de la app y las copias de seguridad son gratis.",
+      "Bloqueo de la app, notificaciones discretas, un icono sencillo en la pantalla de inicio y copias protegidas con contraseña: todo gratis.",
       "Puedes borrar todos tus datos desde la propia app."
     ],
     "medical": "Nilu no diagnostica, no recomienda tratamientos y no es un método anticonceptivo. Las previsiones se calculan a partir de tus registros anteriores y son aproximadas.",
@@ -184,7 +184,7 @@
     "coming_soon": "Bientôt sur l'App Store",
     "features_title": "Ce qu'elle fait",
     "features": [
-      "Calendrier et prévisions : note tes règles, vois les prochaines et ta période fertile estimée.",
+      "Calendrier et prévisions : note tes règles et vois les prochaines sous forme de période, avec la façon dont elle est calculée, ainsi que ta période fertile estimée.",
       "Journal quotidien : flux, douleurs, humeur, symptômes et notes.",
       "Tout l'historique de tes cycles et un résumé à montrer en consultation — gratuit.",
       "Grossesse et post-partum : semaines et jours, rendez-vous et rappels, signes d'alerte.",
@@ -196,7 +196,7 @@
       "Tes saisies restent chiffrées sur ton téléphone. Aucun compte nécessaire.",
       "Les publicités ne sont pas personnalisées ; aucun identifiant publicitaire, aucune demande de pistage.",
       "Tes données de santé ne servent jamais à la publicité et ne sont jamais vendues.",
-      "Le verrouillage de l'app et les sauvegardes sont gratuits.",
+      "Verrouillage de l'app, notifications discrètes, icône sobre sur l'écran d'accueil et sauvegardes protégées par mot de passe : tout est gratuit.",
       "Tu peux supprimer toutes tes données depuis l'app."
     ],
     "medical": "Nilu ne pose pas de diagnostic, ne prescrit aucun traitement et n'est pas un moyen de contraception. Les prévisions sont calculées à partir de tes saisies passées et restent approximatives.",
@@ -227,7 +227,7 @@
     "coming_soon": "Em breve na App Store",
     "features_title": "O que ele faz",
     "features": [
-      "Calendário e previsões: marque a menstruação e veja a próxima e a janela fértil estimada.",
+      "Calendário e previsões: marque a menstruação e veja a próxima como um intervalo, com a explicação do cálculo, além da janela fértil estimada.",
       "Registro diário: fluxo, dor, humor, sintomas e anotações.",
       "Todo o seu histórico de ciclos e um resumo para mostrar na consulta — grátis.",
       "Gravidez e pós-parto: semanas e dias, consultas e lembretes, sinais de alerta.",
@@ -239,7 +239,7 @@
       "Seus registros ficam criptografados no seu celular. Não precisa criar conta.",
       "Os anúncios não são personalizados; sem identificador de publicidade e sem pedido de rastreamento.",
       "Seus dados de saúde nunca são usados para anúncios nem vendidos.",
-      "O bloqueio do app e os backups são gratuitos.",
+      "Bloqueio do app, notificações discretas, um ícone simples na tela inicial e backups protegidos por senha — tudo gratuito.",
       "Você pode apagar todos os seus dados dentro do próprio app."
     ],
     "medical": "O Nilu não faz diagnóstico, não indica tratamento e não é um método contraceptivo. As previsões são calculadas a partir dos seus registros anteriores e são aproximadas.",

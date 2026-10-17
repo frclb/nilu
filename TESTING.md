@@ -101,40 +101,62 @@ curl -s -o /dev/null -w "%{http_code}\n" https://raw.githubusercontent.com/Cocoa
 
 ## 3. Uygulamayı gezerken nelere bakın
 
-Bu turda değişen davranışlar — hepsi elle doğrulanabilir:
+Otomatik testlerin göremediği şeyler: dokunma hissi, animasyon, gerçek
+bildirim, gerçek kamera, gerçek mağaza. Elle bakılacaklar:
 
-**Açılış**
-- Firebase yapılandırması yokken uygulama **açılmalı** (eskiden çöküyordu).
-  Konsolda `Firebase not configured — running in local-only mode` görürsünüz;
-  bu beklenen davranış.
+**Açılış ve kurulum**
+- Firebase/RevenueCat/AdMob anahtarları yokken uygulama **açılmalı**; partner
+  ekranı "şu an kullanılamıyor" der, Premium ekranı fiyat göstermez.
+- Kurulumda dört yol: *Döngümü takip etmek istiyorum*, *Bebek istiyorum*
+  (ne zamandır denendiği sorulur), *Hamileyim*, *Yakın zamanda doğum yaptım*
+  (yalnızca doğum günü sorulur, son 42 gün). Her yolun son ekranındaki
+  açıklama seçilen yola göre değişmeli.
 
-**Onboarding → Takvim**
-- Son regl tarihi ve döngü uzunluğu sorulur, sonra ana ekran açılır.
-- Takvimde bir güne dokunun → "Regl işaretle" → gün renklenir, tahmin
-  çizgileri kayar. Tekrar dokunun → işaret kalkar.
-- **Gelecek bir tarihe** işaretlemeyi deneyin → uyarı çıkmalı, kayıt olmamalı.
+**Takvim ve kayıt**
+- Bir güne dokunun → gün sayfası: regl, lekelenme, belirti, ağrı, ruh hâli,
+  not, gebelik testi. Seçili bir çipe tekrar dokunmak seçimi kaldırmalı.
+- Gebelik testinde *Pozitif* → "Gebelik takibini başlat" önerisi çıkar; evre
+  kendiliğinden değişmez.
+- Cinsel aktivite alanı varsayılan olarak **görünmez**; Profil → Gizlilik'te
+  açılır.
+- Döngü Ayarları → *Geçmiş reglleri ekle*: son 12 ay, her başlangıç tek
+  dokunuş.
+- Gelecek bir güne regl işaretlemek reddedilmeli.
 
-**Günlük kayıt**
-- Ana ekrandaki + düğmesi → akış/semptom/ruh hâli seçip kaydedin.
-- Takvimde aynı güne dönün → seçimleriniz **orada durmalı**.
-  (Eskiden takvim ve log ekranı farklı kelime kullandığı için görünmüyordu.)
+**Tahminler**
+- Ana ekranda sonraki regl tek gün değil **aralık** ("20–23 Ekim") ve altında
+  *Bu tahmin nasıl hesaplandı?*. Açıklama ekranı kendi sayılarınızı söyler.
+- Beklenen gün geçince ajanda yerine nazik bir not ve *Bugünü kaydet*.
+
+**Bildirimler** (Profil → Bildirim Ayarları)
+- Kaç gün önce (1–5), hatırlatma saati, günlük kayıt saati, *Gecikirse sor*.
+  Gerçek bildirimi görmek için saati iki dakika sonraya alıp uygulamayı
+  arka plana atın.
+- *Gizli bildirim* açıkken kilit ekranında içerik görünmemeli.
+
+**Gizlilik** (Profil → Gizlilik ve Güvenlik)
+- Uygulama kilidi: Face ID/cihaz şifresi; arka plandan dönünce ister.
+- *Verilerimi dışa aktar* → paylaşım sayfası. *Yedeği parolayla koru* açıkken
+  dosya şifreli `.json`; içe aktarırken parola sorulmalı, yanlış parola
+  reddedilmeli.
+- *Tüm verilerimi sil* → kurulum ekranına döner.
+- Profil → Görünüm → *Uygulama simgesi* → *Sade*: ana ekran simgesi not
+  sayfasına döner (iOS bir uyarı gösterir; bu sistemin davranışı).
 
 **Dil**
-- Ayarlar yerine cihaz dilini değiştirip uygulamayı yeniden açın.
-- Türkçe ve İngilizce tam çevrilidir. Almanca/İspanyolca/Fransızca/Portekizce
-  seçerseniz **İngilizceye düşer** — çökmez, ham anahtar kodu göstermez.
-- Dil değiştirdikten sonra kayıtlı semptomlarınız **kaybolmamalı**.
+- Altı dil tam çevrili (tr, en, de, es, fr, pt-BR). Cihaz dilini değiştirip
+  uygulamayı yeniden açın; kayıtlı belirtiler kaybolmamalı.
 
-**Gizlilik ekranı** (Profil → Gizlilik ve Güvenlik)
-- "Verilerimi Dışa Aktar" → JSON panoya kopyalanır, bir nota yapıştırıp görün.
-- "Hesabımı Sil" → **gerçekten siler** ve onboarding'e döner. Test verisiyle deneyin.
-
-**Kişisel bilgiler** (Profil → Kişisel Bilgiler)
-- Ad girip kaydedin → ana ekrandaki selamlama adınızı göstermeli.
+**Erişilebilirlik**
+- VoiceOver'ı açın (Ayarlar → Erişilebilirlik): takvim günleri "17 Ekim
+  2026, bugün, Adet Dönemi" gibi okunmalı; çipler seçili olup olmadığını
+  söylemeli.
+- Metin boyutunu en büyüğe alın: uygulama 1,5 kata kadar büyür, taşma
+  olmamalı.
 
 **Partner eşleştirme**
-- QR ekranındaki "Eşleşme Kodunu Kopyala" gerçekten panoya kopyalar.
-- QR **tarama** için gerçek cihaz gerekir (simülatörde kamera yok).
+- Firebase bağlandıktan sonra iki cihazla: QR → onay kodu → onay. QR
+  **tarama** için gerçek cihaz gerekir (simülatörde kamera yok).
 
 ---
 
@@ -157,25 +179,66 @@ açılıyor; tanıtım görüntüsü için orası daha iyi duruyor.
 
 ## 5. Otomatik testler
 
+Hepsi ağ ve hesap gerektirmeden çalışır. Yükleme öncesi tam kontrol:
+
+```bash
+dart format --output=none --set-exit-if-changed lib test tool integration_test
+```
+
+```bash
+flutter analyze --fatal-infos
+```
+
 ```bash
 flutter test
 ```
 
-173 dosyada 1900'ü aşkın test var (Ekim 2026). Çoğu saf mantığı ve depolamayı kapsar (döngü
-hesabı, tahmin, şifreli depolama, eski veri kurtarma, abonelik korumaları).
-Yanına üç tür daha eklendi:
+```bash
+dart run tool/check_localization.dart
+```
 
-| Tür | Ne yakalar |
-|---|---|
-| Kaynak taraması | Sabit renk kaçağı, uzak görsel, eksik efsane işareti |
-| Kontrast | Gerçek `ThemeData` üzerinden, açık/koyu × dört tema için WCAG oranı |
-| Arayüz | Yönlendirme, alt gezinme, uygulama kilidi kapısı |
-| Ekran boyutu | On cihaz genişliğinde taşma, menü seçimi, sütun sayısı |
+```bash
+python3 tool/check_store_listing.py
+```
+
+```bash
+dart run tool/build_site.dart
+```
+
+Aynı zincir her push'ta GitHub Actions'ta da koşuyor (`.github/workflows/ci.yml`).
+
+**Birim ve ekran testleri** (`flutter test`, 2300'ü aşkın test, Ekim 2026):
+döngü ve tahmin hesabı, hatırlatıcı planı, şifreli depolama, yedek
+şifreleme, içe/dışa aktarma, partner kuralları, her ekranın üç cihaz
+boyutunda çizilmesi, erişilebilirlik taraması (etiketsiz dokunma hedefi,
+44 pt altı hedef, büyük yazıda taşma), kontrast, yerelleştirme.
+
+**Firestore kuralları** (Node 22 ve Java 21 gerekir; hesap gerekmez, yerel
+emülatör `demo-nilu` projesiyle çalışır):
+
+```bash
+cd firebase_tests && npm ci && npm test
+```
+
+**Uçtan uca (simülatörde gerçek uygulama)** — `integration_test/`. Gerçek
+Anahtar Zinciri ve gerçek iOS kanallarıyla kurulum yollarını, kaydı,
+gizlilik ayarını ve sade simgeyi dener. Uygulama verisini **siler**; bu yüzden
+yalnızca bu iş için ayrılmış bir simülatörde koşun:
+
+```bash
+xcrun simctl create "Nilu E2E" com.apple.CoreSimulator.SimDeviceType.iPhone-16e
+```
+
+```bash
+flutter test integration_test -d "Nilu E2E"
+```
+
+**Yayın denetimi** — hesap anahtarları girildikten sonra eksik kalan bir şey
+var mı:
+
+```bash
+dart run tool/check_release.dart
+```
 
 Ekranların görsel doğruluğunu hâlâ elle doğrulamanız gerekir; testler
 düzenin *doğru göründüğünü* değil, kurallara uyduğunu kontrol eder.
-
-Yükleme öncesi tam kontrol:
-```bash
-flutter analyze --fatal-infos && flutter test && dart run tool/check_localization.dart
-```

@@ -15,13 +15,13 @@ veya tasarım gerektiriyor).
 | Alan | Değer | Durum |
 |---|---|---|
 | Bundle ID | `com.furkan.rcperiodtracker` | ✅ |
-| Görünen ad | Period Tracker | ✅ `CFBundleDisplayName` + `CFBundleName` |
+| Görünen ad | Nilu | ✅ `CFBundleDisplayName` + `CFBundleName` (widget: "Nilu") |
 | Sürüm | `1.0.0` (build 1) | ✅ [pubspec.yaml:19](pubspec.yaml) |
 | Minimum iOS | 15.0 (CycleWidget hedefi 17.0) | ✅ |
 | Cihaz ailesi | iPhone **ve** iPad (`TARGETED_DEVICE_FAMILY = "1,2"`) | ✅ ikisi de destekleniyor |
 | Yön | iPhone dikey; iPad dikey + yatay | ✅ |
 | Desteklenen diller | tr, en, de, es, fr, pt | ✅ altısı da eşit (`dart run tool/check_localization.dart`) |
-| Şifreleme beyanı | `ITSAppUsesNonExemptEncryption` = `false` | ✅ — yükleme sırasında soru sorulmaz |
+| Şifreleme beyanı | `ITSAppUsesNonExemptEncryption` = `false` | ✅ — yükleme sırasında soru sorulmaz. Not: parolalı yedek AES-256 kullanıyor (`cryptography` paketi); uygulamanın birincil işlevi bilgi güvenliği olmadığı için EAR Kategori 5 Kısım 2 Not 4 kapsamında değerlendirildi. Hukuki emin olmak istersen [SUBMIT.md](SUBMIT.md) §5'e bak |
 
 > iOS deployment target 13.0'dı ama Podfile ve Firebase 15.0 istiyor — düzeltildi.
 > Uyumsuz kalsaydı App Store doğrulaması reddederdi.
@@ -252,10 +252,9 @@ Ad, alt başlık, tanıtım metni, açıklama ve anahtar kelimeler altı dilde
 [STORE_LISTING.md](STORE_LISTING.md) içinde. Karakter sınırları
 `python3 tool/check_store_listing.py` ile denetleniyor.
 
-Uygulama adı **Nilu** olarak kararlaştırıldı — mevcut "Period Tracker"
-mağazada görünmez, birebir aynı adı taşıyan onlarca uygulama var. İki iş
-kaldı: adın müsait olduğunu App Store Connect'te doğrulamak ve cihazda
-görünen adı (`CFBundleDisplayName`) güncellemek.
+Uygulama adı **Nilu**; cihazda görünen ad (`CFBundleDisplayName`) ve widget
+adı güncellendi. Kalan tek iş: adın müsait olduğunu App Store Connect'te
+uygulama kaydını açarken doğrulamak.
 
 ---
 

@@ -93,13 +93,13 @@ Regl uygulamalarının çoğu işaretlediğin günleri, belirtilerini ve notlar�
 
 GÜNLÜK HAYATINDA
 
-• Takvim — reglini işaretle, bir sonrakini ve doğurgan dönemini gör
+• Takvim — reglini işaretle; bir sonrakini aralıkla ve nasıl hesaplandığıyla, tahmini doğurgan dönemini de gör
 • Günlük — akış, ağrı, ruh hâli, belirtiler. Canın isterse iki kelime not
 • Geçmiş — bütün döngülerin, ortalaman, en kısa ve en uzun döngün
 • Kütüphane — hormonlar, beslenme, PMS ve ruh hâli üzerine kaynak gösterilen yazılar
 • Hareket — dönemine göre hafif yoga ve esneme akışları
 • Apple Sağlık — regl kayıtlarını içeri al; istersen işaretlediğin günleri geri yaz
-• Hatırlatıcılar — bildirimler telefonunda hazırlanır, içerikleri hiçbir yere gitmez
+• Hatırlatıcılar — kaç gün önce ve hangi saatte, sen seç; bildirimler telefonunda hazırlanır, içerikleri hiçbir yere gitmez
 • Ana ekran widget'ı — döngü günün, gebelik haftan ya da lohusalık günün bir bakışta
 
 GEBELİKTE VE DOĞUMDAN SONRA
@@ -119,7 +119,8 @@ Bir özellik listesine sıkıştırılmış bir madde değil; uygulama baştan b
 • Reklamlar kişiselleştirilmiyor. Reklam kimliğin kullanılmıyor, izleme izni istenmiyor
 • Sağlık verin hiçbir koşulda reklam için kullanılmıyor
 • Ekran kilidi ücretsiz — Face ID ya da telefonunun şifresiyle
-• Yedeğini ve verinin okunabilir bir kopyasını istediğin an alabilirsin, ücretsiz
+• Yedeğini ve verinin okunabilir bir kopyasını istediğin an alabilirsin, istersen parolayla şifreli, ücretsiz
+• Sade ana ekran simgesi ve gizli bildirim — kimse ne takip ettiğini görmesin
 • Bütün verini uygulamanın içinden silebilirsin
 
 İSTERSEN PARTNERİNLE
@@ -175,13 +176,13 @@ Most period apps move the days you log, your symptoms and your notes to their ow
 
 WHAT IT DOES
 
-• Calendar — mark your period, see predictions and your fertile window
+• Calendar — mark your period; see the next one as a range, with how it was calculated, plus your estimated fertile window
 • Daily log — flow, pain, mood, symptoms, notes
 • History — every cycle, your average, your shortest and longest cycle
 • Health library — sourced articles on hormones, nutrition, PMS and mood
 • Movement — gentle yoga and stretching flows matched to your phase
 • Apple Health — import your period records and, if you want, write the days you mark back
-• Reminders — notifications are built on your device and their contents go nowhere
+• Reminders — you choose how many days ahead and what time; notifications are built on your device and their contents go nowhere
 • Home Screen widget — your cycle day, pregnancy week or postnatal day at a glance
 
 PREGNANCY AND AFTER BIRTH
@@ -199,7 +200,8 @@ PRIVACY ISN'T A FEATURE HERE, IT'S THE ARCHITECTURE
 • Ads are not personalised; no advertising identifier, no tracking prompt
 • Your health data is never used for ad targeting
 • App lock is free — Face ID or your device passcode
-• You can export a backup and a machine-readable copy of your data at any time, free
+• You can export a backup and a machine-readable copy of your data at any time, optionally password-encrypted, free
+• A plain home-screen icon and discreet notifications — no one sees what you track
 • You can delete all your data from inside the app
 
 PARTNER SHARING — IF YOU WANT IT
@@ -253,13 +255,13 @@ Die meisten Perioden-Apps übertragen deine eingetragenen Tage, Symptome und Not
 
 WAS DIE APP KANN
 
-• Kalender — Periode eintragen, Vorhersagen und fruchtbare Tage sehen
+• Kalender — Periode eintragen; die nächste als Zeitraum sehen, mit Erklärung der Berechnung, dazu die geschätzten fruchtbaren Tage
 • Tägliches Protokoll — Blutung, Schmerzen, Stimmung, Symptome, Notizen
 • Verlauf — alle Zyklen, dein Durchschnitt, dein kürzester und längster Zyklus
 • Gesundheitsbibliothek — belegte Artikel zu Hormonen, Ernährung, PMS und Stimmung
 • Bewegung — sanfte Yoga- und Dehnabläufe passend zur Zyklusphase
 • Apple Health — Periodendaten importieren und, wenn du willst, eingetragene Tage zurückschreiben
-• Erinnerungen — Mitteilungen entstehen auf deinem Gerät, ihre Inhalte gehen nirgendwohin
+• Erinnerungen — du wählst, wie viele Tage vorher und um wie viel Uhr; Mitteilungen entstehen auf deinem Gerät, ihre Inhalte gehen nirgendwohin
 • Widget für den Home-Bildschirm — Zyklustag, Schwangerschaftswoche oder Tag im Wochenbett auf einen Blick
 
 SCHWANGERSCHAFT UND NACH DER GEBURT
@@ -277,7 +279,8 @@ DATENSCHUTZ IST HIER KEIN FEATURE, SONDERN DIE BAUWEISE
 • Werbung wird nicht personalisiert; keine Werbe-ID, keine Tracking-Abfrage
 • Deine Gesundheitsdaten werden nie für Werbung genutzt
 • App-Sperre ist kostenlos — Face ID oder Gerätecode
-• Du kannst jederzeit ein Backup und eine maschinenlesbare Kopie deiner Daten exportieren, kostenlos
+• Du kannst jederzeit ein Backup und eine maschinenlesbare Kopie deiner Daten exportieren, auf Wunsch passwortverschlüsselt, kostenlos
+• Ein schlichtes Home-Bildschirm-Symbol und diskrete Mitteilungen — niemand sieht, was du erfasst
 • Du kannst alle deine Daten in der App löschen
 
 PARTNER-FREIGABE — WENN DU WILLST
@@ -331,13 +334,13 @@ La mayoría de las apps de regla llevan los días que registras, tus síntomas y
 
 QUÉ HACE
 
-• Calendario — marca tu regla y consulta las previsiones y los días fértiles
+• Calendario — marca tu regla; consulta la siguiente como un rango, con cómo se calculó, y tus días fértiles estimados
 • Registro diario — flujo, dolor, ánimo, síntomas y notas
 • Historial — todos tus ciclos, tu media, tu ciclo más corto y el más largo
 • Biblioteca de salud — artículos con fuentes sobre hormonas, alimentación, SPM y ánimo
 • Movimiento — yoga suave y estiramientos según la fase del ciclo
 • Apple Salud — importa tus registros de regla y, si quieres, guarda allí los días que marcas
-• Recordatorios — las notificaciones se crean en tu dispositivo y su contenido no va a ninguna parte
+• Recordatorios — tú eliges cuántos días antes y a qué hora; las notificaciones se crean en tu dispositivo y su contenido no va a ninguna parte
 • Widget de pantalla de inicio — tu día del ciclo, tu semana de embarazo o tu día de posparto de un vistazo
 
 EMBARAZO Y DESPUÉS DEL PARTO
@@ -355,7 +358,8 @@ AQUÍ LA PRIVACIDAD NO ES UNA FUNCIÓN, ES LA ESTRUCTURA
 • Los anuncios no se personalizan; sin identificador publicitario ni permiso de rastreo
 • Tus datos de salud nunca se usan para segmentar anuncios
 • El bloqueo de la app es gratis — con Face ID o el código del dispositivo
-• Puedes exportar una copia de seguridad y una copia legible por máquina cuando quieras, gratis
+• Puedes exportar una copia de seguridad y una copia legible por máquina cuando quieras, cifrada con contraseña si lo deseas, gratis
+• Un icono sencillo en la pantalla de inicio y notificaciones discretas: nadie ve lo que registras
 • Puedes borrar todos tus datos desde la propia app
 
 COMPARTIR CON TU PAREJA — SI QUIERES
@@ -409,13 +413,13 @@ La plupart des applis de règles envoient les jours que tu notes, tes symptômes
 
 CE QU'ELLE FAIT
 
-• Calendrier — note tes règles, vois les prévisions et ta période fertile
+• Calendrier — note tes règles ; vois les prochaines sous forme de période, avec la façon dont elle est calculée, et ta période fertile estimée
 • Journal quotidien — flux, douleurs, humeur, symptômes, notes
 • Historique — tous tes cycles, ta moyenne, ton cycle le plus court et le plus long
 • Bibliothèque santé — des articles sourcés sur les hormones, l'alimentation, le SPM et l'humeur
 • Mouvement — yoga doux et étirements adaptés à ta phase
 • Apple Santé — importe tes règles et, si tu veux, enregistre-y les jours que tu notes
-• Rappels — les notifications sont créées sur ton appareil et leur contenu ne part nulle part
+• Rappels — tu choisis combien de jours avant et à quelle heure ; les notifications sont créées sur ton appareil et leur contenu ne part nulle part
 • Widget d'écran d'accueil — ton jour du cycle, ta semaine de grossesse ou ton jour de post-partum en un coup d'œil
 
 GROSSESSE ET APRÈS LA NAISSANCE
@@ -433,7 +437,8 @@ ICI LA CONFIDENTIALITÉ N'EST PAS UNE OPTION, C'EST L'ARCHITECTURE
 • Les publicités ne sont pas personnalisées ; aucun identifiant publicitaire, aucune demande de pistage
 • Tes données de santé ne servent jamais au ciblage publicitaire
 • Le verrouillage de l'app est gratuit — Face ID ou code de l'appareil
-• Tu peux exporter une sauvegarde et une copie lisible par machine quand tu veux, gratuitement
+• Tu peux exporter une sauvegarde et une copie lisible par machine quand tu veux, chiffrée par mot de passe si tu le souhaites, gratuitement
+• Une icône sobre sur l'écran d'accueil et des notifications discrètes : personne ne voit ce que tu suis
 • Tu peux supprimer toutes tes données depuis l'app
 
 PARTAGE AVEC UN PARTENAIRE — SI TU VEUX
@@ -487,13 +492,13 @@ A maioria dos apps de menstruação leva os dias que você registra, seus sintom
 
 O QUE ELE FAZ
 
-• Calendário — marque a menstruação e veja as previsões e o período fértil
+• Calendário — marque a menstruação; veja a próxima como um intervalo, com a explicação do cálculo, e o período fértil estimado
 • Registro diário — fluxo, dor, humor, sintomas e anotações
 • Histórico — todos os seus ciclos, sua média, seu ciclo mais curto e o mais longo
 • Biblioteca de saúde — artigos com fontes sobre hormônios, alimentação, TPM e humor
 • Movimento — ioga leve e alongamentos de acordo com a fase do ciclo
 • Apple Saúde — importe seus registros de menstruação e, se quiser, grave lá os dias que você marca
-• Lembretes — as notificações são criadas no seu aparelho e o conteúdo não vai para lugar nenhum
+• Lembretes — você escolhe quantos dias antes e em que horário; as notificações são criadas no seu aparelho e o conteúdo não vai para lugar nenhum
 • Widget da Tela de Início — seu dia do ciclo, sua semana de gravidez ou seu dia de pós-parto num relance
 
 GRAVIDEZ E DEPOIS DO PARTO
@@ -511,7 +516,8 @@ AQUI A PRIVACIDADE NÃO É UM RECURSO, É A ESTRUTURA
 • Os anúncios não são personalizados; sem identificador de publicidade e sem pedido de rastreamento
 • Seus dados de saúde nunca são usados para segmentar anúncios
 • O bloqueio do app é gratuito — com Face ID ou o código do aparelho
-• Você pode exportar um backup e uma cópia legível por máquina quando quiser, de graça
+• Você pode exportar um backup e uma cópia legível por máquina quando quiser, criptografado com senha se preferir, de graça
+• Um ícone simples na tela inicial e notificações discretas — ninguém vê o que você acompanha
 • Você pode apagar todos os seus dados dentro do próprio app
 
 COMPARTILHAR COM SEU PARCEIRO — SE QUISER

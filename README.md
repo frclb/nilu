@@ -1,9 +1,21 @@
-# RCApp — Period Tracker
+# Nilu
 
-Adet döngüsü takip uygulaması (Flutter). Standart döngü takibinin yanında bir
-**partner modu** sunar: kullanıcı QR kod ile eşleştiği partnerine duygusal ve
-fiziksel yakınlık durumunu paylaşır, partner kendi arayüzünde bunu görüp öneri
-alır.
+Regl, gebelik ve lohusalık takibi (Flutter, iOS). Sağlık verisi **cihazda**
+kalır ve Anahtar Zinciri'nde şifreli durur; hesap, sunucu ya da analiz SDK'sı
+yok. Tahminler kullanıcının kendi kayıtlarından, açıklanabilir kurallarla
+hesaplanır (yapay zekâ yok).
+
+Öne çıkanlar: dört kurulum yolu (döngü, bebek istiyorum, gebelik, yeni doğum),
+tahmin aralığı ve "nasıl hesaplandı" ekranı, ayarlanabilir hatırlatıcılar
+(kaç gün önce, saat, gecikme), gebelik testi kaydı, geçmiş reglleri toplu
+ekleme, Türkiye izlem takvimiyle gebelik/lohusalık bakımı, hekim özeti,
+uygulama kilidi, gizli bildirim, sade ana ekran simgesi, parolalı yedek, altı
+dil (tr, en, de, es, fr, pt-BR) ve isteğe bağlı partner modu (yalnızca
+kullanıcının açıkça paylaştığı durum; döngü verisi gitmez).
+
+Belgeler: kurulum anahtarları [SETUP_KEYS.md](SETUP_KEYS.md), yükleme
+[SUBMIT.md](SUBMIT.md), mağaza [STORE_CHECKLIST.md](STORE_CHECKLIST.md) ve
+[STORE_LISTING.md](STORE_LISTING.md), test [TESTING.md](TESTING.md).
 
 ## Gereksinimler
 
@@ -21,8 +33,8 @@ flutter pub get
 ```
 
 Uygulama **Firebase yapılandırması olmadan da çalışır** (yerel-only mod): tüm
-veriler cihazda kalır, uzak özellikler (partner senkronizasyonu, push bildirim)
-sessizce devre dışı olur. Uzak özellikleri açmak için:
+veriler cihazda kalır, yalnızca partner modu "şu an kullanılamıyor" der.
+Partner modunu açmak için:
 
 ```bash
 flutterfire configure
@@ -40,7 +52,10 @@ datasource'lar canlanır. Yapılandırma dosyaları `.gitignore`'dadır.
 | Çalıştır | `flutter run` |
 | Statik analiz | `flutter analyze` |
 | Testler | `flutter test` |
-| Biçimlendirme | `dart format lib test` |
+| Biçimlendirme | `dart format lib test tool integration_test` |
+| Uçtan uca (ayrı simülatörde) | `flutter test integration_test -d "Nilu E2E"` |
+| Firestore kuralları | `cd firebase_tests && npm ci && npm test` |
+| Yayın denetimi | `dart run tool/check_release.dart` |
 | Lokalizasyon denetimi | `dart run tool/check_localization.dart` |
 | iOS release | `flutter build ios --release` |
 | Cihaza kur | `flutter run -d "<cihaz>"` |
@@ -49,8 +64,10 @@ datasource'lar canlanır. Yapılandırma dosyaları `.gitignore`'dadır.
 eski sürümü kaldırıp yerine bir şey koymaz. Cihaza kurmak için `flutter run`
 kullanın ya da önce `flutter build ios --debug` çalıştırın.
 
-CI (`.github/workflows/ci.yml`) her push ve PR'da biçim, analiz, test ve
-lokalizasyon denetimini çalıştırır.
+CI (`.github/workflows/ci.yml`) her push ve PR'da biçim, analiz, test,
+lokalizasyon ve mağaza metni denetimini, site üretimini ve Firestore kural
+testlerini çalıştırır. Site `.github/workflows/pages.yml` ile GitHub Pages'e
+yayınlanır.
 
 ## Mimari
 

@@ -154,6 +154,18 @@ Derleme **işlenmesi** 5–60 dakika sürüyor. Bitince e-posta geliyor.
 **İhracat uyumluluğu (encryption) sorusu çıkmayacak:** `Info.plist` içinde
 `ITSAppUsesNonExemptEncryption` `false` beyan edildi.
 
+Gerekçe ve senin kararın olan nokta: uygulama iki yerde şifreleme kullanıyor —
+iOS'un kendi Anahtar Zinciri (cihazdaki veri) ve isteğe bağlı **parolalı
+yedek** (AES-256-GCM, PBKDF2; `cryptography` paketi, iOS'un dışında bir
+uygulama). Ayrıca Firebase bağlantısı TLS kullanıyor. Uygulamanın birincil
+işlevi bilgi güvenliği değil (döngü takibi); ABD ihracat kurallarında
+(EAR Kategori 5 Kısım 2, Not 4) bu tür kullanım muaf sayılıyor ve yaygın
+uygulama `false` beyan etmek. Bu bir hukuki değerlendirme; emin olmak
+istersen `false` yerine App Store Connect'in sorularını yanıtlayabilirsin:
+"standart algoritma, birincil işlev güvenlik değil" → muafiyet seçeneği.
+Fransa'da dağıtım için ek beyan istenirse App Store Connect bunu ayrıca
+sorar.
+
 Derleme "Invalid Binary" olursa sebebi e-postada yazıyor; en sık olanları
 eksik simge boyutu ve yetki/profil uyuşmazlığı.
 
