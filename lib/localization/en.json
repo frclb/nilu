@@ -1135,5 +1135,10 @@
   "privacy_import_open": "Open",
   "privacy_working": "Working",
   "privacy_sexual_log": "Sexual activity logging",
-  "privacy_sexual_log_desc": "When on, it appears on the day page. Off by default; turning it off hides the field without deleting saved data."
+  "privacy_sexual_log_desc": "When on, it appears on the day page. Off by default; turning it off hides the field without deleting saved data.",
+  "appearance_icon_title": "App icon",
+  "appearance_icon_desc": "You can choose a plain icon that doesn't stand out on your home screen. The name under the icon stays Nilu.",
+  "appearance_icon_standard": "Standard",
+  "appearance_icon_neutral": "Discreet",
+  "appearance_icon_failed": "The icon couldn't be changed."
 }

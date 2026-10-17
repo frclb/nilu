@@ -1135,5 +1135,10 @@
   "privacy_import_open": "Abrir",
   "privacy_working": "Processando",
   "privacy_sexual_log": "Registro de atividade sexual",
-  "privacy_sexual_log_desc": "Quando ativado, aparece na página do dia. Desativado por padrão; ao desativar, o campo é ocultado sem apagar os dados salvos."
+  "privacy_sexual_log_desc": "Quando ativado, aparece na página do dia. Desativado por padrão; ao desativar, o campo é ocultado sem apagar os dados salvos.",
+  "appearance_icon_title": "Ícone do app",
+  "appearance_icon_desc": "Você pode escolher um ícone simples que não chama atenção na tela inicial. O nome abaixo do ícone continua Nilu.",
+  "appearance_icon_standard": "Padrão",
+  "appearance_icon_neutral": "Discreto",
+  "appearance_icon_failed": "Não foi possível alterar o ícone."
 }

@@ -1135,5 +1135,10 @@
   "privacy_import_open": "Öffnen",
   "privacy_working": "Wird verarbeitet",
   "privacy_sexual_log": "Sexuelle Aktivität erfassen",
-  "privacy_sexual_log_desc": "Wenn aktiviert, erscheint es auf der Tagesseite. Standardmäßig aus; beim Ausschalten wird das Feld ausgeblendet, gespeicherte Daten bleiben erhalten."
+  "privacy_sexual_log_desc": "Wenn aktiviert, erscheint es auf der Tagesseite. Standardmäßig aus; beim Ausschalten wird das Feld ausgeblendet, gespeicherte Daten bleiben erhalten.",
+  "appearance_icon_title": "App-Symbol",
+  "appearance_icon_desc": "Du kannst ein schlichtes Symbol wählen, das auf dem Home-Bildschirm nicht auffällt. Der Name unter dem Symbol bleibt Nilu.",
+  "appearance_icon_standard": "Standard",
+  "appearance_icon_neutral": "Dezent",
+  "appearance_icon_failed": "Das Symbol konnte nicht geändert werden."
 }

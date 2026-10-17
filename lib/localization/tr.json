@@ -1135,5 +1135,10 @@
   "privacy_import_open": "Aç",
   "privacy_working": "İşleniyor",
   "privacy_sexual_log": "Cinsel aktivite kaydı",
-  "privacy_sexual_log_desc": "Açıkken gün sayfasında görünür. Varsayılan olarak kapalı; kapatınca alan gizlenir, kayıtlı veriler silinmez."
+  "privacy_sexual_log_desc": "Açıkken gün sayfasında görünür. Varsayılan olarak kapalı; kapatınca alan gizlenir, kayıtlı veriler silinmez.",
+  "appearance_icon_title": "Uygulama simgesi",
+  "appearance_icon_desc": "Ana ekranda dikkat çekmeyen sade bir simge seçebilirsin. Simgenin altındaki ad Nilu olarak kalır.",
+  "appearance_icon_standard": "Standart",
+  "appearance_icon_neutral": "Sade",
+  "appearance_icon_failed": "Simge değiştirilemedi."
 }
