@@ -102,13 +102,21 @@ class _AppIconSectionState extends State<_AppIconSection> {
   Future<void> _select(AppIconChoice choice) async {
     if (_busy || choice == _current) return;
     setState(() => _busy = true);
-    final ok = await widget.service.set(choice);
+    final sonuc = await widget.service.set(choice);
     if (!mounted) return;
     setState(() {
       _busy = false;
-      if (ok) _current = choice;
+      if (sonuc == AppIconResult.changed) _current = choice;
     });
-    if (!ok) AppSnack.error(context, context.tr('appearance_icon_failed'));
+    switch (sonuc) {
+      case AppIconResult.changed:
+        break;
+      // iOS'un hız sınırı: arıza gibi kırmızı değil, nötr bir not.
+      case AppIconResult.throttled:
+        AppSnack.show(context, context.tr('appearance_icon_try_later'));
+      case AppIconResult.failed:
+        AppSnack.error(context, context.tr('appearance_icon_failed'));
+    }
   }
 
   @override

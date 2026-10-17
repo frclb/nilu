@@ -512,7 +512,7 @@
   "premium_feature_history_desc": "The trend chart shows your last {free} cycles for free and your whole history with Premium.",
   "premium_feature_phase_title": "Symptom–phase analysis",
   "premium_feature_phase_desc": "See which phase of your cycle your symptoms cluster in.",
-  "premium_feature_export_title": "Data export",
+  "premium_feature_export_title": "Report files",
   "premium_feature_export_desc": "Share the doctor summary and table as files. The on-screen summary and backup are free.",
   "premium_feature_themes_title": "Custom themes",
   "premium_feature_themes_desc": "Choose the app colour; calendar colours stay the same in every theme.",
@@ -531,7 +531,7 @@
   "premium_manage_hint": "You can manage your subscription in Settings → Apple Account → Subscriptions.",
   "premium_retry": "Try again",
   "premium_banner_title": "Go Premium",
-  "premium_banner_desc": "Cycle trend across your whole history, symptom–phase analysis, export and custom themes.",
+  "premium_banner_desc": "Cycle trend across your whole history, symptom–phase analysis, sharing the doctor summary as a file, and custom themes.",
   "premium_banner_cta": "See features",
   "health_sync_title": "Apple Health",
   "health_sync_desc": "Import your period records from the Health app and, if you like, write the days you mark here to Health too. You grant permission, and you can revoke it at any time.",
@@ -1140,5 +1140,6 @@
   "appearance_icon_neutral": "Discreet",
   "appearance_icon_failed": "The icon couldn't be changed.",
   "assistant_send": "Ask",
-  "calendar_has_log": "has entries"
+  "calendar_has_log": "has entries",
+  "appearance_icon_try_later": "iOS limits icon changes for a short while. Try again in a few minutes."
 }

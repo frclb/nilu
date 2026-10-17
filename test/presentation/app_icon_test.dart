@@ -23,7 +23,7 @@ void main() {
   List<Object?> taklit({
     bool destek = true,
     String? mevcut,
-    bool basarili = true,
+    Object basarili = 'ok',
   }) {
     final cagrilar = <Object?>[];
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -92,7 +92,7 @@ void main() {
   });
 
   testWidgets('değişmezse seçim kaymıyor ve söyleniyor', (tester) async {
-    final cagrilar = taklit(basarili: false);
+    final cagrilar = taklit(basarili: 'failed');
     await ac(tester);
     await dokun(tester, AppIconChoice.neutral);
 
@@ -113,5 +113,22 @@ void main() {
     await ac(tester);
     expect(find.byKey(const Key('appearance_icon_section')), findsNothing);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('iOS sınırladıysa arıza değil "biraz sonra" deniyor', (
+    tester,
+  ) async {
+    taklit(basarili: 'throttled');
+    await ac(tester);
+    await dokun(tester, AppIconChoice.neutral);
+
+    final ctx = tester.element(find.byType(AppearanceScreen));
+    expect(find.text(ctx.tr('appearance_icon_try_later')), findsOneWidget);
+    expect(find.text(ctx.tr('appearance_icon_failed')), findsNothing);
+    expect(
+      tester.getSemantics(find.byKey(const Key('appearance_icon_standard'))),
+      containsSemantics(isSelected: true),
+      reason: 'Değişmeyen simge seçili görünmemeli',
+    );
   });
 }

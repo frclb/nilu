@@ -112,6 +112,23 @@ void main() {
       expect(kart, findsNothing);
     });
 
+    testWidgets('takvimden saatli tarihle gelen bugün de "bugün" sayılıyor', (
+      tester,
+    ) async {
+      // Takvim seçili günü `DateTime.now()` ile veriyor: bugün, saatiyle.
+      await seedCycles(lastStartAgo: 10);
+      final simdi = DateTime.now();
+      await sayfayiAc(
+        tester,
+        DateTime(simdi.year, simdi.month, simdi.day, 23, 59),
+      );
+      expect(
+        secenek('positive'),
+        findsOneWidget,
+        reason: 'Bugün gelecek sayılıp bölüm gizleniyordu',
+      );
+    });
+
     testWidgets('gebelikte bölüm yok', (tester) async {
       await seedPregnancy();
       await sayfayiAc(tester, today);

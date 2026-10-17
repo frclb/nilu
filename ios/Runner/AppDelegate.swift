@@ -32,18 +32,29 @@ import UIKit
         result(app.alternateIconName)
       case "set":
         guard app.supportsAlternateIcons else {
-          result(false)
+          result("failed")
           return
         }
         let name = call.arguments as? String
+        if app.alternateIconName == name {
+          result("ok")
+          return
+        }
         app.setAlternateIconName(name) { error in
-          // Tamamlama UIKit'in kuyruğunda geliyor; Flutter yanıtı ana
-          // iş parçacığında bekliyor.
+          // Tamamlama UIKit'in kuyruğunda geliyor; Flutter yanıtı ana iş
+          // parçacığında bekliyor.
           DispatchQueue.main.async {
-            if let error = error {
-              NSLog("Alternate icon failed: \(error.localizedDescription)")
+            guard let error = error as NSError? else {
+              result("ok")
+              return
             }
-            result(error == nil)
+            NSLog("Alternate icon failed (\(error.domain) \(error.code)): \(error.localizedDescription)")
+            // iOS simge değişikliğini kısa aralıklarla sınırlıyor
+            // (LaunchServices "icon alert token" alamıyor: POSIX 35). Bu
+            // bir arıza değil; kullanıcıya "biraz sonra" denmeli. Hemen
+            // yeniden denemek sınırı uzatıyor.
+            let throttled = error.domain == NSPOSIXErrorDomain && error.code == 35
+            result(throttled ? "throttled" : "failed")
           }
         }
       default:

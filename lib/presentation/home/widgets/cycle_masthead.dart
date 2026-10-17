@@ -306,6 +306,8 @@ class _AgendaRow extends StatelessWidget {
                 ),
               ),
             ),
+            // Uzun etiket ("Tahmini yumurtlama") kalan güne yapışmasın.
+            const SizedBox(width: 8),
             Text(
               context.tr(
                 'agenda_days_away',

@@ -512,7 +512,7 @@
   "premium_feature_history_desc": "Das Trenddiagramm zeigt kostenlos die letzten {free} Zyklen, mit Premium deinen ganzen Verlauf.",
   "premium_feature_phase_title": "Symptom-Phasen-Analyse",
   "premium_feature_phase_desc": "Sieh, in welcher Zyklusphase sich deine Symptome häufen.",
-  "premium_feature_export_title": "Datenexport",
+  "premium_feature_export_title": "Berichtsdateien",
   "premium_feature_export_desc": "Arztübersicht und Tabelle als Datei teilen. Bildschirmübersicht und Backup sind kostenlos.",
   "premium_feature_themes_title": "Eigene Themes",
   "premium_feature_themes_desc": "Wähle die App-Farbe; Kalenderfarben bleiben in jedem Theme gleich.",
@@ -531,7 +531,7 @@
   "premium_manage_hint": "Du kannst dein Abo unter Einstellungen → Apple-Account → Abonnements verwalten.",
   "premium_retry": "Erneut versuchen",
   "premium_banner_title": "Premium holen",
-  "premium_banner_desc": "Zyklustrend über den ganzen Verlauf, Symptom-Phasen-Analyse, Export und eigene Designs.",
+  "premium_banner_desc": "Zyklustrend über den ganzen Verlauf, Symptom-Phasen-Analyse, Arztbericht als Datei teilen und eigene Designs.",
   "premium_banner_cta": "Funktionen ansehen",
   "health_sync_title": "Apple Health",
   "health_sync_desc": "Importiere deine Periodenaufzeichnungen aus der Health-App und schreibe auf Wunsch die hier markierten Tage auch in Health. Du erteilst die Berechtigung und kannst sie jederzeit widerrufen.",
@@ -1140,5 +1140,6 @@
   "appearance_icon_neutral": "Dezent",
   "appearance_icon_failed": "Das Symbol konnte nicht geändert werden.",
   "assistant_send": "Fragen",
-  "calendar_has_log": "mit Einträgen"
+  "calendar_has_log": "mit Einträgen",
+  "appearance_icon_try_later": "iOS begrenzt Symboländerungen für kurze Zeit. Versuche es in ein paar Minuten noch einmal."
 }

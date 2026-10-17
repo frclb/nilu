@@ -195,9 +195,18 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
     return context.tr('day_detail_fertility_low');
   }
 
+  /// Gün gelecekte mi? Saat yok sayılıyor: takvim seçili günü saatiyle
+  /// veriyor (`DateTime.now()`) ve bugün 01:43 gece yarısından "sonra"
+  /// olduğu için bugün gelecek sayılıyor, gebelik testi ve ölçüm girişi
+  /// bugün için gizleniyordu.
   bool get _gelecekGun {
     final n = DateTime.now();
-    return widget.date.isAfter(DateTime(n.year, n.month, n.day));
+    final d = widget.date;
+    return DateTime(
+      d.year,
+      d.month,
+      d.day,
+    ).isAfter(DateTime(n.year, n.month, n.day));
   }
 
   void _olcumEkle() {

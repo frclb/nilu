@@ -14,6 +14,17 @@ enum AppIconChoice {
   neutral,
 }
 
+/// Simge değiştirme sonucu.
+enum AppIconResult {
+  changed,
+
+  /// iOS kısa aralıklarla yapılan değişiklikleri bir süre reddediyor; bir
+  /// arıza değil, biraz sonra yeniden denenebilir.
+  throttled,
+
+  failed,
+}
+
 /// Ana ekran simgesini değiştirir (iOS alternatif simgeleri).
 ///
 /// Yerel taraf `ios/Runner/AppDelegate.swift`, simge seti
@@ -55,19 +66,23 @@ class AppIconService {
     }
   }
 
-  /// Simgeyi değiştirir; başarılıysa `true`.
-  Future<bool> set(AppIconChoice choice) async {
+  /// Simgeyi değiştirir.
+  Future<AppIconResult> set(AppIconChoice choice) async {
     try {
-      return await _channel.invokeMethod<bool>(
-            'set',
-            choice == AppIconChoice.neutral ? neutralIconName : null,
-          ) ??
-          false;
+      final sonuc = await _channel.invokeMethod<Object>(
+        'set',
+        choice == AppIconChoice.neutral ? neutralIconName : null,
+      );
+      return switch (sonuc) {
+        'ok' || true => AppIconResult.changed,
+        'throttled' => AppIconResult.throttled,
+        _ => AppIconResult.failed,
+      };
     } on MissingPluginException {
-      return false;
+      return AppIconResult.failed;
     } on PlatformException catch (e) {
       debugPrint('App icon change failed: $e');
-      return false;
+      return AppIconResult.failed;
     }
   }
 }

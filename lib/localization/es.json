@@ -512,7 +512,7 @@
   "premium_feature_history_desc": "El gráfico de tendencia muestra gratis tus últimos {free} ciclos y con Premium todo tu historial.",
   "premium_feature_phase_title": "Análisis síntoma–fase",
   "premium_feature_phase_desc": "Descubre en qué fase del ciclo se concentran tus síntomas.",
-  "premium_feature_export_title": "Exportación de datos",
+  "premium_feature_export_title": "Archivos de informe",
   "premium_feature_export_desc": "Comparte el resumen médico y la tabla como archivos. El resumen en pantalla y la copia son gratis.",
   "premium_feature_themes_title": "Temas personalizados",
   "premium_feature_themes_desc": "Elige el color de la app; los colores del calendario no cambian.",
@@ -531,7 +531,7 @@
   "premium_manage_hint": "Puedes gestionar tu suscripción en Ajustes → Cuenta de Apple → Suscripciones.",
   "premium_retry": "Reintentar",
   "premium_banner_title": "Hazte Premium",
-  "premium_banner_desc": "Tendencia del ciclo con todo tu historial, análisis de síntomas por fase, exportación y temas propios.",
+  "premium_banner_desc": "Tendencia del ciclo con todo tu historial, análisis de síntomas por fase, compartir el resumen médico como archivo y temas propios.",
   "premium_banner_cta": "Ver funciones",
   "health_sync_title": "Apple Salud",
   "health_sync_desc": "Importa tus registros de regla desde la app Salud y, si quieres, escribe también en Salud los días que marques aquí. Tú das el permiso y puedes retirarlo cuando quieras.",
@@ -1140,5 +1140,6 @@
   "appearance_icon_neutral": "Discreto",
   "appearance_icon_failed": "No se pudo cambiar el icono.",
   "assistant_send": "Preguntar",
-  "calendar_has_log": "con registros"
+  "calendar_has_log": "con registros",
+  "appearance_icon_try_later": "iOS limita los cambios de icono durante un rato. Vuelve a intentarlo en unos minutos."
 }

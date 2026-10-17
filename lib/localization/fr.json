@@ -512,7 +512,7 @@
   "premium_feature_history_desc": "Le graphique de tendance montre gratuitement tes {free} derniers cycles, et tout ton historique avec Premium.",
   "premium_feature_phase_title": "Analyse symptôme–phase",
   "premium_feature_phase_desc": "Vois à quelle phase de ton cycle tes symptômes se concentrent.",
-  "premium_feature_export_title": "Export des données",
+  "premium_feature_export_title": "Fichiers de rapport",
   "premium_feature_export_desc": "Partage le résumé médical et le tableau en fichiers. Le résumé à l’écran et la sauvegarde sont gratuits.",
   "premium_feature_themes_title": "Thèmes personnalisés",
   "premium_feature_themes_desc": "Choisis la couleur de l’app ; les couleurs du calendrier ne changent pas.",
@@ -531,7 +531,7 @@
   "premium_manage_hint": "Tu peux gérer ton abonnement dans Réglages → Compte Apple → Abonnements.",
   "premium_retry": "Réessayer",
   "premium_banner_title": "Passer à Premium",
-  "premium_banner_desc": "Tendance du cycle sur tout ton historique, analyse des symptômes par phase, export et thèmes personnalisés.",
+  "premium_banner_desc": "Tendance du cycle sur tout ton historique, analyse des symptômes par phase, partage du résumé médical en fichier et thèmes personnalisés.",
   "premium_banner_cta": "Voir les fonctions",
   "health_sync_title": "Apple Santé",
   "health_sync_desc": "Importe tes relevés de règles depuis l’app Santé et, si tu veux, écris aussi dans Santé les jours que tu notes ici. Tu donnes l’autorisation et peux la retirer à tout moment.",
@@ -1140,5 +1140,6 @@
   "appearance_icon_neutral": "Discret",
   "appearance_icon_failed": "L'icône n'a pas pu être modifiée.",
   "assistant_send": "Demander",
-  "calendar_has_log": "avec des notes"
+  "calendar_has_log": "avec des notes",
+  "appearance_icon_try_later": "iOS limite les changements d’icône pendant un court moment. Réessaie dans quelques minutes."
 }

@@ -512,7 +512,7 @@
   "premium_feature_history_desc": "Trend grafiği ücretsiz sürümde son {free} döngüyü, Premium'da geçmişinin tamamını gösterir.",
   "premium_feature_phase_title": "Belirti–evre analizi",
   "premium_feature_phase_desc": "Belirtilerinin döngünün hangi evresinde yoğunlaştığını gör.",
-  "premium_feature_export_title": "Veri dışa aktarma",
+  "premium_feature_export_title": "Rapor dosyaları",
   "premium_feature_export_desc": "Hekim özetini ve tabloyu dosya olarak paylaş. Ekrandaki özet ve yedek herkese açık.",
   "premium_feature_themes_title": "Özel temalar",
   "premium_feature_themes_desc": "Uygulamanın rengini seç; takvim renkleri her temada aynı kalır.",
@@ -531,7 +531,7 @@
   "premium_manage_hint": "Aboneliğini Ayarlar → Apple Kimliği → Abonelikler bölümünden yönetebilirsin.",
   "premium_retry": "Tekrar dene",
   "premium_banner_title": "Premium'a Geç",
-  "premium_banner_desc": "Tüm geçmişle döngü trendi, belirti–evre analizi, dışa aktarma ve özel temalar.",
+  "premium_banner_desc": "Tüm geçmişle döngü trendi, belirti–evre analizi, hekim özetini dosya olarak paylaşma ve özel temalar.",
   "premium_banner_cta": "Özellikleri gör",
   "health_sync_title": "Apple Sağlık",
   "health_sync_desc": "Sağlık uygulamasındaki regl kayıtlarını içeri aktar; istersen burada işaretlediğin günleri Sağlık'a da yaz. İzni sen verirsin, istediğin zaman geri alabilirsin.",
@@ -1140,5 +1140,6 @@
   "appearance_icon_neutral": "Sade",
   "appearance_icon_failed": "Simge değiştirilemedi.",
   "assistant_send": "Sor",
-  "calendar_has_log": "kayıt var"
+  "calendar_has_log": "kayıt var",
+  "appearance_icon_try_later": "iOS simge değişikliklerini kısa bir süre için sınırlıyor. Birkaç dakika sonra yeniden dene."
 }
