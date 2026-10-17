@@ -250,6 +250,7 @@ void main() {
           periodReminders: false,
           fertileWindow: false,
           dailyLogs: false,
+          lateReminder: false,
         ),
       );
       expect(result, isEmpty);

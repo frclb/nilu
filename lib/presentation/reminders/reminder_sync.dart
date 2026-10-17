@@ -246,8 +246,8 @@ class _ReminderSyncState extends State<ReminderSync> {
     //   * sahibin metniyle ("Reglinin yaklaştığını…") bildirim izni
     //     isteniyordu — kendi regli hakkında sanıyordu,
     //   * ve kendi boş takvimine göre hatırlatıcı planlanıyordu.
-    // Partnerin gerçek bildirimleri ayrı yoldan geliyor (Partner → Bildirim
-    // Ayarları, push).
+    // Partner modunda cihaz bildirimi yok; partner paylaşılan durumu
+    // uygulamayı açınca görüyor.
     final isPartner = context.select<UserViewModel, bool>((vm) => vm.isPartner);
 
     // Yükleme sürerken tahminler henüz boş; o hâli planlamak anlamsız.

@@ -1060,5 +1060,15 @@
   "cycle_summary_title": "Résumé pour ton médecin",
   "cycle_summary_entry_desc": "À montrer en consultation : durée des cycles, règles, douleurs et symptômes.",
   "cycle_summary_intro": "Tu peux montrer cet écran en consultation. Il est calculé uniquement à partir de tes saisies ; le partager en fichier fait partie de Premium.",
-  "cycle_summary_share": "Partager en fichier"
+  "cycle_summary_share": "Partager en fichier",
+  "notif_lead_days": "Quand",
+  "notif_lead_one": "1 jour avant",
+  "notif_lead_many": "{n} jours avant",
+  "notif_reminder_time": "Heure du rappel",
+  "notif_reminder_time_body": "Les rappels de règles, de fenêtre fertile, de retard et de suivi arrivent à cette heure.",
+  "notif_daily_log_time": "Heure",
+  "notif_late_setting": "Demander en cas de retard",
+  "notif_late_setting_body": "Demande une fois, {n} jours après le jour prévu.",
+  "notif_late_title": "Tes règles ont-elles commencé ?",
+  "notif_late_body": "Le jour prévu est passé de quelques jours. Si elles ont commencé, tu peux les noter ; un décalage de quelques jours est fréquent."
 }

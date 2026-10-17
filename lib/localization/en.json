@@ -1060,5 +1060,15 @@
   "cycle_summary_title": "Summary for your doctor",
   "cycle_summary_entry_desc": "Show it at your appointment: cycle lengths, periods, pain and symptoms.",
   "cycle_summary_intro": "You can show this screen at your appointment. It is calculated only from your own entries; sharing it as a file is part of Premium.",
-  "cycle_summary_share": "Share as a file"
+  "cycle_summary_share": "Share as a file",
+  "notif_lead_days": "When",
+  "notif_lead_one": "1 day before",
+  "notif_lead_many": "{n} days before",
+  "notif_reminder_time": "Reminder time",
+  "notif_reminder_time_body": "Period, fertile window, late period and check-up reminders arrive at this time.",
+  "notif_daily_log_time": "Time",
+  "notif_late_setting": "Ask if it's late",
+  "notif_late_setting_body": "Asks once, {n} days after the expected day.",
+  "notif_late_title": "Has your period started?",
+  "notif_late_body": "It's a few days past the expected day. If it has started, you can log it; cycles shifting by a few days is common."
 }

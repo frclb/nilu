@@ -289,7 +289,10 @@ void main() {
         ).where((r) => r.type == ReminderType.periodApproaching);
         expect(
           regl.first.when,
-          saat(g(0), ReminderPlanner.morningHour),
+          saat(
+            g(0),
+            GeneralNotificationSettings.defaultReminderMinuteOfDay ~/ 60,
+          ),
           reason: 'Regl iki gün önce, sabah',
         );
 
@@ -301,7 +304,13 @@ void main() {
           ),
           simdi: saat(g(-1), 21),
         ).where((r) => r.type == ReminderType.dailyLog);
-        expect(gunluk.single.when, saat(g(0), ReminderPlanner.dailyLogHour));
+        expect(
+          gunluk.single.when,
+          saat(
+            g(0),
+            GeneralNotificationSettings.defaultDailyLogMinuteOfDay ~/ 60,
+          ),
+        );
 
         final folik = plan(
           ayar: const GeneralNotificationSettings(
@@ -318,7 +327,10 @@ void main() {
         ).where((r) => r.titleKey == 'care_folic_acid_title');
         expect(
           folik.single.when,
-          saat(g(1), ReminderPlanner.morningHour),
+          saat(
+            g(1),
+            GeneralNotificationSettings.defaultReminderMinuteOfDay ~/ 60,
+          ),
           reason: 'Folik asit niyetin ertesi sabahı',
         );
 
@@ -346,7 +358,10 @@ void main() {
             ],
           ),
         ).where((r) => r.type == ReminderType.care);
-        expect(randevu.single.when, saat(g(0), ReminderPlanner.eveningHour));
+        expect(
+          randevu.single.when,
+          saat(g(0), ReminderPlanner.eveningMinuteOfDay ~/ 60),
+        );
       });
 
       test('Sağlık içe aktarımı: üç gün boşluk ayrı dönem', () {

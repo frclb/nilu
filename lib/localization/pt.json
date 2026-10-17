@@ -1060,5 +1060,15 @@
   "cycle_summary_title": "Resumo para o seu médico",
   "cycle_summary_entry_desc": "Mostre na consulta: duração dos ciclos, menstruação, dor e sintomas.",
   "cycle_summary_intro": "Você pode mostrar esta tela na consulta. Ela é calculada só com os seus registros; compartilhar como arquivo faz parte do Premium.",
-  "cycle_summary_share": "Compartilhar como arquivo"
+  "cycle_summary_share": "Compartilhar como arquivo",
+  "notif_lead_days": "Quando",
+  "notif_lead_one": "1 dia antes",
+  "notif_lead_many": "{n} dias antes",
+  "notif_reminder_time": "Horário do lembrete",
+  "notif_reminder_time_body": "Os lembretes de menstruação, período fértil, atraso e consultas chegam neste horário.",
+  "notif_daily_log_time": "Horário",
+  "notif_late_setting": "Perguntar se atrasar",
+  "notif_late_setting_body": "Pergunta uma vez, {n} dias após o dia esperado.",
+  "notif_late_title": "Sua menstruação começou?",
+  "notif_late_body": "Já se passaram alguns dias da data esperada. Se começou, você pode registrar; é comum o ciclo variar alguns dias."
 }

@@ -1060,5 +1060,15 @@
   "cycle_summary_title": "Resumen para tu médico",
   "cycle_summary_entry_desc": "Muéstralo en la consulta: duración de los ciclos, regla, dolor y síntomas.",
   "cycle_summary_intro": "Puedes enseñar esta pantalla en la consulta. Se calcula solo con tus propios registros; compartirla como archivo forma parte de Premium.",
-  "cycle_summary_share": "Compartir como archivo"
+  "cycle_summary_share": "Compartir como archivo",
+  "notif_lead_days": "Cuándo",
+  "notif_lead_one": "1 día antes",
+  "notif_lead_many": "{n} días antes",
+  "notif_reminder_time": "Hora del recordatorio",
+  "notif_reminder_time_body": "Los recordatorios de periodo, días fértiles, retraso y controles llegan a esta hora.",
+  "notif_daily_log_time": "Hora",
+  "notif_late_setting": "Preguntar si se retrasa",
+  "notif_late_setting_body": "Pregunta una vez, {n} días después del día esperado.",
+  "notif_late_title": "¿Te ha bajado el periodo?",
+  "notif_late_body": "Han pasado unos días desde la fecha esperada. Si ya empezó, puedes registrarlo; es habitual que el ciclo se desplace unos días."
 }

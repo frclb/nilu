@@ -208,6 +208,7 @@ void main() {
           periodReminders: false,
           fertileWindow: false,
           dailyLogs: false,
+          lateReminder: false,
         ),
         {},
       ),
@@ -216,6 +217,7 @@ void main() {
           periodReminders: true,
           fertileWindow: false,
           dailyLogs: false,
+          lateReminder: false,
         ),
         {ReminderType.periodApproaching},
       ),
@@ -224,6 +226,7 @@ void main() {
           periodReminders: false,
           fertileWindow: true,
           dailyLogs: false,
+          lateReminder: false,
         ),
         {ReminderType.fertileWindow},
       ),
@@ -232,13 +235,24 @@ void main() {
           periodReminders: false,
           fertileWindow: false,
           dailyLogs: true,
+          lateReminder: false,
         ),
         {ReminderType.dailyLog},
+      ),
+      'yalnızca gecikme': (
+        const GeneralNotificationSettings(
+          periodReminders: false,
+          fertileWindow: false,
+          dailyLogs: false,
+          lateReminder: true,
+        ),
+        {ReminderType.periodLate},
       ),
       'hepsi açık': (
         allOn,
         {
           ReminderType.periodApproaching,
+          ReminderType.periodLate,
           ReminderType.fertileWindow,
           ReminderType.dailyLog,
         },
@@ -286,11 +300,14 @@ void main() {
       final info = infoFor(dayOfCycle: 12);
       final reminder = ofType(plan(info), ReminderType.periodApproaching).first;
       final expected = info.predictedNextPeriod!.subtract(
-        const Duration(days: ReminderPlanner.periodLeadDays),
+        const Duration(days: GeneralNotificationSettings.defaultPeriodLeadDays),
       );
 
       expect(reminder.when.day, expected.day);
-      expect(reminder.when.hour, ReminderPlanner.morningHour);
+      expect(
+        reminder.when.hour,
+        GeneralNotificationSettings.defaultReminderMinuteOfDay ~/ 60,
+      );
     });
 
     test('günlük kayıt saati geçtiyse yarına planlanıyor', () {
@@ -303,7 +320,10 @@ void main() {
       ).firstWhere((r) => r.type == ReminderType.dailyLog);
 
       expect(reminder.when.day, 19);
-      expect(reminder.when.hour, ReminderPlanner.dailyLogHour);
+      expect(
+        reminder.when.hour,
+        GeneralNotificationSettings.defaultDailyLogMinuteOfDay ~/ 60,
+      );
     });
 
     test('plan iOS sınırının çok altında kalıyor', () {

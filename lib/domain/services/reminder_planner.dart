@@ -7,7 +7,13 @@ import '../models/notification_settings.dart';
 import '../models/pregnancy.dart';
 
 /// Planlanabilecek hatırlatıcı türleri.
-enum ReminderType { periodApproaching, fertileWindow, dailyLog, care }
+enum ReminderType {
+  periodApproaching,
+  periodLate,
+  fertileWindow,
+  dailyLog,
+  care,
+}
 
 /// Belirli bir anda gösterilecek hatırlatıcı.
 class ScheduledReminder {
@@ -81,14 +87,10 @@ class CarePlanInput {
 class ReminderPlanner {
   const ReminderPlanner._();
 
-  /// Regl hatırlatıcısı kaç gün önce gönderilsin.
-  static const int periodLeadDays = 2;
-
-  /// Sabah hatırlatıcılarının saati.
-  static const int morningHour = 9;
-
-  /// Günlük kayıt hatırlatıcısının saati.
-  static const int dailyLogHour = 20;
+  /// Gecikme hatırlatıcısı beklenen günden kaç gün sonra gelsin.
+  ///
+  /// Bir iki günlük kayma çok sık; ertesi gün sormak dürtmek olurdu.
+  static const int lateAfterDays = 3;
 
   /// En fazla kaç döngü ileriye planlanır.
   ///
@@ -100,6 +102,7 @@ class ReminderPlanner {
   static const int _periodIdBase = 1000;
   static const int _fertileIdBase = 2000;
   static const int _dailyLogId = 3000;
+  static const int _lateId = 1500;
 
   /// Planı etkileyen girdilerin özeti.
   ///
@@ -138,6 +141,11 @@ class ReminderPlanner {
       // yeniden yazılmalı.
       settings.discreet,
       settings.careReminders,
+      // Kullanıcının seçtiği gün ve saatler: değişince plan yeniden yazılmalı.
+      settings.periodLeadDays,
+      settings.reminderMinuteOfDay,
+      settings.dailyLogMinuteOfDay,
+      settings.lateReminder,
       // Evre ve bakım kalemleri. Düşükten önce ve sonra döngü tahmini
       // olmadığı için yukarıdaki kısım aynı kalıyor; evre buraya girmeseydi
       // plan hiç yenilenmez ve "anomali taraması" bildirimi olduğu gibi
@@ -175,7 +183,10 @@ class ReminderPlanner {
     if (settings.periodReminders && !overdue) {
       final starts = _periodStarts(cycleInfo);
       for (var i = 0; i < starts.length; i++) {
-        final when = _at(starts[i].plusDays(-periodLeadDays), morningHour);
+        final when = _at(
+          starts[i].plusDays(-settings.periodLeadDays),
+          settings.reminderMinuteOfDay,
+        );
         if (when.isAfter(now)) {
           reminders.add(
             ScheduledReminder(
@@ -193,7 +204,7 @@ class ReminderPlanner {
     if (settings.fertileWindow && !overdue) {
       final windows = _fertileStarts(cycleInfo);
       for (var i = 0; i < windows.length; i++) {
-        final when = _at(windows[i], morningHour);
+        final when = _at(windows[i], settings.reminderMinuteOfDay);
         if (when.isAfter(now)) {
           reminders.add(
             ScheduledReminder(
@@ -208,12 +219,42 @@ class ReminderPlanner {
       }
     }
 
+    // Gecikme: tahmin zincirinden bağımsız, tek bir nazik soru.
+    //
+    // Gecikmeye düşünce yukarıdaki iki tür susuyor ve kullanıcı hiçbir şey
+    // duymuyordu. Reglin başlayıp kaydedilmemiş olması da en sık sebep;
+    // bildirim yalnızca bunu soruyor, bir sebep öne sürmüyor. Kayıt
+    // girilince tahmin kayıyor, imza değişiyor ve bu bildirim düşüyor.
+    //
+    // Yalnızca döngü evresinde: gebelikte ve lohusalıkta gecikme diye bir
+    // şey yok.
+    final expected = cycleInfo.predictedNextPeriod;
+    if (settings.lateReminder &&
+        care.stage == LifeStage.cycle &&
+        expected != null) {
+      final when = _at(
+        expected.plusDays(lateAfterDays),
+        settings.reminderMinuteOfDay,
+      );
+      if (when.isAfter(now)) {
+        reminders.add(
+          ScheduledReminder(
+            id: _lateId,
+            type: ReminderType.periodLate,
+            when: when,
+            titleKey: 'notif_late_title',
+            bodyKey: 'notif_late_body',
+          ),
+        );
+      }
+    }
+
     if (settings.dailyLogs) {
       reminders.add(
         ScheduledReminder(
           id: _dailyLogId,
           type: ReminderType.dailyLog,
-          when: _nextDailyLogTime(now),
+          when: _nextDailyLogTime(now, settings.dailyLogMinuteOfDay),
           titleKey: 'notif_daily_logs',
           bodyKey: 'notif_daily_log_body',
         ),
@@ -221,7 +262,7 @@ class ReminderPlanner {
     }
 
     if (settings.careReminders) {
-      reminders.addAll(_careReminders(care, now));
+      reminders.addAll(_careReminders(care, now, settings.reminderMinuteOfDay));
     }
 
     reminders.sort((a, b) => a.when.compareTo(b.when));
@@ -240,8 +281,9 @@ class ReminderPlanner {
   /// Döngü hatırlatıcıları en fazla 7; bakım için güvenli bir pay.
   static const int maxCareReminders = 24;
 
-  /// Randevudan önceki akşam.
-  static const int eveningHour = 20;
+  /// Randevudan önceki akşam (dakika). Kullanıcının seçtiği saate bağlı
+  /// değil: "yarın randevun var" sabah söylenirse bir gün erken olur.
+  static const int eveningMinuteOfDay = 20 * 60;
 
   static const int _conceptionIdBase = 4900;
 
@@ -249,6 +291,7 @@ class ReminderPlanner {
   static List<ScheduledReminder> _conceptionReminders(
     CarePlanInput care,
     DateTime now,
+    int minuteOfDay,
   ) {
     final niyet = care.conception;
     if (niyet == null || care.stage != LifeStage.cycle) return const [];
@@ -258,7 +301,7 @@ class ReminderPlanner {
     // Folik asit: niyetin ertesi sabahı, bir kez. Bakanlık rehberi:
     // gebelikten en az 1 ay önce başlanmalı — uygulamanın bunu
     // söyleyebileceği tek an niyetin belirtildiği an.
-    final folik = _at(niyet.since.plusDays(1), morningHour);
+    final folik = _at(niyet.since.plusDays(1), minuteOfDay);
     if (folik.isAfter(now)) {
       sonuc.add(
         ScheduledReminder(
@@ -273,7 +316,7 @@ class ReminderPlanner {
 
     final basvuru = niyet.consultAt(birthDate: care.birthDate);
     if (basvuru != null) {
-      final when = _at(basvuru, morningHour);
+      final when = _at(basvuru, minuteOfDay);
       if (when.isAfter(now)) {
         sonuc.add(
           ScheduledReminder(
@@ -292,8 +335,9 @@ class ReminderPlanner {
   static List<ScheduledReminder> _careReminders(
     CarePlanInput care,
     DateTime now,
+    int minuteOfDay,
   ) {
-    final planlama = _conceptionReminders(care, now);
+    final planlama = _conceptionReminders(care, now, minuteOfDay);
     final gebelik = care.pregnancy;
     if (gebelik == null) return planlama;
 
@@ -317,7 +361,7 @@ class ReminderPlanner {
       final randevu = e.scheduledAt;
       if (randevu != null) {
         // Kullanıcının aldığı randevu: bir önceki akşam.
-        final when = _at(randevu.plusDays(-1), eveningHour);
+        final when = _at(randevu.plusDays(-1), eveningMinuteOfDay);
         if (when.isAfter(now)) {
           adaylar.add((when: when, event: e, tomorrow: true));
         }
@@ -329,7 +373,7 @@ class ReminderPlanner {
       if (e.isCustom || e.anchor != gecerliCapa) continue;
       final bas = e.windowStart(gebelik);
       if (bas == null) continue;
-      final when = _at(bas, morningHour);
+      final when = _at(bas, minuteOfDay);
       if (when.isAfter(now)) {
         adaylar.add((when: when, event: e, tomorrow: false));
       }
@@ -405,15 +449,20 @@ class ReminderPlanner {
     return result;
   }
 
-  /// Günün belirli saatine sabitler.
-  static DateTime _at(DateTime day, int hour) =>
-      DateTime(day.year, day.month, day.day, hour);
+  /// Günün belirli saatine (gece yarısından itibaren dakika) sabitler.
+  static DateTime _at(DateTime day, int minuteOfDay) => DateTime(
+    day.year,
+    day.month,
+    day.day,
+    minuteOfDay ~/ 60,
+    minuteOfDay % 60,
+  );
 
   /// Bugünün saati geçtiyse yarına planlar.
-  static DateTime _nextDailyLogTime(DateTime now) {
-    final todayAt = _at(now, dailyLogHour);
+  static DateTime _nextDailyLogTime(DateTime now, int minuteOfDay) {
+    final todayAt = _at(now, minuteOfDay);
     // Yarın aynı saat takvim günüyle: 24 saat eklemek yaz saatine geçilen
     // gece saati bir kaydırıyordu.
-    return todayAt.isAfter(now) ? todayAt : _at(now.plusDays(1), dailyLogHour);
+    return todayAt.isAfter(now) ? todayAt : _at(now.plusDays(1), minuteOfDay);
   }
 }

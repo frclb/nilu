@@ -165,5 +165,35 @@ void main() {
       expect(s.periodReminders, isFalse);
       expect(s.dailyLogs, isTrue);
     });
+
+    test('gün, saat ve gecikme ayarı gidiş-dönüşte korunur', () async {
+      await repo.saveGeneralSettings(
+        const GeneralNotificationSettings(
+          periodLeadDays: 4,
+          reminderMinuteOfDay: 7 * 60 + 45,
+          dailyLogMinuteOfDay: 21 * 60 + 30,
+          lateReminder: false,
+        ),
+      );
+
+      final s = await repo.getGeneralSettings();
+      expect(s.periodLeadDays, 4);
+      expect(s.reminderMinuteOfDay, 7 * 60 + 45);
+      expect(s.dailyLogMinuteOfDay, 21 * 60 + 30);
+      expect(s.lateReminder, isFalse);
+    });
+
+    test('bozuk kayıt geçerli aralığa çekiliyor', () async {
+      SharedPreferences.setMockInitialValues({
+        'notif_period_lead_days': 12,
+        'notif_reminder_minute': 99999,
+        'notif_daily_log_minute': -3,
+      });
+
+      final s = await repo.getGeneralSettings();
+      expect(s.periodLeadDays, GeneralNotificationSettings.maxPeriodLeadDays);
+      expect(s.reminderMinuteOfDay, 24 * 60 - 1);
+      expect(s.dailyLogMinuteOfDay, 0);
+    });
   });
 }

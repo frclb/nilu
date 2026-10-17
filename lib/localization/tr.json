@@ -1060,5 +1060,15 @@
   "cycle_summary_title": "Hekim özeti",
   "cycle_summary_entry_desc": "Muayenede ekrandan göster: döngü süreleri, regl, ağrı ve belirtiler.",
   "cycle_summary_intro": "Muayenede bu ekranı gösterebilirsin. Yalnızca senin kayıtlarından hesaplanır; dosya olarak paylaşmak Premium'a dahil.",
-  "cycle_summary_share": "Dosya olarak paylaş"
+  "cycle_summary_share": "Dosya olarak paylaş",
+  "notif_lead_days": "Ne zaman",
+  "notif_lead_one": "1 gün önce",
+  "notif_lead_many": "{n} gün önce",
+  "notif_reminder_time": "Hatırlatma saati",
+  "notif_reminder_time_body": "Regl, doğurganlık, gecikme ve kontrol hatırlatıcıları bu saatte gelir.",
+  "notif_daily_log_time": "Saat",
+  "notif_late_setting": "Gecikirse sor",
+  "notif_late_setting_body": "Beklenen günden {n} gün sonra bir kez sorar.",
+  "notif_late_title": "Reglin başladı mı?",
+  "notif_late_body": "Beklenen günden birkaç gün geçti. Başladıysa kaydedebilirsin; döngünün birkaç gün kayması sık görülür."
 }
