@@ -1122,5 +1122,18 @@
   "prediction_info_fertile_off": "Hormonal doğum kontrolünde yumurtlama çoğunlukla baskılandığı için doğurganlık tahmini gösterilmiyor.",
   "prediction_info_improve_title": "Daha iyi tahmin için",
   "prediction_info_improve": "Her reglinin başladığı günü kaydet. Hatırladığın geçmiş reglleri de ekleyebilirsin.",
-  "prediction_info_device": "Hesap tamamen cihazında yapılır; hiçbir veri gönderilmez."
+  "prediction_info_device": "Hesap tamamen cihazında yapılır; hiçbir veri gönderilmez.",
+  "privacy_export_protect": "Yedeği parolayla koru",
+  "privacy_export_protect_desc": "Yedek AES-256 ile şifrelenir. Parola hiçbir yerde saklanmaz; unutursan yedek açılamaz. Parolalı yedeğe hekim özeti ve tablo eklenmez.",
+  "privacy_export_password": "Parola",
+  "privacy_export_password_repeat": "Parolayı tekrar yaz",
+  "privacy_export_password_short": "Parola en az {n} karakter olmalı.",
+  "privacy_export_password_mismatch": "Parolalar aynı değil.",
+  "privacy_import_password_title": "Yedeğin parolası",
+  "privacy_import_password_desc": "Bu yedek parolayla korunuyor.",
+  "privacy_import_password_wrong": "Parola yanlış ya da dosya bozuk.",
+  "privacy_import_open": "Aç",
+  "privacy_working": "İşleniyor",
+  "privacy_sexual_log": "Cinsel aktivite kaydı",
+  "privacy_sexual_log_desc": "Açıkken gün sayfasında görünür. Varsayılan olarak kapalı; kapatınca alan gizlenir, kayıtlı veriler silinmez."
 }

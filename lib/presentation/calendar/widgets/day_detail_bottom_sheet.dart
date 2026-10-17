@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../design_system/app_tokens.dart';
 import 'package:provider/provider.dart';
 import '../view_models/calendar_view_model.dart';
+import '../../../data/repositories/privacy_settings_repository.dart';
 import '../../../domain/models/daily_log.dart';
 import '../../../domain/models/life_stage.dart';
 import '../../../domain/models/log_vocabulary.dart';
@@ -61,12 +62,22 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
 
   static const List<String> _sexualActivities = LogVocabulary.sexualActivities;
 
+  /// Cinsel aktivite alanı açık mı (Gizlilik ayarı, varsayılan kapalı)?
+  bool _sexualLogging = false;
+
   @override
   void initState() {
     super.initState();
     final viewModel = context.read<CalendarViewModel>();
     _currentLog = viewModel.getDailyLogForDate(widget.date);
     _notesController = TextEditingController(text: _currentLog.notes);
+    _loadSexualLogging();
+  }
+
+  Future<void> _loadSexualLogging() async {
+    final on = await const PrivacySettingsRepository()
+        .getSexualActivityLogging();
+    if (mounted && on) setState(() => _sexualLogging = true);
   }
 
   @override
@@ -574,30 +585,34 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
 
                   const SizedBox(height: 24),
 
-                  // Cinsel Aktivite
-                  Text(
-                    context.tr('day_detail_sexual_activity'),
-                    style: theme.textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    children: _sexualActivities.map((code) {
-                      final isSelected = _currentLog.sexualActivity == code;
-                      return ChoiceChip(
-                        label: Text(
-                          context.tr(LogVocabulary.sexualActivityKey(code)),
-                        ),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          _updateCurrentLog(
-                            sexualActivity: selected ? code : null,
-                            clearSexualActivity: !selected,
-                          );
-                        },
-                      );
-                    }).toList(),
-                  ),
+                  // Cinsel aktivite: Gizlilik'te açılınca. O günün kaydı varsa
+                  // ayar kapalı olsa da görünüyor — kayıtlı bir değeri
+                  // görünmez yapmak düzeltilemez yapmak olurdu.
+                  if (_sexualLogging || _currentLog.sexualActivity != null) ...[
+                    Text(
+                      context.tr('day_detail_sexual_activity'),
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      children: _sexualActivities.map((code) {
+                        final isSelected = _currentLog.sexualActivity == code;
+                        return ChoiceChip(
+                          label: Text(
+                            context.tr(LogVocabulary.sexualActivityKey(code)),
+                          ),
+                          selected: isSelected,
+                          onSelected: (selected) {
+                            _updateCurrentLog(
+                              sexualActivity: selected ? code : null,
+                              clearSexualActivity: !selected,
+                            );
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ],
 
                   // Gebelik testi — yalnızca döngü evresinde ve geçmiş/bugün
                   // için. Gebelikte ve lohusalıkta anlamsız; gelecek güne

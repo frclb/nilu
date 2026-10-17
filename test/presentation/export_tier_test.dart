@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:period_tracker/data/repositories/privacy_settings_repository.dart';
 import 'package:period_tracker/design_system/app_flavor.dart';
 import 'package:period_tracker/design_system/app_theme.dart';
 import 'package:period_tracker/domain/view_models/subscription_view_model.dart';
@@ -133,5 +134,79 @@ void main() {
       findsOneWidget,
       reason: 'onay düğmesi yok — akış kilitli olabilir',
     );
+  });
+
+  group('parolalı yedek', () {
+    Finder onay() => find.byKey(const Key('privacy_export_confirm'));
+    bool etkin(WidgetTester tester) =>
+        tester.widget<ElevatedButton>(onay()).onPressed != null;
+
+    Future<void> yaz(WidgetTester tester, String alan, String deger) async {
+      await tester.enterText(find.byKey(Key(alan)), deger);
+      await tester.pump();
+    }
+
+    testWidgets('varsayılan kapalı, düz yedek hemen alınabiliyor', (
+      tester,
+    ) async {
+      await openDialog(tester);
+      expect(find.byKey(const Key('privacy_export_password')), findsNothing);
+      expect(etkin(tester), isTrue);
+    });
+
+    testWidgets('açınca parola girilmeden aktarılmıyor; kısa ve uyuşmayan '
+        'parola söyleniyor', (tester) async {
+      await openDialog(tester);
+      await tester.tap(find.byKey(const Key('privacy_export_protect')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(dictionary['privacy_export_protect_desc'] as String),
+        findsOneWidget,
+        reason: 'Parolanın saklanmadığı baştan söylenmeli',
+      );
+      expect(etkin(tester), isFalse);
+
+      await yaz(tester, 'privacy_export_password', 'kisa');
+      expect(
+        find.text(
+          (dictionary['privacy_export_password_short'] as String).replaceAll(
+            '{n}',
+            '8',
+          ),
+        ),
+        findsOneWidget,
+      );
+      expect(etkin(tester), isFalse);
+
+      await yaz(tester, 'privacy_export_password', 'yeterince-uzun');
+      await yaz(tester, 'privacy_export_password_repeat', 'baska-bir-sey');
+      expect(
+        find.text(dictionary['privacy_export_password_mismatch'] as String),
+        findsOneWidget,
+      );
+      expect(etkin(tester), isFalse);
+
+      await yaz(tester, 'privacy_export_password_repeat', 'yeterince-uzun');
+      expect(etkin(tester), isTrue);
+    });
+  });
+
+  testWidgets('cinsel aktivite kaydı anahtarı varsayılan kapalı ve '
+      'kalıcı', (tester) async {
+    await openDialog(tester);
+    await tester.tap(find.text(dictionary['cancel'] as String));
+    await tester.pumpAndSettle();
+
+    final anahtar = find.byKey(const Key('privacy_sexual_log'));
+    await tester.ensureVisible(anahtar);
+    expect(tester.widget<SwitchListTile>(anahtar).value, isFalse);
+
+    await tester.tap(anahtar);
+    await tester.pumpAndSettle();
+    final kayitli = await tester.runAsync(
+      () => const PrivacySettingsRepository().getSexualActivityLogging(),
+    );
+    expect(kayitli, isTrue);
   });
 }

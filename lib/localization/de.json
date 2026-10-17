@@ -1122,5 +1122,18 @@
   "prediction_info_fertile_off": "Bei hormoneller Verhütung wird der Eisprung meist unterdrückt, daher werden keine fruchtbaren Tage angezeigt.",
   "prediction_info_improve_title": "Für bessere Schätzungen",
   "prediction_info_improve": "Trage den ersten Tag jeder Periode ein. Du kannst auch frühere Perioden hinzufügen, an die du dich erinnerst.",
-  "prediction_info_device": "Alles wird auf deinem Gerät berechnet; es werden keine Daten gesendet."
+  "prediction_info_device": "Alles wird auf deinem Gerät berechnet; es werden keine Daten gesendet.",
+  "privacy_export_protect": "Sicherung mit Passwort schützen",
+  "privacy_export_protect_desc": "Die Sicherung wird mit AES-256 verschlüsselt. Das Passwort wird nirgends gespeichert; wenn du es vergisst, lässt sich die Sicherung nicht öffnen. Arztbericht und Tabelle werden bei einer geschützten Sicherung nicht mitgeschickt.",
+  "privacy_export_password": "Passwort",
+  "privacy_export_password_repeat": "Passwort wiederholen",
+  "privacy_export_password_short": "Das Passwort muss mindestens {n} Zeichen haben.",
+  "privacy_export_password_mismatch": "Die Passwörter stimmen nicht überein.",
+  "privacy_import_password_title": "Passwort der Sicherung",
+  "privacy_import_password_desc": "Diese Sicherung ist passwortgeschützt.",
+  "privacy_import_password_wrong": "Falsches Passwort oder beschädigte Datei.",
+  "privacy_import_open": "Öffnen",
+  "privacy_working": "Wird verarbeitet",
+  "privacy_sexual_log": "Sexuelle Aktivität erfassen",
+  "privacy_sexual_log_desc": "Wenn aktiviert, erscheint es auf der Tagesseite. Standardmäßig aus; beim Ausschalten wird das Feld ausgeblendet, gespeicherte Daten bleiben erhalten."
 }

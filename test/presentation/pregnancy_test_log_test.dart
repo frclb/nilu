@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
+import 'package:period_tracker/data/repositories/period_repository.dart';
+import 'package:period_tracker/data/repositories/privacy_settings_repository.dart';
 import 'package:period_tracker/domain/models/daily_log.dart';
 import 'package:period_tracker/domain/models/life_stage.dart';
 import 'package:period_tracker/domain/models/log_vocabulary.dart';
@@ -124,6 +126,9 @@ void main() {
 
     testWidgets('cinsel aktivite seçimi geri alınabiliyor', (tester) async {
       await seedCycles(lastStartAgo: 10);
+      await tester.runAsync(
+        () => const PrivacySettingsRepository().setSexualActivityLogging(true),
+      );
       final takvim = await sayfayiAc(tester, daysAgo(1));
       final ctx = tester.element(find.byType(DayDetailBottomSheet));
       final korunmali = find.text(
@@ -138,6 +143,44 @@ void main() {
         takvim.getDailyLogForDate(daysAgo(1)).sexualActivity,
         isNull,
         reason: 'Seçim geri alınamıyordu',
+      );
+    });
+  });
+
+  group('cinsel aktivite alanı (gizlilik)', () {
+    String baslik(WidgetTester tester) => tester
+        .element(find.byType(DayDetailBottomSheet))
+        .tr('day_detail_sexual_activity');
+
+    testWidgets('varsayılan olarak gizli', (tester) async {
+      await seedCycles(lastStartAgo: 10);
+      await sayfayiAc(tester, daysAgo(1));
+      expect(find.text(baslik(tester)), findsNothing);
+    });
+
+    testWidgets('Gizlilik\'te açılınca görünüyor', (tester) async {
+      await seedCycles(lastStartAgo: 10);
+      await tester.runAsync(
+        () => const PrivacySettingsRepository().setSexualActivityLogging(true),
+      );
+      await sayfayiAc(tester, daysAgo(1));
+      expect(find.text(baslik(tester)), findsOneWidget);
+    });
+
+    testWidgets('o günün kaydı varsa ayar kapalıyken de görünüyor', (
+      tester,
+    ) async {
+      await seedCycles(lastStartAgo: 10);
+      await tester.runAsync(
+        () => const PeriodRepository().saveDailyLogs([
+          DailyLog(date: daysAgo(1), sexualActivity: 'protected'),
+        ]),
+      );
+      await sayfayiAc(tester, daysAgo(1));
+      expect(
+        find.text(baslik(tester)),
+        findsOneWidget,
+        reason: 'Kayıtlı değer görünmez olursa düzeltilemez',
       );
     });
   });

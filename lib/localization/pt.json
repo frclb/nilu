@@ -1122,5 +1122,18 @@
   "prediction_info_fertile_off": "Com contracepção hormonal, a ovulação costuma ser suprimida, por isso não é mostrado período fértil.",
   "prediction_info_improve_title": "Para estimativas melhores",
   "prediction_info_improve": "Registre o dia em que cada menstruação começa. Você também pode adicionar menstruações anteriores de que se lembra.",
-  "prediction_info_device": "Tudo é calculado no seu aparelho; nenhum dado é enviado."
+  "prediction_info_device": "Tudo é calculado no seu aparelho; nenhum dado é enviado.",
+  "privacy_export_protect": "Proteger o backup com senha",
+  "privacy_export_protect_desc": "O backup é criptografado com AES-256. A senha não é guardada em lugar nenhum; se você esquecer, o backup não poderá ser aberto. O resumo médico e a planilha não são incluídos em um backup protegido.",
+  "privacy_export_password": "Senha",
+  "privacy_export_password_repeat": "Repita a senha",
+  "privacy_export_password_short": "A senha deve ter pelo menos {n} caracteres.",
+  "privacy_export_password_mismatch": "As senhas não coincidem.",
+  "privacy_import_password_title": "Senha do backup",
+  "privacy_import_password_desc": "Este backup é protegido por senha.",
+  "privacy_import_password_wrong": "Senha incorreta ou arquivo danificado.",
+  "privacy_import_open": "Abrir",
+  "privacy_working": "Processando",
+  "privacy_sexual_log": "Registro de atividade sexual",
+  "privacy_sexual_log_desc": "Quando ativado, aparece na página do dia. Desativado por padrão; ao desativar, o campo é ocultado sem apagar os dados salvos."
 }

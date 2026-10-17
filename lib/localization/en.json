@@ -1122,5 +1122,18 @@
   "prediction_info_fertile_off": "With hormonal birth control, ovulation is usually suppressed, so no fertile window is shown.",
   "prediction_info_improve_title": "For better estimates",
   "prediction_info_improve": "Log the day each period starts. You can also add past periods you remember.",
-  "prediction_info_device": "Everything is calculated on your device; no data is sent anywhere."
+  "prediction_info_device": "Everything is calculated on your device; no data is sent anywhere.",
+  "privacy_export_protect": "Protect backup with a password",
+  "privacy_export_protect_desc": "The backup is encrypted with AES-256. The password isn't stored anywhere; if you forget it, the backup can't be opened. The doctor summary and spreadsheet aren't included with a protected backup.",
+  "privacy_export_password": "Password",
+  "privacy_export_password_repeat": "Repeat password",
+  "privacy_export_password_short": "The password must be at least {n} characters.",
+  "privacy_export_password_mismatch": "The passwords don't match.",
+  "privacy_import_password_title": "Backup password",
+  "privacy_import_password_desc": "This backup is password protected.",
+  "privacy_import_password_wrong": "Wrong password or damaged file.",
+  "privacy_import_open": "Open",
+  "privacy_working": "Working",
+  "privacy_sexual_log": "Sexual activity logging",
+  "privacy_sexual_log_desc": "When on, it appears on the day page. Off by default; turning it off hides the field without deleting saved data."
 }

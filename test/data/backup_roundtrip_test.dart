@@ -6,6 +6,7 @@ import 'package:period_tracker/data/repositories/period_repository.dart';
 import 'package:period_tracker/data/repositories/privacy_settings_repository.dart';
 import 'package:period_tracker/domain/models/daily_log.dart';
 import 'package:period_tracker/domain/models/period_log.dart';
+import 'package:period_tracker/domain/services/backup_crypto.dart';
 import 'package:period_tracker/domain/services/premium_gate.dart';
 
 /// Yedeğin gidiş-dönüşü.
@@ -47,6 +48,7 @@ void main() {
       symptoms: const ['cramp', 'backache'],
       moods: const ['irritable'],
       sexualActivity: 'protected',
+      pregnancyTest: 'negative',
       painLevel: 'severe',
       painLimitedActivity: true,
       painLocations: const ['abdomen', 'pelvis'],
@@ -97,11 +99,36 @@ void main() {
     expect(rich.symptoms, source.symptoms);
     expect(rich.moods, source.moods);
     expect(rich.sexualActivity, source.sexualActivity);
+    expect(rich.pregnancyTest, source.pregnancyTest);
     expect(rich.painLevel, source.painLevel);
     expect(rich.painLimitedActivity, source.painLimitedActivity);
     expect(rich.painLocations, source.painLocations);
     expect(rich.painContexts, source.painContexts);
     expect(rich.notes, source.notes);
+  });
+
+  test('parolalı yedek de eksiksiz geri yükleniyor', () async {
+    final sifreli = await BackupCrypto.encrypt(
+      await exportAfterSaving(),
+      'uzun-bir-parola',
+      iterations: 100000,
+    );
+    expect(sifreli, isNot(contains('ilk gün çok ağrılıydı')));
+
+    FlutterSecureStorage.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({});
+
+    final report = await privacy.importDataFromJson(
+      await BackupCrypto.decrypt(sifreli, 'uzun-bir-parola'),
+    );
+    expect(report.succeeded, isTrue);
+    expect(await periods.getPeriodLogs(), hasLength(samplePeriods.length));
+    expect(
+      (await periods.getDailyLogs()).any(
+        (l) => l.notes == 'ilk gün çok ağrılıydı',
+      ),
+      isTrue,
+    );
   });
 
   test('aynı yedeği iki kez yüklemek kopya üretmiyor', () async {

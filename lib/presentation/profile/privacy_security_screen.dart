@@ -1,5 +1,6 @@
 import '../../domain/view_models/pregnancy_view_model.dart';
 import 'dart:io';
+import 'dart:isolate';
 import 'package:flutter/material.dart';
 import '../../design_system/app_theme.dart';
 import '../../design_system/app_tokens.dart';
@@ -12,6 +13,7 @@ import '../../core/navigation/route_names.dart';
 import '../../data/datasources/ad_consent.dart';
 import '../../data/repositories/privacy_settings_repository.dart';
 import '../../domain/services/app_lock_service.dart';
+import '../../domain/services/backup_crypto.dart';
 import '../../domain/services/backup_import_service.dart';
 import '../../domain/services/data_export_service.dart';
 import '../../domain/services/premium_gate.dart';
@@ -35,6 +37,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
   final AppLockService _lockService = AppLockService();
 
   bool _lockEnabled = false;
+  bool _sexualLogging = false;
   LockCapability _capability = LockCapability.none;
   bool _isLoading = true;
 
@@ -52,9 +55,11 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
   Future<void> _load() async {
     final enabled = await _lockService.isEnabled();
     final capability = await _lockService.capability();
+    final sexualLogging = await _repository.getSexualActivityLogging();
     if (!mounted) return;
     setState(() {
       _lockEnabled = enabled;
+      _sexualLogging = sexualLogging;
       _capability = capability;
       _isLoading = false;
     });
@@ -180,6 +185,40 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         color: context.tokens.textMuted,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+                  // Hassas alanların görünürlüğü.
+                  Container(
+                    decoration: BoxDecoration(
+                      color: context.tokens.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: context.tokens.border),
+                    ),
+                    child: SwitchListTile(
+                      key: const Key('privacy_sexual_log'),
+                      value: _sexualLogging,
+                      onChanged: (v) async {
+                        setState(() => _sexualLogging = v);
+                        await _repository.setSexualActivityLogging(v);
+                      },
+                      title: Text(
+                        context.tr('privacy_sexual_log'),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: context.tokens.text,
+                        ),
+                      ),
+                      subtitle: Text(
+                        context.tr('privacy_sexual_log_desc'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          height: 1.4,
+                          color: context.tokens.textMuted,
+                        ),
                       ),
                     ),
                   ),
@@ -436,6 +475,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
       ImportFailure.empty: message('privacy_import_empty'),
     };
     final genericFailure = message('privacy_import_failed');
+    final wrongPassword = message('privacy_import_password_wrong');
 
     try {
       // Yedek `.json`; iOS belge seçicisinde yalnızca o türü göstermek
@@ -451,9 +491,28 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
       );
       if (file == null) return; // Kullanıcı vazgeçti.
 
-      final report = await _repository.importDataFromJson(
-        await file.readAsString(),
-      );
+      var metin = await file.readAsString();
+      if (BackupCrypto.isEncrypted(metin)) {
+        if (!mounted) return;
+        final parola = await _askBackupPassword();
+        if (parola == null) return;
+        try {
+          final sifreli = metin;
+          metin = await _withProgress(
+            () => Isolate.run(() => BackupCrypto.decrypt(sifreli, parola)),
+          );
+        } on BackupPasswordException {
+          messenger.showSnackBar(SnackBar(content: Text(wrongPassword)));
+          return;
+        } on BackupFormatException {
+          messenger.showSnackBar(
+            SnackBar(content: Text(failureText[ImportFailure.wrongFormat]!)),
+          );
+          return;
+        }
+      }
+
+      final report = await _repository.importDataFromJson(metin);
 
       if (!report.succeeded) {
         messenger.showSnackBar(
@@ -500,39 +559,88 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
 
     showDialog(
       context: context,
+      builder: (ctx) => _ExportDialog(
+        withReports: withReports,
+        onExport: (password) async {
+          Navigator.of(ctx).pop();
+          await _exportAndShare(password: password);
+        },
+      ),
+    );
+  }
+
+  /// İçe aktarılan şifreli yedeğin parolası. Vazgeçilirse `null`.
+  Future<String?> _askBackupPassword() {
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(context.tr('privacy_export')),
-        content: Text(
-          ctx.tr(
-            withReports ? 'privacy_export_desc' : 'privacy_export_desc_free',
-          ),
-          style: TextStyle(color: ctx.tokens.textMuted),
+        title: Text(ctx.tr('privacy_import_password_title')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              ctx.tr('privacy_import_password_desc'),
+              style: TextStyle(color: ctx.tokens.textMuted),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              key: const Key('privacy_import_password'),
+              controller: controller,
+              obscureText: true,
+              autofocus: true,
+              autocorrect: false,
+              enableSuggestions: false,
+              decoration: InputDecoration(
+                labelText: ctx.tr('privacy_export_password'),
+              ),
+              onSubmitted: (v) => Navigator.of(ctx).pop(v),
+            ),
+          ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
-              context.tr('cancel'),
-              style: TextStyle(color: context.tokens.textMuted),
+              ctx.tr('cancel'),
+              style: TextStyle(color: ctx.tokens.textMuted),
             ),
           ),
           ElevatedButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              await _exportAndShare();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: Text(context.tr('privacy_export_confirm')),
+            key: const Key('privacy_import_password_open'),
+            style: AppTheme.dialogAction(),
+            onPressed: () => Navigator.of(ctx).pop(controller.text),
+            child: Text(ctx.tr('privacy_import_open')),
           ),
         ],
       ),
+    ).whenComplete(controller.dispose);
+  }
+
+  /// Uzun süren bir işi (anahtar türetme) dokunulmaz bir bekleme kutusuyla
+  /// sarar: kullanıcı ekranın donduğunu sanıp ikinci kez basmasın.
+  Future<T> _withProgress<T>(Future<T> Function() job) async {
+    final nav = Navigator.of(context, rootNavigator: true);
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      useRootNavigator: true,
+      builder: (ctx) => PopScope(
+        canPop: false,
+        child: Center(
+          child: Semantics(
+            label: ctx.tr('privacy_working'),
+            child: const CircularProgressIndicator(),
+          ),
+        ),
+      ),
     );
+    try {
+      return await job();
+    } finally {
+      nav.pop();
+    }
   }
 
   /// Veriyi dosya olarak dışa aktarır ve sistem paylaşım sayfasını açar.
@@ -543,7 +651,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
   ///
   /// Üç dosya birlikte veriliyor — okunabilir özet (muayenede telefondan
   /// okunur), CSV (tablo programı) ve tam JSON (kayıpsız yedek).
-  Future<void> _exportAndShare() async {
+  Future<void> _exportAndShare({String? password}) async {
     // Yedek herkese açık, raporlar premium.
     //
     // Makine-okunur bir kopya almak KVKK ve GDPR'da bir hak; ücrete
@@ -591,11 +699,20 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
           '${now.year}${now.month.toString().padLeft(2, '0')}'
           '${now.day.toString().padLeft(2, '0')}';
 
+      // Parolalı yedekte yalnızca şifreli dosya gidiyor: özet ve tablo düz
+      // metin; kullanıcı "parolayla koru" dediğinde yanında açık bir kopya
+      // göndermek korumayı boşa çıkarırdı.
+      final yedek = password == null
+          ? json
+          : await _withProgress(
+              () => Isolate.run(() => BackupCrypto.encrypt(json, password)),
+            );
+
       final files = <XFile>[
-        await _writeTemp(dir.path, 'dongu-yedek-$stamp.json', json),
-        if (withReports) ...[
-          await _writeTemp(dir.path, 'dongu-ozeti-$stamp.txt', summary),
-          await _writeTemp(dir.path, 'dongu-kayitlari-$stamp.csv', csv),
+        await _writeTemp(dir.path, 'nilu-yedek-$stamp.json', yedek),
+        if (withReports && password == null) ...[
+          await _writeTemp(dir.path, 'nilu-ozet-$stamp.txt', summary),
+          await _writeTemp(dir.path, 'nilu-kayitlar-$stamp.csv', csv),
         ],
       ];
 
@@ -675,6 +792,141 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Dışa aktarma kutusu: isteğe bağlı parola.
+class _ExportDialog extends StatefulWidget {
+  const _ExportDialog({required this.withReports, required this.onExport});
+
+  final bool withReports;
+
+  /// Parola `null` ise yedek şifrelenmiyor.
+  final Future<void> Function(String? password) onExport;
+
+  @override
+  State<_ExportDialog> createState() => _ExportDialogState();
+}
+
+class _ExportDialogState extends State<_ExportDialog> {
+  final _parola = TextEditingController();
+  final _tekrar = TextEditingController();
+  bool _koru = false;
+
+  @override
+  void dispose() {
+    _parola.dispose();
+    _tekrar.dispose();
+    super.dispose();
+  }
+
+  /// Gösterilecek hata; parola geçerliyse `null`.
+  String? get _hata {
+    if (!_koru) return null;
+    if (_parola.text.length < BackupCrypto.minPasswordLength) {
+      return context.tr(
+        'privacy_export_password_short',
+        params: {'n': '${BackupCrypto.minPasswordLength}'},
+      );
+    }
+    if (_parola.text != _tekrar.text) {
+      return context.tr('privacy_export_password_mismatch');
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final hata = _hata;
+    // Hata yalnızca kullanıcı yazmaya başladıktan sonra: boş alanın
+    // altında kırmızı yazı açılışta azarlıyor gibi görünür.
+    final hataGoster =
+        hata != null && (_parola.text.isNotEmpty || _tekrar.text.isNotEmpty);
+
+    return AlertDialog(
+      title: Text(context.tr('privacy_export')),
+      scrollable: true,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.tr(
+              widget.withReports
+                  ? 'privacy_export_desc'
+                  : 'privacy_export_desc_free',
+            ),
+            style: TextStyle(color: t.textMuted),
+          ),
+          const SizedBox(height: 12),
+          SwitchListTile(
+            key: const Key('privacy_export_protect'),
+            contentPadding: EdgeInsets.zero,
+            value: _koru,
+            onChanged: (v) => setState(() => _koru = v),
+            title: Text(
+              context.tr('privacy_export_protect'),
+              style: TextStyle(fontWeight: FontWeight.w600, color: t.text),
+            ),
+          ),
+          if (_koru) ...[
+            Text(
+              context.tr('privacy_export_protect_desc'),
+              style: TextStyle(fontSize: 13, height: 1.4, color: t.textMuted),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              key: const Key('privacy_export_password'),
+              controller: _parola,
+              obscureText: true,
+              autocorrect: false,
+              enableSuggestions: false,
+              onChanged: (_) => setState(() {}),
+              decoration: InputDecoration(
+                labelText: context.tr('privacy_export_password'),
+              ),
+            ),
+            TextField(
+              key: const Key('privacy_export_password_repeat'),
+              controller: _tekrar,
+              obscureText: true,
+              autocorrect: false,
+              enableSuggestions: false,
+              onChanged: (_) => setState(() {}),
+              decoration: InputDecoration(
+                labelText: context.tr('privacy_export_password_repeat'),
+                errorText: hataGoster ? hata : null,
+                errorMaxLines: 2,
+              ),
+            ),
+          ],
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(
+            context.tr('cancel'),
+            style: TextStyle(color: t.textMuted),
+          ),
+        ),
+        ElevatedButton(
+          key: const Key('privacy_export_confirm'),
+          onPressed: hata != null
+              ? null
+              : () => widget.onExport(_koru ? _parola.text : null),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: Text(context.tr('privacy_export_confirm')),
+        ),
+      ],
     );
   }
 }

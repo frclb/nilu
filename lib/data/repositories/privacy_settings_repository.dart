@@ -17,6 +17,7 @@ import 'pregnancy_repository.dart';
 class PrivacySettingsRepository {
   static const String _biometricKey = 'privacy_biometric_enabled';
   static const String _pinKey = 'privacy_pin_enabled';
+  static const String _sexualLogKey = 'log_sexual_activity';
 
   final SecureStore _store;
   final PeriodRepository _periodRepository;
@@ -57,6 +58,21 @@ class PrivacySettingsRepository {
   Future<void> setPinEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_pinKey, value);
+  }
+
+  /// Gün sayfasında cinsel aktivite alanı görünsün mü? Varsayılan kapalı.
+  ///
+  /// Telefonu başkasının eline geçebilecek kullanıcı için bu alanın her gün
+  /// açıkta durması başlı başına bir ifşa. İsteyen açıyor; kapatmak kayıtlı
+  /// veriyi silmiyor, yalnızca alanı gizliyor.
+  Future<bool> getSexualActivityLogging() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_sexualLogKey) ?? false;
+  }
+
+  Future<void> setSexualActivityLogging(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_sexualLogKey, value);
   }
 
   // ─── Veri yönetimi ───

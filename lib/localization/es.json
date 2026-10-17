@@ -1122,5 +1122,18 @@
   "prediction_info_fertile_off": "Con anticonceptivos hormonales la ovulación suele estar suprimida, por eso no se muestra ventana fértil.",
   "prediction_info_improve_title": "Para mejores estimaciones",
   "prediction_info_improve": "Registra el día en que empieza cada periodo. También puedes añadir periodos anteriores que recuerdes.",
-  "prediction_info_device": "Todo se calcula en tu dispositivo; no se envía ningún dato."
+  "prediction_info_device": "Todo se calcula en tu dispositivo; no se envía ningún dato.",
+  "privacy_export_protect": "Proteger la copia con contraseña",
+  "privacy_export_protect_desc": "La copia se cifra con AES-256. La contraseña no se guarda en ningún sitio; si la olvidas, no podrás abrir la copia. Con una copia protegida no se incluyen el resumen médico ni la hoja de cálculo.",
+  "privacy_export_password": "Contraseña",
+  "privacy_export_password_repeat": "Repite la contraseña",
+  "privacy_export_password_short": "La contraseña debe tener al menos {n} caracteres.",
+  "privacy_export_password_mismatch": "Las contraseñas no coinciden.",
+  "privacy_import_password_title": "Contraseña de la copia",
+  "privacy_import_password_desc": "Esta copia está protegida con contraseña.",
+  "privacy_import_password_wrong": "Contraseña incorrecta o archivo dañado.",
+  "privacy_import_open": "Abrir",
+  "privacy_working": "Procesando",
+  "privacy_sexual_log": "Registro de actividad sexual",
+  "privacy_sexual_log_desc": "Si está activado, aparece en la página del día. Desactivado por defecto; al desactivarlo se oculta el campo sin borrar los datos guardados."
 }

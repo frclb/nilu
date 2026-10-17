@@ -1122,5 +1122,18 @@
   "prediction_info_fertile_off": "Avec une contraception hormonale, l'ovulation est généralement bloquée : aucune fenêtre fertile n'est affichée.",
   "prediction_info_improve_title": "Pour de meilleures estimations",
   "prediction_info_improve": "Note le premier jour de chaque règles. Tu peux aussi ajouter les règles passées dont tu te souviens.",
-  "prediction_info_device": "Tout est calculé sur ton appareil ; aucune donnée n'est envoyée."
+  "prediction_info_device": "Tout est calculé sur ton appareil ; aucune donnée n'est envoyée.",
+  "privacy_export_protect": "Protéger la sauvegarde par mot de passe",
+  "privacy_export_protect_desc": "La sauvegarde est chiffrée en AES-256. Le mot de passe n'est enregistré nulle part ; si tu l'oublies, la sauvegarde ne pourra pas être ouverte. Le résumé médical et le tableau ne sont pas joints à une sauvegarde protégée.",
+  "privacy_export_password": "Mot de passe",
+  "privacy_export_password_repeat": "Répète le mot de passe",
+  "privacy_export_password_short": "Le mot de passe doit comporter au moins {n} caractères.",
+  "privacy_export_password_mismatch": "Les mots de passe ne correspondent pas.",
+  "privacy_import_password_title": "Mot de passe de la sauvegarde",
+  "privacy_import_password_desc": "Cette sauvegarde est protégée par mot de passe.",
+  "privacy_import_password_wrong": "Mot de passe incorrect ou fichier endommagé.",
+  "privacy_import_open": "Ouvrir",
+  "privacy_working": "Traitement en cours",
+  "privacy_sexual_log": "Suivi de l'activité sexuelle",
+  "privacy_sexual_log_desc": "Activé, il apparaît sur la page du jour. Désactivé par défaut ; le désactiver masque le champ sans supprimer les données enregistrées."
 }
