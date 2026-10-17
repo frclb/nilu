@@ -44,8 +44,16 @@ import UIKit
           // Tamamlama UIKit'in kuyruğunda geliyor; Flutter yanıtı ana iş
           // parçacığında bekliyor.
           DispatchQueue.main.async {
-            guard let error = error as NSError? else {
+            // Sonuca iOS'un hata koduyla değil simgenin gerçek durumuyla
+            // karar veriliyor: simülatörde simge değiştiği hâlde tamamlama
+            // "G/Ç hatası" (POSIX 5) döndüğü görüldü; kullanıcı "değişmedi"
+            // uyarısı alırken ana ekranda yeni simge duruyordu.
+            if app.alternateIconName == name {
               result("ok")
+              return
+            }
+            guard let error = error as NSError? else {
+              result("failed")
               return
             }
             NSLog("Alternate icon failed (\(error.domain) \(error.code)): \(error.localizedDescription)")

@@ -624,14 +624,16 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                         );
                       }).toList(),
                     ),
+                    const SizedBox(height: 24),
                   ],
 
                   // Gebelik testi — yalnızca döngü evresinde ve geçmiş/bugün
                   // için. Gebelikte ve lohusalıkta anlamsız; gelecek güne
                   // test sonucu girilemez.
+                  // Boşluklar bölümlerin sonunda: gizli bir bölüm araya iki
+                  // kat boşluk bırakmasın.
                   if (viewModel.lifeStage == LifeStage.cycle &&
                       !_gelecekGun) ...[
-                    const SizedBox(height: 24),
                     Text(
                       context.tr('day_detail_pregnancy_test'),
                       style: theme.textTheme.titleMedium,
@@ -657,9 +659,8 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                     if (_currentLog.pregnancyTest ==
                         LogVocabulary.pregnancyTestPositive)
                       _PositiveTestCard(onStart: _gebelikBaslat),
+                    const SizedBox(height: 24),
                   ],
-
-                  const SizedBox(height: 24),
 
                   // Notlar
                   Text(

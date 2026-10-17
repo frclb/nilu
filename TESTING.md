@@ -141,7 +141,11 @@ bildirim, gerçek kamera, gerçek mağaza. Elle bakılacaklar:
   reddedilmeli.
 - *Tüm verilerimi sil* → kurulum ekranına döner.
 - Profil → Görünüm → *Uygulama simgesi* → *Sade*: ana ekran simgesi not
-  sayfasına döner (iOS bir uyarı gösterir; bu sistemin davranışı).
+  sayfasına döner (iOS bir uyarı gösterir; bu sistemin davranışı). iOS
+  simgeyi kısa aralıklarla art arda değiştirmeyi birkaç dakikalığına
+  sınırlıyor; o sırada uygulama "birkaç dakika sonra yeniden dene" der ve
+  seçim gerçek simgede kalır. Uçtan uca test de simgeyi değiştirdiği için
+  hemen ardından elle denerken bu mesajı görmek normal.
 
 **Dil**
 - Altı dil tam çevrili (tr, en, de, es, fr, pt-BR). Cihaz dilini değiştirip
