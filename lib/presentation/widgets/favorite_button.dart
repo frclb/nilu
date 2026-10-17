@@ -62,6 +62,9 @@ class _FavoriteButtonState extends State<FavoriteButton> {
 
     if (!widget.expanded) {
       return IconButton(
+        tooltip: context.tr(
+          _isFavorite ? 'favorite_remove' : 'recipe_favorite',
+        ),
         icon: Icon(
           _isFavorite ? Icons.bookmark : Icons.bookmark_border,
           color: theme.colorScheme.primary,

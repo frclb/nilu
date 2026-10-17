@@ -1,3 +1,4 @@
+import '../../../design_system/app_tappable.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
@@ -177,9 +178,9 @@ class _ShareControls extends StatelessWidget {
                   ),
                 ),
                 IconButton(
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                   onPressed: viewModel.clearError,
                   icon: const Icon(Icons.close, size: 16),
-                  visualDensity: VisualDensity.compact,
                 ),
               ],
             ),
@@ -223,7 +224,7 @@ class _MiniDesireCard extends StatelessWidget {
     final icon = _desireIcons[selected] ?? Icons.favorite_border_rounded;
     final hasSelection = selected != null;
 
-    return GestureDetector(
+    return AppTappable(
       onTap: () => _showDesireSheet(context),
       child: Container(
         height: 120,
@@ -427,7 +428,7 @@ class _MiniAffectionCard extends StatelessWidget {
           '${_getNeedLabel(context, needs.first)} +${needs.length - 1}';
     }
 
-    return GestureDetector(
+    return AppTappable(
       onTap: () => _showAffectionSheet(context),
       child: Container(
         height: 120,
@@ -646,7 +647,8 @@ class _MiniAffectionCard extends StatelessWidget {
                     children: options.map((opt) {
                       final isSelected = viewModel.selectedAffectionNeeds
                           .contains(opt.key);
-                      return GestureDetector(
+                      return AppTappable(
+                        selected: isSelected,
                         onTap: () {
                           viewModel.toggleAffectionNeed(opt.key);
                           setSheetState(() {});
@@ -760,7 +762,8 @@ class _OptionTile extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: GestureDetector(
+      child: AppTappable(
+        selected: isSelected,
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),

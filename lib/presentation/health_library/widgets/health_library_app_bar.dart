@@ -21,22 +21,31 @@ class HealthLibraryAppBar extends StatelessWidget
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          // Dikey pay 4: 56 pt'lik çubukta düğmeye 48 pt kalsın (8 iken
+          // 40'a sıkışıyordu, iOS'un önerdiği 44'ün altında).
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const SizedBox(width: 48),
-              Text(
-                context.tr('health_library_title'),
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
-                  color: textColor,
+              Expanded(
+                // Büyük yazıda başlık kısalıyor; düğmeler yerinde kalıyor.
+                child: Text(
+                  context.tr('health_library_title'),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.5,
+                    color: textColor,
+                  ),
                 ),
               ),
               IconButton(
+                tooltip: context.tr('nav_profile'),
                 onPressed: () {
                   context.goNamed(RouteNames.profile);
                 },

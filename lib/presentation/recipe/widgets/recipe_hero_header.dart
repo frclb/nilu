@@ -3,7 +3,6 @@ import '../../../design_system/app_scrim.dart';
 import '../../../design_system/app_tokens.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/content_illustration.dart';
-import '../../../localization/app_localizations.dart';
 
 class RecipeHeroHeader extends StatelessWidget {
   /// Gerçek fotoğraf tedarik edilince buraya bir adres verilir; adres ölürse
@@ -46,44 +45,18 @@ class RecipeHeroHeader extends StatelessWidget {
             ),
           ),
 
-          // Top Buttons
+          // Geri düğmesi.
+          //
+          // Yanında bir "⋮" menüsü vardı: "Paylaş" ve "Kaydet" yalnızca menüyü
+          // kapatıyordu, hiçbir şey yapmıyordu. Kaydetme ekranın altındaki
+          // gerçek favori düğmesinde; işlevsiz menü kaldırıldı.
           Positioned(
             top: MediaQuery.of(context).padding.top + 12,
             left: 16,
-            right: 16,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildCircleButton(
-                  icon: Icons.arrow_back,
-                  onTap: () => Navigator.of(context).pop(),
-                ),
-                _buildCircleButton(
-                  icon: Icons.more_vert,
-                  onTap: () {
-                    showModalBottomSheet(
-                      context: context,
-                      builder: (context) => SafeArea(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ListTile(
-                              leading: const Icon(Icons.share),
-                              title: Text(context.tr('share')),
-                              onTap: () => Navigator.pop(context),
-                            ),
-                            ListTile(
-                              leading: const Icon(Icons.bookmark_border),
-                              title: Text(context.tr('save')),
-                              onTap: () => Navigator.pop(context),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
+            child: _buildCircleButton(
+              icon: Icons.arrow_back,
+              label: MaterialLocalizations.of(context).backButtonTooltip,
+              onTap: () => Navigator.of(context).pop(),
             ),
           ),
         ],
@@ -93,21 +66,28 @@ class RecipeHeroHeader extends StatelessWidget {
 
   Widget _buildCircleButton({
     required IconData icon,
+    required String label,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: ClipOval(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AppScrim.veil(51),
-              shape: BoxShape.circle,
+    // 44 pt: iOS'un önerdiği en küçük dokunma hedefi.
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: onTap,
+        child: ClipOval(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: AppScrim.veil(51),
+                shape: BoxShape.circle,
+              ),
+              child: Center(child: Icon(icon, color: AppScrim.ink, size: 24)),
             ),
-            child: Center(child: Icon(icon, color: AppScrim.ink, size: 24)),
           ),
         ),
       ),

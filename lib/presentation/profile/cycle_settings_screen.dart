@@ -88,6 +88,7 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: Icon(
             Icons.arrow_back_ios_new,
             color: context.tokens.text,

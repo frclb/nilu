@@ -1,3 +1,4 @@
+import '../../../design_system/app_tappable.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_tokens.dart';
 import 'package:provider/provider.dart';
@@ -75,7 +76,7 @@ class TwoColumnWidgets extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: GestureDetector(
+            child: AppTappable(
               onTap: () {
                 NavigationService().push(RouteNames.partner);
               },
@@ -164,7 +165,7 @@ class TwoColumnWidgets extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           Expanded(
-            child: GestureDetector(
+            child: AppTappable(
               onTap: () {
                 NavigationService().push(RouteNames.logEntry);
               },

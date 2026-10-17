@@ -1,3 +1,4 @@
+import '../../design_system/app_tappable.dart';
 import 'package:flutter/material.dart';
 import '../../design_system/app_scrim.dart';
 import '../../design_system/app_tokens.dart';
@@ -127,6 +128,9 @@ class _OnboardingLastPeriodScreenState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
+                      tooltip: MaterialLocalizations.of(
+                        context,
+                      ).backButtonTooltip,
                       icon: Icon(Icons.arrow_back, color: textMainColor),
                       onPressed: () => onboardingBack(context),
                     ),
@@ -142,7 +146,7 @@ class _OnboardingLastPeriodScreenState
                   physics: const BouncingScrollPhysics(),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0,
+                      horizontal: 16.0,
                       vertical: 16.0,
                     ),
                     child: Column(
@@ -175,7 +179,12 @@ class _OnboardingLastPeriodScreenState
                         Container(
                           width: double.infinity,
                           constraints: const BoxConstraints(maxWidth: 340),
-                          padding: const EdgeInsets.all(16),
+                          // Yatay pay 10: gün hücreleri iOS'un önerdiği 44
+                          // pt'nin altına düşmesin (16 iken 43,7 idi).
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 16,
+                          ),
                           decoration: BoxDecoration(
                             color: cardColor,
                             borderRadius: BorderRadius.circular(24),
@@ -198,6 +207,9 @@ class _OnboardingLastPeriodScreenState
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   IconButton(
+                                    tooltip: MaterialLocalizations.of(
+                                      context,
+                                    ).previousMonthTooltip,
                                     icon: Icon(
                                       Icons.chevron_left,
                                       color: textMainColor,
@@ -216,6 +228,9 @@ class _OnboardingLastPeriodScreenState
                                     ),
                                   ),
                                   IconButton(
+                                    tooltip: MaterialLocalizations.of(
+                                      context,
+                                    ).nextMonthTooltip,
                                     icon: Icon(
                                       Icons.chevron_right,
                                       color: textMainColor,
@@ -343,7 +358,10 @@ class _OnboardingLastPeriodScreenState
           _selectedDate.day == date.day;
 
       gridItems.add(
-        GestureDetector(
+        AppTappable(
+          selected: isSelected,
+          label: '$i ${_getFormattedMonth(context, date)}',
+          excludeChildSemantics: true,
           onTap: () {
             setState(() {
               _selectedDate = date;

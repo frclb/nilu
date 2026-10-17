@@ -29,6 +29,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
         ),
         centerTitle: true,
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: Icon(Icons.arrow_back_ios, color: textColor),
           onPressed: () => Navigator.of(context).pop(),
         ),

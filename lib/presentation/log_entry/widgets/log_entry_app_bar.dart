@@ -25,6 +25,7 @@ class LogEntryAppBar extends StatelessWidget implements PreferredSizeWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
+                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                 onPressed: () => NavigationService().pop(),
                 icon: const Icon(Icons.close),
                 color: theme.colorScheme.onSurface,

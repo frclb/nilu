@@ -44,6 +44,9 @@ class YogaDetailScreen extends StatelessWidget {
                     surfaceTintColor: Colors.transparent,
                     elevation: 0,
                     leading: IconButton(
+                      tooltip: MaterialLocalizations.of(
+                        context,
+                      ).backButtonTooltip,
                       icon: Icon(Icons.arrow_back, color: context.tokens.text),
                       onPressed: () => Navigator.of(context).pop(),
                     ),

@@ -139,6 +139,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
               ),
               const SizedBox(width: AppSpacing.sm),
               IconButton.filled(
+                tooltip: context.tr('assistant_send'),
                 onPressed: () => _ask(_controller.text),
                 icon: const Icon(Icons.arrow_upward),
               ),

@@ -97,6 +97,7 @@ class _SessionScreenState extends State<SessionScreen> {
         elevation: 0,
         title: Text(context.tr(widget.plan.titleKey)),
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
         ),

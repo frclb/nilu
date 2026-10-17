@@ -1,3 +1,4 @@
+import '../../../design_system/app_tappable.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_scrim.dart';
 import '../../../design_system/app_tokens.dart';
@@ -101,7 +102,8 @@ class _FlowIntensitySectionState extends State<FlowIntensitySection> {
               final isSelected = _selectedIndex == index;
               return ConstrainedBox(
                 constraints: const BoxConstraints(minWidth: _chipMinWidth),
-                child: GestureDetector(
+                child: AppTappable(
+                  selected: isSelected,
                   onTap: () {
                     setState(() {
                       _selectedIndex = index;

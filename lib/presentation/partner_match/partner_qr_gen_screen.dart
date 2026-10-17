@@ -106,6 +106,7 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: Icon(Icons.arrow_back, color: textMainColor),
           onPressed: () => context.pop(),
         ),

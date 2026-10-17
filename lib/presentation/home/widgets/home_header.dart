@@ -68,14 +68,21 @@ class _HomeHeaderState extends State<HomeHeader> {
                 ),
             ],
           ),
-          GestureDetector(
-            onTap: () {
-              NavigationService().go(RouteNames.profile);
-            },
-            // Avatar da uzak bir adresten geliyordu — üstelik her kullanıcıya
-            // **aynı** fotoğrafı gösteriyordu. Kullanıcının kendi adının baş
-            // harfi hem doğru hem çevrimdışı çalışıyor.
-            child: InitialAvatar(name: _name),
+          // VoiceOver'da "Profil, düğme": baş harf tek başına bir şey
+          // söylemiyor.
+          Semantics(
+            button: true,
+            label: context.tr('nav_profile'),
+            excludeSemantics: true,
+            child: GestureDetector(
+              onTap: () {
+                NavigationService().go(RouteNames.profile);
+              },
+              // Avatar da uzak bir adresten geliyordu — üstelik her
+              // kullanıcıya **aynı** fotoğrafı gösteriyordu. Kullanıcının
+              // kendi adının baş harfi hem doğru hem çevrimdışı çalışıyor.
+              child: InitialAvatar(name: _name),
+            ),
           ),
         ],
       ),

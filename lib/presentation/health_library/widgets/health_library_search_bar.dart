@@ -55,6 +55,9 @@ class HealthLibrarySearchBar extends StatelessWidget {
             suffixIcon: controller.text.isEmpty
                 ? null
                 : IconButton(
+                    tooltip: MaterialLocalizations.of(
+                      context,
+                    ).deleteButtonTooltip,
                     icon: const Icon(Icons.close, size: 18),
                     onPressed: () {
                       controller.clear();

@@ -36,6 +36,7 @@ class CalendarAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ],
               ),
               IconButton(
+                tooltip: context.tr('cycle_settings_title'),
                 onPressed: () {
                   context.pushNamed(RouteNames.cycleSettings);
                 },

@@ -1,3 +1,4 @@
+import '../../../design_system/app_tappable.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_contrast.dart';
 import '../../../design_system/app_card.dart';
@@ -456,11 +457,10 @@ class _DayTile extends StatelessWidget {
     final dailyLog = context.select<CalendarViewModel, DailyLog>(
       (v) => v.getDailyLogForDate(date),
     );
-    final hasLog =
-        dailyLog.symptoms.isNotEmpty ||
-        dailyLog.moods.isNotEmpty ||
-        dailyLog.flowIntensity != null ||
-        (dailyLog.notes != null && dailyLog.notes!.isNotEmpty);
+    // Tek tanım: `DailyLog.hasContent`. Burada ayrı bir liste vardı ve
+    // yalnızca ağrı, ölçüm ya da test sonucu girilmiş günlerde nokta
+    // çıkmıyordu.
+    final hasLog = dailyLog.hasContent;
 
     // Lekelenme günü: kanama var ama regl değil. Regl gününde ayrıca
     // gösterilmiyor — orada zaten bandın kendisi kanamayı anlatıyor.
@@ -542,9 +542,28 @@ class _DayTile extends StatelessWidget {
       textColor = context.tokens.text;
     }
 
-    return GestureDetector(
+    // VoiceOver yalnızca "17" okuyordu: ayı, reglin ya da tahminin
+    // olduğunu söylemiyordu. Renklerin anlattığı her şey burada yazıyla.
+    final etiket = [
+      '${date.day} ${context.monthName(date.month)} ${date.year}',
+      if (isToday) MaterialLocalizations.of(context).currentDateLabel,
+      if (isPeriod) context.tr('calendar_legend_period'),
+      if (isPredicted && !isPeriod) context.tr('calendar_legend_predicted'),
+      if (isSpotting) context.tr('calendar_legend_spotting'),
+      if (isOvulation)
+        context.tr('calendar_legend_ovulation')
+      else if (isFertile)
+        context.tr('calendar_legend_fertility'),
+      if (hasAppointment) context.tr('calendar_legend_appointment'),
+      if (isDueOrBirth) context.tr('calendar_legend_due'),
+      if (hasLog) context.tr('calendar_has_log'),
+    ].join(', ');
+
+    return AppTappable(
+      selected: isSelected,
+      label: etiket,
+      excludeChildSemantics: true,
       onTap: () => viewModel.selectDate(date),
-      behavior: HitTestBehavior.opaque,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

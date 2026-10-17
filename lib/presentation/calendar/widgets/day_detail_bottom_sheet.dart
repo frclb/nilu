@@ -1,3 +1,4 @@
+import '../../../design_system/app_tappable.dart';
 import '../../pregnancy/stage_bleeding_note.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_tokens.dart';
@@ -294,6 +295,7 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                   ),
                 ),
                 IconButton(
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.close),
                 ),
@@ -539,7 +541,8 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                     children: _moodEmojis.entries.map((entry) {
                       final code = entry.key;
                       final isSelected = _currentLog.moods.contains(code);
-                      return GestureDetector(
+                      return AppTappable(
+                        selected: isSelected,
                         onTap: () => _toggleMood(code),
                         child: Container(
                           padding: const EdgeInsets.symmetric(

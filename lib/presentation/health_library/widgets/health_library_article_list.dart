@@ -1,3 +1,4 @@
+import '../../../design_system/app_tappable.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../design_system/app_card.dart';
@@ -34,27 +35,18 @@ class HealthLibraryArticleList extends StatelessWidget {
             top: 24,
             bottom: 8,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                context.tr('health_library_recommended'),
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: context.tokens.text,
-                ),
+          // Yanında "Tümünü Gör" yazıyordu ama dokunulamıyordu; liste
+          // zaten tamamı. Yalnızca başlık kaldı.
+          child: Semantics(
+            header: true,
+            child: Text(
+              context.tr('health_library_recommended'),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: context.tokens.text,
               ),
-              Text(
-                context.tr('health_library_see_all'),
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
         if (articles.isEmpty)
@@ -96,7 +88,7 @@ class HealthLibraryArticleList extends StatelessWidget {
     ThemeData theme,
     bool isDark,
   ) {
-    return GestureDetector(
+    return AppTappable(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => ArticleScreen(article: article),
@@ -125,8 +117,9 @@ class HealthLibraryArticleList extends StatelessWidget {
             const SizedBox(width: 16),
             // Content
             Expanded(
-              child: SizedBox(
-                height: 96,
+              // En az 96: büyük yazıda satır uzuyor, taşmıyor.
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 96),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -151,7 +144,7 @@ class HealthLibraryArticleList extends StatelessWidget {
                         height: 1.3,
                       ),
                     ),
-                    const Spacer(),
+                    const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -176,11 +169,6 @@ class HealthLibraryArticleList extends StatelessWidget {
                               ),
                             ),
                           ],
-                        ),
-                        Icon(
-                          Icons.bookmark_border,
-                          size: 20,
-                          color: context.tokens.textFaint,
                         ),
                       ],
                     ),

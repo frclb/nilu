@@ -97,7 +97,6 @@
   "health_library_cat_exercise": "Bewegung",
   "health_library_editor_choice": "Empfehlung der Redaktion",
   "health_library_recommended": "Für dich empfohlen",
-  "health_library_see_all": "Alle ansehen",
   "health_library_read_time": "{min} Min. Lesezeit",
   "health_library_read_time_short": "{min} Min.",
   "home_greeting_partner": "Zyklus der Partnerin",
@@ -315,7 +314,6 @@
   "personal_info_saved": "Daten aktualisiert",
   "recipe_favorited": "Zu Favoriten hinzugefügt",
   "recipe_favorite": "Zu Favoriten",
-  "share": "Teilen",
   "recipe_phase_follicular": "Follikelphase",
   "recipe_tag_energizing": "Energiespendend",
   "recipe_salmon_title": "Lachs-Quinoa-Salat",
@@ -1140,5 +1138,7 @@
   "appearance_icon_desc": "Du kannst ein schlichtes Symbol wählen, das auf dem Home-Bildschirm nicht auffällt. Der Name unter dem Symbol bleibt Nilu.",
   "appearance_icon_standard": "Standard",
   "appearance_icon_neutral": "Dezent",
-  "appearance_icon_failed": "Das Symbol konnte nicht geändert werden."
+  "appearance_icon_failed": "Das Symbol konnte nicht geändert werden.",
+  "assistant_send": "Fragen",
+  "calendar_has_log": "mit Einträgen"
 }

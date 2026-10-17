@@ -1,3 +1,4 @@
+import '../../../design_system/app_tappable.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 8),
-      child: GestureDetector(
+      child: AppTappable(
         onTap: () => Navigator.of(context).push(
           MaterialPageRoute<void>(
             builder: (_) => ArticleScreen(article: article),

@@ -325,14 +325,18 @@ class RecipeContentSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              Text(
-                item['name']!,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: textColor,
+              // Büyük yazıda ad sarıyor, miktar sağda kalıyor.
+              Expanded(
+                child: Text(
+                  item['name']!,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: textColor,
+                  ),
                 ),
               ),
+              const SizedBox(width: 12),
               Text(
                 item['amount']!,
                 style: TextStyle(fontSize: 14, color: mutedColor),

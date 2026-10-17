@@ -97,7 +97,6 @@
   "health_library_cat_exercise": "Egzersiz",
   "health_library_editor_choice": "Editörün Seçimi",
   "health_library_recommended": "Sizin İçin Önerilenler",
-  "health_library_see_all": "Tümünü Gör",
   "health_library_read_time": "{min} dk okuma",
   "health_library_read_time_short": "{min} dk",
   "home_greeting_partner": "Partnerinin Döngüsü",
@@ -315,7 +314,6 @@
   "personal_info_saved": "Bilgiler güncellendi",
   "recipe_favorited": "Favorilere eklendi!",
   "recipe_favorite": "Favorilere Ekle",
-  "share": "Paylaş",
   "recipe_phase_follicular": "Foliküler Faz",
   "recipe_tag_energizing": "Enerji Verici",
   "recipe_salmon_title": "Somonlu Kinoa Salatası",
@@ -1140,5 +1138,7 @@
   "appearance_icon_desc": "Ana ekranda dikkat çekmeyen sade bir simge seçebilirsin. Simgenin altındaki ad Nilu olarak kalır.",
   "appearance_icon_standard": "Standart",
   "appearance_icon_neutral": "Sade",
-  "appearance_icon_failed": "Simge değiştirilemedi."
+  "appearance_icon_failed": "Simge değiştirilemedi.",
+  "assistant_send": "Sor",
+  "calendar_has_log": "kayıt var"
 }

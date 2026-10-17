@@ -97,7 +97,6 @@
   "health_library_cat_exercise": "Exercício",
   "health_library_editor_choice": "Escolha do editor",
   "health_library_recommended": "Recomendado para você",
-  "health_library_see_all": "Ver tudo",
   "health_library_read_time": "{min} min de leitura",
   "health_library_read_time_short": "{min} min",
   "home_greeting_partner": "Ciclo da sua parceira",
@@ -315,7 +314,6 @@
   "personal_info_saved": "Dados atualizados",
   "recipe_favorited": "Adicionado aos favoritos",
   "recipe_favorite": "Adicionar aos favoritos",
-  "share": "Compartilhar",
   "recipe_phase_follicular": "Fase folicular",
   "recipe_tag_energizing": "Energizante",
   "recipe_salmon_title": "Salada de quinoa com salmão",
@@ -1140,5 +1138,7 @@
   "appearance_icon_desc": "Você pode escolher um ícone simples que não chama atenção na tela inicial. O nome abaixo do ícone continua Nilu.",
   "appearance_icon_standard": "Padrão",
   "appearance_icon_neutral": "Discreto",
-  "appearance_icon_failed": "Não foi possível alterar o ícone."
+  "appearance_icon_failed": "Não foi possível alterar o ícone.",
+  "assistant_send": "Perguntar",
+  "calendar_has_log": "com registros"
 }

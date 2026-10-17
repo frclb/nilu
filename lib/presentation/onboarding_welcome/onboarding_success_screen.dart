@@ -69,7 +69,7 @@ class OnboardingSuccessScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(width: 40), // Empty space for balance
+                    const SizedBox(width: 48), // Empty space for balance
                     Text(
                       AppInfo.displayName.toUpperCase(),
                       style: TextStyle(
@@ -80,8 +80,11 @@ class OnboardingSuccessScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(
-                      width: 40,
+                      width: 48,
                       child: IconButton(
+                        tooltip: MaterialLocalizations.of(
+                          context,
+                        ).closeButtonTooltip,
                         icon: const Icon(Icons.close),
                         color: context.tokens.textFaint,
                         onPressed: () => _completeOnboarding(context),

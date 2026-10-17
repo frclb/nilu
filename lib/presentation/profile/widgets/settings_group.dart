@@ -65,71 +65,75 @@ class SettingsGroup extends StatelessWidget {
 
               return Column(
                 children: [
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: item.onTap,
-                      borderRadius: isLast
-                          ? const BorderRadius.vertical(
-                              bottom: Radius.circular(12),
-                            )
-                          : index == 0
-                          ? const BorderRadius.vertical(
-                              top: Radius.circular(12),
-                            )
-                          : BorderRadius.zero,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? item.iconBgColor.withAlpha(12)
-                                    : item.iconBgColor,
-                                shape: BoxShape.circle,
+                  // Satır ve sağdaki anahtar tek öğe: VoiceOver anahtarı ayrı ve
+                  // etiketsiz okuyordu ("anahtar, kapalı" — neyin anahtarı?).
+                  MergeSemantics(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: item.onTap,
+                        borderRadius: isLast
+                            ? const BorderRadius.vertical(
+                                bottom: Radius.circular(12),
+                              )
+                            : index == 0
+                            ? const BorderRadius.vertical(
+                                top: Radius.circular(12),
+                              )
+                            : BorderRadius.zero,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? item.iconBgColor.withAlpha(12)
+                                      : item.iconBgColor,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  item.icon,
+                                  color: item.iconColor,
+                                  size: 20,
+                                ),
                               ),
-                              child: Icon(
-                                item.icon,
-                                color: item.iconColor,
-                                size: 20,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.title,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  if (item.subtitle != null) ...[
-                                    const SizedBox(height: 2),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
                                     Text(
-                                      item.subtitle!,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: context.tokens.textMuted,
+                                      item.title,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
+                                    if (item.subtitle != null) ...[
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        item.subtitle!,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: context.tokens.textMuted,
+                                        ),
+                                      ),
+                                    ],
                                   ],
-                                ],
-                              ),
-                            ),
-                            item.trailing ??
-                                Icon(
-                                  Icons.chevron_right,
-                                  color: isDark
-                                      ? context.tokens.textMuted
-                                      : context.tokens.textFaint,
                                 ),
-                          ],
+                              ),
+                              item.trailing ??
+                                  Icon(
+                                    Icons.chevron_right,
+                                    color: isDark
+                                        ? context.tokens.textMuted
+                                        : context.tokens.textFaint,
+                                  ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

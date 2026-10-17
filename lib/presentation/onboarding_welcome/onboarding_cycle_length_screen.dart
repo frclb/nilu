@@ -145,6 +145,9 @@ class _OnboardingCycleLengthScreenState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
+                      tooltip: MaterialLocalizations.of(
+                        context,
+                      ).backButtonTooltip,
                       icon: Icon(Icons.arrow_back, color: textColor),
                       onPressed: () => onboardingBack(context),
                     ),

@@ -97,7 +97,6 @@
   "health_library_cat_exercise": "Exercise",
   "health_library_editor_choice": "Editor's Choice",
   "health_library_recommended": "Recommended for You",
-  "health_library_see_all": "See All",
   "health_library_read_time": "{min} min read",
   "health_library_read_time_short": "{min} m",
   "home_greeting_partner": "Partner's Cycle",
@@ -315,7 +314,6 @@
   "personal_info_saved": "Details updated",
   "recipe_favorited": "Added to favorites",
   "recipe_favorite": "Add to Favorites",
-  "share": "Share",
   "recipe_phase_follicular": "Follicular Phase",
   "recipe_tag_energizing": "Energizing",
   "recipe_salmon_title": "Salmon Quinoa Salad",
@@ -1140,5 +1138,7 @@
   "appearance_icon_desc": "You can choose a plain icon that doesn't stand out on your home screen. The name under the icon stays Nilu.",
   "appearance_icon_standard": "Standard",
   "appearance_icon_neutral": "Discreet",
-  "appearance_icon_failed": "The icon couldn't be changed."
+  "appearance_icon_failed": "The icon couldn't be changed.",
+  "assistant_send": "Ask",
+  "calendar_has_log": "has entries"
 }

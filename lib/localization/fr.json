@@ -97,7 +97,6 @@
   "health_library_cat_exercise": "Exercice",
   "health_library_editor_choice": "Choix de la rédaction",
   "health_library_recommended": "Recommandé pour toi",
-  "health_library_see_all": "Tout voir",
   "health_library_read_time": "{min} min de lecture",
   "health_library_read_time_short": "{min} min",
   "home_greeting_partner": "Cycle de ta partenaire",
@@ -315,7 +314,6 @@
   "personal_info_saved": "Informations mises à jour",
   "recipe_favorited": "Ajouté aux favoris",
   "recipe_favorite": "Ajouter aux favoris",
-  "share": "Partager",
   "recipe_phase_follicular": "Phase folliculaire",
   "recipe_tag_energizing": "Énergisant",
   "recipe_salmon_title": "Salade de quinoa au saumon",
@@ -1140,5 +1138,7 @@
   "appearance_icon_desc": "Tu peux choisir une icône sobre qui passe inaperçue sur ton écran d'accueil. Le nom sous l'icône reste Nilu.",
   "appearance_icon_standard": "Standard",
   "appearance_icon_neutral": "Discret",
-  "appearance_icon_failed": "L'icône n'a pas pu être modifiée."
+  "appearance_icon_failed": "L'icône n'a pas pu être modifiée.",
+  "assistant_send": "Demander",
+  "calendar_has_log": "avec des notes"
 }

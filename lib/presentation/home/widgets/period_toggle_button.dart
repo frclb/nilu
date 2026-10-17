@@ -239,10 +239,7 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
               onPressed: _busy ? null : () => _undo(undo),
               icon: const Icon(Icons.undo, size: 18),
               label: Text(context.tr('home_period_undo')),
-              style: TextButton.styleFrom(
-                foregroundColor: t.textMuted,
-                visualDensity: VisualDensity.compact,
-              ),
+              style: TextButton.styleFrom(foregroundColor: t.textMuted),
             ),
         ],
       ),

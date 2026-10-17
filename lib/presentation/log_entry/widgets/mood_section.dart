@@ -1,3 +1,4 @@
+import '../../../design_system/app_tappable.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_scrim.dart';
 import '../../../design_system/app_tokens.dart';
@@ -74,7 +75,8 @@ class _MoodSectionState extends State<MoodSection> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(moods.length, (index) {
               final isSelected = _selectedIndex == index;
-              return GestureDetector(
+              return AppTappable(
+                selected: isSelected,
                 onTap: () {
                   setState(() {
                     _selectedIndex = index;

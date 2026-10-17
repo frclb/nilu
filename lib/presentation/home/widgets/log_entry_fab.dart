@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/navigation/navigation_service.dart';
 import '../../../core/navigation/route_names.dart';
+import '../../../localization/app_localizations.dart';
 
 /// Günlük kayıt ekranını açan "+" düğmesi.
 ///
@@ -16,6 +17,9 @@ class LogEntryFab extends StatelessWidget {
   Widget build(BuildContext context) => FloatingActionButton(
     key: const Key('log_entry_fab'),
     heroTag: 'home_fab',
+    // VoiceOver "Kayıt Ekle, düğme" desin; yalnızca "+" simgesi bir şey
+    // söylemiyor.
+    tooltip: context.tr('log_title'),
     onPressed: () => NavigationService().push(RouteNames.logEntry),
     backgroundColor: Theme.of(context).colorScheme.primary,
     foregroundColor: Theme.of(context).colorScheme.onPrimary,

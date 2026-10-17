@@ -35,6 +35,7 @@ class PremiumScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.of(context).pop(),
         ),

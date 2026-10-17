@@ -1,3 +1,4 @@
+import '../../../design_system/app_tappable.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_scrim.dart';
 import '../../../design_system/app_tokens.dart';
@@ -68,7 +69,8 @@ class _SymptomsSectionState extends State<SymptomsSection> {
             children: List.generate(symptoms.length, (index) {
               final code = codes[index];
               final isSelected = _selected.contains(code);
-              return GestureDetector(
+              return AppTappable(
+                selected: isSelected,
                 onTap: () {
                   setState(() {
                     if (isSelected) {
@@ -80,9 +82,10 @@ class _SymptomsSectionState extends State<SymptomsSection> {
                   widget.onChanged(_selected.toList());
                 },
                 child: Container(
+                  // Dikey 12: çip 44 pt'nin altında kalmasın.
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
-                    vertical: 10,
+                    vertical: 12,
                   ),
                   decoration: BoxDecoration(
                     color: isSelected

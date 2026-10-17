@@ -44,12 +44,15 @@ class DailySuggestionCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  context.tr('home_daily_suggestion_title'),
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    letterSpacing: -0.5,
+                // Büyük yazıda başlık sarıyor; düğme yerinde kalıyor.
+                Expanded(
+                  child: Text(
+                    context.tr('home_daily_suggestion_title'),
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      letterSpacing: -0.5,
+                    ),
                   ),
                 ),
                 // Dokunma hedefi 10 piksellik bir yazıydı — parmakla
@@ -62,7 +65,6 @@ class DailySuggestionCard extends StatelessWidget {
                     minimumSize: const Size(0, 44),
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity.compact,
                   ),
                   child: Text(
                     context.tr('home_see_all'),
