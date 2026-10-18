@@ -21,6 +21,14 @@
 	<key>com.apple.developer.healthkit</key>
 	<true/>
 	<!--
+	  Apple ile giriş (isteğe bağlı hesap ve bulut eşitleme). Apple
+	  Developer'da App ID'de "Sign in with Apple" capability açık olmalı.
+	-->
+	<key>com.apple.developer.applesignin</key>
+	<array>
+		<string>Default</string>
+	</array>
+	<!--
 	  `aps-environment` (push) BİLEREK yok. Uygulama push göndermiyor:
 	  hatırlatıcılar cihazda planlanan yerel bildirimler. Önceden FCM jetonu
 	  toplanıp sunucuya yazılıyordu ama hiçbir şey gönderilmiyordu.

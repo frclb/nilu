@@ -213,9 +213,15 @@ Aynı zincir her push'ta GitHub Actions'ta da koşuyor (`.github/workflows/ci.ym
 
 **Birim ve ekran testleri** (`flutter test`, 2300'ü aşkın test, Ekim 2026):
 döngü ve tahmin hesabı, hatırlatıcı planı, şifreli depolama, yedek
-şifreleme, içe/dışa aktarma, partner kuralları, her ekranın üç cihaz
-boyutunda çizilmesi, erişilebilirlik taraması (etiketsiz dokunma hedefi,
-44 pt altı hedef, büyük yazıda taşma), kontrast, yerelleştirme.
+şifreleme, içe/dışa aktarma, partner kuralları, bulut eşitleme (iki cihazın
+birleşmesi, boş cihazın buluta yazmaması, bozuk kopyanın reddi, rıza
+olmadan yükleme olmaması, hesap silmede yeniden doğrulama), her ekranın üç
+cihaz boyutunda çizilmesi, erişilebilirlik taraması (etiketsiz dokunma
+hedefi, 44 pt altı hedef, büyük yazıda taşma), kontrast, yerelleştirme.
+
+Apple ve Google ile girişin kendisi testte sahte bir kimlik kaynağıyla
+deneniyor (`test/support/fake_sync.dart`); gerçek giriş ancak Firebase
+yapılandırılıp (SETUP_KEYS.md §7) imzalı bir derlemeyle cihazda denenebilir.
 
 **Firestore kuralları** (Node 22 ve Java 21 gerekir; hesap gerekmez, yerel
 emülatör `demo-nilu` projesiyle çalışır):

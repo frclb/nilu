@@ -15,6 +15,7 @@ void main() {
 
   const appId = 'ca-app-pub-1234567890123456~1234567890';
   const banner = 'ca-app-pub-1234567890123456/0987654321';
+  const tersKimlik = 'com.googleusercontent.apps.123-abc';
 
   void yaz(String yol, String icerik) {
     final f = File('${kok.path}/$yol')..createSync(recursive: true);
@@ -41,11 +42,20 @@ class ReleaseConfig {
     yaz('lib/core/release_config.dart', configMetni ?? config());
     yaz(
       'ios/Runner/Info.plist',
-      '<dict><key>GADApplicationIdentifier</key><string>$appId</string></dict>',
+      '<dict><key>GADApplicationIdentifier</key><string>$appId</string>'
+          '<key>CFBundleURLSchemes</key><array><string>$tersKimlik</string>'
+          '</array></dict>',
     );
     yaz(
       'ios/Runner/GoogleService-Info.plist',
-      '<dict><key>BUNDLE_ID</key><string>com.furkan.rcperiodtracker</string></dict>',
+      '<dict><key>BUNDLE_ID</key><string>com.furkan.rcperiodtracker</string>'
+          '<key>REVERSED_CLIENT_ID</key><string>$tersKimlik</string>'
+          '<key>GOOGLE_APP_ID</key><string>1:123:ios:abc</string></dict>',
+    );
+    yaz(
+      'ios/Runner/Runner.entitlements',
+      '<dict><key>com.apple.developer.applesignin</key>'
+          '<array><string>Default</string></array></dict>',
     );
     yaz(
       'ios/Runner.xcodeproj/project.pbxproj',
@@ -88,7 +98,8 @@ class ReleaseConfig {
     yaz(
       'ios/Runner/Info.plist',
       '<dict><key>GADApplicationIdentifier</key>'
-          '<string>ca-app-pub-1234567890123456~1111111111</string></dict>',
+          '<string>ca-app-pub-1234567890123456~1111111111</string>'
+          '<string>$tersKimlik</string></dict>',
     );
     expect(
       checkRelease(kok).single.what,
@@ -103,6 +114,41 @@ class ReleaseConfig {
     final eksikler = checkRelease(kok).map((i) => i.what).join('\n');
     expect(eksikler, contains('RevenueCat'));
     expect(eksikler, contains('Destek e-postası'));
+  });
+
+  group('hesapla giriş', () {
+    test('Google dönüş adresi hâlâ yer tutucuysa yakalanıyor', () {
+      doluProje();
+      yaz(
+        'ios/Runner/Info.plist',
+        '<dict><key>GADApplicationIdentifier</key><string>$appId</string>'
+            '<string>com.googleusercontent.apps.YER-TUTUCU</string></dict>',
+      );
+      final eksik = checkRelease(kok).single;
+      expect(eksik.what, contains('Google ile giriş'));
+      expect(eksik.how, contains(tersKimlik));
+    });
+
+    test('kodlanmış uygulama kimliği de geçerli dönüş adresi', () {
+      doluProje();
+      yaz(
+        'ios/Runner/Info.plist',
+        '<dict><key>GADApplicationIdentifier</key><string>$appId</string>'
+            '<string>app-1-123-ios-abc</string></dict>',
+      );
+      expect(checkRelease(kok), isEmpty);
+    });
+
+    test('Apple ile giriş yetkisi yoksa yakalanıyor', () {
+      doluProje();
+      yaz('ios/Runner/Runner.entitlements', '<dict></dict>');
+      expect(checkRelease(kok).single.what, contains('Apple ile giriş'));
+    });
+
+    test('bugünkü proje: yetki var, dönüş adresi hesap bekliyor', () {
+      final eksikler = checkRelease(Directory.current).map((i) => i.what);
+      expect(eksikler, isNot(contains(contains('Apple ile giriş'))));
+    });
   });
 
   group('reklam birimi', () {

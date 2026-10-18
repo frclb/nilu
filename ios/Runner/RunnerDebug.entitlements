@@ -16,6 +16,8 @@
   Bu yapılandırmada ÇALIŞMAYANLAR:
     * Sağlık senkronizasyonu (HealthKit yok)
     * Ana ekran widget'ı (App Group yok — veri paylaşılamıyor)
+    * Apple ile giriş (kişisel takımlar bu yetkiyi de vermiyor; Google ile
+      giriş çalışır)
 
   Ücretli Apple Developer Program üyeliği alındığında bu dosyaya gerek
   kalmaz: Debug'ın CODE_SIGN_ENTITLEMENTS ayarı `Runner/Runner.entitlements`

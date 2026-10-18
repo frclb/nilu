@@ -92,7 +92,7 @@ List<ReleaseIssue> checkRelease(Directory root) {
     issues.add(
       const ReleaseIssue(
         'Destek e-postası (ReleaseConfig.supportEmail)',
-        'Politika §9 ve Şartlar §12 bu adresi gösteriyor; kullanıcı haklarını '
+        'Politika §10 ve Şartlar §12 bu adresi gösteriyor; kullanıcı haklarını '
             'buradan kullanacak',
       ),
     );
@@ -137,7 +137,8 @@ List<ReleaseIssue> checkRelease(Directory root) {
         ),
       );
     }
-    final bundle = _plistAnahtar(gsi.readAsStringSync(), 'BUNDLE_ID');
+    final gsiMetni = gsi.readAsStringSync();
+    final bundle = _plistAnahtar(gsiMetni, 'BUNDLE_ID');
     if (bundle != null && bundle != 'com.furkan.rcperiodtracker') {
       issues.add(
         ReleaseIssue(
@@ -146,6 +147,42 @@ List<ReleaseIssue> checkRelease(Directory root) {
         ),
       );
     }
+
+    // Google ile giriş sayfası uygulamaya bu adresle dönüyor. Firebase
+    // REVERSED_CLIENT_ID'yi, o yoksa kodlanmış uygulama kimliğini kullanır.
+    final tersKimlik = _plistAnahtar(gsiMetni, 'REVERSED_CLIENT_ID');
+    final uygulama = _plistAnahtar(gsiMetni, 'GOOGLE_APP_ID');
+    final beklenen = [
+      ?tersKimlik,
+      if (uygulama != null) 'app-${uygulama.replaceAll(':', '-')}',
+    ];
+    if (!beklenen.any((s) => plist.contains('<string>$s</string>'))) {
+      issues.add(
+        ReleaseIssue(
+          'Google ile giriş dönüş adresi (Info.plist → CFBundleURLSchemes)',
+          tersKimlik == null
+              ? 'Firebase → Authentication → Google sağlayıcısını aç, '
+                    'GoogleService-Info.plist\'i yeniden indir; içindeki '
+                    'REVERSED_CLIENT_ID\'yi Info.plist\'e yaz. SETUP_KEYS.md §7'
+              : 'ios/Runner/Info.plist içinde YER-TUTUCU yerine $tersKimlik',
+        ),
+      );
+    }
+  }
+
+  // ── Apple ile giriş ──
+  final yetkiler = f('ios/Runner/Runner.entitlements');
+  if (!yetkiler.existsSync() ||
+      !yetkiler.readAsStringSync().contains(
+        'com.apple.developer.applesignin',
+      )) {
+    issues.add(
+      const ReleaseIssue(
+        'Apple ile giriş yetkisi (Runner.entitlements)',
+        'com.apple.developer.applesignin = [Default]; App ID\'de "Sign in '
+            'with Apple" capability. SETUP_KEYS.md §7',
+      ),
+    );
   }
   final firebaserc = f('.firebaserc');
   String? proje;

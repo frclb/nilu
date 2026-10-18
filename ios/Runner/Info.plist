@@ -31,6 +31,24 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<!--
+	  Google ile giriş: Google'ın giriş sayfası uygulamaya bu adresle döner.
+	  Değer GoogleService-Info.plist'teki REVERSED_CLIENT_ID (Firebase'de
+	  Google sağlayıcısı açıldıktan SONRA indirilen dosyada bulunur).
+	  `dart run tool/check_release.dart` ikisinin aynı olduğunu denetler.
+	  SETUP_KEYS.md §7.
+	-->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.YER-TUTUCU</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>GADApplicationIdentifier</key>

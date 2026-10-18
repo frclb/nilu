@@ -11,10 +11,12 @@ import 'localization/supported_locales.dart';
 import 'core/navigation/app_router.dart';
 import 'domain/view_models/theme_view_model.dart';
 import 'data/datasources/ads_datasource.dart';
+import 'presentation/account/cloud_sync_trigger.dart';
 import 'presentation/lock/app_lock_gate.dart';
 import 'presentation/reminders/reminder_sync.dart';
 import 'presentation/widgets_preview/home_widget_sync.dart';
 import 'presentation/calendar/view_models/calendar_view_model.dart';
+import 'domain/view_models/account_view_model.dart';
 import 'domain/view_models/intimacy_view_model.dart';
 import 'domain/view_models/partner_view_model.dart';
 import 'domain/view_models/pregnancy_view_model.dart';
@@ -51,8 +53,15 @@ void main() async {
 
   // UserViewModel'ı önceden oluştur (router'a ihtiyaç duyduğu için)
   final userViewModel = UserViewModel();
+  // İsteğe bağlı hesap ve bulut eşitleme. Firebase hazır olunca tazeleniyor.
+  final accountViewModel = AccountViewModel();
 
-  runApp(PeriodTrackerApp(userViewModel: userViewModel));
+  runApp(
+    PeriodTrackerApp(
+      userViewModel: userViewModel,
+      accountViewModel: accountViewModel,
+    ),
+  );
 
   // Ağ bağımlı SDK'lar ilk kareden **sonra** başlıyor.
   //
@@ -64,17 +73,36 @@ void main() async {
   // Hiçbiri ilk kare için gerekli değil: ana ekran yalnızca cihazdaki
   // veriyi gösteriyor. Üçü birden ve paralel başlıyor; bitince kimlik
   // durumu tazeleniyor.
-  unawaited(_startServices(userViewModel));
+  unawaited(_startServices(userViewModel, accountViewModel));
 }
 
 /// SDK'ları ilk kareden sonra, hep birlikte başlatır.
-Future<void> _startServices(UserViewModel userViewModel) async {
+Future<void> _startServices(
+  UserViewModel userViewModel,
+  AccountViewModel accountViewModel,
+) async {
+  // `init` kendi hatasını yakalıyor; bu Future hiç hata vermiyor.
+  final firebase = FirebaseConfig.init();
   await Future.wait([
-    _bootstrap('Firebase', FirebaseConfig.init),
+    _bootstrap('Firebase', () => firebase),
     _bootstrap('RevenueCat', SubscriptionService.init),
     _bootstrap('Ads', AdsDatasource.init),
   ]);
   await userViewModel.refreshAuthState();
+  await accountViewModel.refresh();
+
+  // Firebase süre sınırını aştıysa başlatma arka planda sürüyor. Bittiğinde
+  // kimlik ve hesap yeniden okunmalı: yoksa giriş yapmış kullanıcı bir
+  // sonraki açılışa kadar "giriş yapılmadı" görüyor ve eşitleme başlamıyor.
+  if (!FirebaseConfig.isAvailable) {
+    unawaited(
+      firebase.then((_) async {
+        if (!FirebaseConfig.isAvailable) return;
+        await userViewModel.refreshAuthState();
+        await accountViewModel.refresh();
+      }),
+    );
+  }
 }
 
 /// Açılışta bir SDK'yı başlatır; [limit] içinde bitmezse vazgeçer.
@@ -98,7 +126,14 @@ Future<void> _bootstrap(
 class PeriodTrackerApp extends StatefulWidget {
   final UserViewModel userViewModel;
 
-  const PeriodTrackerApp({super.key, required this.userViewModel});
+  /// Verilmezse uygulama kendisi kuruyor (testler).
+  final AccountViewModel? accountViewModel;
+
+  const PeriodTrackerApp({
+    super.key,
+    required this.userViewModel,
+    this.accountViewModel,
+  });
 
   @override
   State<PeriodTrackerApp> createState() => _PeriodTrackerAppState();
@@ -114,11 +149,15 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
   /// sıçramasının sebebi buydu.
   late final GoRouter _router = createAppRouter(widget.userViewModel);
 
+  late final AccountViewModel _account =
+      widget.accountViewModel ?? AccountViewModel();
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: widget.userViewModel),
+        ChangeNotifierProvider.value(value: _account),
         ChangeNotifierProvider(create: (_) => PregnancyViewModel()..load()),
 
         // Takvim koruması evreyi gebelik ViewModel'inden alıyor. Gebelik
@@ -223,11 +262,14 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
                 behavior: HitTestBehavior.translucent,
                 onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
                 // Widget kilidin dışında: uygulama kilitliyken de ana
-                // ekran widget'ının günü doğru kalsın.
+                // ekran widget'ının günü doğru kalsın. Bulut eşitleme de:
+                // öne gelince kilit açılmadan önce başlayabilir.
                 child: HomeWidgetSync(
-                  child: AppLockGate(
-                    child: ReminderSync(
-                      child: child ?? const SizedBox.shrink(),
+                  child: CloudSyncTrigger(
+                    child: AppLockGate(
+                      child: ReminderSync(
+                        child: child ?? const SizedBox.shrink(),
+                      ),
                     ),
                   ),
                 ),

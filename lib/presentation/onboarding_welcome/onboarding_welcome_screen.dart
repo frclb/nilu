@@ -213,7 +213,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                       left: 24,
                       right: 24,
                       top: 16,
-                      bottom: 24,
+                      bottom: 8,
                     ),
                     decoration: BoxDecoration(color: bgColor.withAlpha(204)),
                     // Nokta göstergesi ve düğmeler metinle aynı genişlikte:
@@ -248,7 +248,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                             }),
                           ),
 
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 24),
 
                           // CTA Button
                           ElevatedButton(
@@ -283,7 +283,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                           OutlinedButton(
                             onPressed: () {
                               context.pushNamed(RouteNames.partnerScan);
@@ -304,6 +304,25 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                          // Yeni cihaz: buluttaki kayıtları geri al. Hesap
+                          // isteğe bağlı olduğu için ikincil bir bağlantı.
+                          TextButton(
+                            key: const Key('onboarding_restore'),
+                            onPressed: () {
+                              context.pushNamed(RouteNames.accountRestore);
+                            },
+                            style: TextButton.styleFrom(
+                              foregroundColor: textColor.withAlpha(178),
+                              minimumSize: const Size(double.infinity, 44),
+                            ),
+                            child: Text(
+                              context.tr('onboarding_restore'),
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),

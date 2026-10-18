@@ -13,6 +13,7 @@ import 'package:period_tracker/domain/view_models/partner_view_model.dart';
 import 'package:period_tracker/domain/view_models/pregnancy_view_model.dart';
 import 'package:period_tracker/domain/view_models/subscription_view_model.dart';
 import 'package:period_tracker/domain/view_models/theme_view_model.dart';
+import 'package:period_tracker/domain/view_models/account_view_model.dart';
 import 'package:period_tracker/domain/view_models/user_view_model.dart';
 import 'package:period_tracker/localization/app_localizations.dart';
 import 'package:period_tracker/presentation/calendar/view_models/calendar_view_model.dart';
@@ -56,12 +57,17 @@ Widget wrapWithProviders(
   UserViewModel? userViewModel,
   PartnerViewModel? partnerViewModel,
   SubscriptionViewModel? subscriptionViewModel,
+  AccountViewModel? accountViewModel,
 }) => MultiProvider(
   providers: [
     if (userViewModel != null)
       ChangeNotifierProvider.value(value: userViewModel)
     else
       ChangeNotifierProvider(create: (_) => UserViewModel()),
+    if (accountViewModel != null)
+      ChangeNotifierProvider.value(value: accountViewModel)
+    else
+      ChangeNotifierProvider(create: (_) => AccountViewModel()),
     ChangeNotifierProvider(create: (_) => PregnancyViewModel()..load()),
 
     // Takvim koruması evreyi gebelik ViewModel'inden alıyor. Gebelik
@@ -194,6 +200,7 @@ Future<GoRouter> pumpRouter(
   GoRouter? router,
   UserViewModel? userViewModel,
   SubscriptionViewModel? subscriptionViewModel,
+  AccountViewModel? accountViewModel,
 }) async {
   tester.view.physicalSize = size * 3;
   tester.view.devicePixelRatio = 3;
@@ -214,6 +221,7 @@ Future<GoRouter> pumpRouter(
       wrapWithProviders(
         userViewModel: userViewModel,
         subscriptionViewModel: subscriptionViewModel,
+        accountViewModel: accountViewModel,
         MaterialApp.router(
           theme: AppTheme.light(AppFlavor.plum),
           localizationsDelegates: const [

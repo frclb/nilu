@@ -72,7 +72,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
   ///
   /// Sözlükte `privacy_policy_section1..N` anahtarları var; sayı burada
   /// tek yerde duruyor ve testi bu ikisinin uyuştuğunu doğruluyor.
-  static const int _sectionCount = 10;
+  static const int _sectionCount = 11;
 
   Widget _buildSection(
     BuildContext context,

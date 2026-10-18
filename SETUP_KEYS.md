@@ -137,12 +137,13 @@ Sonra iki App ID:
 
 | App ID | Capability |
 |---|---|
-| `com.furkan.rcperiodtracker` | HealthKit, App Groups |
+| `com.furkan.rcperiodtracker` | HealthKit, App Groups, Sign in with Apple |
 | `com.furkan.rcperiodtracker.CycleWidget` | App Groups |
 
-Bunlar `ios/Runner/Runner.entitlements` ile **eşleşmek zorunda**. (Sign in with
-Apple kaldırıldı; portalda açıksa kapatılabilir.) Portalda
-kapalı bir yeteneği yetki dosyası isterse imzalama şu hatayla duruyor:
+Bunlar `ios/Runner/Runner.entitlements` ile **eşleşmek zorunda**. Sign in with
+Apple isteğe bağlı hesap ve bulut eşitleme için (bkz. §7.3); "Enable as a
+primary App ID" seçili kalsın. Portalda kapalı bir yeteneği yetki dosyası
+isterse imzalama şu hatayla duruyor:
 
 ```
 Provisioning profile "..." doesn't include the ... entitlement
@@ -377,16 +378,19 @@ tıklama** — geçersiz trafik hesabı kapattırıyor ve geri dönüşü zor.
 
 ## 7. Firebase
 
-Partner eşleşmesi için. Uygulamanın geri kalanı Firebase'siz çalışıyor;
-yapılandırılmazsa partner ekranı eşleşmenin kullanılamadığını söylüyor.
+Partner eşleşmesi ve isteğe bağlı hesap / bulut eşitleme için. Uygulamanın
+geri kalanı Firebase'siz çalışıyor; yapılandırılmazsa partner ekranı
+eşleşmenin, hesap ekranı girişin kullanılamadığını söylüyor.
 
 **7.1 Proje:** [console.firebase.google.com](https://console.firebase.google.com)
 → yeni proje (Analytics **kapalı**: uygulama analiz kullanmıyor ve gizlilik
 politikası bunu söylüyor). Konum: `eur3` (Avrupa) — KVKK ve GDPR açısından
-Türkiye'ye en yakın seçenek; politika §5 sunucuların yurt dışında olabileceğini
-zaten söylüyor.
+Türkiye'ye en yakın seçenek; politika §4 ve §6 sunucuların yurt dışında
+olabileceğini söylüyor, eşitleme de bunun için açık rıza alıyor.
 
-**7.2 iOS uygulaması ve yapılandırma dosyası:**
+**7.2 iOS uygulaması ve yapılandırma dosyası:** önce 7.3'teki Google
+sağlayıcısını aç, **sonra** dosyayı indir — Google açılmadan indirilen dosyada
+`REVERSED_CLIENT_ID` yok ve Google ile giriş dönüş adresini bulamıyor.
 
 ```bash
 dart pub global activate flutterfire_cli
@@ -397,9 +401,26 @@ flutterfire configure --platforms=ios
 (denetleyici ikisini de kontrol ediyor). Uygulama `Firebase.initializeApp()`'i
 seçeneksiz çağırıyor, yani `firebase_options.dart` gerekmiyor.
 
-**7.3 Anonim giriş:** Authentication → Sign-in method → **Anonymous** → aç.
-Partner eşleşmesi anonim bir kimlikle çalışıyor (e-posta, ad, hesap yok);
-kimlik yalnızca eşleşme başlatılınca açılıyor.
+Ardından `ios/Runner/Info.plist` → `CFBundleURLSchemes` içindeki
+`com.googleusercontent.apps.YER-TUTUCU` yerine dosyadaki
+`REVERSED_CLIENT_ID`'yi yaz. Denetleyici ikisinin aynı olduğuna bakıyor.
+
+**7.3 Giriş yöntemleri:** Authentication → Sign-in method:
+
+- **Anonymous** → aç. Partner eşleşmesi anonim bir kimlikle çalışıyor (e-posta,
+  ad yok); kimlik yalnızca eşleşme başlatılınca açılıyor.
+- **Google** → aç, destek e-postasını seç.
+- **Apple** → aç. iOS'ta yerel "Apple ile giriş" kullanılıyor, Services ID
+  gerekmiyor. Ama hesap silinirken Apple jetonunun iptali (App Store kuralı
+  5.1.1(v)) için **OAuth code flow** alanları doldurulmalı: Apple Developer →
+  Keys → yeni anahtar, "Sign in with Apple" işaretli → `.p8` dosyası, Key ID
+  ve Team ID Firebase'deki Apple sağlayıcısına girilir.
+- Settings → **User account linking** → "Link accounts that use the same
+  email" (varsayılan). Partner için açılmış anonim kimliğe hesap
+  bağlanıyor (`linkWithProvider`), uid değişmiyor.
+
+Hesap isteğe bağlı: giriş tek başına hiçbir sağlık verisi göndermiyor; bulut
+eşitleme ayrı bir açık rızayla açılıyor (`sync_consent_sheet.dart`).
 
 **7.4 Firestore ve kurallar:**
 
@@ -420,9 +441,11 @@ ya her şeyi kapatır ya her şeyi açar.
 cd firebase_tests && npm install && npm test
 ```
 
-Emülatörde gerçek kural motoruyla 20 senaryo: partnerin kendini listeye
+Emülatörde gerçek kural motoruyla 28 senaryo: partnerin kendini listeye
 ekleyemediği, yalnızca kendini çıkarabildiği, onaysız okuyamadığı, davet
-kodunun yalnızca sahibince iptal edildiği… CI'da da koşuyor.
+kodunun yalnızca sahibince iptal edildiği; bulut kopyasını yalnızca Apple ya
+da Google ile girmiş sahibin okuyup yazabildiği, anonim kimliğin ve onaylı
+partnerin bile göremediği… CI'da da koşuyor.
 
 **7.6 İsteğe bağlı sertleştirme — App Check:** Firestore'a yalnızca gerçek
 uygulamanın erişmesini sağlar (App Attest). Yeni bir paket ve App Attest

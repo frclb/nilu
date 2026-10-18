@@ -188,36 +188,51 @@ Aşağıdakiler **koddan çıkarılmıştır** — formu buna göre doldurun.
 
 | Kategori | Alanlar | Nerede durur | Paylaşılır mı |
 |---|---|---|---|
-| Sağlık ve fitness | Regl tarihleri, semptomlar, ruh hâli, akış yoğunluğu, cinsel aktivite, döngü ayarları | Cihazda **şifreli** (`SecureStore`) | Hayır |
+| Sağlık ve fitness | Regl tarihleri, semptomlar, ruh hâli, akış yoğunluğu, cinsel aktivite, gebelik testi, gebelik/lohusalık kayıtları, ölçümler, notlar, döngü ayarları | Cihazda **şifreli** (`SecureStore`); **bulut eşitleme açıksa** (açık rızayla) hesaba bağlı olarak Firestore'da (`syncData/{uid}`) | Hayır |
 | Hassas kişisel | Yakınlık/cinsel istek seçimleri | Cihazda **şifreli** | Yalnızca kullanıcı açıkça eşleşirse partnerine |
-| Kişisel bilgi | Ad, e-posta, doğum tarihi | Cihazda **şifreli** | Hayır |
-| Tanımlayıcı | Anonim kullanıcı kimliği, partner kimliği — **yalnızca partner eşleşmesi başlatılırsa** | Cihaz + Firestore | Hayır |
+| Kişisel bilgi | Profildeki ad, e-posta, doğum tarihi | Cihazda **şifreli**; bulut eşitleme açıksa Firestore'da | Hayır |
+| İletişim bilgisi | Hesabın e-postası ve adı — **yalnızca Apple ya da Google ile giriş yapılırsa** | Firebase Authentication | Hayır |
+| Tanımlayıcı | Anonim kullanıcı kimliği, partner kimliği — **yalnızca partner eşleşmesi başlatılırsa**; hesap kimliği — **yalnızca giriş yapılırsa** | Cihaz + Firebase | Hayır |
 | Cihaz kimliği | Reklam SDK'sı (kişiselleştirilmemiş reklam) | Google AdMob | Hayır |
 | Satın alma | Abonelik durumu | RevenueCat açıksa | Hayır |
 
 **Önemli:** Firebase yapılandırma dosyası eklenmediği sürece uygulama
-**yerel-only** çalışır; hiçbir veri cihazdan çıkmaz. Firebase'i açtığınızda
-yukarıdaki "Firestore" satırları geçerli olur ve beyanı güncellemelisiniz.
+**yerel-only** çalışır; hiçbir veri cihazdan çıkmaz. Yayın derlemesinde
+Firebase açık olacağı için beyan aşağıdaki gibi, **isteğe bağlı** toplamayı da
+kapsayarak yapılmalı — Apple isteğe bağlı toplanan veriyi de beyan istiyor.
 
 ### Apple — App Privacy
 - "Data Used to Track You": **Hayır** (reklamlar kişiselleştirilmiyor, ATT istenmiyor)
-- "Data Linked to You": Health & Fitness (yalnızca partnerle paylaşılan
-  yakınlık durumu), Identifiers (anonim kimlik, partner eşleşmesi),
-  Purchases. Ad, e-posta ve doğum tarihi cihazdan çıkmıyor; Contact Info
-  beyan edilmemeli.
-- "Data Not Linked to You": Device ID (reklam)
-- "Data Not Collected": Firebase kapalıyken hepsi
+- "Data Linked to You" (amaç: **App Functionality**; hiçbiri izleme ya da
+  reklam için değil):
+  - **Health & Fitness → Health**: bulut eşitleme açıksa kayıtların kopyası;
+    partner paylaşımı açıksa yakınlık durumu
+  - **Contact Info → Email Address, Name**: Apple ya da Google ile giriş
+    yapılırsa (Apple'da e-posta gizlenebiliyor)
+  - **User Content → Other User Content**: eşitleme açıksa gün notları
+  - **Identifiers → User ID**: hesap kimliği ya da partner için anonim kimlik
+  - **Purchases → Purchase History**: abonelik (RevenueCat)
+- "Data Not Linked to You": **Identifiers → Device ID** (reklam,
+  kişiselleştirilmemiş)
+- Formda her kategoride "optional" ayrımı yok; açıklama alanı olmadığı için
+  politika §4 isteğe bağlı olduğunu anlatıyor.
 
 ### Hesap silme ✅
 Apple, hesap oluşturan uygulamalarda **uygulama içinden hesap silmeyi**
 zorunlu tutar (App Store Review Guideline 5.1.1(v)).
-Profil → Gizlilik → Hesabımı Sil; yerel veriyle birlikte Firestore'daki
-profil, loglar ve yakınlık dokümanı da siliniyor, ardından kimliğin kendisi
-kaldırılıyor. (Önceden yalnızca cihazdaki veri siliniyordu — bağlı partner
-hesap silindikten sonra da veriyi okuyabiliyordu.)
+
+- Profil → **Hesap ve bulut yedeği → Hesabı sil**: kimlik yeniden
+  doğrulanıyor, Apple ile girildiyse Apple jetonu iptal ediliyor
+  (`revokeTokenWithAuthorizationCode`), bulut kopyası, partner verisi ve
+  kimlik siliniyor. Cihazdaki kayıtlar kalıyor.
+- Profil → Gizlilik → **Tüm verilerimi sil**: giriş yapılmışsa önce aynı hesap
+  silme akışı, sonra cihazdaki her şey. Doğrulamadan vazgeçilirse hiçbir şey
+  silinmiyor.
+- Apple jetonunun iptali için Firebase'deki Apple sağlayıcısına anahtar
+  girilmeli (SETUP_KEYS.md §7.3).
 
 ### Destek e-postası ⬜ — **engelleyici**
-Politikanın 9. bölümü (haklar) ve Şartların 12. bölümü (iletişim) aynı
+Politikanın 10. bölümü (haklar) ve Şartların 12. bölümü (iletişim) aynı
 adresi gösteriyor; adres `lib/core/app_info.dart` → `AppInfo.supportEmail`.
 Boşken ekranda dilin köşeli parantezli yer tutucusu görünüyor
 (`legal_email_placeholder`) — bilerek: gözden kaçmasın.

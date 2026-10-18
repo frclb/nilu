@@ -315,6 +315,18 @@ class UserViewModel extends ChangeNotifier {
     return deleted;
   }
 
+  /// Hesap silindi ama bu cihazdaki kayıtlar kalıyor (Profil → Hesap →
+  /// "Hesabı sil"). Kimlik ve partner bağlantısı silinmiş hesaba aitti;
+  /// bu cihazda onlara işaret eden bir şey kalmamalı. Onboarding durumu
+  /// değişmiyor: kullanıcı kendi döngüsünü kullanmaya devam ediyor.
+  Future<void> forgetIdentity() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('myId');
+    await prefs.remove(_requestTokenKey);
+    _myId = null;
+    await setPartnerState(isPartner: false, partnerId: null);
+  }
+
   /// Yerel veri tamamen silindikten sonra durumu sıfırdan okur.
   /// (Profil → "Tüm verilerimi sil" akışı bunu çağırır.)
   Future<void> reloadAfterDataWipe() async {

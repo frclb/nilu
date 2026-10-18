@@ -23,7 +23,8 @@ Yükleme bunlardan birini atlarsa ya derleme durur ya inceleme reddeder.
 | Destek e-postası | ⬜ **engelleyici** | `lib/core/release_config.dart` |
 | RevenueCat anahtarı + `premium` entitlement | ⬜ | [SETUP_KEYS.md §5](SETUP_KEYS.md) |
 | Gerçek AdMob kimlikleri (+ Info.plist) | ⬜ | [SETUP_KEYS.md §6](SETUP_KEYS.md) |
-| Firebase: `GoogleService-Info.plist`, anonim giriş, kurallar | ⬜ | [SETUP_KEYS.md §7](SETUP_KEYS.md) |
+| Firebase: `GoogleService-Info.plist`, anonim + Apple + Google giriş, Google dönüş adresi, kurallar | ⬜ | [SETUP_KEYS.md §7](SETUP_KEYS.md) |
+| App ID'de "Sign in with Apple" | ⬜ | [SETUP_KEYS.md §2](SETUP_KEYS.md) |
 | Site yayında (gizlilik ve destek adresleri) | ⬜ | [SETUP_KEYS.md §8](SETUP_KEYS.md) |
 | Şartlar ve politikanın hukuki gözden geçirilmesi | ⬜ | [STORE_CHECKLIST.md](STORE_CHECKLIST.md) |
 
@@ -230,11 +231,17 @@ ama satın alma çalışmaz; ürünler "Missing Metadata"da bekler.
 **App Review Information**
 
 - İletişim bilgisi
-- Demo hesabı: uygulamada zorunlu hesap yok, **gerekmiyor**
+- Demo hesabı: uygulamada zorunlu hesap yok, **gerekmiyor**. Apple ile
+  giriş isteğe bağlı; inceleyen kendi Apple kimliğiyle deneyebilir.
 - Notes alanına yaz:
   - Verinin cihazda kaldığını; partner eşlemesinin isteğe bağlı olduğunu ve
     yalnızca anonim bir kimlik ile paylaşılmayı seçilen yakınlık durumunun
     sunucuya gittiğini
+  - Hesabın isteğe bağlı olduğunu (Apple ya da Google ile giriş, Profil →
+    Hesap ve bulut yedeği); girişin tek başına sağlık verisi göndermediğini,
+    bulut eşitlemenin ayrı bir açık rıza ekranından sonra açıldığını
+  - Hesap silme yeri: Profil → Hesap ve bulut yedeği → Hesabı sil (kimlik
+    yeniden doğrulanıyor, Apple jetonu iptal ediliyor)
   - Premium'u denemeleri için Sandbox hesabı ya da promosyon kodu
   - Uygulamanın teşhis koymadığını, içeriğin bilgilendirme amaçlı olduğunu
 

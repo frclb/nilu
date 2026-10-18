@@ -80,14 +80,14 @@ Döngün sende kalır
 
 **Tanıtım metni**
 ```
-Bedenini tanımak için sakin bir yer. Döngün, gebeliğin ve notların telefonunda kalıyor — hesap yok, izleme yok.
+Bedenini tanımak için sakin bir yer. Döngün, gebeliğin ve notların telefonunda kalıyor — hesap zorunlu değil, izleme yok.
 ```
 
 **Açıklama**
 ```
 Yazdıkların sende kalıyor. Gerçekten.
 
-Regl uygulamalarının çoğu işaretlediğin günleri, belirtilerini ve notlarını kendi sunucularına taşır. Nilu taşımıyor. Hepsi telefonunda, şifreli duruyor. Hesap açman bile gerekmiyor.
+Regl uygulamalarının çoğu işaretlediğin günleri, belirtilerini ve notlarını kendi sunucularına taşır. Nilu taşımıyor. Hepsi telefonunda, şifreli duruyor. Hesap açman bile gerekmiyor; buluta yedeklemek isteğe bağlı ve yalnızca senin açık rızanla.
 
 Çünkü bunlar senin. Kimsenin okumasına, saklamasına ya da satmasına gerek yok.
 
@@ -115,7 +115,8 @@ GİZLİLİK SONRADAN EKLENMEDİ
 
 Bir özellik listesine sıkıştırılmış bir madde değil; uygulama baştan böyle kuruldu.
 
-• Döngü verin telefonundan çıkmıyor
+• Döngü verin telefonundan çıkmıyor — buluta yedeklemeyi sen açmadıkça
+• İstersen Apple ya da Google hesabınla bulut yedeği: yeni telefona geçince kayıtların gelir, kapatınca buluttaki kopya silinir
 • Reklamlar kişiselleştirilmiyor. Reklam kimliğin kullanılmıyor, izleme izni istenmiyor
 • Sağlık verin hiçbir koşulda reklam için kullanılmıyor
 • Ekran kilidi ücretsiz — Face ID ya da telefonunun şifresiyle
@@ -165,14 +166,14 @@ Your cycle stays on your phone
 
 **Promotional text**
 ```
-Log your period, understand your cycle. Your data is written to your device, not a server — no account, no tracking.
+Log your period, understand your cycle. Your data is written to your device, not a server — no account required, no tracking.
 ```
 
 **Description**
 ```
-Your cycle data never leaves your phone.
+Your cycle data stays on your phone.
 
-Most period apps move the days you log, your symptoms and your notes to their own servers. Nilu doesn't. It all stays on your device, encrypted. You don't need an account.
+Most period apps move the days you log, your symptoms and your notes to their own servers. Nilu doesn't. It all stays on your device, encrypted. You don't need an account; cloud backup is optional and only with your explicit consent.
 
 WHAT IT DOES
 
@@ -196,7 +197,8 @@ PREGNANCY AND AFTER BIRTH
 
 PRIVACY ISN'T A FEATURE HERE, IT'S THE ARCHITECTURE
 
-• Your cycle data never leaves the device
+• Your cycle data never leaves the device unless you turn on cloud backup
+• Optional cloud backup with your Apple or Google account: your entries follow you to a new phone, and turning it off deletes the cloud copy
 • Ads are not personalised; no advertising identifier, no tracking prompt
 • Your health data is never used for ad targeting
 • App lock is free — Face ID or your device passcode
@@ -244,14 +246,14 @@ Dein Zyklus bleibt bei dir
 
 **Werbetext**
 ```
-Periode eintragen, Zyklus verstehen. Deine Daten liegen auf deinem Gerät, nicht auf einem Server — ohne Konto, ohne Tracking.
+Periode eintragen, Zyklus verstehen. Deine Daten liegen auf deinem Gerät, nicht auf einem Server — kein Konto nötig, kein Tracking.
 ```
 
 **Beschreibung**
 ```
-Deine Zyklusdaten verlassen dein Telefon nicht.
+Deine Zyklusdaten bleiben auf deinem Telefon.
 
-Die meisten Perioden-Apps übertragen deine eingetragenen Tage, Symptome und Notizen auf eigene Server. Nilu nicht. Alles bleibt verschlüsselt auf deinem Gerät. Ein Konto brauchst du nicht.
+Die meisten Perioden-Apps übertragen deine eingetragenen Tage, Symptome und Notizen auf eigene Server. Nilu nicht. Alles bleibt verschlüsselt auf deinem Gerät. Ein Konto brauchst du nicht; ein Cloud-Backup ist freiwillig und nur mit deiner ausdrücklichen Einwilligung.
 
 WAS DIE APP KANN
 
@@ -275,7 +277,8 @@ SCHWANGERSCHAFT UND NACH DER GEBURT
 
 DATENSCHUTZ IST HIER KEIN FEATURE, SONDERN DIE BAUWEISE
 
-• Deine Zyklusdaten verlassen das Gerät nicht
+• Deine Zyklusdaten verlassen das Gerät nicht, außer du schaltest das Cloud-Backup ein
+• Freiwilliges Cloud-Backup mit deinem Apple- oder Google-Konto: Deine Einträge kommen mit aufs neue Handy, und beim Ausschalten wird die Cloud-Kopie gelöscht
 • Werbung wird nicht personalisiert; keine Werbe-ID, keine Tracking-Abfrage
 • Deine Gesundheitsdaten werden nie für Werbung genutzt
 • App-Sperre ist kostenlos — Face ID oder Gerätecode
@@ -323,14 +326,14 @@ Tu ciclo se queda en tu móvil
 
 **Texto promocional**
 ```
-Registra tu regla y entiende tu ciclo. Tus datos se guardan en tu dispositivo, no en un servidor: sin cuenta y sin rastreo.
+Registra tu regla y entiende tu ciclo. Tus datos se guardan en tu dispositivo, no en un servidor: sin cuenta obligatoria y sin rastreo.
 ```
 
 **Descripción**
 ```
-Los datos de tu ciclo no salen de tu teléfono.
+Los datos de tu ciclo se quedan en tu teléfono.
 
-La mayoría de las apps de regla llevan los días que registras, tus síntomas y tus notas a sus propios servidores. Nilu no. Todo se queda cifrado en tu dispositivo. No necesitas crear una cuenta.
+La mayoría de las apps de regla llevan los días que registras, tus síntomas y tus notas a sus propios servidores. Nilu no. Todo se queda cifrado en tu dispositivo. No necesitas crear una cuenta; la copia en la nube es opcional y solo con tu consentimiento explícito.
 
 QUÉ HACE
 
@@ -354,7 +357,8 @@ EMBARAZO Y DESPUÉS DEL PARTO
 
 AQUÍ LA PRIVACIDAD NO ES UNA FUNCIÓN, ES LA ESTRUCTURA
 
-• Los datos de tu ciclo no salen del dispositivo
+• Los datos de tu ciclo no salen del dispositivo salvo que actives la copia en la nube
+• Copia opcional en la nube con tu cuenta de Apple o Google: tus registros te siguen al móvil nuevo y, al desactivarla, se borra la copia en la nube
 • Los anuncios no se personalizan; sin identificador publicitario ni permiso de rastreo
 • Tus datos de salud nunca se usan para segmentar anuncios
 • El bloqueo de la app es gratis — con Face ID o el código del dispositivo
@@ -402,14 +406,14 @@ Ton cycle reste sur ton mobile
 
 **Texte promotionnel**
 ```
-Note tes règles, comprends ton cycle. Tes données sont écrites sur ton appareil, pas sur un serveur — sans compte, sans pistage.
+Note tes règles, comprends ton cycle. Tes données sont écrites sur ton appareil, pas sur un serveur — sans compte obligatoire, sans pistage.
 ```
 
 **Description**
 ```
-Les données de ton cycle ne quittent pas ton téléphone.
+Les données de ton cycle restent sur ton téléphone.
 
-La plupart des applis de règles envoient les jours que tu notes, tes symptômes et tes notes sur leurs propres serveurs. Nilu non. Tout reste chiffré sur ton appareil. Aucun compte n'est nécessaire.
+La plupart des applis de règles envoient les jours que tu notes, tes symptômes et tes notes sur leurs propres serveurs. Nilu non. Tout reste chiffré sur ton appareil. Aucun compte n'est nécessaire ; la sauvegarde cloud est facultative et uniquement avec ton consentement explicite.
 
 CE QU'ELLE FAIT
 
@@ -433,7 +437,8 @@ GROSSESSE ET APRÈS LA NAISSANCE
 
 ICI LA CONFIDENTIALITÉ N'EST PAS UNE OPTION, C'EST L'ARCHITECTURE
 
-• Les données de ton cycle ne quittent pas l'appareil
+• Les données de ton cycle ne quittent pas l'appareil, sauf si tu actives la sauvegarde cloud
+• Sauvegarde cloud facultative avec ton compte Apple ou Google : tes données te suivent sur un nouveau téléphone, et la désactiver supprime la copie cloud
 • Les publicités ne sont pas personnalisées ; aucun identifiant publicitaire, aucune demande de pistage
 • Tes données de santé ne servent jamais au ciblage publicitaire
 • Le verrouillage de l'app est gratuit — Face ID ou code de l'appareil
@@ -481,14 +486,14 @@ Seu ciclo fica no seu celular
 
 **Texto promocional**
 ```
-Registre a menstruação e entenda seu ciclo. Seus dados ficam no seu aparelho, não num servidor — sem conta e sem rastreamento.
+Registre a menstruação e entenda seu ciclo. Seus dados ficam no seu aparelho, não num servidor — sem conta obrigatória e sem rastreamento.
 ```
 
 **Descrição**
 ```
-Os dados do seu ciclo não saem do seu celular.
+Os dados do seu ciclo ficam no seu celular.
 
-A maioria dos apps de menstruação leva os dias que você registra, seus sintomas e suas anotações para os próprios servidores. O Nilu não. Tudo fica criptografado no seu aparelho. Você não precisa criar conta.
+A maioria dos apps de menstruação leva os dias que você registra, seus sintomas e suas anotações para os próprios servidores. O Nilu não. Tudo fica criptografado no seu aparelho. Você não precisa criar conta; o backup na nuvem é opcional e só com seu consentimento explícito.
 
 O QUE ELE FAZ
 
@@ -512,7 +517,8 @@ GRAVIDEZ E DEPOIS DO PARTO
 
 AQUI A PRIVACIDADE NÃO É UM RECURSO, É A ESTRUTURA
 
-• Os dados do seu ciclo não saem do aparelho
+• Os dados do seu ciclo não saem do aparelho, a menos que você ative o backup na nuvem
+• Backup opcional na nuvem com sua conta Apple ou Google: seus registros vão junto para o celular novo, e desativá-lo apaga a cópia na nuvem
 • Os anúncios não são personalizados; sem identificador de publicidade e sem pedido de rastreamento
 • Seus dados de saúde nunca são usados para segmentar anúncios
 • O bloqueio do app é gratuito — com Face ID ou o código do aparelho

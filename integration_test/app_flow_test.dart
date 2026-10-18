@@ -14,6 +14,7 @@ import 'package:period_tracker/data/repositories/privacy_settings_repository.dar
 import 'package:period_tracker/domain/models/pregnancy.dart';
 import 'package:period_tracker/localization/app_localizations.dart';
 import 'package:period_tracker/main.dart' as app;
+import 'package:period_tracker/presentation/account/account_screen.dart';
 import 'package:period_tracker/presentation/appearance/appearance_screen.dart';
 import 'package:period_tracker/presentation/calendar/view_models/calendar_view_model.dart';
 import 'package:period_tracker/presentation/insights/prediction_info_screen.dart';
@@ -195,6 +196,39 @@ void main() {
     await dokun(tester, find.byKey(const Key('appearance_icon_standard')));
     await bekle(tester, kare: 30);
     expect(find.text(tr(tester, 'appearance_icon_failed')), findsNothing);
+  });
+
+  testWidgets('hesap ekranı karşılamadan açılıyor; giriş yoksa veri gitmiyor', (
+    tester,
+  ) async {
+    await temizle();
+    final cerceve = FlutterError.onError;
+    app.main();
+    await bekle(tester, kare: 2);
+    FlutterError.onError = cerceve;
+    await gorunene(tester, find.byType(OnboardingWelcomeScreen));
+
+    await dokun(tester, find.byKey(const Key('onboarding_restore')));
+    await gorunene(tester, find.byType(AccountScreen));
+    // Firebase yapılandırılmamış derlemede giriş dürüstçe "kullanılamıyor";
+    // yapılandırılmışsa Apple düğmesi Google'ın üstünde.
+    final kullanilamiyor = find.text(tr(tester, 'account_unavailable'));
+    final apple = find.byKey(const Key('account_apple'));
+    await bekle(tester, kare: 10);
+    expect(
+      kullanilamiyor.evaluate().isNotEmpty || apple.evaluate().isNotEmpty,
+      isTrue,
+    );
+    if (apple.evaluate().isNotEmpty) {
+      expect(
+        tester.getTopLeft(apple).dy,
+        lessThan(tester.getTopLeft(find.byKey(const Key('account_google'))).dy),
+      );
+    }
+    expect(find.byKey(const Key('account_sync_switch')), findsNothing);
+
+    await geri(tester);
+    await gorunene(tester, find.byType(OnboardingWelcomeScreen));
   });
 
   testWidgets('"Yakın zamanda doğum yaptım" kurulumu lohusa panosuna '

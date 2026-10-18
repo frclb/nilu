@@ -42,6 +42,7 @@ import '../../presentation/profile/cycle_settings_screen.dart';
 import '../../presentation/calendar/past_periods_screen.dart';
 import '../../presentation/insights/prediction_info_screen.dart';
 import '../../presentation/profile/privacy_security_screen.dart';
+import '../../presentation/account/account_screen.dart';
 import '../../presentation/health_library/health_library_screen.dart';
 import '../../presentation/profile/profile_settings_screen.dart';
 import '../../presentation/partner_match/partner_match_screen.dart';
@@ -60,7 +61,9 @@ import '../../presentation/insights/cycle_summary_screen.dart';
 /// Onboarding tamamlanmadan da erişilebilen yollar.
 ///
 /// `/partner_scan` buradadır çünkü partner, karşılama ekranından QR okutarak
-/// giriş yapar; `/splash` durum yüklenirken beklenen yerdir.
+/// giriş yapar; `/account_restore` da karşılama ekranından açılıyor (yeni
+/// cihazda buluttaki kayıtları geri almak); `/splash` durum yüklenirken
+/// beklenen yerdir.
 const Set<String> preOnboardingPaths = {
   '/splash',
   '/onboarding',
@@ -73,6 +76,7 @@ const Set<String> preOnboardingPaths = {
   '/onboarding_cycle_length',
   '/onboarding_success',
   '/partner_scan',
+  '/account_restore',
   '/privacy_policy',
   '/terms_of_service',
 };
@@ -480,6 +484,18 @@ GoRouter createAppRouter(
         path: '/privacy_security',
         name: RouteNames.privacySecurity,
         builder: (context, state) => const PrivacySecurityScreen(),
+      ),
+
+      GoRoute(
+        path: '/account',
+        name: RouteNames.account,
+        builder: (context, state) => const AccountScreen(),
+      ),
+      // Karşılama ekranından: yeni cihazda kayıtları buluttan geri almak.
+      GoRoute(
+        path: '/account_restore',
+        name: RouteNames.accountRestore,
+        builder: (context, state) => const AccountScreen(restore: true),
       ),
 
       GoRoute(

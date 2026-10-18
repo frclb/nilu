@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import '../../localization/app_localizations.dart';
 import '../../core/navigation/route_names.dart';
 import 'package:provider/provider.dart';
+import '../../domain/view_models/account_view_model.dart';
 import '../../domain/view_models/user_view_model.dart';
 import 'widgets/premium_banner.dart';
 import 'widgets/settings_group.dart';
@@ -62,6 +63,24 @@ class ProfileSettingsScreen extends StatelessWidget {
                       iconBgColor: context.tokens.brandTint,
                       onTap: () {
                         context.pushNamed(RouteNames.personalInfo);
+                      },
+                    ),
+                    // İsteğe bağlı hesap ve bulut yedeği.
+                    SettingsItem(
+                      title: context.tr('profile_cloud_account'),
+                      subtitle: context.tr(switch (context
+                          .watch<AccountViewModel>()) {
+                        AccountViewModel(isSignedIn: false) =>
+                          'account_signed_out_short',
+                        AccountViewModel(syncEnabled: true) =>
+                          'account_sync_on_short',
+                        _ => 'account_sync_off_short',
+                      }),
+                      icon: Icons.cloud_outlined,
+                      iconColor: Theme.of(context).colorScheme.primary,
+                      iconBgColor: context.tokens.brandTint,
+                      onTap: () {
+                        context.pushNamed(RouteNames.account);
                       },
                     ),
                   ],

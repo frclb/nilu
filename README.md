@@ -1,9 +1,11 @@
 # Nilu
 
 Regl, gebelik ve lohusalık takibi (Flutter, iOS). Sağlık verisi **cihazda**
-kalır ve Anahtar Zinciri'nde şifreli durur; hesap, sunucu ya da analiz SDK'sı
-yok. Tahminler kullanıcının kendi kayıtlarından, açıklanabilir kurallarla
-hesaplanır (yapay zekâ yok).
+kalır ve Anahtar Zinciri'nde şifreli durur; analiz SDK'sı yok, hesap zorunlu
+değil. İsteğe bağlı Apple/Google hesabıyla bulut eşitleme var: yalnızca açık
+rızayla açılıyor, kapatınca buluttaki kopya siliniyor (`lib/domain/services/
+sync_engine.dart`). Tahminler kullanıcının kendi kayıtlarından, açıklanabilir
+kurallarla hesaplanır (yapay zekâ yok).
 
 Öne çıkanlar: dört kurulum yolu (döngü, bebek istiyorum, gebelik, yeni doğum),
 tahmin aralığı ve "nasıl hesaplandı" ekranı, ayarlanabilir hatırlatıcılar

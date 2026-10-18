@@ -18,6 +18,7 @@ import '../../domain/services/backup_import_service.dart';
 import '../../domain/services/data_export_service.dart';
 import '../../domain/services/premium_gate.dart';
 import '../../domain/view_models/subscription_view_model.dart';
+import '../../domain/view_models/account_view_model.dart';
 import '../../domain/view_models/user_view_model.dart';
 import '../calendar/view_models/calendar_view_model.dart';
 import '../../localization/app_localizations.dart';
@@ -744,7 +745,17 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
             context,
           ).dialogTheme.titleTextStyle?.copyWith(color: context.tokens.danger),
         ),
-        content: Text(context.tr('privacy_delete_desc')),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(context.tr('privacy_delete_desc')),
+            if (context.read<AccountViewModel>().isSignedIn) ...[
+              const SizedBox(height: 12),
+              Text(context.tr('privacy_delete_signed_in')),
+            ],
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
@@ -755,15 +766,43 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               final messenger = ScaffoldMessenger.of(context);
               final router = GoRouter.of(context);
               final userViewModel = context.read<UserViewModel>();
+              final hesap = context.read<AccountViewModel>();
               final gebelik = context.read<PregnancyViewModel>();
               final takvim = context.read<CalendarViewModel>();
               final doneMessage = context.tr('privacy_delete_done');
               final reauthMessage = context.tr('privacy_delete_reauth');
+              final cancelledMessage = context.tr('account_delete_cancelled');
+              final failedMessage = context.tr('account_delete_failed');
               Navigator.of(ctx).pop();
 
               // Önce uzak veri: yerel silme `myId`'yi temizliyor, ondan
               // sonra hangi dokümanın silineceği bilinemez.
-              final accountDeleted = await userViewModel.deleteRemoteData();
+              //
+              // Apple ya da Google ile giriş yapıldıysa hesap silme kimliği
+              // yeniden doğruluyor (Apple jetonu iptali dahil) ve bulut
+              // kopyasını da siliyor. Doğrulamadan vazgeçilirse ya da
+              // silinemezse **hiçbir şey** silinmiyor: cihazdaki veri
+              // gidip buluttaki kalsaydı "tüm verilerim silindi" yanlış
+              // olurdu.
+              final bool accountDeleted;
+              if (hesap.isSignedIn) {
+                final sonuc = await hesap.deleteAccount();
+                if (sonuc != AccountDeleteResult.deleted) {
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        sonuc == AccountDeleteResult.cancelled
+                            ? cancelledMessage
+                            : failedMessage,
+                      ),
+                    ),
+                  );
+                  return;
+                }
+                accountDeleted = true;
+              } else {
+                accountDeleted = await userViewModel.deleteRemoteData();
+              }
               await _repository.deleteAllLocalData();
               await userViewModel.reloadAfterDataWipe();
               // Bellekteki kopyalar da. Yalnızca depo silinip ViewModel'ler

@@ -108,29 +108,43 @@ void main() {
   });
 
   group('bilinen yanlış beyanlar geri gelmedi', () {
-    test('Apple ile Giriş anılmıyor', () {
-      // Paket, yetki ve yöntem vardı ama hiçbir yerden çağrılmıyordu;
-      // politika olmayan bir giriş yöntemini anlatıyordu. Kaldırıldı.
-      const ifadeler = {
-        'tr': 'Apple ile Giriş',
-        'en': 'Sign in with Apple',
-        'de': 'Mit Apple anmelden',
-        'es': 'Iniciar sesión con Apple',
-        'fr': 'Se connecter avec Apple',
-        'pt': 'com a Apple',
-      };
-      expect(
-        File('pubspec.yaml').readAsStringSync(),
-        isNot(contains('sign_in_with_apple')),
-      );
-      for (final lang in languages) {
-        final policy = dictionary(lang).entries
-            .where((e) => e.key.startsWith('privacy_policy'))
-            .map((e) => e.value)
-            .join(' ');
-        expect(policy, isNot(contains(ifadeler[lang]!)), reason: lang);
-      }
-    });
+    test(
+      'Apple ve Google ile giriş anlatılıyorsa uygulamada gerçekten var',
+      () {
+        // Bir kez olmayan bir giriş yöntemi anlatılmıştı: paket, yetki ve
+        // yöntem vardı ama hiçbir yerden çağrılmıyordu. Şimdi giriş Firebase'in
+        // kendi akışıyla yapılıyor; politika onu anlatıyorsa kod da onu
+        // yapıyor olmalı.
+        final giris = File(
+          'lib/data/datasources/remote/account_auth.dart',
+        ).readAsStringSync();
+        expect(giris, contains('AppleAuthProvider'));
+        expect(giris, contains('GoogleAuthProvider'));
+        expect(
+          File('ios/Runner/Runner.entitlements').readAsStringSync(),
+          contains('com.apple.developer.applesignin'),
+        );
+        expect(
+          File('lib/core/navigation/app_router.dart').readAsStringSync(),
+          contains('AccountScreen'),
+          reason: 'Giriş ekranına bir yoldan ulaşılabilmeli',
+        );
+        // Ayrı bir giriş paketi yok; ölü kod olarak geri gelmesin.
+        expect(
+          File('pubspec.yaml').readAsStringSync(),
+          isNot(contains('sign_in_with_apple')),
+        );
+        for (final lang in languages) {
+          final hesap = dictionary(lang).entries
+              .where((e) => e.key.startsWith('privacy_policy_section4'))
+              .map((e) => e.value)
+              .join(' ');
+          expect(hesap, contains('Apple'), reason: lang);
+          expect(hesap, contains('Google'), reason: lang);
+          expect(hesap, contains('Firebase Authentication'), reason: lang);
+        }
+      },
+    );
 
     test('üçüncü tarafla hiç paylaşılmadığı iddiası yok', () {
       const claims = {
@@ -155,6 +169,47 @@ void main() {
         );
       }
     });
+  });
+
+  group('bulut eşitleme dürüstçe anlatılıyor', () {
+    // Sağlık verisi sunucuya ancak açık rızayla gidiyor ve kopya uçtan uca
+    // şifreli değil. Politika bunu yazmazsa "verilerim telefonumda" sanan
+    // kullanıcı yanılır; rızanın dayanağı da bu bilgilendirme.
+    const riza = {
+      'tr': 'açık rıza',
+      'en': 'explicit consent',
+      'de': 'ausdrücklich',
+      'es': 'consentimiento explícito',
+      'fr': 'consentement explicite',
+      'pt': 'consentimento explícito',
+    };
+    const uctanUca = {
+      'tr': 'uçtan uca',
+      'en': 'end-to-end',
+      'de': 'Ende-zu-Ende',
+      'es': 'extremo a extremo',
+      'fr': 'bout en bout',
+      'pt': 'ponta a ponta',
+    };
+
+    for (final lang in languages) {
+      test('$lang: rıza, saklama yeri, şifreleme sınırı ve silme', () {
+        final d = dictionary(lang);
+        final hesap = d['privacy_policy_section4_content'] as String;
+        expect(hesap, contains(riza[lang]));
+        expect(hesap, contains('Cloud Firestore'));
+        expect(hesap, contains(uctanUca[lang]));
+        // Üçüncü taraflar bölümü Firestore'u da sayıyor.
+        expect(
+          d['privacy_policy_section6_content'],
+          contains('Cloud Firestore'),
+        );
+        // Saklama bölümü bulut kopyasının ne zaman silindiğini söylüyor.
+        expect(d['privacy_policy_section9_content'], contains('Apple'));
+        // Uygulamadaki rıza metni de aynı sınırı söylüyor.
+        expect(d['sync_consent_where'], contains(uctanUca[lang]));
+      });
+    }
   });
 
   group('saklanan veri türleri metinde anlatılıyor', () {
@@ -197,7 +252,7 @@ void main() {
         expect(p, contains(tansiyon[lang]));
         // Partnere ve üçüncü taraflara gitmediği de yazılı.
         expect(metin(lang, 'privacy_policy_section3'), contains(gebelik[lang]));
-        expect(metin(lang, 'privacy_policy_section5'), contains(gebelik[lang]));
+        expect(metin(lang, 'privacy_policy_section6'), contains(gebelik[lang]));
       });
 
       test('$lang: şartlar gebelik takibinin hekim izleminin yerine '

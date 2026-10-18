@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:period_tracker/domain/models/article.dart';
 import 'package:period_tracker/domain/services/session_plan.dart';
+import 'package:period_tracker/presentation/account/account_screen.dart';
 import 'package:period_tracker/presentation/appearance/appearance_screen.dart';
 import 'package:period_tracker/presentation/assistant/assistant_screen.dart';
 import 'package:period_tracker/presentation/calendar/calendar_screen.dart';
@@ -65,6 +66,8 @@ Map<String, Widget> allScreens() => <String, Widget>{
   'privacy_policy': const PrivacyPolicyScreen(),
   'terms_of_service': const TermsOfServiceScreen(),
   'privacy_security': const PrivacySecurityScreen(),
+  'account': const AccountScreen(),
+  'account_restore': const AccountScreen(restore: true),
   'notification_settings': const NotificationSettingsScreen(),
   'cycle_settings': const CycleSettingsScreen(),
   'past_periods': const PastPeriodsScreen(),

@@ -116,7 +116,7 @@ void main() {
 
       for (final lang in languages) {
         expect(
-          (dictionary(lang)['privacy_policy_section4_content'] as String)
+          (dictionary(lang)['privacy_policy_section5_content'] as String)
               .toLowerCase(),
           contains(denials[lang]),
           reason: '$lang: politika farkı açıklamıyor',
