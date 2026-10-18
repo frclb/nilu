@@ -78,6 +78,37 @@ class CycleSettingsRepository {
   Future<bool> hasCycleLength() async =>
       await _store.getInt(_cycleLengthKey) != null;
 
+  /// Kullanıcı bir kanama süresi kaydetti mi?
+  Future<bool> hasPeriodLength() async =>
+      await _store.getInt(_periodLengthKey) != null;
+
+  /// Başka bir cihazdan gelen ayarları olduğu gibi yazar (bulut eşitleme).
+  ///
+  /// [saveCycleSettings] tarihi "şimdi" yapıyor; burada öbür cihazın tarihi
+  /// korunmalı, yoksa iki cihaz birbirinin tahmin kuralını değiştirirdi.
+  /// Girilmemiş süre silinir: varsayılanla doldurulursa kullanıcının
+  /// söylemediği bir sayı onunmuş gibi görünür.
+  Future<void> restore({
+    int? cycleLength,
+    int? periodLength,
+    DateTime? updatedAt,
+    required bool hormonalContraception,
+  }) async {
+    cycleLength == null
+        ? await _store.remove(_cycleLengthKey)
+        : await _store.setInt(_cycleLengthKey, cycleLength);
+    periodLength == null
+        ? await _store.remove(_periodLengthKey)
+        : await _store.setInt(_periodLengthKey, periodLength);
+    updatedAt == null
+        ? await _store.remove(_settingsUpdatedAtKey)
+        : await _store.setString(
+            _settingsUpdatedAtKey,
+            updatedAt.toIso8601String(),
+          );
+    await _store.setBool(_hormonalContraceptionKey, hormonalContraception);
+  }
+
   /// Kayıtlı kanama süresini döndürür (varsayılan: 5).
   Future<int> getPeriodLength() async {
     return await _store.getInt(_periodLengthKey) ?? defaultPeriodLength;

@@ -23,6 +23,26 @@ class ProfileRepository {
     return DateTime.tryParse(raw);
   }
 
+  /// Profili olduğu gibi yazar: `null` alan **silinir** (bulut eşitleme).
+  ///
+  /// [save] `null`u "dokunma" sayıyor; öbür cihazda silinmiş bir ad
+  /// burada kalırdı.
+  Future<void> replace({
+    String? name,
+    String? email,
+    DateTime? birthDate,
+  }) async {
+    (name ?? '').trim().isEmpty
+        ? await _store.remove(nameKey)
+        : await _store.setString(nameKey, name!.trim());
+    (email ?? '').trim().isEmpty
+        ? await _store.remove(emailKey)
+        : await _store.setString(emailKey, email!.trim());
+    birthDate == null
+        ? await _store.remove(birthDateKey)
+        : await _store.setString(birthDateKey, birthDate.toIso8601String());
+  }
+
   Future<void> save({String? name, String? email, DateTime? birthDate}) async {
     if (name != null) {
       name.trim().isEmpty

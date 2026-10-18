@@ -219,6 +219,93 @@ describe('pairingTokens: davet kodu ve istekler', () => {
   });
 });
 
+describe('syncData/{uid}: bulut kopyası', () => {
+  // Apple ya da Google ile giriş yapmış hesabın kimlik jetonu.
+  const hesap = (uid, saglayici = 'apple.com') =>
+    env
+      .authenticatedContext(uid, {
+        firebase: { sign_in_provider: saglayici, identities: { [saglayici]: ['1'] } },
+      })
+      .firestore();
+  const anonim = (uid) =>
+    env
+      .authenticatedContext(uid, { firebase: { sign_in_provider: 'anonymous', identities: {} } })
+      .firestore();
+
+  const meta = { version: 'v1', hash: 'abc', chunkCount: 1, schema: 1, disabled: false, updatedAt: serverTimestamp() };
+  const parca = { index: 0, data: '{"format":"nilu-sync"}' };
+
+  test('Apple ile giren sahip yazar, okur, siler', async () => {
+    const fs = hesap('ada');
+    await assertSucceeds(setDoc(doc(fs, 'syncData/ada/chunks/0'), parca));
+    await assertSucceeds(setDoc(doc(fs, 'syncData/ada'), meta));
+    await assertSucceeds(getDoc(doc(fs, 'syncData/ada')));
+    await assertSucceeds(getDoc(doc(fs, 'syncData/ada/chunks/0')));
+    await assertSucceeds(deleteDoc(doc(fs, 'syncData/ada/chunks/0')));
+    await assertSucceeds(deleteDoc(doc(fs, 'syncData/ada')));
+  });
+
+  test('Google ile giren sahip de', async () => {
+    const fs = hesap('ada', 'google.com');
+    await assertSucceeds(setDoc(doc(fs, 'syncData/ada'), meta));
+    await assertSucceeds(getDoc(doc(fs, 'syncData/ada')));
+  });
+
+  test('anonim kimliğe sonradan bağlanan hesap (aynı uid) erişir', async () => {
+    const fs = env
+      .authenticatedContext('ada', {
+        firebase: { sign_in_provider: 'anonymous', identities: { 'apple.com': ['1'] } },
+      })
+      .firestore();
+    await assertSucceeds(setDoc(doc(fs, 'syncData/ada'), meta));
+  });
+
+  test('anonim kimlik kendi uid\'sinde bile okuyamaz, yazamaz', async () => {
+    await seed(async (fs) => setDoc(doc(fs, 'syncData/ada'), meta));
+    const fs = anonim('ada');
+    await assertFails(getDoc(doc(fs, 'syncData/ada')));
+    await assertFails(setDoc(doc(fs, 'syncData/ada'), meta));
+    await assertFails(setDoc(doc(fs, 'syncData/ada/chunks/0'), parca));
+  });
+
+  test('başka hesap ve onaylı partner bile okuyamaz', async () => {
+    await seed(async (fs) => {
+      await setDoc(doc(fs, 'users/ada'), { partners: ['partner'] });
+      await setDoc(doc(fs, 'syncData/ada'), meta);
+      await setDoc(doc(fs, 'syncData/ada/chunks/0'), parca);
+    });
+    for (const fs of [hesap('baska'), anonim('partner'), hesap('partner')]) {
+      await assertFails(getDoc(doc(fs, 'syncData/ada')));
+      await assertFails(getDoc(doc(fs, 'syncData/ada/chunks/0')));
+      await assertFails(getDocs(collection(fs, 'syncData/ada/chunks')));
+      await assertFails(setDoc(doc(fs, 'syncData/ada'), meta));
+      await assertFails(deleteDoc(doc(fs, 'syncData/ada')));
+    }
+  });
+
+  test('oturumsuz hiçbir şey yapılamaz', async () => {
+    await seed(async (fs) => setDoc(doc(fs, 'syncData/ada'), meta));
+    await assertFails(getDoc(doc(db(null), 'syncData/ada')));
+    await assertFails(setDoc(doc(db(null), 'syncData/ada'), meta));
+  });
+
+  test('tanımsız alan ve geçersiz parça sayısı reddediliyor', async () => {
+    const fs = hesap('ada');
+    await assertFails(setDoc(doc(fs, 'syncData/ada'), { ...meta, fazla: 1 }));
+    await assertFails(setDoc(doc(fs, 'syncData/ada'), { ...meta, chunkCount: -1 }));
+    await assertFails(setDoc(doc(fs, 'syncData/ada'), { ...meta, chunkCount: '1' }));
+    await assertFails(setDoc(doc(fs, 'syncData/ada/chunks/0'), { ...parca, fazla: 1 }));
+    await assertFails(setDoc(doc(fs, 'syncData/ada/chunks/0'), { index: 0, data: 42 }));
+  });
+
+  test('"kapatıldı" işareti sağlık verisi olmadan yazılır', async () => {
+    const fs = hesap('ada');
+    await assertSucceeds(
+      setDoc(doc(fs, 'syncData/ada'), { disabled: true, chunkCount: 0, schema: 1, updatedAt: serverTimestamp() }),
+    );
+  });
+});
+
 describe('tanımsız yollar', () => {
   test('her şey kapalı', async () => {
     await assertFails(setDoc(doc(db('sahip'), 'baska/x'), { a: 1 }));

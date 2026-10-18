@@ -7,8 +7,12 @@ rules_version = '2';
 //   users/{uid}/logs/{dateStr}   -> ESKİ: artık yazılmıyor; yalnızca silme
 //   intimacy/{uid}               -> paylaşılan yakınlık durumu (HASSAS)
 //   pairingTokens/{token}        -> eşleştirme kodu → sahip UID
+//   syncData/{uid}               -> bulut kopyasının üst bilgisi (HASSAS)
+//   syncData/{uid}/chunks/{i}    -> bulut kopyasının parçaları (HASSAS)
 //
-// Kimlik anonim ve yalnızca partner eşleşmesi başlatılınca açılıyor.
+// Kimlik anonim ve yalnızca partner eşleşmesi başlatılınca açılıyor. Apple
+// ya da Google hesabı isteğe bağlı; yalnızca bulut eşitleme için (kullanıcı
+// açık rıza verdikten sonra, bkz. `firestore_sync_remote.dart`).
 //
 // Temel ilke: kullanıcı yalnızca kendi verisine yazar. Erişim verme yetkisi
 // yalnızca verinin sahibinde.
@@ -90,6 +94,41 @@ service cloud.firestore {
       match /logs/{dateStr} {
         allow read, delete: if isOwner(uid);
         allow create, update: if false;
+      }
+    }
+
+    // Apple ya da Google hesabı bağlı mı? Anonim kimlik (yalnızca partner
+    // eşleşmesi için açılan) bulut kopyasına erişemez.
+    //
+    // `sign_in_provider` değil `identities`: anonim kimliğe hesap
+    // bağlandığında (`linkWithProvider`) uid aynı kalıyor ve oturumun
+    // sağlayıcısı değişmeyebiliyor; bağlı hesaplar ise `identities`'te.
+    function hasAccount() {
+      let kimlikler = request.auth.token.firebase.get('identities', {});
+      return isSignedIn()
+        && ('apple.com' in kimlikler || 'google.com' in kimlikler);
+    }
+
+    function isAccountOwner(uid) {
+      return isOwner(uid) && hasAccount();
+    }
+
+    // Bulut eşitleme: yalnızca hesabın sahibi okur ve yazar. Partner dahil
+    // başka hiç kimse — onaylı partner yalnızca `intimacy`'yi görüyor.
+    match /syncData/{uid} {
+      allow read, delete: if isAccountOwner(uid);
+      allow create, update: if isAccountOwner(uid)
+        && request.resource.data.keys().hasOnly(
+             ['version', 'hash', 'chunkCount', 'schema', 'disabled', 'updatedAt'])
+        && request.resource.data.chunkCount is int
+        && request.resource.data.chunkCount >= 0
+        && request.resource.data.chunkCount <= 200;
+
+      match /chunks/{index} {
+        allow read, delete: if isAccountOwner(uid);
+        allow create, update: if isAccountOwner(uid)
+          && request.resource.data.keys().hasOnly(['index', 'data'])
+          && request.resource.data.data is string;
       }
     }
 
