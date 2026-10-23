@@ -27,7 +27,7 @@ class CycleRing extends StatefulWidget {
     required this.center,
     this.caption,
     this.markerIndex,
-    this.size = 232,
+    this.size = 246,
   });
 
   final CycleRingData data;
@@ -55,9 +55,22 @@ class CycleRing extends StatefulWidget {
   State<CycleRing> createState() => _CycleRingState();
 }
 
-class _CycleRingState extends State<CycleRing>
-    with SingleTickerProviderStateMixin {
+class _CycleRingState extends State<CycleRing> with TickerProviderStateMixin {
   late final AnimationController _controller;
+
+  /// Bugünün boncuğundan yayılan nabız. Sürekli değil: dizi yerine
+  /// oturduktan sonra **üç kez** atıyor ve duruyor. Sürekli bir canlandırma
+  /// ekran açık kaldıkça her kareyi yeniden çizip pil harcardı.
+  late final AnimationController _pulse;
+
+  /// iOS "Hareketi Azalt": dizi yenilemesi ve nabız atlanıyor, halka son
+  /// hâliyle çiziliyor. `MediaQuery` `initState` içinde okunamıyor; ayar
+  /// doğrudan platformdan okunuyor.
+  bool get _reduceMotion => WidgetsBinding
+      .instance
+      .platformDispatcher
+      .accessibilityFeatures
+      .disableAnimations;
 
   /// Sönecek olan düzen.
   late CycleRingData _from;
@@ -68,6 +81,10 @@ class _CycleRingState extends State<CycleRing>
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1700),
       vsync: this,
+    )..addStatusListener(_onRefreshStatus);
+    _pulse = AnimationController(
+      duration: const Duration(milliseconds: 1600),
+      vsync: this,
     );
 
     // Uygulama açıldığında döngü çoktan uzamışsa dizi yenileniyor: önce
@@ -76,13 +93,27 @@ class _CycleRingState extends State<CycleRing>
     // dizinin yeniden kurulması olarak görüyor.
     final target = widget.data;
     final start = target.clampedToExpected();
-    if (start != target) {
+    if (start != target && !_reduceMotion) {
       _from = start;
       _controller.forward(from: 0);
     } else {
       _from = target;
       _controller.value = 1;
+      _startPulse();
     }
+  }
+
+  void _onRefreshStatus(AnimationStatus status) {
+    if (status == AnimationStatus.completed) _startPulse();
+  }
+
+  void _startPulse() {
+    if (_reduceMotion || widget.data.todayIndex == null) return;
+    // Tekrar bitince değer son karede (0 ile 1 arasında) kalıyor ve
+    // boncuğun çevresinde soluk bir halka asılı kalıyordu: sıfırla.
+    _pulse.repeat(count: 3).then((_) {
+      if (mounted) _pulse.value = 0;
+    });
   }
 
   @override
@@ -94,12 +125,19 @@ class _CycleRingState extends State<CycleRing>
     // kalmış bir dizinin üzerine ikinci bir sıra başlatmak, henüz yanmamış
     // boncukları sönüyor gösteriyordu.
     _from = old.data;
+    _pulse.stop();
+    _pulse.value = 0;
+    if (_reduceMotion) {
+      _controller.value = 1;
+      return;
+    }
     _controller.forward(from: 0);
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _pulse.dispose();
     super.dispose();
   }
 
@@ -118,13 +156,14 @@ class _CycleRingState extends State<CycleRing>
         width: size,
         height: size,
         child: AnimatedBuilder(
-          animation: _controller,
+          animation: Listenable.merge([_controller, _pulse]),
           builder: (context, child) => CustomPaint(
             size: Size.square(size),
             painter: _BeadRingPainter(
               from: _from,
               to: widget.data,
               progress: _controller.value,
+              pulse: _pulse.value,
               marker: widget.markerIndex,
               track: t.border,
               surface: t.surface,
@@ -236,6 +275,7 @@ class _BeadRingPainter extends CustomPainter {
     required this.from,
     required this.to,
     required this.progress,
+    this.pulse = 0,
     required this.marker,
     required this.track,
     required this.surface,
@@ -245,6 +285,9 @@ class _BeadRingPainter extends CustomPainter {
   final CycleRingData from;
   final CycleRingData to;
   final double progress;
+
+  /// Bugünün nabzı, 0–1. 0 ve 1'de görünmüyor.
+  final double pulse;
 
   /// Ayrıca işaretlenen boncuk (bkz. [CycleRing.markerIndex]).
   final int? marker;
@@ -432,6 +475,18 @@ class _BeadRingPainter extends CustomPainter {
 
   /// Bugün: yumuşak hâle, saydam halka, dolu boncuk, beyaz göbek.
   void _paintToday(Canvas canvas, Offset at, double bead, Color color) {
+    // Nabız: boncuktan dışa yayılıp sönen ince halka.
+    if (pulse > 0 && pulse < 1) {
+      final t = Curves.easeOutCubic.transform(pulse);
+      canvas.drawCircle(
+        at,
+        bead * (1.42 + 2.6 * t),
+        Paint()
+          ..color = color.withAlpha(((1 - t) * 150).round())
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.6,
+      );
+    }
     canvas.drawCircle(
       at,
       bead * 3.2,
@@ -465,6 +520,7 @@ class _BeadRingPainter extends CustomPainter {
   @override
   bool shouldRepaint(_BeadRingPainter old) =>
       old.progress != progress ||
+      old.pulse != pulse ||
       old.from != from ||
       old.to != to ||
       old.marker != marker ||

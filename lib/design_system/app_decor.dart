@@ -179,32 +179,75 @@ class AppGradientButton extends StatelessWidget {
       child: AnimatedOpacity(
         duration: const Duration(milliseconds: 150),
         opacity: enabled || busy ? 1 : 0.45,
-        child: Container(
-          constraints: BoxConstraints(minHeight: height),
-          width: expand ? double.infinity : null,
-          decoration: BoxDecoration(
-            gradient: gradient ?? AppGradients.primary(context),
-            borderRadius: BorderRadius.circular(radius),
-            boxShadow: enabled ? AppShadows.floating(context) : null,
-          ),
-          child: Material(
-            type: MaterialType.transparency,
-            child: InkWell(
-              onTap: enabled ? onPressed : null,
+        child: _PressScale(
+          enabled: enabled,
+          child: Container(
+            constraints: BoxConstraints(minHeight: height),
+            width: expand ? double.infinity : null,
+            decoration: BoxDecoration(
+              gradient: gradient ?? AppGradients.primary(context),
               borderRadius: BorderRadius.circular(radius),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 8,
+              boxShadow: enabled ? AppShadows.floating(context) : null,
+            ),
+            child: Material(
+              type: MaterialType.transparency,
+              child: InkWell(
+                onTap: enabled ? onPressed : null,
+                borderRadius: BorderRadius.circular(radius),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
+                  // `heightFactor: 1`: ortalayıcı içerik kadar yükseliyor.
+                  // Olmadan, yüksekliği sınırlı bir yerde (iskeletin alt
+                  // çubuğu) bütün alanı kaplıyor ve düğme ekranı örtüyordu.
+                  child: Center(
+                    widthFactor: 1,
+                    heightFactor: 1,
+                    child: content,
+                  ),
                 ),
-                // `heightFactor: 1`: ortalayıcı içerik kadar yükseliyor.
-                // Olmadan, yüksekliği sınırlı bir yerde (iskeletin alt
-                // çubuğu) bütün alanı kaplıyor ve düğme ekranı örtüyordu.
-                child: Center(widthFactor: 1, heightFactor: 1, child: content),
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Basılıyken hafifçe (%2) küçülüp bırakınca geri dönen sarmalayıcı —
+/// dokunuşun "tutulduğunu" hissettiriyor. Hareketi Azalt açıkken kapalı.
+class _PressScale extends StatefulWidget {
+  const _PressScale({required this.enabled, required this.child});
+
+  final bool enabled;
+  final Widget child;
+
+  @override
+  State<_PressScale> createState() => _PressScaleState();
+}
+
+class _PressScaleState extends State<_PressScale> {
+  bool _down = false;
+
+  void _set(bool value) {
+    if (_down != value) setState(() => _down = value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final reduce = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    return Listener(
+      onPointerDown: widget.enabled ? (_) => _set(true) : null,
+      onPointerUp: (_) => _set(false),
+      onPointerCancel: (_) => _set(false),
+      child: AnimatedScale(
+        scale: _down && !reduce ? 0.98 : 1,
+        duration: const Duration(milliseconds: 110),
+        curve: Curves.easeOut,
+        child: widget.child,
       ),
     );
   }
