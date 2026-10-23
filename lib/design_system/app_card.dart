@@ -76,10 +76,16 @@ class AppCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
 
+    // Saydam `Material`: içerideki `ListTile` ve `InkWell` dokunma
+    // efektini kartın **üstüne** çizsin. Yoksa en yakın Material iskeletin
+    // kendisi oluyor ve efekt beyaz kartın altında kalıp görünmüyordu.
     final body = Container(
       decoration: decoration(t),
       clipBehavior: Clip.antiAlias,
-      child: Padding(padding: padding, child: child),
+      child: Material(
+        type: MaterialType.transparency,
+        child: Padding(padding: padding, child: child),
+      ),
     );
 
     if (onTap == null) return body;
@@ -118,21 +124,26 @@ class AppSectionedCard extends StatelessWidget {
     final body = Container(
       decoration: AppCard.decoration(t),
       clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(padding: headerPadding, child: header),
-          if (footer != null)
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: t.surfaceAlt,
-                border: Border(top: BorderSide(color: AppCard.dividerColor(t))),
+      child: Material(
+        type: MaterialType.transparency,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(padding: headerPadding, child: header),
+            if (footer != null)
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: t.surfaceAlt,
+                  border: Border(
+                    top: BorderSide(color: AppCard.dividerColor(t)),
+                  ),
+                ),
+                padding: footerPadding,
+                child: footer,
               ),
-              padding: footerPadding,
-              child: footer,
-            ),
-        ],
+          ],
+        ),
       ),
     );
 

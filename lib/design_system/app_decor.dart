@@ -240,16 +240,21 @@ class AppBrandBar extends StatelessWidget {
           children: [
             const AppLogoMark(),
             const SizedBox(width: 8),
-            Text(
-              title,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontSize: 23,
-                color: theme.colorScheme.primary,
-                letterSpacing: -0.3,
+            // Başlık esnek: uzun başlık (ör. Fransızca "Statut du
+            // partenaire") büyük yazıda dar telefonda taşmak yerine kısalıyor.
+            Expanded(
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontSize: 23,
+                  color: theme.colorScheme.primary,
+                  letterSpacing: -0.3,
+                ),
               ),
             ),
-            const Spacer(),
-            ?trailing,
+            if (trailing != null) ...[const SizedBox(width: 8), trailing!],
           ],
         ),
       ),
