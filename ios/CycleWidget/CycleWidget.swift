@@ -158,14 +158,14 @@ func niluColor(_ key: String, dark: Bool) -> Color {
         )
     }
     switch key {
-    case "menstruation": return rgb(dark ? 0xD07E93 : 0xB24A66)   // flow
-    case "follicular":   return rgb(dark ? 0x5FB3A1 : 0x3E8E7E)   // phaseFollicular
-    case "ovulation":    return rgb(dark ? 0x9E85C6 : 0x7B5EA7)   // ovulation
-    case "luteal":       return rgb(dark ? 0xE08A5F : 0xB85936)   // phaseLuteal
-    case "suppressed":   return rgb(dark ? 0xA0788F : 0xC79BB4)   // phaseSuppressed
+    case "menstruation": return rgb(dark ? 0xFB7185 : 0xE11D48)   // flow
+    case "follicular":   return rgb(dark ? 0x34D399 : 0x059669)   // phaseFollicular
+    case "ovulation":    return rgb(dark ? 0xA78BFA : 0x7C3AED)   // ovulation
+    case "luteal":       return rgb(dark ? 0xFBBF24 : 0xD97706)   // phaseLuteal
+    case "suppressed":   return rgb(dark ? 0xA0788F : 0xC084AB)   // phaseSuppressed
     case "pregnancy", "postpartum":
-                         return rgb(dark ? 0xE08A5F : 0xB85936)   // accent
-    default:             return rgb(dark ? 0xC79BB4 : 0x6B2F55)   // marka
+                         return rgb(dark ? 0xF78E69 : 0xC2410C)   // accent
+    default:             return rgb(dark ? 0xFFAEDE : 0x541942)   // marka
     }
 }
 
