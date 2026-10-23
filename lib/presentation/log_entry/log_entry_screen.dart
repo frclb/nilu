@@ -3,8 +3,11 @@ import '../../domain/models/life_stage.dart';
 import '../../core/navigation/route_names.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_tokens.dart';
 import '../../design_system/app_snack.dart';
+import '../../domain/models/cycle_info.dart';
+import '../../domain/services/phase_guide.dart';
 import 'package:provider/provider.dart';
 import 'widgets/log_entry_app_bar.dart';
 import 'widgets/log_entry_header.dart';
@@ -315,11 +318,21 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final stage = context.watch<CalendarViewModel>().lifeStage;
+    final t = context.tokens;
+    final takvim = context.watch<CalendarViewModel>();
+    final stage = takvim.lifeStage;
+
+    // Başlıktaki döngü günü ve en alttaki evre önerisi: kaydedilen günün
+    // gerçek verisi. Gebelikte ve lohusalıkta döngü günü yok (null).
+    final dongu = takvim.getCycleDayForDate(_gun);
+    final evre = takvim.phaseForDate(_gun);
+    final evreOnerisi =
+        stage.showsCyclePredictions &&
+        evre != CyclePhase.unknown &&
+        evre != CyclePhase.suppressed;
 
     return Scaffold(
+      backgroundColor: t.background,
       appBar: const LogEntryAppBar(),
       // Eylem çubuğu gövdenin değil `Scaffold`'un altında: içerik
       // sütununun içinde kalınca zemini geniş ekranda 600 pt'de
@@ -328,42 +341,15 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
       // gövdenin `Stack`'inin ekranı doldurmasına da bağlı değil.
       bottomNavigationBar: Container(
         padding: EdgeInsets.only(
-          left: 24,
-          right: 24,
-          top: 16,
-          bottom: 16 + MediaQuery.of(context).padding.bottom,
+          left: 20,
+          right: 20,
+          top: 12,
+          bottom: 14 + MediaQuery.of(context).padding.bottom,
         ),
-        decoration: BoxDecoration(
-          color: context.tokens.surface.withAlpha(229),
-          border: Border(
-            top: BorderSide(color: context.tokens.surfaceAlt, width: 1),
-          ),
-        ),
+        color: t.background,
         child: AppContentWidth(
           // Zemin tam genişlikte, düğme okunur sütunda kalıyor.
-          child: SizedBox(
-            height: 48,
-            child: ElevatedButton.icon(
-              onPressed: _saveLog,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 4,
-                shadowColor: theme.colorScheme.primary.withAlpha(102),
-              ),
-              icon: const Icon(Icons.check, size: 20),
-              label: Text(
-                context.tr('log_save_button'),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
+          child: _KaydetDugmesi(onPressed: _saveLog),
         ),
       ),
       body: AppContentWidth(
@@ -372,18 +358,25 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
             // Scrollable Content
             SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.only(bottom: 100),
+              padding: const EdgeInsets.only(bottom: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  LogEntryHeader(date: _gun),
+                  LogEntryHeader(
+                    date: _gun,
+                    eyebrow: dongu == null
+                        ? null
+                        : context.tr(
+                            'calendar_cycle_day',
+                            params: {'day': '$dongu'},
+                          ),
+                  ),
                   FlowIntensitySection(
                     initialValue: _flowIntensity,
                     onChanged: (value) {
                       _flowIntensity = value;
                     },
                   ),
-                  _buildDivider(isDark, theme),
                   SymptomsSection(
                     initialSymptoms: _symptoms,
                     codes: LogVocabulary.symptomsFor(stage),
@@ -396,7 +389,6 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
                         LogVocabulary.pregnancyWarningSymptoms.contains,
                       ))
                     const _GebelikBelirtiNotu(),
-                  _buildDivider(isDark, theme),
                   // Ağrı, semptomlardan sonra: kullanıcı "kramp"ı
                   // işaretledikten hemen sonra şiddetini soruyoruz.
                   PainSection(
@@ -408,23 +400,20 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
                       _pain = value;
                     },
                   ),
-                  _buildDivider(isDark, theme),
                   MoodSection(
                     initialMoods: _moods,
                     onChanged: (value) {
                       _moods = value;
                     },
                   ),
-                  _buildDivider(isDark, theme),
-                  if (stage != LifeStage.cycle) ...[
+                  if (stage != LifeStage.cycle)
                     MeasurementsSection(
                       weight: _kilo,
                       systolic: _buyuk,
                       diastolic: _kucuk,
                     ),
-                    _buildDivider(isDark, theme),
-                  ],
                   NotesSection(controller: _notesController),
+                  if (evreOnerisi) _EvreOnerisi(phase: evre),
                 ],
               ),
             ),
@@ -433,11 +422,108 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
       ),
     );
   }
+}
 
-  Widget _buildDivider(bool isDark, ThemeData theme) {
+/// Kaydet: ekranın tek ana eylemi, degrade hap.
+///
+/// `ElevatedButton` olarak kalıyor (zemini saydam, degrade altında):
+/// erişilebilirlik ve odak davranışı temanın düğmesinden geliyor.
+class _KaydetDugmesi extends StatelessWidget {
+  const _KaydetDugmesi({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onPrimary = theme.colorScheme.onPrimary;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: AppGradients.primary(context),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        boxShadow: AppShadows.floating(context),
+      ),
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          foregroundColor: onPrimary,
+          elevation: 0,
+          minimumSize: const Size.fromHeight(54),
+          shape: const StadiumBorder(),
+        ),
+        icon: const Icon(Icons.check_circle_outline, size: 20),
+        label: Text(
+          context.tr('log_save_button'),
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: onPrimary,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Kaydedilen günün evresine göre kısa öneri — takvimdeki gün özetiyle
+/// aynı kaynaktan (`PhaseGuide`).
+class _EvreOnerisi extends StatelessWidget {
+  const _EvreOnerisi({required this.phase});
+
+  final CyclePhase phase;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    final rehber = PhaseGuide.forPhase(phase);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      child: Divider(color: context.tokens.border, height: 1),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: t.brandTint,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AppIconTile(
+              icon: Icons.self_improvement,
+              size: 44,
+              background: t.surface,
+              color: t.secondary,
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    context.tr(rehber.titleKey),
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    context.tr(rehber.tipKey),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontSize: 13,
+                      height: 1.45,
+                      color: t.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -454,14 +540,14 @@ class _GebelikBelirtiNotu extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       child: Container(
         key: const Key('log_preg_symptom_note'),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: t.surfaceAlt,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: t.border),
+          color: t.surface,
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          border: Border.all(color: t.warning.withAlpha(90)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -3,44 +3,53 @@ import '../../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../../core/navigation/navigation_service.dart';
 
+/// Kayıt ekranının üst çubuğu: solda kapat, ortada serif başlık.
+///
+/// Zemin ekranla aynı: çubuk ayrı bir şerit gibi değil, sayfanın başı gibi
+/// okunuyor.
 class LogEntryAppBar extends StatelessWidget implements PreferredSizeWidget {
   const LogEntryAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = context.tokens;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        border: Border(
-          bottom: BorderSide(color: context.tokens.surfaceAlt, width: 1),
-        ),
-      ),
+    return ColoredBox(
+      color: t.background,
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
                 tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                 onPressed: () => NavigationService().pop(),
-                icon: const Icon(Icons.close),
-                color: theme.colorScheme.onSurface,
+                icon: const Icon(Icons.close, size: 20),
                 style: IconButton.styleFrom(
-                  backgroundColor: context.tokens.surfaceAlt,
+                  backgroundColor: t.brandTint,
+                  foregroundColor: theme.colorScheme.primary,
+                  fixedSize: const Size(40, 40),
+                  minimumSize: const Size(40, 40),
+                  padding: EdgeInsets.zero,
                 ),
               ),
-              Text(
-                context.tr('log_title'),
-                style: theme.textTheme.displayLarge?.copyWith(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  context.tr('log_title'),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontSize: 22,
+                    color: theme.colorScheme.primary,
+                    letterSpacing: -0.2,
+                  ),
                 ),
               ),
-              const SizedBox(width: 48), // To balance the close button
+              // Kapat düğmesini dengeler; başlık tam ortada kalsın.
+              const SizedBox(width: 48),
             ],
           ),
         ),

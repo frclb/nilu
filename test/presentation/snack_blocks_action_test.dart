@@ -50,6 +50,14 @@ void main() {
       findsOneWidget,
       reason: 'Bugün regl değilken "işaretle" düğmesi olmalı',
     );
+    // Marka çubuğu ve başlık satırıyla gün eylemleri bu yükseklikte ilk
+    // ekranın altında kalıyor. Düğme ekranın **dibine** kaydırılıyor:
+    // bildirimin çıktığı bölge orası, sınanan çakışma da o.
+    await Scrollable.ensureVisible(
+      tester.element(find.text(isaretle)),
+      alignment: 1,
+    );
+    await tester.pump();
     await tester.tap(find.text(isaretle));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));

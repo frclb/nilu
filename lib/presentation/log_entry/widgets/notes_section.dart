@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
-import '../../../design_system/app_card.dart';
 import '../../../../localization/app_localizations.dart';
+import 'log_section_header.dart';
 
 class NotesSection extends StatelessWidget {
   final TextEditingController controller;
@@ -11,54 +12,44 @@ class NotesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = context.tokens;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(
-                Icons.edit_note,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                context.tr('log_notes'),
-                style: theme.textTheme.displayLarge?.copyWith(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
-                ),
-              ),
-            ],
+          LogSectionHeader(
+            icon: Icons.edit_note,
+            title: context.tr('log_notes'),
           ),
-          const SizedBox(height: 16),
           Container(
-            height: 120,
+            height: 128,
             decoration: BoxDecoration(
-              color: context.tokens.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: context.tokens.border),
-              boxShadow: AppCard.shadow(),
+              color: t.surface,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              boxShadow: AppShadows.soft(context),
             ),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(18),
             child: TextField(
               controller: controller,
               maxLines: null,
               expands: true,
-              style: TextStyle(
+              style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface,
-                fontSize: 14,
+                fontSize: 15,
               ),
               decoration: InputDecoration(
                 hintText: context.tr('log_notes_hint'),
-                hintStyle: TextStyle(
-                  color: theme.textTheme.labelLarge?.color?.withAlpha(204),
-                  fontSize: 14,
+                hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                  color: t.textFaint,
+                  fontSize: 15,
                 ),
+                // Kartın kendisi alan; temanın dolgu ve çerçevesi yok.
+                filled: false,
                 border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
               ),

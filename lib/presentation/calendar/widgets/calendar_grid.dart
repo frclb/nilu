@@ -148,97 +148,136 @@ class CalendarGrid extends StatelessWidget {
     ];
 
     final currentMonthName = context.monthName(month);
+    final t = context.tokens;
+    final primary = theme.colorScheme.primary;
+
+    // Ay okları: küçük, tül zeminli daireler. Dokunma alanı temanın
+    // `padded` hedefiyle 48 pt; görünen daire 34 pt.
+    final navStyle = IconButton.styleFrom(
+      backgroundColor: t.brandTint,
+      foregroundColor: primary,
+      fixedSize: const Size(34, 34),
+      minimumSize: const Size(34, 34),
+      padding: EdgeInsets.zero,
+    );
 
     // Izgara ekranın iki kenarına yapışık, yalnızca altı yuvarlak bir paneldi
     // ve gölgesi %2 opaklıktaydı — ana ekrandaki kartlarla aynı dili
     // konuşmuyordu. Artık paylaşılan kart bileşeni kullanılıyor.
+    //
+    // Kart düz `surface`: tahmin bandının rengi bu zemine önceden
+    // karıştırılıyor (bkz. [predictedBandColor]); karta degrade ya da ışıma
+    // eklemek bandın tonunu kaydırır.
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
       child: AppCard(
         // Regl aralığı çubuğu satırın iki ucuna kadar uzuyor; dar boşlukta
         // kartın yuvarlak köşesinde kesiliyordu.
-        padding: const EdgeInsets.fromLTRB(12, 8, 12, 14),
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 14),
         child: Column(
           children: [
-            // Ay Navigasyonu
+            // Ay gezintisi: solda "‹ Ekim 2026 ›", sağda "Bugüne dön".
+            //
+            // "Bugüne dön" yalnızca başka bir aya gidildiğinde görünür.
+            // Aksi halde kullanıcı ok düğmesine ay sayısı kadar basmak
+            // zorunda.
+            //
+            // `Wrap`: ikisi bir satıra sığmazsa (büyük yazı, uzun çeviri)
+            // "Bugüne dön" alt satıra iniyor; ay adı kısalmıyor.
             Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 8, left: 4),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => viewModel.previousMonth(),
-                    icon: const Icon(Icons.chevron_left),
-                    color: theme.textTheme.labelLarge?.color,
-                    tooltip: context.tr('calendar_previous_month'),
-                  ),
-                  Expanded(
-                    child: Text(
-                      context.tr(
-                        'calendar_month_year',
-                        params: {
-                          'month': currentMonthName,
-                          'year': year.toString(),
-                        },
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.displayLarge?.copyWith(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+              padding: const EdgeInsets.only(bottom: 8),
+              child: SizedBox(
+                width: double.infinity,
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  runSpacing: 4,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () => viewModel.previousMonth(),
+                          icon: const Icon(Icons.chevron_left, size: 20),
+                          style: navStyle,
+                          tooltip: context.tr('calendar_previous_month'),
+                        ),
+                        Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                            child: Text(
+                              context.tr(
+                                'calendar_month_year',
+                                params: {
+                                  'month': currentMonthName,
+                                  'year': year.toString(),
+                                },
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: primary,
+                                letterSpacing: -0.2,
+                              ),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => viewModel.nextMonth(),
+                          icon: const Icon(Icons.chevron_right, size: 20),
+                          style: navStyle,
+                          tooltip: context.tr('calendar_next_month'),
+                        ),
+                      ],
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () => viewModel.nextMonth(),
-                    icon: const Icon(Icons.chevron_right),
-                    color: theme.textTheme.labelLarge?.color,
-                    tooltip: context.tr('calendar_next_month'),
-                  ),
-                ],
+                    if (!viewModel.isViewingCurrentMonth)
+                      TextButton.icon(
+                        onPressed: viewModel.goToToday,
+                        icon: const Icon(Icons.restart_alt, size: 16),
+                        label: Text(
+                          context.tr('calendar_jump_today'),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        style: TextButton.styleFrom(
+                          minimumSize: const Size(0, 36),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          backgroundColor: t.brandTint,
+                          foregroundColor: primary,
+                          textStyle: theme.textTheme.labelLarge?.copyWith(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
 
-            // "Bugüne dön" — yalnızca başka bir aya gidildiğinde görünür.
-            // Aksi halde kullanıcı ok düğmesine ay sayısı kadar basmak zorunda.
-            if (!viewModel.isViewingCurrentMonth)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: TextButton.icon(
-                  onPressed: viewModel.goToToday,
-                  icon: const Icon(Icons.today, size: 16),
-                  label: Text(context.tr('calendar_jump_today')),
-                  style: TextButton.styleFrom(
-                    minimumSize: const Size(0, 40),
-                    foregroundColor: theme.colorScheme.primary,
-                    textStyle: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-
             // Haftanın Günleri Başlığı.
             // Sabit 48px genişlik yerine eşit paylaşım: dar ekranlarda
-            // (7 × 48 = 336px) satır taşıyordu.
+            // (7 × 48 = 336px) satır taşıyordu. Hafta sonu ikincil renkte.
             Row(
-              children: daysOfWeek.map((day) {
-                return Expanded(
-                  child: Text(
-                    context.upper(day),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                      color: theme.colorScheme.primary.withAlpha(178),
+              children: [
+                for (var i = 0; i < daysOfWeek.length; i++)
+                  Expanded(
+                    child: Text(
+                      context.upper(daysOfWeek[i]),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                        color: i >= 5 ? t.secondary : t.textFaint,
+                      ),
                     ),
                   ),
-                );
-              }).toList(),
+              ],
             ),
             const SizedBox(height: 8),
 
@@ -293,7 +332,7 @@ class CalendarGrid extends StatelessWidget {
               },
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
 
             // Açıklamalar (Legend)
             //
@@ -301,9 +340,15 @@ class CalendarGrid extends StatelessWidget {
             //
             // Sabit bir Row idi; dört etiket tek satıra sığmak zorundaydı.
             // Uzun çevirilerde (ör. Almanca "Fruchtbares Fenster") taşıyordu.
-            // Wrap ile gerektiğinde alt satıra iniyor.
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+            // Wrap ile gerektiğinde alt satıra iniyor. Yumuşak bir kutunun
+            // içinde: takvimin parçası değil, onun anahtarı.
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: t.surfaceAlt,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
               child: Wrap(
                 alignment: WrapAlignment.center,
                 spacing: 14,
@@ -402,8 +447,8 @@ class CalendarGrid extends StatelessWidget {
           marker
         else
           Container(
-            width: 8,
-            height: 8,
+            width: 10,
+            height: 10,
             decoration: BoxDecoration(
               color: outlined ? Colors.transparent : color,
               shape: BoxShape.circle,
@@ -417,12 +462,16 @@ class CalendarGrid extends StatelessWidget {
               ),
             ),
           ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 6),
         Text(
           label,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.labelLarge?.copyWith(fontSize: 11),
+          style: theme.textTheme.labelMedium?.copyWith(
+            fontSize: 11.5,
+            fontWeight: FontWeight.w600,
+            color: context.tokens.textMuted,
+          ),
         ),
       ],
     );
@@ -527,19 +576,38 @@ class _DayTile extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
+    // Yumurtlama günü kendi menekşe halkasıyla çiziliyor; seçili, bugün ya
+    // da regl günüyse onların işareti öne geçiyor (alttaki nokta kalıyor).
+    final ovulationRing =
+        isOvulation && !isPeriod && !isSelected && !isToday && !isFaded;
+
     // --- Renk Hesaplamaları ---
+    final t = context.tokens;
     Color textColor;
+    var textWeight = FontWeight.w500;
     if (isFaded) {
-      textColor = context.tokens.textFaint;
+      textColor = t.textFaint.withAlpha(160);
     } else if (isPeriod) {
       // Akış rengi koyu temada açık pembe; beyaz metin orada okunmuyor.
-      textColor = AppContrast.on(context.tokens.flow);
+      textColor = AppContrast.on(t.flow);
+      textWeight = FontWeight.w700;
     } else if (isSelected) {
       textColor = theme.colorScheme.onPrimary;
+      textWeight = FontWeight.w700;
     } else if (isToday) {
       textColor = theme.colorScheme.primary;
+      textWeight = FontWeight.w700;
+    } else if (ovulationRing) {
+      textColor = t.ovulationText;
+      textWeight = FontWeight.w700;
+    } else if (isPredicted) {
+      // Tül bandın üstünde gül metin: "regl, ama henüz tahmin".
+      textColor = t.flowText;
+      textWeight = FontWeight.w600;
+    } else if (isFertile) {
+      textColor = theme.colorScheme.primary;
     } else {
-      textColor = context.tokens.text;
+      textColor = t.text;
     }
 
     // VoiceOver yalnızca "17" okuyordu: ayı, reglin ya da tahminin
@@ -649,6 +717,7 @@ class _DayTile extends StatelessWidget {
                           isFertile,
                           isDark,
                           theme,
+                          ovulationRing: ovulationRing,
                         ),
                         shape: BoxShape.circle,
                         // Seçim halkası — her zaman görünür
@@ -659,6 +728,7 @@ class _DayTile extends StatelessWidget {
                           isFaded,
                           theme,
                           isDark,
+                          ovulationRing: ovulationRing,
                         ),
                         boxShadow: isSelected
                             ? [
@@ -675,12 +745,11 @@ class _DayTile extends StatelessWidget {
                       child: Center(
                         child: Text(
                           date.day.toString(),
-                          style: TextStyle(
+                          style: theme.textTheme.bodyMedium?.copyWith(
                             color: textColor,
-                            fontWeight: (isSelected || isPeriod || isToday)
-                                ? FontWeight.bold
-                                : FontWeight.w500,
+                            fontWeight: textWeight,
                             fontSize: 14,
+                            height: 1.2,
                           ),
                         ),
                       ),
@@ -814,8 +883,9 @@ class _DayTile extends StatelessWidget {
     bool isPredicted,
     bool isFertile,
     bool isDark,
-    ThemeData theme,
-  ) {
+    ThemeData theme, {
+    bool ovulationRing = false,
+  }) {
     // `context` bu yardımcıda yok; roller temadan okunuyor.
     final t = theme.extension<AppTokens>() ?? AppTokens.light;
 
@@ -825,6 +895,9 @@ class _DayTile extends StatelessWidget {
       return t.flow;
     } else if (isSelected) {
       return theme.colorScheme.primary;
+    } else if (ovulationRing) {
+      // Yumurtlama: menekşe tülü (halkası [_getCircleBorder]'da).
+      return t.ovulationTint;
     } else if (isPredicted) {
       // Daire ile bant tek şekil gibi görünsün diye ikisi aynı oranda
       // (bant opaklığının ~%65'i).
@@ -844,8 +917,9 @@ class _DayTile extends StatelessWidget {
     bool isToday,
     bool isFaded,
     ThemeData theme,
-    bool isDark,
-  ) {
+    bool isDark, {
+    bool ovulationRing = false,
+  }) {
     final t = theme.extension<AppTokens>() ?? AppTokens.light;
     if (isSelected && isPeriod) {
       // Seçili regl günü: dolgunun üstünde okunan halka
@@ -859,6 +933,10 @@ class _DayTile extends StatelessWidget {
         color: theme.colorScheme.primary.withAlpha(isDark ? 150 : 120),
         width: 1.5,
       );
+    } else if (ovulationRing) {
+      // Yumurtlama günü: menekşe halka. Alttaki nokta da menekşe; lejant
+      // o noktayı tarif ediyor.
+      return Border.all(color: t.ovulation, width: 1.5);
     }
     return null;
   }

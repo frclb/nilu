@@ -1,10 +1,11 @@
 import '../../../design_system/app_tappable.dart';
 import 'package:flutter/material.dart';
 
-import '../../../design_system/app_scrim.dart';
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../../domain/models/log_vocabulary.dart';
 import '../../../../localization/app_localizations.dart';
+import 'log_section_header.dart';
 
 /// Kayıt ekranının ağrı bölümü.
 ///
@@ -102,95 +103,111 @@ class _PainSectionState extends State<PainSection> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = context.tokens;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Icon(Icons.bolt_outlined, color: theme.colorScheme.primary),
-              const SizedBox(width: 8),
-              Text(
-                context.tr('day_detail_pain'),
-                style: theme.textTheme.displayLarge?.copyWith(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
-                ),
-              ),
-            ],
+          LogSectionHeader(
+            icon: Icons.monitor_heart_outlined,
+            title: context.tr('day_detail_pain'),
           ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final code in LogVocabulary.painLevels)
-                _Pill(
-                  label: context.tr(LogVocabulary.painLevelKey(code)),
-                  selected: _level == code,
-                  onTap: () => _selectLevel(code),
-                ),
-            ],
+          // Şiddet: tül bir rayın içinde üç bölüm; seçili olan şeftali.
+          Container(
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: t.surfaceAlt,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
+            child: Row(
+              children: [
+                for (final code in LogVocabulary.painLevels)
+                  Expanded(
+                    child: _Segment(
+                      label: context.tr(LogVocabulary.painLevelKey(code)),
+                      selected: _level == code,
+                      onTap: () => _selectLevel(code),
+                    ),
+                  ),
+              ],
+            ),
           ),
 
           if (_level != null) ...[
-            const SizedBox(height: 8),
-            CheckboxListTile(
-              contentPadding: EdgeInsets.zero,
-              controlAffinity: ListTileControlAffinity.leading,
-              dense: true,
-              value: _limited,
-              onChanged: (v) {
-                setState(() => _limited = v ?? false);
-                _emit();
-              },
-              title: Text(
-                context.tr('day_detail_pain_limited'),
-                style: theme.textTheme.bodyMedium,
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.fromLTRB(14, 6, 14, 16),
+              decoration: BoxDecoration(
+                color: t.surface,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                boxShadow: AppShadows.soft(context),
               ),
-            ),
-
-            const SizedBox(height: 8),
-            _Label(context.tr('log_pain_location')),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final code in LogVocabulary.painLocations)
-                  _Pill(
-                    label: context.tr(LogVocabulary.painLocationKey(code)),
-                    selected: _locations.contains(code),
-                    onTap: () => _toggle(_locations, code),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    dense: true,
+                    value: _limited,
+                    onChanged: (v) {
+                      setState(() => _limited = v ?? false);
+                      _emit();
+                    },
+                    title: Text(
+                      context.tr('day_detail_pain_limited'),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: t.text,
+                      ),
+                    ),
                   ),
-              ],
-            ),
 
-            const SizedBox(height: 18),
-            _Label(context.tr('log_pain_when')),
-            const SizedBox(height: 4),
-            Text(
-              context.tr('log_pain_when_hint'),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: context.tokens.textMuted,
-                height: 1.4,
+                  const SizedBox(height: 6),
+                  _Label(context.tr('log_pain_location')),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final code in LogVocabulary.painLocations)
+                        _Pill(
+                          label: context.tr(
+                            LogVocabulary.painLocationKey(code),
+                          ),
+                          selected: _locations.contains(code),
+                          onTap: () => _toggle(_locations, code),
+                        ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 18),
+                  _Label(context.tr('log_pain_when')),
+                  const SizedBox(height: 4),
+                  Text(
+                    context.tr('log_pain_when_hint'),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: t.textMuted,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final code in LogVocabulary.painContexts)
+                        _Pill(
+                          label: context.tr(LogVocabulary.painContextKey(code)),
+                          selected: _contexts.contains(code),
+                          onTap: () => _toggle(_contexts, code),
+                        ),
+                    ],
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final code in LogVocabulary.painContexts)
-                  _Pill(
-                    label: context.tr(LogVocabulary.painContextKey(code)),
-                    selected: _contexts.contains(code),
-                    onTap: () => _toggle(_contexts, code),
-                  ),
-              ],
             ),
           ],
         ],
@@ -207,13 +224,74 @@ class _Label extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(
     text,
-    style: Theme.of(
-      context,
-    ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+      fontWeight: FontWeight.w700,
+      color: context.tokens.textMuted,
+    ),
   );
 }
 
-/// Kayıt ekranının çip biçimi; semptom ve ruh hâli bölümleriyle aynı.
+/// Şiddet rayının bir bölümü.
+class _Segment extends StatelessWidget {
+  const _Segment({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return AppTappable(
+      selected: selected,
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        constraints: const BoxConstraints(minHeight: 44),
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
+        decoration: BoxDecoration(
+          color: selected ? t.accentTint : null,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: selected ? AppShadows.soft(context) : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (selected) ...[
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  color: t.accent,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Flexible(
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  fontSize: 14,
+                  fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                  color: selected ? t.text : t.textMuted,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Ağrı yeri ve bağlamı çipi: seçiliyken gül tülü ve onay işareti.
 class _Pill extends StatelessWidget {
   const _Pill({
     required this.label,
@@ -228,39 +306,40 @@ class _Pill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = context.tokens;
+    final fg = selected ? t.secondary : t.textMuted;
 
     return AppTappable(
       selected: selected,
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        // En az 44 pt: dokunma hedefi iOS'un önerdiği ölçüde kalsın.
+        constraints: const BoxConstraints(minHeight: 44),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: selected
-              ? theme.colorScheme.primary
-              : theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(32),
-          border: Border.all(
-            color: selected ? theme.colorScheme.primary : context.tokens.border,
-          ),
-          boxShadow: selected
-              ? null
-              : [
-                  BoxShadow(
-                    color: AppScrim.veil(26),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
+          color: selected ? t.secondaryTint : t.surfaceAlt,
+          borderRadius: BorderRadius.circular(AppRadius.pill),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: selected
-                ? theme.colorScheme.onPrimary
-                : theme.textTheme.labelLarge?.color,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (selected) ...[
+              Icon(Icons.check, size: 15, color: fg),
+              const SizedBox(width: 5),
+            ],
+            Flexible(
+              child: Text(
+                label,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 14,
+                  height: 1.2,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  color: fg,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

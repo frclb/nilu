@@ -21,6 +21,8 @@ class CalendarSummarySection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final t = context.tokens;
+    final primary = theme.colorScheme.primary;
     final viewModel = context.watch<CalendarViewModel>();
     final selectedDate = viewModel.selectedDate;
     final dailyLog = viewModel.getDailyLogForDate(selectedDate);
@@ -42,208 +44,205 @@ class CalendarSummarySection extends StatelessWidget {
     final evreVar = viewModel.lifeStage.showsCyclePredictions;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Summary Card
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: AppCard.decoration(context.tokens),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+      child: AppCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        context.tr(
-                          isToday
-                              ? 'calendar_today_summary'
-                              : 'calendar_day_summary',
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
-                        ),
+                // Başlığın solundaki küçük vurgu çizgisi.
+                Container(
+                  width: 5,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: t.secondary,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Semantics(
+                    header: true,
+                    child: Text(
+                      context.tr(
+                        isToday
+                            ? 'calendar_today_summary'
+                            : 'calendar_day_summary',
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                        color: primary,
                       ),
                     ),
-                    IconButton(
-                      onPressed: () =>
-                          showDayDetailSheet(context, selectedDate),
-                      tooltip: context.tr('calendar_add_note'),
-                      icon: Icon(
-                        Icons.edit,
-                        size: 20,
-                        color: theme.colorScheme.primary,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => showDayDetailSheet(context, selectedDate),
+                  tooltip: context.tr('calendar_add_note'),
+                  icon: const Icon(Icons.edit_outlined, size: 18),
+                  style: IconButton.styleFrom(
+                    backgroundColor: t.brandTint,
+                    foregroundColor: primary,
+                    fixedSize: const Size(36, 36),
+                    minimumSize: const Size(36, 36),
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+
+            // Kayıt çipleri — gerçek veriye göre
+            if (hasFlow || hasMoods || hasSymptoms)
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (hasFlow)
+                    _SummaryChip(
+                      icon: Icons.water_drop,
+                      iconColor: t.flow,
+                      label: context.tr(
+                        LogVocabulary.flowKey(dailyLog.flowIntensity!),
+                      ),
+                    ),
+                  if (hasMoods)
+                    ...dailyLog.moods.map(
+                      (mood) => _SummaryChip(
+                        icon: Icons.sentiment_satisfied_alt,
+                        iconColor: t.accent,
+                        label: context.tr(LogVocabulary.moodKey(mood)),
+                      ),
+                    ),
+                  if (hasSymptoms)
+                    ...dailyLog.symptoms
+                        .take(3)
+                        .map(
+                          (symptom) => _SummaryChip(
+                            icon: Icons.healing,
+                            iconColor: t.ovulation,
+                            label: context.tr(
+                              LogVocabulary.symptomKey(symptom),
+                            ),
+                          ),
+                        ),
+                ],
+              )
+            else if (!hasAnyData)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Text(
+                  context.tr('calendar_no_log_yet'),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 13,
+                    fontStyle: FontStyle.italic,
+                    color: t.textMuted,
+                  ),
+                ),
+              ),
+
+            // Notlar (gerçek veriden)
+            if (hasNotes) ...[
+              if (hasFlow || hasMoods || hasSymptoms)
+                const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: t.surfaceAlt,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.sticky_note_2_outlined,
+                      size: 20,
+                      color: t.textMuted,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            context.tr('log_notes'),
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: primary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            dailyLog.notes!,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontSize: 13,
+                              color: t.textMuted,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+              ),
+            ],
 
-                // Status Chips - gerçek veriye göre
-                if (hasAnyData)
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      if (hasFlow)
-                        _buildChip(
-                          icon: Icons.water_drop,
-                          iconColor: context.tokens.flow,
-                          label: context.tr(
-                            LogVocabulary.flowKey(dailyLog.flowIntensity!),
-                          ),
-                          textColor: theme.colorScheme.primary,
-                          bgColor: context.tokens.brandTint,
-                          borderColor: theme.colorScheme.primary.withAlpha(25),
-                        ),
-                      if (hasMoods)
-                        ...dailyLog.moods.map(
-                          (mood) => _buildChip(
-                            icon: Icons.sentiment_satisfied,
-                            iconColor: context.tokens.accent,
-                            label: context.tr(LogVocabulary.moodKey(mood)),
-                            textColor: context.tokens.accent,
-                            bgColor: isDark
-                                ? context.tokens.accent.withAlpha(51)
-                                : context.tokens.accentTint,
-                            borderColor: isDark
-                                ? context.tokens.accent.withAlpha(51)
-                                : theme.colorScheme.tertiary.withAlpha(38),
-                          ),
-                        ),
-                      if (hasSymptoms)
-                        ...dailyLog.symptoms
-                            .take(3)
-                            .map(
-                              (symptom) => _buildChip(
-                                icon: Icons.healing,
-                                iconColor: context.tokens.ovulation,
-                                label: context.tr(
-                                  LogVocabulary.symptomKey(symptom),
-                                ),
-                                textColor: context.tokens.ovulation,
-                                bgColor: isDark
-                                    ? context.tokens.ovulation.withAlpha(51)
-                                    : context.tokens.ovulationTint,
-                                borderColor: context.tokens.ovulation.withAlpha(
-                                  51,
-                                ),
-                              ),
-                            ),
-                    ],
-                  )
-                else
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Text(
-                      context.tr('calendar_no_log_yet'),
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        fontSize: 13,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ),
-
-                if (hasNotes || evreVar) ...[
-                  const SizedBox(height: 20),
-                  Divider(color: context.tokens.border, height: 1),
-                  const SizedBox(height: 20),
-                ],
-
-                // Notes (gerçek veriden)
-                if (hasNotes) ...[
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? context.tokens.border.withAlpha(76)
-                              : context.tokens.surfaceAlt,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.note_alt_outlined,
-                          color: context.tokens.textMuted,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              context.tr('log_notes'),
-                              style: theme.textTheme.displayLarge?.copyWith(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              dailyLog.notes!,
-                              style: theme.textTheme.labelLarge?.copyWith(
-                                fontSize: 12,
-                                height: 1.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-
-                if (hasNotes && evreVar) const SizedBox(height: 20),
-
-                // Seçili günün evresine göre içerik.
-                //
-                // Burada eskiden her gün için aynı sabit öneri yazıyordu;
-                // hangi güne dokunulursa dokunulsun metin değişmiyordu.
-                if (evreVar) _PhaseGuidanceBlock(phase: phase, isDark: isDark),
-              ],
-            ),
-          ),
-        ],
+            // Seçili günün evresine göre içerik.
+            //
+            // Burada eskiden her gün için aynı sabit öneri yazıyordu;
+            // hangi güne dokunulursa dokunulsun metin değişmiyordu.
+            if (evreVar) ...[
+              const SizedBox(height: 16),
+              _PhaseGuidanceBlock(phase: phase, isDark: isDark),
+            ],
+          ],
+        ),
       ),
     );
   }
+}
 
-  Widget _buildChip({
-    required IconData icon,
-    required Color iconColor,
-    required String label,
-    required Color textColor,
-    required Color bgColor,
-    required Color borderColor,
-  }) {
+/// Özet çipi: renkli simge + etiket, gül tülü zeminde.
+class _SummaryChip extends StatelessWidget {
+  const _SummaryChip({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: borderColor),
+        color: t.brandTint,
+        borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 18, color: iconColor),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: textColor,
+          Icon(icon, size: 16, color: iconColor),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              label,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                height: 1.2,
+                color: theme.colorScheme.primary,
+              ),
             ),
           ),
         ],
@@ -264,75 +263,100 @@ class _PhaseGuidanceBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = context.tokens;
     final guidance = PhaseGuide.forPhase(phase);
-    final phaseColor = phase.color(context.tokens);
+    final phaseColor = phase.color(t);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: phaseColor.withAlpha(isDark ? 51 : 30),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.spa_outlined, color: phaseColor),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    context.tr(guidance.titleKey),
-                    style: theme.textTheme.displayLarge?.copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    context.tr(guidance.bodyKey),
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      fontSize: 12,
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            phaseColor.withAlpha(isDark ? 40 : 26),
+            phaseColor.withAlpha(isDark ? 16 : 8),
           ],
         ),
-        const SizedBox(height: 16),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: phaseColor.withAlpha(isDark ? 30 : 18),
-            borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: phaseColor.withAlpha(isDark ? 56 : 36),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(Icons.autorenew, size: 20, color: phaseColor),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(Icons.lightbulb_outline, size: 18, color: phaseColor),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  context.tr(guidance.tipKey),
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    fontSize: 12,
-                    height: 1.5,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        context.tr(guidance.titleKey),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: phaseColor,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  context.tr(guidance.bodyKey),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: t.textMuted,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 10),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: t.accentTint,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.lightbulb_outline, size: 16, color: t.accent),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          context.tr(guidance.tipKey),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontSize: 12.5,
+                            height: 1.45,
+                            color: t.text,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

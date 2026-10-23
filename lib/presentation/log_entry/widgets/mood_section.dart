@@ -1,9 +1,10 @@
 import '../../../design_system/app_tappable.dart';
 import 'package:flutter/material.dart';
-import '../../../design_system/app_scrim.dart';
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../../domain/models/log_vocabulary.dart';
 import '../../../../localization/app_localizations.dart';
+import 'log_section_header.dart';
 
 class MoodSection extends StatefulWidget {
   final List<String> initialMoods;
@@ -25,12 +26,13 @@ class _MoodSectionState extends State<MoodSection> {
   // Saklanan değerler kanonik kodlardır; etiketler lokalizasyondan gelir.
   static const List<String> _moodCodes = ['happy', 'calm', 'sad', 'anxious'];
 
-  static const List<IconData> _moodIcons = [
-    Icons.sentiment_satisfied,
-    Icons.self_improvement,
-    Icons.sentiment_dissatisfied,
-    Icons.thunderstorm,
-  ];
+  /// Kod → emoji. Gün sayfasındaki ruh hâli kutularıyla aynı dil.
+  static const Map<String, String> _emojis = {
+    'happy': '😊',
+    'calm': '😌',
+    'sad': '😔',
+    'anxious': '😟',
+  };
 
   @override
   void initState() {
@@ -41,96 +43,108 @@ class _MoodSectionState extends State<MoodSection> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    final moods = List.generate(
-      _moodCodes.length,
-      (i) => {
-        'icon': _moodIcons[i],
-        'label': context.tr(LogVocabulary.moodKey(_moodCodes[i])),
-      },
-    );
-
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(Icons.mood, color: Theme.of(context).colorScheme.primary),
-              const SizedBox(width: 8),
-              Text(
-                context.tr('log_mood'),
-                style: theme.textTheme.displayLarge?.copyWith(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.5,
+          LogSectionHeader(icon: Icons.mood, title: context.tr('log_mood')),
+          // Kutular eşit boyda: küçülen etiket kutuyu kısaltmasın.
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < _moodCodes.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 10),
+                  Expanded(child: _tile(context, i)),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _tile(BuildContext context, int index) {
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    final code = _moodCodes[index];
+    final isSelected = _selectedIndex == index;
+
+    return AppTappable(
+      selected: isSelected,
+      onTap: () {
+        setState(() {
+          _selectedIndex = index;
+        });
+        widget.onChanged([code]);
+      },
+      child: Stack(
+        clipBehavior: Clip.none,
+        fit: StackFit.expand,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 14),
+            decoration: BoxDecoration(
+              color: isSelected ? t.accentTint : t.surface,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              border: Border.all(
+                color: isSelected ? t.accent.withAlpha(90) : Colors.transparent,
+              ),
+              boxShadow: AppShadows.soft(context),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Emoji süs; VoiceOver yalnızca etiketi okusun.
+                ExcludeSemantics(
+                  child: Text(
+                    _emojis[code] ?? '',
+                    style: const TextStyle(fontSize: 28),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                // Uzun etiket ("Angespannt") kelimenin ortasından
+                // bölünmesin; hafifçe küçülsün.
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    context.tr(LogVocabulary.moodKey(code)),
+                    maxLines: 1,
+                    softWrap: false,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontSize: 12.5,
+                      fontWeight: isSelected
+                          ? FontWeight.w800
+                          : FontWeight.w600,
+                      color: isSelected ? t.text : t.textMuted,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (isSelected)
+            Positioned(
+              top: -5,
+              right: -4,
+              child: Container(
+                width: 18,
+                height: 18,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.check,
+                  size: 12,
+                  color: theme.colorScheme.onPrimary,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(moods.length, (index) {
-              final isSelected = _selectedIndex == index;
-              return AppTappable(
-                selected: isSelected,
-                onTap: () {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                  widget.onChanged([_moodCodes[index]]);
-                },
-                child: Column(
-                  children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.surface,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isSelected
-                              ? theme.colorScheme.primary
-                              : (context.tokens.border),
-                          width: 2,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppScrim.veil(26),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        moods[index]['icon'] as IconData,
-                        size: 32,
-                        color: isSelected
-                            ? Theme.of(context).colorScheme.onPrimary
-                            : theme.textTheme.labelLarge?.color?.withAlpha(127),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      moods[index]['label'] as String,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: isSelected
-                            ? (Theme.of(context).colorScheme.primary)
-                            : theme.textTheme.labelLarge?.color,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-          ),
+            ),
         ],
       ),
     );
