@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import '../../design_system/app_scrim.dart';
-import '../../design_system/app_tokens.dart';
-import '../../data/datasources/remote/firestore_datasource.dart';
-import '../../data/repositories/pairing_repository.dart';
-import 'widgets/pairing_requests_section.dart';
-import '../../domain/services/pairing_token.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+
 import '../../../domain/view_models/user_view_model.dart';
 import '../../../localization/app_localizations.dart';
-import 'package:go_router/go_router.dart';
+import '../../data/datasources/remote/firestore_datasource.dart';
+import '../../data/repositories/pairing_repository.dart';
+import '../../design_system/app_card.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
+import '../../design_system/app_tokens.dart';
+import '../../domain/services/pairing_token.dart';
+import 'widgets/pairing_requests_section.dart';
+import 'widgets/partner_match_app_bar.dart';
 
 class PartnerQrGenScreen extends StatefulWidget {
   const PartnerQrGenScreen({super.key, this.remote});
@@ -88,199 +90,70 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
     // Kopyalama bildirimi duruyor: panoya yazmanın ekranda başka bir izi yok.
   }
 
+  Future<void> _copy() async {
+    final copied = context.tr('partner_qr_gen_code_copied');
+    final messenger = ScaffoldMessenger.of(context);
+    await Clipboard.setData(ClipboardData(text: _token!));
+    if (!mounted) return;
+    messenger.showSnackBar(SnackBar(content: Text(copied)));
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    final bgColor = context.tokens.background;
-    final surfaceColor = context.tokens.surface;
-    final primaryColor = theme.colorScheme.primary;
-    final textMainColor = context.tokens.text;
-    final textMutedColor = context.tokens.textMuted;
+    final t = context.tokens;
+    final primary = theme.colorScheme.primary;
 
     return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-          icon: Icon(Icons.arrow_back, color: textMainColor),
-          onPressed: () => context.pop(),
-        ),
-        centerTitle: true,
-        title: Text(
-          context.tr('partner_qr_gen_title'),
-          style: TextStyle(
-            color: textMainColor,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
+      backgroundColor: t.background,
+      appBar: const PartnerMatchAppBar(
+        titleKey: 'partner_qr_gen_title',
+        showSettings: false,
       ),
       body: AppContentWidth(
         child: _failed
             ? _Failed(unavailable: !_remote.isAvailable, onRetry: _load)
             : _token == null
-            ? Center(child: CircularProgressIndicator(color: primaryColor))
+            ? Center(child: CircularProgressIndicator(color: primary))
             : SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24.0,
-                  vertical: 32.0,
-                ),
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
                 physics: const BouncingScrollPhysics(),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Icon header
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: primaryColor.withAlpha(25),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.qr_code_2,
-                        size: 60,
-                        color: primaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Title and instruction
                     Text(
                       context.tr('partner_qr_gen_header'),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: textMainColor,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontSize: 30,
+                        height: 1.15,
+                        color: primary,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     Text(
                       context.tr('partner_qr_gen_desc'),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 15,
+                      style: theme.textTheme.bodyLarge?.copyWith(
                         height: 1.5,
-                        color: textMutedColor,
+                        color: t.textMuted,
                       ),
                     ),
-                    const SizedBox(height: 48),
-
-                    // Premium QR Code Card with glow
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Decorative Glow Background
-                        Container(
-                          width: 250,
-                          height: 250,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: primaryColor.withAlpha(51),
-                                blurRadius: 60,
-                                spreadRadius: 20,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // QR Card
-                        Container(
-                          padding: const EdgeInsets.all(24),
-                          decoration: BoxDecoration(
-                            color: surfaceColor,
-                            borderRadius: BorderRadius.circular(32),
-                            border: Border.all(color: context.tokens.border),
-                            boxShadow: [
-                              BoxShadow(
-                                color: isDark
-                                    ? AppScrim.veil(76)
-                                    : primaryColor.withAlpha(20),
-                                blurRadius: 30,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              QrImageView(
-                                data: _token!,
-                                version: QrVersions.auto,
-                                size: 200.0,
-                                backgroundColor: Colors.transparent,
-                                eyeStyle: QrEyeStyle(
-                                  eyeShape: QrEyeShape.square,
-                                  color: context.tokens.text,
-                                ),
-                                dataModuleStyle: QrDataModuleStyle(
-                                  dataModuleShape: QrDataModuleShape.circle,
-                                  color: context.tokens.text,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              // ID Display (hidden optionally or stylized)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: context.tokens.surfaceAlt,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                // Kodun tamamı gösteriliyor: kamera
-                                // çalışmadığında elle yazılabilmeli. Kısaltılmış
-                                // bir parça hiçbir işe yaramıyordu.
-                                child: Text(
-                                  PairingToken.forDisplay(_token!),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1.5,
-                                    color: textMutedColor,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
                     const SizedBox(height: 24),
-
-                    // Kodu yenile.
-                    //
-                    // Ayrılırken erişimi kesmek listeden çıkarmakla oluyor ama
-                    // eski QR ortada kalıyor. Bunu yenilemek onu da geçersiz
-                    // kılar — kullanıcının kontrolünde olması gereken bir şey.
-                    TextButton.icon(
-                      onPressed: _rotating ? null : _rotate,
-                      icon: _rotating
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.autorenew, size: 18),
-                      label: Text(context.tr('partner_qr_gen_rotate')),
-                      style: TextButton.styleFrom(
-                        foregroundColor: primaryColor,
-                      ),
+                    _QrCard(
+                      token: _token!,
+                      rotating: _rotating,
+                      onRotate: _rotate,
+                      onCopy: _copy,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Text(
-                        context.tr('partner_qr_gen_rotate_hint'),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 12, color: textMutedColor),
+                    const SizedBox(height: 20),
+                    OutlinedButton.icon(
+                      onPressed: _copy,
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(56),
                       ),
+                      icon: const Icon(Icons.copy_rounded, size: 20),
+                      label: Text(context.tr('partner_qr_gen_copy_code')),
                     ),
 
                     // Partner kodu okutunca istek burada beliriyor: sahip
@@ -290,42 +163,139 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
                       remote: _remote,
                       pairing: _pairing,
                     ),
-
-                    const SizedBox(height: 24),
-
-                    // Share Button Alternative
-                    OutlinedButton.icon(
-                      onPressed: () async {
-                        await Clipboard.setData(ClipboardData(text: _token!));
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              context.tr('partner_qr_gen_code_copied'),
-                            ),
-                          ),
-                        );
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: textMainColor,
-                        side: BorderSide(color: context.tokens.border),
-                        minimumSize: const Size(double.infinity, 56),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      icon: const Icon(Icons.copy_rounded, size: 20),
-                      label: Text(
-                        context.tr('partner_qr_gen_copy_code'),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
+      ),
+    );
+  }
+}
+
+/// QR, elle yazılacak kod ve yenileme — tek kartta.
+class _QrCard extends StatelessWidget {
+  const _QrCard({
+    required this.token,
+    required this.rotating,
+    required this.onRotate,
+    required this.onCopy,
+  });
+
+  final String token;
+  final bool rotating;
+  final VoidCallback onRotate;
+  final VoidCallback onCopy;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final t = context.tokens;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+      decoration: BoxDecoration(
+        color: t.surface,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: AppCard.borderColor(t)),
+        boxShadow: AppShadows.floating(context),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: t.surface,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                border: Border.all(color: AppCard.borderColor(t)),
+              ),
+              child: QrImageView(
+                data: token,
+                version: QrVersions.auto,
+                size: 200.0,
+                backgroundColor: Colors.transparent,
+                eyeStyle: QrEyeStyle(
+                  eyeShape: QrEyeShape.square,
+                  color: t.text,
+                ),
+                dataModuleStyle: QrDataModuleStyle(
+                  dataModuleShape: QrDataModuleShape.circle,
+                  color: t.text,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          // Kodun tamamı gösteriliyor: kamera çalışmadığında elle
+          // yazılabilmeli. Kısaltılmış bir parça hiçbir işe yaramıyordu.
+          Container(
+            padding: const EdgeInsetsDirectional.fromSTEB(20, 4, 4, 4),
+            decoration: BoxDecoration(
+              color: t.brandTint,
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      PairingToken.forDisplay(token),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 2.2,
+                        color: t.text,
+                      ),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  tooltip: context.tr('partner_qr_gen_copy_code'),
+                  onPressed: onCopy,
+                  icon: Icon(
+                    Icons.copy_rounded,
+                    size: 20,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Kodu yenile.
+          //
+          // Ayrılırken erişimi kesmek listeden çıkarmakla oluyor ama eski QR
+          // ortada kalıyor. Bunu yenilemek onu da geçersiz kılar —
+          // kullanıcının kontrolünde olması gereken bir şey.
+          Center(
+            child: TextButton.icon(
+              onPressed: rotating ? null : onRotate,
+              icon: rotating
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.autorenew_rounded, size: 18),
+              label: Text(context.tr('partner_qr_gen_rotate')),
+              style: TextButton.styleFrom(
+                foregroundColor: t.secondary,
+                minimumSize: const Size(0, 44),
+              ),
+            ),
+          ),
+          Text(
+            context.tr('partner_qr_gen_rotate_hint'),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodySmall?.copyWith(
+              height: 1.45,
+              color: t.textMuted,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -340,24 +310,34 @@ class _Failed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final theme = Theme.of(context);
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
         child: Column(
           key: const Key('partner_qr_failed'),
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.cloud_off_outlined, size: 56, color: t.textMuted),
-            const SizedBox(height: 16),
+            AppIconTile(
+              icon: Icons.cloud_off_outlined,
+              size: 80,
+              circle: true,
+              background: t.surfaceAlt,
+              color: t.textMuted,
+            ),
+            const SizedBox(height: 20),
             Text(
               context.tr(
                 unavailable ? 'partner_unavailable' : 'partner_qr_gen_failed',
               ),
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 15, height: 1.5, color: t.text),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                height: 1.5,
+                color: t.text,
+              ),
             ),
             if (!unavailable) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               OutlinedButton(
                 onPressed: onRetry,
                 child: Text(context.tr('retry')),

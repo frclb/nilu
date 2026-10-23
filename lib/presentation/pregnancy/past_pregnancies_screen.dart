@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/navigation/route_names.dart';
+import '../../design_system/app_card.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/models/pregnancy.dart';
@@ -19,7 +21,8 @@ import 'delete_pregnancy.dart';
 /// `PregnancyCalendar`).
 ///
 /// Nasıl bittiği yalnızca kullanıcı belirttiyse yazıyor; "belirtmek
-/// istemiyorum" diyene burada da bir etiket konmuyor.
+/// istemiyorum" diyene burada da bir etiket konmuyor. Kartlar her sonuçta
+/// aynı görünümde: doğum ile kayıp arasında renk ya da simge farkı yok.
 class PastPregnanciesScreen extends StatelessWidget {
   const PastPregnanciesScreen({super.key});
 
@@ -34,27 +37,60 @@ class PastPregnanciesScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: t.background,
         elevation: 0,
-        title: Text(context.tr('past_preg_title')),
+        iconTheme: IconThemeData(color: theme.colorScheme.primary),
+        title: Text(
+          context.tr('past_preg_title'),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.primary,
+          ),
+        ),
       ),
       body: AppContentWidth(
         child: SafeArea(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
             children: [
-              Text(
-                context.tr(
-                  gecmis.isEmpty ? 'past_preg_empty' : 'past_preg_list_intro',
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  gradient: AppGradients.blush(context),
+                  borderRadius: BorderRadius.circular(AppCard.radius),
+                  border: Border.all(color: AppCard.borderColor(t)),
                 ),
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontSize: 13,
-                  height: 1.5,
-                  color: t.textMuted,
+                child: Row(
+                  children: [
+                    AppIconTile(
+                      icon: Icons.spa_outlined,
+                      size: 44,
+                      circle: true,
+                      background: t.surface,
+                      color: t.secondary,
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        context.tr(
+                          gecmis.isEmpty
+                              ? 'past_preg_empty'
+                              : 'past_preg_list_intro',
+                        ),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: 1.5,
+                          color: t.text,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               for (final g in gecmis) ...[
                 _Kart(gebelik: g),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
               ],
             ],
           ),
@@ -92,55 +128,98 @@ class _Kart extends StatelessWidget {
         ),
     ].join(' · ');
 
-    return Material(
-      key: Key('past_preg_${gebelik.id}'),
-      color: t.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: t.border),
-      ),
+    return Container(
+      decoration: AppCard.decoration(t),
       clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => context.pushNamed(
-          RouteNames.pastPregnancy,
-          pathParameters: {'id': gebelik.id},
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _aralik(context),
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: t.text,
-                      ),
-                    ),
-                    if (alt.isNotEmpty) ...[
-                      const SizedBox(height: 4),
+      child: Material(
+        key: Key('past_preg_${gebelik.id}'),
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: () => context.pushNamed(
+            RouteNames.pastPregnancy,
+            pathParameters: {'id': gebelik.id},
+          ),
+          child: Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(20, 18, 8, 6),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(end: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (alt.isNotEmpty) ...[
+                        Row(
+                          children: [
+                            Container(
+                              width: 7,
+                              height: 7,
+                              decoration: BoxDecoration(
+                                color: t.secondary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                alt,
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: t.secondary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                      ],
                       Text(
-                        alt,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: t.textMuted,
+                        _aralik(context),
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontSize: 22,
+                          height: 1.2,
+                          color: t.text,
                         ),
                       ),
                     ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Divider(height: 1, color: AppCard.dividerColor(t)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              context.tr('past_preg_record_title'),
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                color: t.text,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          Icon(
+                            Icons.chevron_right_rounded,
+                            size: 20,
+                            color: t.textMuted,
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      key: Key('past_preg_delete_${gebelik.id}'),
+                      tooltip: context.tr('preg_delete_title'),
+                      icon: Icon(Icons.delete_outline, color: t.textMuted),
+                      onPressed: () =>
+                          confirmDeletePregnancy(context, gebelik.id),
+                    ),
                   ],
                 ),
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                key: Key('past_preg_delete_${gebelik.id}'),
-                tooltip: context.tr('preg_delete_title'),
-                icon: Icon(Icons.delete_outline, color: t.textFaint),
-                onPressed: () => confirmDeletePregnancy(context, gebelik.id),
-              ),
-              Icon(Icons.chevron_right, color: t.textFaint),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_theme.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../localization/app_localizations.dart';
@@ -20,16 +21,23 @@ Future<bool> askIntimacyConsent(BuildContext context) async {
       final t = ctx.tokens;
       final theme = Theme.of(ctx);
       Widget madde(IconData icon, String key) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.only(bottom: 14),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 18, color: theme.colorScheme.primary),
-            const SizedBox(width: 10),
+            AppIconTile(icon: icon, size: 32, circle: true),
+            const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                ctx.tr(key),
-                style: TextStyle(fontSize: 13, height: 1.45, color: t.text),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  ctx.tr(key),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 13.5,
+                    height: 1.45,
+                    color: t.text,
+                  ),
+                ),
               ),
             ),
           ],
@@ -43,11 +51,11 @@ Future<bool> askIntimacyConsent(BuildContext context) async {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              madde(Icons.favorite_border, 'consent_what'),
-              madde(Icons.person_outline, 'consent_who'),
+              madde(Icons.favorite_border_rounded, 'consent_what'),
+              madde(Icons.person_outline_rounded, 'consent_who'),
               madde(Icons.cloud_outlined, 'consent_where'),
               madde(Icons.shield_outlined, 'consent_special'),
-              madde(Icons.undo, 'consent_withdraw'),
+              madde(Icons.undo_rounded, 'consent_withdraw'),
             ],
           ),
         ),

@@ -4,12 +4,16 @@ import 'package:provider/provider.dart';
 
 import '../../../data/datasources/remote/firestore_datasource.dart';
 import '../../../data/repositories/pairing_repository.dart';
+import '../../../design_system/app_card.dart';
+import '../../../design_system/app_decor.dart';
+import '../../../design_system/app_theme.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../domain/services/pairing_token.dart';
 import '../../../domain/view_models/intimacy_view_model.dart';
 import '../../../domain/view_models/user_view_model.dart';
 import '../../../localization/app_localizations.dart';
 import 'intimacy_consent.dart';
+import 'partner_ui.dart';
 
 /// Bekleyen eşleştirme istekleri ve onayları.
 ///
@@ -95,27 +99,24 @@ class _PairingRequestsSectionState extends State<PairingRequestsSection> {
         final theme = Theme.of(context);
 
         return Padding(
-          padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+          padding: const EdgeInsets.only(top: 28),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
+              PartnerSectionTitle(
                 context.tr('partner_requests_title'),
-                style: theme.textTheme.displayLarge?.copyWith(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                trailing: AppTag(
+                  label: '${docs.length}',
+                  background: t.secondary,
+                  foreground: theme.colorScheme.onSecondary,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 context.tr('partner_requests_hint'),
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontSize: 12,
-                  height: 1.5,
-                  color: t.textMuted,
-                ),
+                style: theme.textTheme.bodyMedium?.copyWith(color: t.textMuted),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               for (final doc in docs)
                 _RequestTile(
                   requesterUid: doc.id,
@@ -148,52 +149,107 @@ class _RequestTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
     final theme = Theme.of(context);
+    final code = PairingToken.confirmationCode(requesterUid);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: t.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: t.border),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.person_add_alt, color: theme.colorScheme.primary),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              // Uygulama isim toplamıyor. Önceden kısaltılmış bir kimlik
-              // gösteriliyordu ("k3Jd9QzL…") ve sahip isteği kimin
-              // gönderdiğini ayırt edemiyordu. Aynı dört haneli kod
-              // partnerin ekranında da yazıyor: eşleşiyorsa doğru kişi.
-              context.tr(
-                'partner_request_code',
-                params: {'code': PairingToken.confirmationCode(requesterUid)},
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: AppCard(
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    AppIconTile(
+                      icon: Icons.person_outline_rounded,
+                      size: 52,
+                      background: t.brandTint,
+                    ),
+                    Positioned(
+                      top: -3,
+                      right: -3,
+                      child: Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: t.secondary,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: t.surface, width: 2),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text.rich(
+                    // Uygulama isim toplamıyor. Önceden kısaltılmış bir
+                    // kimlik gösteriliyordu ("k3Jd9QzL…") ve sahip isteği
+                    // kimin gönderdiğini ayırt edemiyordu. Aynı dört haneli
+                    // kod partnerin ekranında da yazıyor: eşleşiyorsa doğru
+                    // kişi.
+                    PartnerUi.emphasize(
+                      context.tr(
+                        'partner_request_code',
+                        params: {'code': code},
+                      ),
+                      code,
+                      theme.textTheme.titleLarge!.copyWith(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 2,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: t.textMuted,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (busy)
+              const Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+              )
+            else
+              Wrap(
+                alignment: WrapAlignment.end,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  TextButton(
+                    onPressed: onReject,
+                    style: TextButton.styleFrom(
+                      foregroundColor: t.textMuted,
+                      minimumSize: const Size(64, 44),
+                    ),
+                    child: Text(context.tr('partner_request_reject')),
+                  ),
+                  FilledButton.icon(
+                    onPressed: onApprove,
+                    // Temanın tam genişlik asgarisi satırda taşırdı.
+                    style: AppTheme.dialogAction(),
+                    icon: const Icon(Icons.check_rounded, size: 18),
+                    label: Text(context.tr('partner_request_approve')),
+                  ),
+                ],
               ),
-              style: theme.textTheme.labelLarge?.copyWith(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          if (busy)
-            const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          else ...[
-            TextButton(
-              onPressed: onReject,
-              child: Text(context.tr('partner_request_reject')),
-            ),
-            FilledButton(
-              onPressed: onApprove,
-              child: Text(context.tr('partner_request_approve')),
-            ),
           ],
-        ],
+        ),
       ),
     );
   }

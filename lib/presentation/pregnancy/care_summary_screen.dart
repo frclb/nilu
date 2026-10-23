@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/navigation/route_names.dart';
+import '../../design_system/app_card.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/models/life_stage.dart';
@@ -105,15 +107,24 @@ class CareSummaryScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: t.background,
         elevation: 0,
+        centerTitle: false,
+        iconTheme: IconThemeData(color: theme.colorScheme.primary),
         title: Text(
           context.tr(gecmis ? 'past_preg_record_title' : 'care_summary_title'),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.primary,
+          ),
         ),
         actions: [
           if (ozet != null)
             IconButton(
               key: const Key('care_summary_share'),
               tooltip: context.tr('care_summary_share'),
-              icon: const Icon(Icons.ios_share),
+              icon: Icon(Icons.ios_share, color: theme.colorScheme.primary),
               onPressed: () {
                 if (!PremiumGate.canExportReports(isPremium: premium)) {
                   context.pushNamed(RouteNames.premium);
@@ -132,61 +143,61 @@ class CareSummaryScreen extends StatelessWidget {
       ),
       body: AppContentWidth(
         child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-            children: [
-              Text(
-                context.tr(gecmis ? 'past_preg_intro' : 'care_summary_intro'),
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontSize: 13,
-                  height: 1.5,
-                  color: t.textMuted,
-                ),
-              ),
-              for (final b in bolumler) ...[
-                const SizedBox(height: 20),
-                Text(
-                  context.upper(b.title),
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    fontSize: 12,
-                    letterSpacing: 1.4,
-                    fontWeight: FontWeight.w700,
-                    color: t.textMuted,
+          // Tembel liste değil: özet baştan sona okunan (ve aynen paylaşılan)
+          // tek bir belge; bölüm sayısı sabit. Kartlı görünümde son bölümler
+          // ilk karede hiç kurulmuyordu.
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _Giris(
+                  metin: context.tr(
+                    gecmis ? 'past_preg_intro' : 'care_summary_intro',
+                  ),
+                  tarih: context.tr(
+                    'care_summary_generated',
+                    params: {
+                      'date':
+                          '${bugun.day} ${context.monthName(bugun.month)} '
+                          '${bugun.year}',
+                    },
                   ),
                 ),
-                const SizedBox(height: 8),
-                for (final s in b.lines)
+                for (final b in bolumler) ...[
+                  const SizedBox(height: 24),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
+                    padding: const EdgeInsets.only(left: 4, bottom: 10),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (s.flagged) ...[
-                          Icon(
-                            Icons.warning_amber_rounded,
-                            size: 18,
-                            color: t.warning,
-                          ),
-                          const SizedBox(width: 6),
+                        if (b.icon != null) ...[
+                          Icon(b.icon, size: 17, color: t.secondary),
+                          const SizedBox(width: 8),
                         ],
                         Expanded(
                           child: Text(
-                            s.text,
-                            style: theme.textTheme.labelLarge?.copyWith(
-                              fontSize: 15,
-                              height: 1.45,
-                              fontWeight: s.flagged
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
-                              color: s.muted ? t.textMuted : t.text,
+                            context.upper(b.title),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontSize: 12,
+                              letterSpacing: 1.4,
+                              fontWeight: FontWeight.w800,
+                              color: t.textMuted,
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
+                  AppCard(
+                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [for (final s in b.lines) _Satir(satir: s)],
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
@@ -413,15 +424,18 @@ class CareSummaryScreen extends StatelessWidget {
           SummaryLine('${tarih(n.date)} — ${n.text}'),
     ]);
 
+    // Bölüm simgeleri yalnızca ekranda; paylaşılan metin düz kalıyor.
+    // Uyarı üçgeni burada kullanılmıyor: o, hekimin dikkatine sunulan
+    // satırların işareti.
     return [
-      kimlik,
-      tansiyon,
-      kilo,
-      kanama,
-      belirtiler,
-      kontroller,
-      notlar,
-      if (o.past) gunluk,
+      kimlik.withIcon(Icons.event_note_outlined),
+      tansiyon.withIcon(Icons.monitor_heart_outlined),
+      kilo.withIcon(Icons.monitor_weight_outlined),
+      kanama.withIcon(Icons.water_drop_outlined),
+      belirtiler.withIcon(Icons.healing_outlined),
+      kontroller.withIcon(Icons.fact_check_outlined),
+      notlar.withIcon(Icons.edit_note_rounded),
+      if (o.past) gunluk.withIcon(Icons.sticky_note_2_outlined),
     ];
   }
 
@@ -497,7 +511,113 @@ class SummarySection {
   final String title;
   final List<SummaryLine> lines;
 
-  const SummarySection(this.title, this.lines);
+  /// Ekrandaki başlığın simgesi; paylaşılan metne girmiyor.
+  final IconData? icon;
+
+  const SummarySection(this.title, this.lines, {this.icon});
+
+  SummarySection withIcon(IconData icon) =>
+      SummarySection(title, lines, icon: icon);
+}
+
+/// Özetin girişi: ne olduğu, ne olmadığı ve ne zaman hazırlandığı.
+class _Giris extends StatelessWidget {
+  const _Giris({required this.metin, required this.tarih});
+
+  final String metin;
+  final String tarih;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: AppGradients.blush(context),
+        borderRadius: BorderRadius.circular(AppCard.radius),
+        border: Border.all(color: AppCard.borderColor(t)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppIconTile(
+            icon: Icons.assignment_outlined,
+            size: 40,
+            circle: true,
+            background: t.surface,
+            color: t.secondary,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  tarih,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: t.secondary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  metin,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    height: 1.5,
+                    color: t.text,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Bölümdeki bir satır. Hekimin dikkatine sunulanlar tülle ayrışıyor.
+class _Satir extends StatelessWidget {
+  const _Satir({required this.satir});
+
+  final SummaryLine satir;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    final s = satir;
+    final metin = Text(
+      s.text,
+      style: theme.textTheme.bodyLarge?.copyWith(
+        fontSize: s.muted ? 14 : 15,
+        height: 1.45,
+        fontWeight: s.flagged ? FontWeight.w700 : FontWeight.w400,
+        color: s.muted ? t.textMuted : t.text,
+      ),
+    );
+
+    if (!s.flagged) {
+      return Padding(padding: const EdgeInsets.only(bottom: 6), child: metin);
+    }
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8, top: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: t.danger.withAlpha(22),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.warning_amber_rounded, size: 18, color: t.danger),
+          const SizedBox(width: 8),
+          Expanded(child: metin),
+        ],
+      ),
+    );
+  }
 }
 
 /// Bölümdeki bir satır.

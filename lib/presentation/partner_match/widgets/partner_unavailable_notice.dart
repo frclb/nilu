@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../design_system/app_card.dart';
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../localization/app_localizations.dart';
 
@@ -14,23 +15,30 @@ class PartnerUnavailableNotice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
-    return Container(
+    return Padding(
       key: const Key('partner_unavailable'),
-      margin: const EdgeInsets.only(top: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: AppCard.decoration(t),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.cloud_off_outlined, color: t.textMuted),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              context.tr('partner_unavailable'),
-              style: TextStyle(fontSize: 13, height: 1.45, color: t.text),
+      padding: const EdgeInsets.only(top: 16),
+      child: AppCard(
+        padding: const EdgeInsets.all(18),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AppIconTile(
+              icon: Icons.cloud_off_outlined,
+              background: t.surfaceAlt,
+              color: t.textMuted,
             ),
-          ),
-        ],
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                context.tr('partner_unavailable'),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(height: 1.45, color: t.text),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

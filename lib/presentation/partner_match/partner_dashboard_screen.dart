@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
-import '../../design_system/app_scrim.dart';
-import '../../design_system/app_tokens.dart';
-import 'dart:async';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/navigation/route_names.dart';
-import '../../localization/app_localizations.dart';
-import '../../localization/relative_time.dart';
-import '../../domain/view_models/partner_view_model.dart';
-import '../../domain/view_models/user_view_model.dart';
+import '../../design_system/app_card.dart';
+import '../../design_system/app_decor.dart';
+import '../../design_system/app_layout.dart';
+import '../../design_system/app_theme.dart';
+import '../../design_system/app_tokens.dart';
 import '../../domain/services/pairing_token.dart';
 import '../../domain/services/partner_suggestion_engine.dart';
-import '../../design_system/app_layout.dart';
+import '../../domain/view_models/partner_view_model.dart';
+import '../../domain/view_models/user_view_model.dart';
+import '../../localization/app_localizations.dart';
+import '../../localization/relative_time.dart';
+import '../widgets/profile_avatar_button.dart';
+import 'widgets/partner_ui.dart';
 
+/// Partner rolündeki kullanıcının ana sekmesi ("Durum").
+///
+/// Partner yalnızca sahibin paylaşmayı seçtiği yakınlık durumunu görüyor:
+/// istek düzeyi ve sevgi ihtiyaçları. Döngü verisi buraya hiç gelmiyor ve
+/// ekran geliyormuş gibi konuşmuyor.
 class PartnerDashboardScreen extends StatefulWidget {
   const PartnerDashboardScreen({super.key});
 
@@ -47,7 +55,7 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.04).animate(
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.03).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
   }
@@ -67,20 +75,8 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final t = context.tokens;
     final vm = context.watch<PartnerViewModel>();
-
-    final bgColor = context.tokens.background;
-    final surfaceColor = context.tokens.surface;
-    final primaryColor = Theme.of(context).colorScheme.primary;
-    // Marka pembesi sabit yazılıydı; premium tema çeşitleri bu ekranda
-    // uygulanmıyordu.
-    final warmAccent = context.tokens.flowSoft;
-    final textMainColor = context.tokens.text;
-    final textMutedColor = context.tokens.textMuted;
-    final borderColor = context.tokens.border;
-    final warmBg = context.tokens.brandTint;
 
     // Pulse animasyonu tetikle
     if (vm.hasNewUpdate) {
@@ -88,82 +84,54 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
       Future.microtask(() => vm.clearNewUpdateFlag());
     }
 
-    if (!vm.isLoaded) {
-      return Scaffold(
-        backgroundColor: bgColor,
-        body: AppContentWidth(
-          child: Center(child: CircularProgressIndicator(color: primaryColor)),
-        ),
-      );
-    }
-
     return Scaffold(
-      backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: bgColor,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Text(
-          // Partner'ın adı hiçbir yerde saklanmıyor; burada `partnerId`
-          // kullanılıyordu ve kullanıcıya ham UUID gösteriliyordu
-          // ("a3f2b8c1-... Durumu"). Ad alanı eklenene kadar genel başlık.
-          context.tr('pv_header_title'),
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: textMainColor,
-            letterSpacing: -0.3,
-          ),
-        ),
-        // Ayar simgesi sahibin paylaşım ayarlarını açıyordu; partner
-        // rolünde orada değiştirebileceği bir şey yok.
-      ),
-      body: AppContentWidth(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: _buildBody(
-            context,
-            vm,
-            isDark,
-            bgColor,
-            surfaceColor,
-            primaryColor,
-            warmAccent,
-            textMainColor,
-            textMutedColor,
-            borderColor,
-            warmBg,
-          ),
+      backgroundColor: t.background,
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            // Partnerin adı hiçbir yerde saklanmıyor; burada eskiden
+            // `partnerId` yazıyordu ve kullanıcıya ham UUID gösteriliyordu.
+            // Sekmenin adı yeterli. Ayar simgesi de yok: sahibin paylaşım
+            // ayarlarında partnerin değiştirebileceği bir şey yok.
+            AppBrandBar(
+              title: context.tr('partner_nav_dashboard'),
+              trailing: const ProfileAvatarButton(),
+            ),
+            Expanded(
+              child: AppContentWidth(
+                child: !vm.isLoaded
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      )
+                    : FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: _buildBody(context, vm),
+                      ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildBody(
-    BuildContext context,
-    PartnerViewModel vm,
-    bool isDark,
-    Color bgColor,
-    Color surfaceColor,
-    Color primaryColor,
-    Color warmAccent,
-    Color textMainColor,
-    Color textMutedColor,
-    Color borderColor,
-    Color warmBg,
-  ) {
+  Widget _buildBody(BuildContext context, PartnerViewModel vm) {
+    final t = context.tokens;
+    final primary = Theme.of(context).colorScheme.primary;
     final kod = PairingToken.confirmationCode(
       context.watch<UserViewModel>().myId ?? '',
     );
     switch (vm.state) {
       case PartnerLinkState.notConnected:
         return _StateMessage(
-          icon: Icons.link_off,
+          icon: Icons.link_off_rounded,
           titleKey: 'pv_no_connection_title',
           descKey: 'pv_no_connection_desc',
-          color: primaryColor,
+          color: primary,
+          tint: t.brandTint,
           showLeave: true,
         );
       case PartnerLinkState.unavailable:
@@ -171,7 +139,8 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
           icon: Icons.cloud_off_outlined,
           titleKey: 'pv_unavailable_title',
           descKey: 'partner_unavailable',
-          color: primaryColor,
+          color: primary,
+          tint: t.brandTint,
           showLeave: true,
         );
       case PartnerLinkState.awaitingApproval:
@@ -183,7 +152,9 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
           icon: Icons.hourglass_top_rounded,
           titleKey: 'pv_awaiting_title',
           desc: context.tr('pv_awaiting_desc', params: {'code': kod}),
-          color: primaryColor,
+          emphasis: kod,
+          color: primary,
+          tint: t.brandTint,
           showLeave: true,
         );
       case PartnerLinkState.unreachable:
@@ -191,7 +162,8 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
           icon: Icons.wifi_off_rounded,
           titleKey: 'pv_unreachable_title',
           descKey: 'pv_unreachable_desc',
-          color: warmAccent,
+          color: t.flowText,
+          tint: t.flowTint,
           showLeave: true,
         );
       case PartnerLinkState.connected:
@@ -204,568 +176,134 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
             icon: Icons.hourglass_empty_rounded,
             titleKey: 'pv_empty_title',
             descKey: 'pv_empty_desc',
-            color: warmAccent,
+            color: t.flowText,
+            tint: t.flowTint,
             showLeave: true,
           );
         }
     }
 
-    // ── Normal State ──
+    // ── Normal durum ──
     return RefreshIndicator(
-      color: primaryColor,
+      color: primary,
       onRefresh: () async => vm.retry(),
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 8),
-            // ── Header ──
-            _buildHeader(
-              context,
-              vm,
-              textMainColor,
-              textMutedColor,
-              primaryColor,
+            const _HeaderCard(),
+            const SizedBox(height: 16),
+            if (vm.isDataStale) ...[
+              const _StaleWarning(),
+              const SizedBox(height: 16),
+            ],
+            AnimatedBuilder(
+              animation: _pulseAnimation,
+              builder: (context, child) =>
+                  Transform.scale(scale: _pulseAnimation.value, child: child),
+              child: _FeelingCard(vm: vm),
             ),
-            const SizedBox(height: 20),
-            // ── Stale Data Warning ──
-            if (vm.isDataStale) _buildStaleWarning(warmAccent, textMutedColor),
-            // ── Ana Kart — Şu An Ne Hissediyor? ──
-            _buildMainFeelingCard(
-              context,
-              vm,
-              isDark,
-              surfaceColor,
-              primaryColor,
-              warmAccent,
-              textMainColor,
-              textMutedColor,
-              borderColor,
-              warmBg,
-            ),
-            const SizedBox(height: 20),
-            // ── Akıllı Öneriler ──
-            _buildSuggestions(
-              context,
-              vm,
-              isDark,
-              surfaceColor,
-              primaryColor,
-              warmAccent,
-              textMainColor,
-              textMutedColor,
-              borderColor,
-            ),
-            const SizedBox(height: 20),
-            // ── Son Güncelleme ──
-            _buildLastUpdated(context, vm, textMutedColor),
-            const SizedBox(height: 20),
-            // ── Geçmiş (Collapsible) ──
-            _buildHistory(
-              context,
-              vm,
-              isDark,
-              surfaceColor,
-              primaryColor,
-              textMainColor,
-              textMutedColor,
-              borderColor,
-            ),
-            const SizedBox(height: 20),
-            // ── Kontroller ──
-            _buildControls(
-              context,
-              vm,
-              isDark,
-              surfaceColor,
-              primaryColor,
-              warmAccent,
-              textMainColor,
-              textMutedColor,
-              borderColor,
-            ),
-            const SizedBox(height: 32),
+            if (vm.suggestions.isNotEmpty) ...[
+              const SizedBox(height: 28),
+              _Suggestions(vm: vm),
+            ],
+            // İlk girdi mevcut durum; geçmiş yalnızca daha eskisi varsa.
+            if (vm.historyList.length > 1) ...[
+              const SizedBox(height: 24),
+              _CollapsibleHistory(
+                entries: vm.historyList.skip(1).take(3).toList(),
+              ),
+            ],
+            const SizedBox(height: 24),
+            Center(child: _LeaveButton(color: t.danger)),
           ],
         ),
       ),
     );
   }
+}
 
-  // ══════════════════════════════════════════════════════════════
-  // HEADER
-  // ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// BAŞLIK KARTI
+// ══════════════════════════════════════════════════════════════
 
-  Widget _buildHeader(
-    BuildContext context,
-    PartnerViewModel vm,
-    Color textMainColor,
-    Color textMutedColor,
-    Color primaryColor,
-  ) {
-    // Burada `partnerId` yazıyordu ve ham bir UID kullanıcıya partnerin **adı**
-    // gibi gösteriliyordu ("k3Jd9QzLm2Xp..."), avatar harfi de onun ilk
-    // karakterinden geliyordu. Aynı hata uygulama çubuğu başlığında bulunup
-    // düzeltilmiş (yukarıya bak) ama bu blokta kalmıştı. Partnerin adı
-    // hiçbir yerde saklanmadığı için ad alanı eklenene kadar genel etiket.
+/// Kimin durumuna bakıldığı.
+///
+/// Burada eskiden `partnerId` yazıyordu ve ham bir UID kullanıcıya partnerin
+/// **adı** gibi gösteriliyordu ("k3Jd9QzLm2Xp..."), avatar harfi de onun ilk
+/// karakterinden geliyordu. Partnerin adı hiçbir yerde saklanmadığı için ad
+/// alanı eklenene kadar genel etiket ve onun baş harfi.
+class _HeaderCard extends StatelessWidget {
+  const _HeaderCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final t = context.tokens;
     final userName = context.tr('partner_label');
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Avatar + İsim
-        Container(
-          width: 56,
-          height: 56,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [primaryColor, primaryColor.withAlpha(180)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: primaryColor.withAlpha(40),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Center(
-            child: Text(
-              // Ad saklanmıyor; harf yerelleştirilmiş etiketten.
-              context.upper(userName.characters.first),
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          userName,
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: textMainColor,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          context.tr('pv_header_subtitle'),
-          style: TextStyle(fontSize: 13, color: textMutedColor),
-        ),
-        const SizedBox(height: 8),
-        // Bağlantı durumu
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: context.tokens.success.withAlpha(20),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: context.tokens.success,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                context.tr('pv_connected'),
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: context.tokens.success,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
 
-  // ══════════════════════════════════════════════════════════════
-  // STALE DATA WARNING
-  // ══════════════════════════════════════════════════════════════
-
-  Widget _buildStaleWarning(Color warmAccent, Color textMutedColor) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: context.tokens.warning.withAlpha(30),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: context.tokens.warning.withAlpha(76)),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.schedule, size: 16, color: context.tokens.warning),
-            const SizedBox(width: 8),
-            Expanded(
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          ExcludeSemantics(
+            child: Container(
+              width: 56,
+              height: 56,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: AppGradients.mark(context),
+                boxShadow: AppShadows.soft(context),
+              ),
               child: Text(
-                context.tr('pv_old_data_warning'),
-                style: TextStyle(fontSize: 12, color: context.tokens.text),
+                // Ad saklanmıyor; harf yerelleştirilmiş etiketten.
+                context.upper(userName.characters.first),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontSize: 24,
+                  height: 1,
+                  color: theme.colorScheme.onPrimary,
+                ),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ══════════════════════════════════════════════════════════════
-  // ANA KART — ŞU AN NE HİSSEDİYOR?
-  // ══════════════════════════════════════════════════════════════
-
-  Widget _buildMainFeelingCard(
-    BuildContext context,
-    PartnerViewModel vm,
-    bool isDark,
-    Color surfaceColor,
-    Color primaryColor,
-    Color warmAccent,
-    Color textMainColor,
-    Color textMutedColor,
-    Color borderColor,
-    Color warmBg,
-  ) {
-    final status = vm.currentStatus!;
-    final desireKey = PartnerSuggestionEngine.getDesireKey(status.sexualDesire);
-    final desireText = desireKey == null ? '' : context.tr(desireKey);
-
-    return AnimatedBuilder(
-      animation: _pulseAnimation,
-      builder: (context, child) {
-        return Transform.scale(scale: _pulseAnimation.value, child: child);
-      },
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [context.tokens.brandTint, context.tokens.flowTint],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isDark
-                ? warmAccent.withAlpha(30)
-                : primaryColor.withAlpha(25),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: primaryColor.withAlpha(isDark ? 15 : 12),
-              blurRadius: 20,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Başlık
-            Row(
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: primaryColor.withAlpha(30),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.favorite_rounded,
-                    size: 16,
-                    color: warmAccent,
-                  ),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      userName,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontSize: 20,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    AppTag(
+                      label: context.tr('pv_connected'),
+                      dotColor: t.success,
+                      background: t.success.withAlpha(26),
+                      foreground: t.success,
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(height: 2),
                 Text(
-                  context.tr('pv_feeling_title'),
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: textMainColor,
-                    letterSpacing: -0.2,
+                  context.tr('pv_header_subtitle'),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: t.textMuted,
                   ),
                 ),
               ],
-            ),
-            const SizedBox(height: 18),
-
-            // ── Cinsel İstek (doğal dil) ──
-            if (desireText.isNotEmpty) ...[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('🔥', style: TextStyle(fontSize: 18)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      desireText,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: textMainColor,
-                        height: 1.4,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-            ],
-
-            // ── Sevgi İhtiyaçları ──
-            if (status.affectionNeeds.isNotEmpty) ...[
-              Row(
-                children: [
-                  Text('❤️', style: TextStyle(fontSize: 16)),
-                  const SizedBox(width: 8),
-                  Text(
-                    context.tr('pv_affection_label'),
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: textMutedColor,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: status.affectionNeeds.map((need) {
-                  final needKey = PartnerSuggestionEngine.getNeedKey(need);
-                  final needText = needKey == null ? need : context.tr(needKey);
-                  return Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isDark ? AppScrim.frost(8) : AppScrim.frost(180),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: isDark
-                            ? AppScrim.frost(12)
-                            : primaryColor.withAlpha(20),
-                      ),
-                    ),
-                    child: Text(
-                      needText,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? AppScrim.frost(220)
-                            : primaryColor.withAlpha(200),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ══════════════════════════════════════════════════════════════
-  // AKILLI ÖNERİLER — NE YAPABİLİRSİN?
-  // ══════════════════════════════════════════════════════════════
-
-  Widget _buildSuggestions(
-    BuildContext context,
-    PartnerViewModel vm,
-    bool isDark,
-    Color surfaceColor,
-    Color primaryColor,
-    Color warmAccent,
-    Color textMainColor,
-    Color textMutedColor,
-    Color borderColor,
-  ) {
-    final suggestions = vm.suggestions;
-    if (suggestions.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(Icons.lightbulb_outline, color: warmAccent, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              context.tr('pv_suggestions_title'),
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: textMainColor,
-                letterSpacing: -0.2,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        ...suggestions.map(
-          (s) => Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: surfaceColor,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: borderColor),
-                boxShadow: isDark
-                    ? []
-                    : [
-                        BoxShadow(
-                          color: AppScrim.veil(26),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(s.emoji, style: const TextStyle(fontSize: 20)),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      context.tr(s.key),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: textMainColor,
-                        height: 1.4,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ══════════════════════════════════════════════════════════════
-  // SON GÜNCELLEME
-  // ══════════════════════════════════════════════════════════════
-
-  Widget _buildLastUpdated(
-    BuildContext context,
-    PartnerViewModel vm,
-    Color textMutedColor,
-  ) {
-    return Center(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.access_time, size: 14, color: textMutedColor),
-          const SizedBox(width: 6),
-          Text(
-            '${context.tr('pv_last_updated')}: '
-            '${context.relativeTime(vm.timeSinceLastUpdate)}',
-            style: TextStyle(fontSize: 12, color: textMutedColor),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ══════════════════════════════════════════════════════════════
-  // GEÇMİŞ (COLLAPSIBLE)
-  // ══════════════════════════════════════════════════════════════
-
-  Widget _buildHistory(
-    BuildContext context,
-    PartnerViewModel vm,
-    bool isDark,
-    Color surfaceColor,
-    Color primaryColor,
-    Color textMainColor,
-    Color textMutedColor,
-    Color borderColor,
-  ) {
-    if (vm.historyList.length <= 1) return const SizedBox.shrink();
-
-    // İlk girdi mevcut durum, gerisini göster
-    final pastEntries = vm.historyList.skip(1).take(3).toList();
-    if (pastEntries.isEmpty) return const SizedBox.shrink();
-
-    return _CollapsibleHistory(
-      entries: pastEntries,
-      isDark: isDark,
-      surfaceColor: surfaceColor,
-      primaryColor: primaryColor,
-      textMainColor: textMainColor,
-      textMutedColor: textMutedColor,
-      borderColor: borderColor,
-    );
-  }
-
-  // ══════════════════════════════════════════════════════════════
-  // KONTROLLER (Mute / Disconnect)
-  // ══════════════════════════════════════════════════════════════
-
-  Widget _buildControls(
-    BuildContext context,
-    PartnerViewModel vm,
-    bool isDark,
-    Color surfaceColor,
-    Color primaryColor,
-    Color warmAccent,
-    Color textMainColor,
-    Color textMutedColor,
-    Color borderColor,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        children: [
-          // Bağlantı Kes
-          InkWell(
-            key: const Key('pv_leave'),
-            onTap: () => confirmLeavePartner(context),
-            borderRadius: BorderRadius.circular(10),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                children: [
-                  Icon(Icons.link_off, size: 20, color: warmAccent),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      context.tr('pv_disconnect'),
-                      style: TextStyle(fontSize: 14, color: warmAccent),
-                    ),
-                  ),
-                  Icon(Icons.chevron_right, size: 20, color: textMutedColor),
-                ],
-              ),
             ),
           ),
         ],
@@ -775,27 +313,312 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
 }
 
 // ══════════════════════════════════════════════════════════════
-// COLLAPSIBLE HISTORY
+// ESKİ VERİ UYARISI
+// ══════════════════════════════════════════════════════════════
+
+class _StaleWarning extends StatelessWidget {
+  const _StaleWarning();
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: t.warning.withAlpha(30),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: t.warning.withAlpha(76)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.schedule_rounded, size: 18, color: t.warning),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              context.tr('pv_old_data_warning'),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(height: 1.4, color: t.text),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// ANA KART — ŞU AN NE HİSSEDİYOR?
+// ══════════════════════════════════════════════════════════════
+
+class _FeelingCard extends StatelessWidget {
+  const _FeelingCard({required this.vm});
+
+  final PartnerViewModel vm;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    final on = theme.colorScheme.onPrimary;
+    final status = vm.currentStatus!;
+    final desireKey = PartnerSuggestionEngine.getDesireKey(status.sexualDesire);
+    final desireText = desireKey == null ? '' : context.tr(desireKey);
+    final guncelleme = context.relativeTime(vm.timeSinceLastUpdate);
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: PartnerUi.plum(context),
+        borderRadius: BorderRadius.circular(AppCard.radius),
+        boxShadow: AppShadows.floating(context),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          // Köşede yumuşak bir gül ışıması.
+          Positioned(
+            top: -60,
+            right: -60,
+            child: IgnorePointer(
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      t.secondary.withAlpha(90),
+                      t.secondary.withAlpha(0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 12,
+                  runSpacing: 8,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: on.withAlpha(30),
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.favorite_rounded, size: 14, color: on),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              context.upper(context.tr('pv_feeling_title')),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.2,
+                                color: on,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (guncelleme.isNotEmpty)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.schedule_rounded,
+                            size: 14,
+                            color: on.withAlpha(190),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            guncelleme,
+                            semanticsLabel:
+                                '${context.tr('pv_last_updated')}: $guncelleme',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: on.withAlpha(190),
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+
+                // ── Cinsel istek (doğal dil) ──
+                if (desireText.isNotEmpty)
+                  Text(
+                    desireText,
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontSize: 28,
+                      height: 1.2,
+                      color: on,
+                    ),
+                  ),
+
+                // ── Sevgi ihtiyaçları ──
+                if (status.affectionNeeds.isNotEmpty) ...[
+                  const SizedBox(height: 20),
+                  Text(
+                    context.upper(context.tr('pv_affection_label')),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.4,
+                      color: on.withAlpha(170),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final (i, need) in status.affectionNeeds.indexed)
+                        _NeedPill(
+                          text: PartnerSuggestionEngine.getNeedKey(need) == null
+                              ? need
+                              : context.tr(
+                                  PartnerSuggestionEngine.getNeedKey(need)!,
+                                ),
+                          first: i == 0,
+                        ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Erik kartın üstünde ihtiyaç hapı: ilki beyaz, gerisi tül.
+class _NeedPill extends StatelessWidget {
+  const _NeedPill({required this.text, required this.first});
+
+  final String text;
+  final bool first;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final on = scheme.onPrimary;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+      decoration: BoxDecoration(
+        color: first ? on : on.withAlpha(36),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+      ),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+          fontSize: 13,
+          fontWeight: first ? FontWeight.w700 : FontWeight.w600,
+          color: first ? scheme.primary : on,
+        ),
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// ÖNERİLER — NE YAPABİLİRSİN?
+// ══════════════════════════════════════════════════════════════
+
+class _Suggestions extends StatelessWidget {
+  const _Suggestions({required this.vm});
+
+  final PartnerViewModel vm;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final t = context.tokens;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            AppIconTile(
+              icon: Icons.lightbulb_outline_rounded,
+              size: 32,
+              circle: true,
+              background: t.accentTint,
+              color: t.accent,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: PartnerSectionTitle(context.tr('pv_suggestions_title')),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        for (final s in vm.suggestions)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: AppCard(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: t.brandTint,
+                      shape: BoxShape.circle,
+                    ),
+                    child: ExcludeSemantics(
+                      child: Text(
+                        s.emoji,
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Text(
+                      context.tr(s.key),
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        height: 1.4,
+                        color: t.text,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// GEÇMİŞ (AÇILIR)
 // ══════════════════════════════════════════════════════════════
 
 class _CollapsibleHistory extends StatefulWidget {
-  final List entries;
-  final bool isDark;
-  final Color surfaceColor;
-  final Color primaryColor;
-  final Color textMainColor;
-  final Color textMutedColor;
-  final Color borderColor;
+  const _CollapsibleHistory({required this.entries});
 
-  const _CollapsibleHistory({
-    required this.entries,
-    required this.isDark,
-    required this.surfaceColor,
-    required this.primaryColor,
-    required this.textMainColor,
-    required this.textMutedColor,
-    required this.borderColor,
-  });
+  final List entries;
 
   @override
   State<_CollapsibleHistory> createState() => _CollapsibleHistoryState();
@@ -814,97 +637,105 @@ class _CollapsibleHistoryState extends State<_CollapsibleHistory> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        InkWell(
-          onTap: () => setState(() => _expanded = !_expanded),
-          borderRadius: BorderRadius.circular(10),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              children: [
-                Icon(Icons.history, size: 18, color: widget.textMutedColor),
-                const SizedBox(width: 8),
-                Text(
-                  context.tr('pv_history_title'),
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: widget.textMainColor,
-                  ),
+    final theme = Theme.of(context);
+    final t = context.tokens;
+
+    return Container(
+      decoration: AppCard.decoration(t),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        type: MaterialType.transparency,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            InkWell(
+              onTap: () => setState(() => _expanded = !_expanded),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
                 ),
-                const Spacer(),
-                AnimatedRotation(
-                  turns: _expanded ? 0.5 : 0.0,
-                  duration: const Duration(milliseconds: 200),
-                  child: Icon(
-                    Icons.keyboard_arrow_down,
-                    size: 20,
-                    color: widget.textMutedColor,
-                  ),
+                child: Row(
+                  children: [
+                    Icon(Icons.history_rounded, size: 20, color: t.textMuted),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        context.tr('pv_history_title'),
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontSize: 15,
+                          color: t.text,
+                        ),
+                      ),
+                    ),
+                    AnimatedRotation(
+                      turns: _expanded ? 0.5 : 0.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 22,
+                        color: t.textMuted,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-        AnimatedCrossFade(
-          duration: const Duration(milliseconds: 250),
-          crossFadeState: _expanded
-              ? CrossFadeState.showFirst
-              : CrossFadeState.showSecond,
-          firstChild: Column(
-            children: widget.entries.map<Widget>((entry) {
-              return Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: widget.surfaceColor,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: widget.borderColor),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.schedule,
-                        size: 14,
-                        color: widget.textMutedColor,
+            AnimatedCrossFade(
+              duration: const Duration(milliseconds: 250),
+              crossFadeState: _expanded
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+              firstChild: Column(
+                children: [
+                  for (final entry in widget.entries)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        _formatTimestamp(entry.timestamp),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: widget.textMutedColor,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(color: AppCard.dividerColor(t)),
                         ),
                       ),
-                      const Spacer(),
-                      if (entry.sexualDesire.isNotEmpty &&
-                          entry.sexualDesire != '')
-                        Text('🔥', style: const TextStyle(fontSize: 14)),
-                      if (entry.affectionNeeds.isNotEmpty) ...[
-                        const SizedBox(width: 6),
-                        Text(
-                          '❤️ ${entry.affectionNeeds.length}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: widget.textMutedColor,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.schedule_rounded,
+                            size: 15,
+                            color: t.textMuted,
                           ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-          secondChild: const SizedBox.shrink(),
+                          const SizedBox(width: 8),
+                          Text(
+                            _formatTimestamp(entry.timestamp),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: t.textMuted,
+                            ),
+                          ),
+                          const Spacer(),
+                          if (entry.sexualDesire.isNotEmpty &&
+                              entry.sexualDesire != '')
+                            const Text('🔥', style: TextStyle(fontSize: 14)),
+                          if (entry.affectionNeeds.isNotEmpty) ...[
+                            const SizedBox(width: 6),
+                            Text(
+                              '❤️ ${entry.affectionNeeds.length}',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: t.textMuted,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+              secondChild: const SizedBox(width: double.infinity),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -923,7 +754,9 @@ class _StateMessage extends StatelessWidget {
     required this.titleKey,
     this.descKey,
     this.desc,
+    this.emphasis,
     required this.color,
+    required this.tint,
     this.showLeave = false,
   });
 
@@ -931,58 +764,91 @@ class _StateMessage extends StatelessWidget {
   final String titleKey;
   final String? descKey;
   final String? desc;
+
+  /// Açıklamada kalın gösterilecek parça (doğrulama kodu).
+  final String? emphasis;
   final Color color;
+  final Color tint;
   final bool showLeave;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final t = context.tokens;
+    final metin = desc ?? context.tr(descKey!);
+    final govde = theme.textTheme.bodyLarge?.copyWith(
+      height: 1.5,
+      color: t.textMuted,
+    );
+
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: color.withAlpha(15),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 36, color: color.withAlpha(180)),
+            AppIconTile(
+              icon: icon,
+              size: 84,
+              circle: true,
+              background: tint,
+              color: color,
             ),
             const SizedBox(height: 24),
             Text(
               context.tr(titleKey),
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: t.text,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontSize: 26,
+                color: theme.colorScheme.primary,
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              desc ?? context.tr(descKey!),
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: t.textMuted, height: 1.5),
-            ),
+            const SizedBox(height: 10),
+            if (emphasis == null)
+              Text(metin, textAlign: TextAlign.center, style: govde)
+            else
+              Text.rich(
+                PartnerUi.emphasize(
+                  metin,
+                  emphasis!,
+                  TextStyle(
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.5,
+                    color: t.text,
+                  ),
+                ),
+                textAlign: TextAlign.center,
+                style: govde,
+              ),
             if (showLeave) ...[
               const SizedBox(height: 24),
-              TextButton.icon(
-                key: const Key('pv_leave'),
-                onPressed: () => confirmLeavePartner(context),
-                icon: Icon(Icons.link_off, size: 18, color: t.danger),
-                label: Text(
-                  context.tr('pv_disconnect'),
-                  style: TextStyle(color: t.danger),
-                ),
-              ),
+              _LeaveButton(color: t.danger),
             ],
           ],
         ),
       ),
+    );
+  }
+}
+
+/// "Bağlantıyı Kes": her durumda aynı düğme.
+class _LeaveButton extends StatelessWidget {
+  const _LeaveButton({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      key: const Key('pv_leave'),
+      onPressed: () => confirmLeavePartner(context),
+      style: TextButton.styleFrom(
+        foregroundColor: color,
+        minimumSize: const Size(0, 44),
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+      ),
+      icon: const Icon(Icons.link_off_rounded, size: 18),
+      label: Text(context.tr('pv_disconnect')),
     );
   }
 }
@@ -1004,16 +870,13 @@ Future<void> confirmLeavePartner(BuildContext context) async {
           onPressed: () => Navigator.pop(ctx, false),
           child: Text(ctx.tr('pv_cancel')),
         ),
-        TextButton(
+        FilledButton(
           key: const Key('pv_leave_confirm'),
-          onPressed: () => Navigator.pop(ctx, true),
-          child: Text(
-            ctx.tr('pv_disconnect_confirm'),
-            style: TextStyle(
-              color: ctx.tokens.danger,
-              fontWeight: FontWeight.w600,
-            ),
+          style: AppTheme.dialogAction().copyWith(
+            backgroundColor: WidgetStatePropertyAll(ctx.tokens.danger),
           ),
+          onPressed: () => Navigator.pop(ctx, true),
+          child: Text(ctx.tr('pv_disconnect_confirm')),
         ),
       ],
     ),

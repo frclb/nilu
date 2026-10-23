@@ -1,36 +1,24 @@
 import 'package:flutter/material.dart';
-import '../../../design_system/app_card.dart';
-import '../../../design_system/app_tokens.dart';
-import '../../../../localization/app_localizations.dart';
 
+import '../../../design_system/app_card.dart';
+import '../../../design_system/app_decor.dart';
+import '../../../design_system/app_tokens.dart';
+import '../../../localization/app_localizations.dart';
+import 'partner_ui.dart';
+
+/// Partnere gerçekte giden şeyler.
 class SharedInfoSection extends StatelessWidget {
   const SharedInfoSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    final headerColor = context.tokens.text;
+    final t = context.tokens;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              context.tr('partner_match_shared_info'),
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: headerColor,
-              ),
-            ),
-            Icon(Icons.info, color: context.tokens.textFaint, size: 20),
-          ],
-        ),
-        const SizedBox(height: 16),
+        PartnerSectionTitle(context.tr('partner_match_shared_info')),
+        const SizedBox(height: 14),
         // Yalnızca gerçekten giden iki şey listeleniyor.
         //
         // Eskiden burada "Döngü Fazı — güncel döngü aşamanızı ve tahmini
@@ -38,57 +26,52 @@ class SharedInfoSection extends StatelessWidget {
         // hiç gitmiyor. Kullanıcı bağlanma kararını tam bu ekranda veriyor;
         // vermediği bir izni verdiğini sanarak vermesi, gizlilik açısından
         // en kötü hâl.
-        _buildInfoItem(
-          context,
-          Icons.favorite_border,
-          context.tr('partner_match_intimacy'),
-          context.tr('partner_match_intimacy_desc'),
-          isDark,
-          theme,
+        _InfoItem(
+          icon: Icons.favorite_border_rounded,
+          tint: t.flowTint,
+          color: t.secondary,
+          title: context.tr('partner_match_intimacy'),
+          desc: context.tr('partner_match_intimacy_desc'),
         ),
         const SizedBox(height: 12),
-        _buildInfoItem(
-          context,
-          Icons.lightbulb,
-          context.tr('partner_match_tips'),
-          context.tr('partner_match_tips_desc'),
-          isDark,
-          theme,
+        _InfoItem(
+          icon: Icons.lightbulb_outline_rounded,
+          tint: t.accentTint,
+          color: t.accent,
+          title: context.tr('partner_match_tips'),
+          desc: context.tr('partner_match_tips_desc'),
         ),
       ],
     );
   }
+}
 
-  Widget _buildInfoItem(
-    BuildContext context,
-    IconData icon,
-    String title,
-    String desc,
-    bool isDark,
-    ThemeData theme,
-  ) {
-    final iconBg = theme.colorScheme.primary.withAlpha(25);
-    final titleColor = context.tokens.text;
-    final descColor = context.tokens.textMuted;
+class _InfoItem extends StatelessWidget {
+  const _InfoItem({
+    required this.icon,
+    required this.tint,
+    required this.color,
+    required this.title,
+    required this.desc,
+  });
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: AppCard.decoration(context.tokens),
+  final IconData icon;
+  final Color tint;
+  final Color color;
+  final String title;
+  final String desc;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final t = context.tokens;
+
+    return AppCard(
+      padding: const EdgeInsets.all(20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: iconBg,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              icon,
-              color: Theme.of(context).colorScheme.primary,
-              size: 20,
-            ),
-          ),
+          AppIconTile(icon: icon, size: 48, background: tint, color: color),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -96,14 +79,18 @@ class SharedInfoSection extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: titleColor,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontSize: 17,
+                    color: t.text,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(desc, style: TextStyle(fontSize: 12, color: descColor)),
+                const SizedBox(height: 4),
+                Text(
+                  desc,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: t.textMuted,
+                  ),
+                ),
               ],
             ),
           ),

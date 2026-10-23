@@ -1,76 +1,91 @@
 import 'package:flutter/material.dart';
-import '../../../design_system/app_scrim.dart';
-import '../../../design_system/app_tokens.dart';
-import '../../../design_system/app_card.dart';
-import '../../../../localization/app_localizations.dart';
 
+import '../../../design_system/app_card.dart';
+import '../../../design_system/app_decor.dart';
+import '../../../design_system/app_tokens.dart';
+import '../../../localization/app_localizations.dart';
+
+/// Davet ekranının girişi: kalp halkası, başlık ve neyin paylaşıldığı.
 class PartnerMatchHero extends StatelessWidget {
   const PartnerMatchHero({super.key});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final t = context.tokens;
+    final primary = theme.colorScheme.primary;
 
-    final titleColor = context.tokens.text; // slate-900
-    final descColor = context.tokens.textMuted;
-
-    return Column(
-      children: [
-        // Abstract Graphic
-        Container(
-          width: double.infinity,
-          height: 200, // Roughly aspect-[4/3] depending on screen width
-          margin: const EdgeInsets.only(bottom: 24),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                theme.colorScheme.primary.withAlpha(25),
-                theme.colorScheme.primary.withAlpha(12),
-              ],
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 32, 24, 28),
+      decoration: BoxDecoration(
+        gradient: AppGradients.blush(context),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: AppCard.borderColor(t)),
+        boxShadow: AppCard.shadow(t),
+      ),
+      child: Column(
+        children: [
+          const _HeartHalo(),
+          const SizedBox(height: 22),
+          Text(
+            context.tr('partner_match_hero_title'),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              fontSize: 30,
+              height: 1.15,
+              color: primary,
             ),
           ),
-          child: Center(
-            child: Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: isDark ? AppScrim.veil(51) : AppScrim.frost(102),
-                shape: BoxShape.circle,
-                boxShadow: AppCard.shadow(),
-              ),
-              child: Icon(
-                Icons.diversity_1, // close enough equivalent
-                size: 60,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-          ),
-        ),
-
-        Text(
-          context.tr('partner_match_hero_title'),
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: titleColor,
-            height: 1.2,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Text(
+          const SizedBox(height: 12),
+          Text(
             context.tr('partner_match_hero_desc'),
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: descColor, height: 1.5),
+            style: theme.textTheme.bodyLarge?.copyWith(
+              height: 1.55,
+              color: t.textMuted,
+            ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Degrade halkanın içinde kalp; köşede küçük bir ışıltı.
+class _HeartHalo extends StatelessWidget {
+  const _HeartHalo();
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final primary = Theme.of(context).colorScheme.primary;
+    return Container(
+      width: 104,
+      height: 104,
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: AppGradients.mark(context),
+        boxShadow: AppShadows.floating(context),
+      ),
+      child: Container(
+        decoration: BoxDecoration(shape: BoxShape.circle, color: t.surface),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Icon(Icons.favorite_border_rounded, size: 42, color: primary),
+            Positioned(
+              top: 22,
+              right: 20,
+              child: Icon(
+                Icons.auto_awesome_rounded,
+                size: 18,
+                color: t.secondary,
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

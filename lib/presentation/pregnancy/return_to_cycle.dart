@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/navigation/route_names.dart';
+import '../../design_system/app_theme.dart';
 import '../../domain/view_models/pregnancy_view_model.dart';
 import '../../localization/app_localizations.dart';
 
@@ -28,6 +29,8 @@ Future<void> confirmReturnToCycle(BuildContext context) async {
         ),
         FilledButton(
           key: const Key('pp_return_confirm'),
+          // Temanın tam genişlik asgarisi düğmeyi "İptal"in altına itiyordu.
+          style: AppTheme.dialogAction(),
           onPressed: () => Navigator.of(ctx).pop(true),
           child: Text(ctx.tr('pp_return_to_cycle')),
         ),

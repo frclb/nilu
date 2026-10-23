@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../design_system/app_theme.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/view_models/pregnancy_view_model.dart';
 import '../../localization/app_localizations.dart';
@@ -53,6 +54,8 @@ Future<void> showDueDateSheet(BuildContext context) async {
             child: Text(ctx.tr('preg_due_source_self')),
           ),
           FilledButton(
+            // Temanın tam genişlik asgarisi düğmeyi "Hayır"ın altına itiyordu.
+            style: AppTheme.dialogAction(),
             onPressed: () => Navigator.of(ctx).pop(true),
             child: Text(ctx.tr('preg_due_source_clinician')),
           ),
