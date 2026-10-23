@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../design_system/app_scrim.dart';
+import '../../../design_system/app_card.dart';
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
 
@@ -16,56 +17,51 @@ class HealthLibrarySearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final t = context.tokens;
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(AppRadius.md),
+      borderSide: BorderSide(color: AppCard.borderColor(t)),
+    );
 
-    final bgColor = context.tokens.surface;
-    final inputBgColor = isDark ? AppScrim.veil(51) : context.tokens.background;
-    final hintColor = context.tokens.textMuted;
-
-    return Container(
-      color: bgColor,
-      padding: const EdgeInsets.only(left: 24, right: 24, top: 8, bottom: 16),
-      child: Container(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+      child: DecoratedBox(
         decoration: BoxDecoration(
-          color: inputBgColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          boxShadow: AppShadows.soft(context),
         ),
         child: TextField(
           controller: controller,
           onChanged: onChanged,
           textInputAction: TextInputAction.search,
-          style: TextStyle(
-            color: context.tokens.text,
-            fontSize: 14,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: t.text,
             fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
             hintText: context.tr('health_library_search'),
-            hintStyle: TextStyle(
-              color: hintColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-            prefixIcon: Icon(
-              Icons.search,
-              color: isDark
-                  ? theme.colorScheme.primary.withAlpha(204)
-                  : theme.colorScheme.primary.withAlpha(153),
-            ),
+            hintStyle: theme.textTheme.bodyMedium?.copyWith(color: t.textFaint),
+            filled: true,
+            fillColor: t.surface,
+            prefixIcon: Icon(Icons.search, color: theme.colorScheme.primary),
             suffixIcon: controller.text.isEmpty
                 ? null
                 : IconButton(
                     tooltip: MaterialLocalizations.of(
                       context,
                     ).deleteButtonTooltip,
-                    icon: const Icon(Icons.close, size: 18),
+                    icon: Icon(Icons.close, size: 18, color: t.textMuted),
                     onPressed: () {
                       controller.clear();
                       onChanged('');
                     },
                   ),
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 16),
+            border: border,
+            enabledBorder: border,
+            focusedBorder: border.copyWith(
+              borderSide: BorderSide(color: t.secondary, width: 1.5),
+            ),
+            contentPadding: const EdgeInsets.symmetric(vertical: 14),
           ),
         ),
       ),

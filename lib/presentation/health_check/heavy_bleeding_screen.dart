@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../design_system/app_card.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/models/article.dart';
 import '../../domain/services/heavy_bleeding_check.dart';
@@ -13,7 +15,8 @@ import '../../design_system/app_layout.dart';
 /// başına hiçbir şey söylemiyor: "ağır" herkes için farklı bir şey. NHS'in
 /// somut ölçütleri kullanıcıya karşılaştırabileceği bir zemin veriyor.
 ///
-/// Teşhis koymuyor, yönlendiriyor.
+/// Teşhis koymuyor, yönlendiriyor. İşaretlenenler hiçbir yere kaydedilmiyor
+/// ve hekim özetine eklenmiyor; ekran kapanınca gidiyor.
 class HeavyBleedingScreen extends StatefulWidget {
   const HeavyBleedingScreen({super.key});
 
@@ -24,10 +27,21 @@ class HeavyBleedingScreen extends StatefulWidget {
 class _HeavyBleedingScreenState extends State<HeavyBleedingScreen> {
   final Set<HeavyBleedingSign> _selected = {};
 
+  static IconData _iconOf(HeavyBleedingSign sign) => switch (sign) {
+    HeavyBleedingSign.frequentChanges => Icons.timer_outlined,
+    HeavyBleedingSign.doubleProtection => Icons.layers_outlined,
+    HeavyBleedingSign.longerThanSevenDays => Icons.calendar_month_outlined,
+    HeavyBleedingSign.largeClots => Icons.grain,
+    HeavyBleedingSign.floodingThrough => Icons.water_drop_outlined,
+    HeavyBleedingSign.limitsDailyLife => Icons.bed_outlined,
+    HeavyBleedingSign.tirednessOrBreathlessness => Icons.battery_alert_outlined,
+  };
+
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final result = HeavyBleedingCheck.evaluate(_selected);
     final demir = ArticleCatalog.byKey('library_article_iron');
 
@@ -36,25 +50,46 @@ class _HeavyBleedingScreenState extends State<HeavyBleedingScreen> {
       appBar: AppBar(
         backgroundColor: t.background,
         elevation: 0,
-        title: Text(context.tr('bleeding_check_title')),
+        title: Text(
+          context.tr('bleeding_check_title'),
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontSize: 21,
+            color: t.text,
+          ),
+        ),
       ),
       body: AppContentWidth(
         child: SafeArea(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
             children: [
-              Text(
-                context.tr('bleeding_check_intro'),
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontSize: 14,
-                  height: 1.6,
-                  color: t.textMuted,
+              AppCard(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppIconTile(
+                      icon: Icons.monitor_heart_outlined,
+                      circle: true,
+                      background: t.brandTint,
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        context.tr('bleeding_check_intro'),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: 1.55,
+                          color: t.textMuted,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 20),
 
               for (final sign in HeavyBleedingCheck.allSigns)
                 _SignTile(
+                  icon: _iconOf(sign),
                   label: context.tr(HeavyBleedingResult.signKey(sign)),
                   selected: _selected.contains(sign),
                   onChanged: (v) => setState(() {
@@ -66,14 +101,17 @@ class _HeavyBleedingScreenState extends State<HeavyBleedingScreen> {
                   }),
                 ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
               if (result.shouldSeeClinician) ...[
                 _Callout(
-                  icon: Icons.medical_information_outlined,
+                  icon: Icons.medical_information,
                   title: context.tr('bleeding_check_result_title'),
                   body: context.tr('bleeding_check_result_body'),
-                  color: theme.colorScheme.primary,
+                  background: t.brandTint,
+                  iconColor: scheme.onPrimary,
+                  iconBackground: scheme.primary,
+                  titleColor: scheme.primary,
                 ),
                 // Demir yazısı katalogdan anahtarla bulunuyor. Anahtar
                 // değişirse bağlantı sessizce kaybolmalı — eskiden
@@ -81,10 +119,13 @@ class _HeavyBleedingScreenState extends State<HeavyBleedingScreen> {
                 if (result.suggestsIronCheck && demir != null) ...[
                   const SizedBox(height: 12),
                   _Callout(
-                    icon: Icons.bloodtype_outlined,
+                    icon: Icons.bloodtype,
                     title: context.tr('bleeding_check_iron_title'),
                     body: context.tr('bleeding_check_iron_body'),
-                    color: t.warning,
+                    background: t.accentTint,
+                    iconColor: t.accent,
+                    iconBackground: t.surface,
+                    titleColor: t.text,
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
                         builder: (_) => ArticleScreen(article: demir),
@@ -97,23 +138,27 @@ class _HeavyBleedingScreenState extends State<HeavyBleedingScreen> {
                   icon: Icons.info_outline,
                   title: context.tr('bleeding_check_none_title'),
                   body: context.tr('bleeding_check_none_body'),
-                  color: t.textMuted,
+                  background: t.surfaceAlt,
+                  iconColor: t.textMuted,
+                  iconBackground: t.surface,
+                  titleColor: t.text,
                 ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               Text(
                 context.tr('article_disclaimer'),
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontSize: 12,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall?.copyWith(
                   height: 1.55,
-                  color: t.textFaint,
+                  color: t.textMuted,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'NHS — Heavy periods',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontSize: 12,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
                   color: t.textFaint,
                 ),
               ),
@@ -127,11 +172,13 @@ class _HeavyBleedingScreenState extends State<HeavyBleedingScreen> {
 
 class _SignTile extends StatelessWidget {
   const _SignTile({
+    required this.icon,
     required this.label,
     required this.selected,
     required this.onChanged,
   });
 
+  final IconData icon;
   final String label;
   final bool selected;
   final ValueChanged<bool> onChanged;
@@ -140,41 +187,73 @@ class _SignTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final radius = BorderRadius.circular(AppRadius.md);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: () => onChanged(!selected),
+      child: Semantics(
+        checked: selected,
         child: Container(
-          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: selected ? t.brandTint : t.surface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: selected ? theme.colorScheme.primary : t.border,
-            ),
+            borderRadius: radius,
+            boxShadow: AppShadows.soft(context),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                selected ? Icons.check_circle : Icons.circle_outlined,
-                size: 22,
-                color: selected ? theme.colorScheme.primary : t.textFaint,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  label,
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    fontSize: 14,
-                    height: 1.5,
-                    color: t.text,
+          child: Material(
+            color: selected ? t.brandTint : t.surface,
+            borderRadius: radius,
+            child: InkWell(
+              borderRadius: radius,
+              onTap: () => onChanged(!selected),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: radius,
+                  border: Border.all(
+                    color: selected
+                        ? scheme.primary.withAlpha(90)
+                        : AppCard.borderColor(t),
                   ),
                 ),
+                child: Row(
+                  children: [
+                    Icon(
+                      icon,
+                      size: 20,
+                      color: selected ? t.secondary : t.textMuted,
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        label,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontSize: 14,
+                          height: 1.45,
+                          color: t.text,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      width: 26,
+                      height: 26,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: selected ? scheme.primary : t.surfaceAlt,
+                        border: selected ? null : Border.all(color: t.border),
+                      ),
+                      child: selected
+                          ? Icon(Icons.check, size: 17, color: scheme.onPrimary)
+                          : null,
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -187,62 +266,77 @@ class _Callout extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.body,
-    required this.color,
+    required this.background,
+    required this.iconColor,
+    required this.iconBackground,
+    required this.titleColor,
     this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String body;
-  final Color color;
+  final Color background;
+  final Color iconColor;
+  final Color iconBackground;
+  final Color titleColor;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
     final theme = Theme.of(context);
+    final radius = BorderRadius.circular(AppRadius.lg);
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color.withAlpha(20),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withAlpha(64)),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, size: 22, color: color),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: theme.textTheme.displayLarge?.copyWith(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    body,
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      fontSize: 13,
-                      height: 1.55,
-                      color: t.textMuted,
-                    ),
-                  ),
-                ],
+    return Material(
+      color: background,
+      borderRadius: radius,
+      child: InkWell(
+        borderRadius: radius,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AppIconTile(
+                icon: icon,
+                size: 38,
+                circle: true,
+                color: iconColor,
+                background: iconBackground,
               ),
-            ),
-            if (onTap != null)
-              Icon(Icons.chevron_right, size: 20, color: color),
-          ],
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontSize: 19,
+                        height: 1.25,
+                        color: titleColor,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      body,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontSize: 13.5,
+                        height: 1.55,
+                        color: t.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (onTap != null) ...[
+                const SizedBox(width: 8),
+                Icon(Icons.chevron_right, size: 22, color: t.textMuted),
+              ],
+            ],
+          ),
         ),
       ),
     );

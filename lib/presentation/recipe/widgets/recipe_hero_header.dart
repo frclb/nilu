@@ -1,9 +1,12 @@
-import 'dart:ui';
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_scrim.dart';
 import '../../../design_system/app_tokens.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/content_illustration.dart';
+import '../../../localization/app_localizations.dart';
 
+/// Tarifin kapağı: köşeleri yuvarlak görsel, üstünde evre etiketleri,
+/// altında başlık.
 class RecipeHeroHeader extends StatelessWidget {
   /// Gerçek fotoğraf tedarik edilince buraya bir adres verilir; adres ölürse
   /// ya da cihaz çevrimdışıysa uygulama içinde çizilen illüstrasyona düşer.
@@ -14,81 +17,84 @@ class RecipeHeroHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gradientEnd = context.tokens.background;
+    final t = context.tokens;
+    final theme = Theme.of(context);
 
-    return SizedBox(
-      height: 320,
-      width: double.infinity,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Background Image
-          SafeNetworkImage(
-            url: imageUrl,
-            fallback: const ContentIllustration(
-              seed: 'recipe_hero',
-              icon: Icons.restaurant_menu,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+      child: Container(
+        height: 300,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          boxShadow: AppShadows.floating(context),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            SafeNetworkImage(
+              url: imageUrl,
+              fallback: const ContentIllustration(
+                seed: 'recipe_hero',
+                icon: Icons.restaurant_menu,
+              ),
             ),
-          ),
-
-          // Gradient Overlay
-          Positioned.fill(
-            child: DecoratedBox(
+            // Başlığın okunması için alttan karartma. Görselin üstündeki
+            // katman temayla değişmiyor (bkz. `AppScrim`).
+            DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [AppScrim.veil(76), Colors.transparent, gradientEnd],
-                  stops: const [0.0, 0.4, 1.0],
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [
+                    AppScrim.veil(170),
+                    AppScrim.veil(40),
+                    Colors.transparent,
+                  ],
+                  stops: const [0, 0.5, 1],
                 ),
               ),
             ),
-          ),
-
-          // Geri düğmesi.
-          //
-          // Yanında bir "⋮" menüsü vardı: "Paylaş" ve "Kaydet" yalnızca menüyü
-          // kapatıyordu, hiçbir şey yapmıyordu. Kaydetme ekranın altındaki
-          // gerçek favori düğmesinde; işlevsiz menü kaldırıldı.
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 12,
-            left: 16,
-            child: _buildCircleButton(
-              icon: Icons.arrow_back,
-              label: MaterialLocalizations.of(context).backButtonTooltip,
-              onTap: () => Navigator.of(context).pop(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCircleButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    // 44 pt: iOS'un önerdiği en küçük dokunma hedefi.
-    return Semantics(
-      button: true,
-      label: label,
-      excludeSemantics: true,
-      child: GestureDetector(
-        onTap: onTap,
-        child: ClipOval(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppScrim.veil(51),
-                shape: BoxShape.circle,
+            Positioned(
+              top: 16,
+              left: 16,
+              right: 16,
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  AppTag(
+                    label: context.tr('recipe_phase_follicular'),
+                    dotColor: t.phaseFollicular,
+                    background: AppScrim.veil(110),
+                    foreground: AppScrim.ink,
+                  ),
+                  AppTag(
+                    label: context.tr('recipe_tag_energizing'),
+                    background: AppScrim.veil(110),
+                    foreground: AppScrim.ink,
+                  ),
+                ],
               ),
-              child: Center(child: Icon(icon, color: AppScrim.ink, size: 24)),
             ),
-          ),
+            Positioned(
+              left: 20,
+              right: 20,
+              bottom: 22,
+              child: Semantics(
+                header: true,
+                child: Text(
+                  context.tr('recipe_salmon_title'),
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontSize: 30,
+                    height: 1.15,
+                    color: AppScrim.ink,
+                    shadows: AppScrim.lift(alpha: 60, blurRadius: 8),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

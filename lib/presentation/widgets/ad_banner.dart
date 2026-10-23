@@ -5,6 +5,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/datasources/ads_datasource.dart';
+import '../../design_system/app_card.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/services/premium_gate.dart';
 import '../../domain/view_models/subscription_view_model.dart';
@@ -153,13 +154,19 @@ class _AdBannerState extends State<AdBanner> {
     // içinden kesiliyordu; reklam eziliyor, ölçüm küçülüyor, küçülen ölçü
     // geri yazılıyordu. 56 puntodan 32'ye inip "gösterilecek reklam yok"a
     // düşmesinin sebebi buydu.
+    //
+    // Bant kenardan kenara kalıyor: reklamın genişliği ekran genişliğinden
+    // isteniyor, yanlara pay verilirse reklam kutusundan taşar. Yalnızca
+    // zemin ve ince çizgiler yeni tasarımın tonlarında.
     return Container(
       alignment: Alignment.center,
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         color: t.surfaceAlt,
-        border: Border.symmetric(horizontal: BorderSide(color: t.border)),
+        border: Border.symmetric(
+          horizontal: BorderSide(color: AppCard.dividerColor(t)),
+        ),
       ),
       child: SizedBox(
         width: size.width.toDouble(),

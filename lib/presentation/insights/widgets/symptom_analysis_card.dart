@@ -6,6 +6,7 @@ import '../../../domain/models/cycle_info.dart';
 import '../../../domain/models/log_vocabulary.dart';
 import '../../../core/navigation/route_names.dart';
 import '../../../design_system/app_card.dart';
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../domain/services/insights_service.dart';
 import '../../../domain/services/premium_gate.dart';
@@ -47,115 +48,148 @@ class SymptomAnalysisCard extends StatelessWidget {
             breaks: viewModel.cycleBreaks,
           );
 
-    final textColor = context.tokens.text;
-    final subtitleColor = context.tokens.textMuted;
+    final t = context.tokens;
+    final primary = theme.colorScheme.primary;
+
+    // Sıraya göre renk: en sık görülen böğürtlen, sonra erik, açık erik ve
+    // mercan. Aynı rengin soluklaşan tonları yan yana ayırt edilmiyordu.
+    final rankColors = [
+      t.secondary,
+      primary,
+      Color.lerp(primary, t.surface, 0.35)!,
+      t.accent,
+    ];
 
     return AppCard(
-      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            context.tr('insights_symptoms_title'),
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: textColor,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            frequencies.isEmpty
-                ? context.tr('insights_symptoms_subtitle')
-                : context.tr(
-                    'insights_symptoms_basis',
-                    params: {'days': '$loggedDays'},
-                  ),
-            style: TextStyle(fontSize: 12, color: subtitleColor),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        context.tr('insights_symptoms_title'),
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontSize: 21,
+                          color: primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      frequencies.isEmpty
+                          ? context.tr('insights_symptoms_subtitle')
+                          : context.tr(
+                              'insights_symptoms_basis',
+                              params: {'days': '$loggedDays'},
+                            ),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: t.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              AppIconTile(
+                icon: Icons.bubble_chart_outlined,
+                size: 34,
+                circle: true,
+                background: t.surfaceAlt,
+              ),
+            ],
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           if (frequencies.isEmpty)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.edit_note_outlined, size: 20, color: subtitleColor),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    context.tr('insights_symptoms_empty'),
-                    style: TextStyle(
-                      fontSize: 13,
-                      height: 1.5,
-                      color: subtitleColor,
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: t.surfaceAlt,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.edit_note_outlined, size: 20, color: t.textMuted),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      context.tr('insights_symptoms_empty'),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontSize: 13,
+                        height: 1.5,
+                        color: t.textMuted,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             )
           else
             for (var i = 0; i < frequencies.length; i++) ...[
-              if (i > 0) const SizedBox(height: 20),
+              if (i > 0) const SizedBox(height: 16),
               _SymptomBar(
                 label: context.tr(
                   LogVocabulary.symptomKey(frequencies[i].code),
                 ),
                 percentage: frequencies[i].percentage,
                 dayCount: frequencies[i].dayCount,
-                // En sık görülen en koyu; sıra aşağı indikçe soluyor.
-                color: theme.colorScheme.primary.withAlpha(
-                  [255, 200, 150, 105][i.clamp(0, 3)],
-                ),
-                textColor: textColor,
-                subtitleColor: subtitleColor,
-                trackColor: context.tokens.border,
+                color: rankColors[i.clamp(0, rankColors.length - 1)],
               ),
             ],
 
           // Kilitli ve gösterilecek veri varsa kapıyı göster; veri yoksa
           // olmayan bir şeyi satmayalım.
           if (!canSeePhase && frequencies.isNotEmpty) ...[
-            const SizedBox(height: 20),
-            Divider(color: AppCard.dividerColor(context.tokens), height: 1),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
             _PhaseLocked(),
           ],
 
           if (dominant != null) ...[
-            const SizedBox(height: 20),
-            Divider(color: AppCard.dividerColor(context.tokens), height: 1),
-            const SizedBox(height: 16),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  Icons.timeline,
-                  size: 20,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    context.tr(
-                      'insights_symptom_phase',
-                      params: {
-                        'symptom': context.tr(
-                          LogVocabulary.symptomKey(frequencies.first.code),
-                        ),
-                        'phase': context.tr(_phaseKey(dominant.phase)),
-                        'count': '${dominant.count}',
-                        'total': '${dominant.total}',
-                      },
-                    ),
-                    style: TextStyle(
-                      fontSize: 13,
-                      height: 1.5,
-                      color: textColor,
+            const SizedBox(height: 18),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: t.brandTint,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.calendar_view_week, size: 19, color: t.secondary),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      context.tr(
+                        'insights_symptom_phase',
+                        params: {
+                          'symptom': context.tr(
+                            LogVocabulary.symptomKey(frequencies.first.code),
+                          ),
+                          'phase': context.tr(_phaseKey(dominant.phase)),
+                          'count': '${dominant.count}',
+                          'total': '${dominant.total}',
+                        },
+                      ),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontSize: 13,
+                        height: 1.45,
+                        color: t.text,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ],
@@ -178,22 +212,19 @@ class _PhaseLocked extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final primary = Theme.of(context).colorScheme.primary;
 
     return Material(
       color: t.brandTint,
-      borderRadius: BorderRadius.circular(AppRadius.sm),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       child: InkWell(
         onTap: () => context.pushNamed(RouteNames.premium),
-        borderRadius: BorderRadius.circular(AppRadius.sm),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Row(
             children: [
-              Icon(
-                Icons.timeline,
-                size: 18,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+              Icon(Icons.lock_outline, size: 18, color: primary),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Text(
@@ -203,11 +234,7 @@ class _PhaseLocked extends StatelessWidget {
                   ).textTheme.bodySmall?.copyWith(color: t.text, height: 1.4),
                 ),
               ),
-              Icon(
-                Icons.chevron_right,
-                size: 18,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+              Icon(Icons.chevron_right, size: 18, color: primary),
             ],
           ),
         ),
@@ -221,22 +248,38 @@ class _SymptomBar extends StatelessWidget {
   final int percentage;
   final int dayCount;
   final Color color;
-  final Color textColor;
-  final Color subtitleColor;
-  final Color trackColor;
 
   const _SymptomBar({
     required this.label,
     required this.percentage,
     required this.dayCount,
     required this.color,
-    required this.textColor,
-    required this.subtitleColor,
-    required this.trackColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+
+    // Ham gün sayısı da gösteriliyor: tek kayıtlı günde "%100" tek başına
+    // yanıltıcı, "%100 · 1 gün" değil. Yüzde kısmı vurgulu, gün sayısı
+    // sönük; ayraç yoksa (başka bir dilde) metin tek parça kalıyor.
+    final count = context.tr(
+      'insights_symptoms_count',
+      params: {'percent': '$percentage', 'days': '$dayCount'},
+    );
+    final split = count.indexOf('·');
+    final countStyle = theme.textTheme.labelMedium?.copyWith(
+      fontSize: 12,
+      fontWeight: FontWeight.w500,
+      color: t.textMuted,
+    );
+    final strongStyle = theme.textTheme.labelMedium?.copyWith(
+      fontSize: 13,
+      fontWeight: FontWeight.w800,
+      color: color,
+    );
+
     return Semantics(
       label: context.tr(
         'insights_symptoms_semantics',
@@ -252,8 +295,8 @@ class _SymptomBar extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 8,
-                height: 8,
+                width: 9,
+                height: 9,
                 decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               ),
               const SizedBox(width: 8),
@@ -262,37 +305,53 @@ class _SymptomBar extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: textColor,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: t.text,
                   ),
                 ),
               ),
               const SizedBox(width: 8),
-              // Ham gün sayısı da gösteriliyor: tek kayıtlı günde "%100"
-              // tek başına yanıltıcı, "%100 · 1 gün" değil.
-              Text(
-                context.tr(
-                  'insights_symptoms_count',
-                  params: {'percent': '$percentage', 'days': '$dayCount'},
-                ),
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                  color: subtitleColor,
-                ),
+              Text.rich(
+                split <= 0
+                    ? TextSpan(text: count, style: strongStyle)
+                    : TextSpan(
+                        children: [
+                          TextSpan(
+                            text: count.substring(0, split).trimRight(),
+                            style: strongStyle,
+                          ),
+                          TextSpan(
+                            text: ' ${count.substring(split)}',
+                            style: countStyle,
+                          ),
+                        ],
+                      ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(5),
-            child: LinearProgressIndicator(
-              value: percentage / 100,
-              minHeight: 10,
-              backgroundColor: trackColor,
-              valueColor: AlwaysStoppedAnimation<Color>(color),
+          const SizedBox(height: 7),
+          Container(
+            height: 12,
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              color: t.surfaceAlt,
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+            ),
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: FractionallySizedBox(
+                widthFactor: (percentage / 100).clamp(0.0, 1.0),
+                heightFactor: 1,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                    gradient: LinearGradient(
+                      colors: [color.withAlpha(120), color],
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ],

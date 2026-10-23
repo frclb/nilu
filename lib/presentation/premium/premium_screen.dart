@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/navigation/route_names.dart';
+import '../../design_system/app_card.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/brand_lotus.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/services/premium_gate.dart';
@@ -25,26 +27,64 @@ import '../../design_system/app_layout.dart';
 ///
 /// Özellik listesi de gerçeğe uyduruldu: eskiden beş şey vaat ediyordu,
 /// biri zaten ücretsizdi (uygulama kilidi), üçü hiç yoktu.
+///
+/// Ücretsiz deneme yazılmıyor: deneme ancak mağaza bir tanıtım teklifi
+/// sunuyorsa, mağazanın kendi metniyle plan kartında görünüyor.
 class PremiumScreen extends StatelessWidget {
   const PremiumScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<SubscriptionViewModel>();
+    final t = context.tokens;
+    final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: t.background,
       appBar: AppBar(
-        leading: IconButton(
-          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-          icon: const Icon(Icons.close),
-          onPressed: () => Navigator.of(context).pop(),
+        backgroundColor: t.background,
+        leading: Padding(
+          padding: const EdgeInsets.all(4),
+          child: IconButton(
+            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+            style: IconButton.styleFrom(backgroundColor: t.surfaceAlt),
+            icon: Icon(Icons.close, color: t.text),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
         ),
-        title: Text(context.tr('premium_title')),
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+          decoration: BoxDecoration(
+            color: t.surface,
+            borderRadius: BorderRadius.circular(AppRadius.pill),
+            boxShadow: AppShadows.soft(context),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.auto_awesome, size: 15, color: t.secondary),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  context.tr('premium_title'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontSize: 19,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      body: AppContentWidth(
-        child: viewModel.isPremium
-            ? const _ActiveState()
-            : _OfferState(viewModel: viewModel),
+      body: AmbientBackground(
+        child: AppContentWidth(
+          child: viewModel.isPremium
+              ? const _ActiveState()
+              : _OfferState(viewModel: viewModel),
+        ),
       ),
     );
   }
@@ -63,29 +103,26 @@ class _ActiveState extends StatelessWidget {
     final theme = Theme.of(context);
 
     return ListView(
-      padding: const EdgeInsets.all(AppSpacing.xl),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
       children: [
-        const SizedBox(height: AppSpacing.xl),
+        const SizedBox(height: AppSpacing.lg),
         Center(
-          child: Container(
-            width: 88,
-            height: 88,
-            decoration: BoxDecoration(
-              color: t.brandTint,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.workspace_premium,
-              size: 44,
-              color: theme.colorScheme.primary,
-            ),
+          child: AppIconTile(
+            icon: Icons.workspace_premium,
+            size: 88,
+            circle: true,
+            gradient: AppGradients.mark(context),
+            color: theme.colorScheme.onPrimary,
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
         Text(
           context.tr('premium_active_title'),
           textAlign: TextAlign.center,
-          style: theme.textTheme.displaySmall?.copyWith(fontSize: 24),
+          style: theme.textTheme.headlineMedium?.copyWith(
+            fontSize: 28,
+            color: theme.colorScheme.primary,
+          ),
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
@@ -93,7 +130,7 @@ class _ActiveState extends StatelessWidget {
           textAlign: TextAlign.center,
           style: theme.textTheme.bodyMedium?.copyWith(color: t.textMuted),
         ),
-        const SizedBox(height: AppSpacing.xxl),
+        const SizedBox(height: AppSpacing.xl),
         const _FeatureList(),
         const SizedBox(height: AppSpacing.xl),
         OutlinedButton.icon(
@@ -148,67 +185,71 @@ class _OfferStateState extends State<_OfferState> {
     return Column(
       children: [
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.xl,
-              AppSpacing.sm,
-              AppSpacing.xl,
-              AppSpacing.xl,
-            ),
-            children: [
-              const _Hero(),
-              const SizedBox(height: AppSpacing.xl),
-              const _FeatureList(),
-              const SizedBox(height: AppSpacing.xxl),
+          // Tembel liste değil: sayfa kısa, ve sonundaki otomatik yenileme
+          // bildirimi ile şartlar katlamanın altında kalsa da ekranın
+          // parçası olarak hep kurulu kalmalı. `ListView` görünür alanın
+          // uzağındaki öğeleri kurmuyor.
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, AppSpacing.xl),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const _Hero(),
+                const SizedBox(height: AppSpacing.lg),
+                const _FeatureList(),
+                const SizedBox(height: AppSpacing.xl),
 
-              if (widget.viewModel.isLoading)
-                const Center(child: CircularProgressIndicator())
-              else if (plans.isEmpty)
-                _Unavailable(onRetry: widget.viewModel.fetchOfferings)
-              else ...[
-                Text(
-                  context.tr('premium_choose_plan'),
-                  style: theme.textTheme.titleMedium,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                for (final plan in plans) ...[
-                  _PlanCard(
-                    plan: plan,
-                    all: plans,
-                    selected: plan.id == selectedId,
-                    recommended: plan.id == recommended?.id,
-                    onTap: () => setState(() => _selectedId = plan.id),
+                if (widget.viewModel.isLoading)
+                  const Center(child: CircularProgressIndicator())
+                else if (plans.isEmpty)
+                  _Unavailable(onRetry: widget.viewModel.fetchOfferings)
+                else ...[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4),
+                    child: AppSectionLabel(context.tr('premium_choose_plan')),
                   ),
                   const SizedBox(height: AppSpacing.md),
+                  for (final plan in plans) ...[
+                    _PlanCard(
+                      plan: plan,
+                      all: plans,
+                      selected: plan.id == selectedId,
+                      recommended: plan.id == recommended?.id,
+                      onTap: () => setState(() => _selectedId = plan.id),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
                 ],
-              ],
 
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                context.tr('premium_disclaimer'),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: t.textFaint,
-                  height: 1.5,
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  context.tr('premium_disclaimer'),
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: t.textMuted,
+                    height: 1.5,
+                  ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton(
-                    onPressed: () =>
-                        context.pushNamed(RouteNames.privacyPolicy),
-                    child: Text(context.tr('premium_privacy')),
-                  ),
-                  Text('·', style: TextStyle(color: t.textFaint)),
-                  TextButton(
-                    onPressed: () =>
-                        context.pushNamed(RouteNames.termsOfService),
-                    child: Text(context.tr('premium_terms')),
-                  ),
-                ],
-              ),
-            ],
+                const SizedBox(height: AppSpacing.sm),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: () =>
+                          context.pushNamed(RouteNames.privacyPolicy),
+                      child: Text(context.tr('premium_privacy')),
+                    ),
+                    Text('·', style: TextStyle(color: t.textFaint)),
+                    TextButton(
+                      onPressed: () =>
+                          context.pushNamed(RouteNames.termsOfService),
+                      child: Text(context.tr('premium_terms')),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
 
@@ -217,24 +258,29 @@ class _OfferStateState extends State<_OfferState> {
         if (plans.isNotEmpty)
           Container(
             padding: EdgeInsets.fromLTRB(
-              AppSpacing.xl,
+              20,
               AppSpacing.md,
-              AppSpacing.xl,
-              MediaQuery.of(context).padding.bottom + AppSpacing.md,
+              20,
+              MediaQuery.of(context).padding.bottom + AppSpacing.sm,
             ),
             decoration: BoxDecoration(
-              color: t.surface,
-              border: Border(top: BorderSide(color: t.border)),
+              color: t.background,
+              boxShadow: AppShadows.soft(context),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                FilledButton(
-                  onPressed: widget.viewModel.isLoading || selectedId == null
+                AppGradientButton(
+                  label: context.tr('premium_subscribe_button'),
+                  icon: Icons.spa,
+                  height: 56,
+                  radius: AppRadius.pill,
+                  busy: widget.viewModel.isLoading,
+                  onPressed: selectedId == null
                       ? null
                       : () => _purchase(selectedId),
-                  child: Text(context.tr('premium_subscribe_button')),
                 ),
+                const SizedBox(height: 4),
                 TextButton(
                   onPressed: widget.viewModel.isLoading ? null : _restore,
                   child: Text(context.tr('premium_restore_purchases')),
@@ -303,92 +349,99 @@ class _PlanCard extends StatelessWidget {
     final theme = Theme.of(context);
     final primary = theme.colorScheme.primary;
     final saving = SubscriptionPricing.savingPercent(plan, all);
+    final radius = BorderRadius.circular(AppRadius.lg);
 
-    return Material(
-      color: selected ? t.brandTint : t.surface,
-      borderRadius: BorderRadius.circular(AppRadius.lg),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        child: Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-            border: Border.all(
-              color: selected ? primary : t.border,
-              width: selected ? 2 : 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                selected
-                    ? Icons.radio_button_checked
-                    : Icons.radio_button_unchecked,
-                color: selected ? primary : t.textFaint,
-                size: 22,
+    return Semantics(
+      selected: selected,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: radius,
+          boxShadow: selected
+              ? AppShadows.floating(context)
+              : AppShadows.soft(context),
+        ),
+        child: Material(
+          color: selected ? t.brandTint : t.surface,
+          borderRadius: radius,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: radius,
+            child: Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                borderRadius: radius,
+                border: Border.all(
+                  color: selected ? primary : AppCard.borderColor(t),
+                  width: selected ? 2 : 1,
+                ),
               ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            context.tr(plan.period.labelKey),
-                            style: theme.textTheme.titleMedium,
-                          ),
-                        ),
-                        if (recommended) ...[
-                          const SizedBox(width: AppSpacing.sm),
-                          _Badge(
-                            text: context.tr('premium_best_value'),
-                            color: primary,
-                          ),
-                        ],
-                      ],
-                    ),
-                    if (plan.introOffer != null) ...[
-                      const SizedBox(height: 2),
-                      Text(
-                        context.tr(
-                          'premium_intro_offer',
-                          params: {'price': plan.introOffer!},
-                        ),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: t.accent,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                    if (saving != null) ...[
-                      const SizedBox(height: 2),
-                      // Ekrandaki en ikna edici sayı en soluk renkteydi.
-                      Text(
-                        context.tr(
-                          'premium_saving',
-                          params: {'percent': '$saving'},
-                        ),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: t.accent,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (recommended) ...[
+                    _Badge(text: context.tr('premium_best_value')),
+                    const SizedBox(height: 10),
                   ],
-                ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              context.tr(plan.period.labelKey),
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontSize: 18,
+                                color: t.text,
+                              ),
+                            ),
+                            if (plan.introOffer != null) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                context.tr(
+                                  'premium_intro_offer',
+                                  params: {'price': plan.introOffer!},
+                                ),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: t.secondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                            if (saving != null) ...[
+                              const SizedBox(height: 2),
+                              // Ekrandaki en ikna edici sayı en soluk
+                              // renkteydi.
+                              Text(
+                                context.tr(
+                                  'premium_saving',
+                                  params: {'percent': '$saving'},
+                                ),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: t.secondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        plan.priceString,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          color: selected ? primary : t.text,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      _Check(selected: selected),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(width: AppSpacing.sm),
-              Text(
-                plan.priceString,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: selected ? primary : t.text,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -396,29 +449,63 @@ class _PlanCard extends StatelessWidget {
   }
 }
 
-class _Badge extends StatelessWidget {
-  final String text;
-  final Color color;
+/// Seçim işareti: seçiliyken dolu erik daire içinde tik.
+class _Check extends StatelessWidget {
+  const _Check({required this.selected});
 
-  const _Badge({required this.text, required this.color});
+  final bool selected;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: 2,
-      ),
+    final t = context.tokens;
+    final scheme = Theme.of(context).colorScheme;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 150),
+      width: 24,
+      height: 24,
       decoration: BoxDecoration(
-        color: color,
+        shape: BoxShape.circle,
+        color: selected ? scheme.primary : t.surfaceAlt,
+        border: selected ? null : Border.all(color: t.border),
+      ),
+      child: selected
+          ? Icon(Icons.check, size: 16, color: scheme.onPrimary)
+          : null,
+    );
+  }
+}
+
+class _Badge extends StatelessWidget {
+  final String text;
+
+  const _Badge({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: t.secondary,
         borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: Theme.of(context).colorScheme.onPrimary,
-          fontWeight: FontWeight.w600,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.stars_rounded, size: 14, color: scheme.onSecondary),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              text,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: scheme.onSecondary,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -440,43 +527,59 @@ class _Hero extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final primary = theme.colorScheme.primary;
-    final onPrimary = theme.colorScheme.onPrimary;
+    final t = context.tokens;
+    final dark = theme.brightness == Brightness.dark;
 
     // Degradenin koyu ucu birincil rengin kendisinden: hangi tema seçiliyse
-    // o rengin koyusu.
+    // o rengin koyusu. Koyu temada birincil renk açık bir pembe; blok onunla
+    // dolunca ekranın en parlak yüzeyi oluyordu. Orada zemin birincil rengin
+    // yüzeye karışmış koyu tonu, yazı gövde metni rengi.
     final hsl = HSLColor.fromColor(primary);
-    final deep = hsl
-        .withLightness((hsl.lightness * 0.6).clamp(0.0, 1.0))
-        .toColor();
+    final Color top;
+    final Color deep;
+    final Color onPrimary;
+    if (dark) {
+      top = Color.lerp(t.surface, primary, 0.34)!;
+      deep = Color.lerp(t.surface, primary, 0.16)!;
+      onPrimary = t.text;
+    } else {
+      top = primary;
+      deep = hsl.withLightness((hsl.lightness * 0.6).clamp(0.0, 1.0)).toColor();
+      onPrimary = theme.colorScheme.onPrimary;
+    }
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xl,
-        vertical: AppSpacing.xl,
-      ),
+      padding: const EdgeInsets.fromLTRB(24, 28, 24, 30),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppRadius.lg),
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [primary, deep],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [top, deep],
         ),
+        boxShadow: AppShadows.floating(context),
       ),
       child: Column(
         children: [
-          SizedBox(
-            width: 56,
+          Container(
+            width: 64,
+            height: 64,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: onPrimary.withAlpha(30),
+              borderRadius: BorderRadius.circular(AppRadius.md + 4),
+            ),
             child: BrandLotus(color: onPrimary, sideOpacity: 0.55),
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
             context.tr('premium_subtitle'),
             textAlign: TextAlign.center,
-            style: theme.textTheme.displaySmall?.copyWith(
-              fontSize: 24,
+            style: theme.textTheme.headlineMedium?.copyWith(
+              fontSize: 27,
+              height: 1.2,
               color: onPrimary,
-              height: 1.25,
             ),
           ),
         ],
@@ -488,58 +591,75 @@ class _Hero extends StatelessWidget {
 /// Premium'un gerçekten açtıkları.
 ///
 /// Liste `PremiumGate` ile aynı gerçeği anlatır; paywall'da yazan ile
-/// uygulamada olan ayrışmasın.
+/// uygulamada olan ayrışmasın. Uygulama kilidi, yedek ve gebelik modu
+/// ücretsiz; burada sayılmıyorlar.
 class _FeatureList extends StatelessWidget {
   const _FeatureList();
 
   @override
   Widget build(BuildContext context) {
+    final t = context.tokens;
+    final primary = Theme.of(context).colorScheme.primary;
     final features = [
       (
-        Icons.timeline,
+        Icons.stacked_line_chart,
+        primary,
         'premium_feature_history_title',
         'premium_feature_history_desc',
       ),
       (
         Icons.insights,
+        t.secondary,
         'premium_feature_phase_title',
         'premium_feature_phase_desc',
       ),
       (
         Icons.ios_share,
+        t.accent,
         'premium_feature_export_title',
         'premium_feature_export_desc',
       ),
       (
         Icons.palette_outlined,
+        t.ovulationText,
         'premium_feature_themes_title',
         'premium_feature_themes_desc',
       ),
       (
         Icons.block_outlined,
+        primary,
         'premium_feature_noads_title',
         'premium_feature_noads_desc',
       ),
     ];
 
-    return Column(
-      children: [
-        for (final (icon, title, desc) in features) ...[
-          _FeatureRow(icon: icon, titleKey: title, descKey: desc),
-          const SizedBox(height: AppSpacing.md),
+    return AppCard(
+      child: Column(
+        children: [
+          for (var i = 0; i < features.length; i++) ...[
+            if (i > 0) const SizedBox(height: 16),
+            _FeatureRow(
+              icon: features[i].$1,
+              color: features[i].$2,
+              titleKey: features[i].$3,
+              descKey: features[i].$4,
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
 
 class _FeatureRow extends StatelessWidget {
   final IconData icon;
+  final Color color;
   final String titleKey;
   final String descKey;
 
   const _FeatureRow({
     required this.icon,
+    required this.color,
     required this.titleKey,
     required this.descKey,
   });
@@ -552,21 +672,24 @@ class _FeatureRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: t.brandTint,
-            borderRadius: BorderRadius.circular(AppRadius.md),
-          ),
-          child: Icon(icon, size: 18, color: theme.colorScheme.primary),
+        AppIconTile(
+          icon: icon,
+          size: 40,
+          color: color,
+          background: t.surfaceAlt,
         ),
-        const SizedBox(width: AppSpacing.md),
+        const SizedBox(width: 14),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(context.tr(titleKey), style: theme.textTheme.titleSmall),
+              Text(
+                context.tr(titleKey),
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontSize: 15,
+                  color: t.text,
+                ),
+              ),
               const SizedBox(height: 2),
               Text(
                 context.tr(
@@ -575,7 +698,7 @@ class _FeatureRow extends StatelessWidget {
                 ),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: t.textMuted,
-                  height: 1.4,
+                  height: 1.45,
                 ),
               ),
             ],
@@ -595,23 +718,30 @@ class _Unavailable extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
 
-    return Column(
-      children: [
-        Icon(Icons.cloud_off, size: 32, color: t.textFaint),
-        const SizedBox(height: AppSpacing.md),
-        Text(
-          context.tr('premium_unavailable'),
-          textAlign: TextAlign.center,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: t.textMuted),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        TextButton(
-          onPressed: onRetry,
-          child: Text(context.tr('premium_retry')),
-        ),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: t.surfaceAlt,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.cloud_off, size: 32, color: t.textMuted),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            context.tr('premium_unavailable'),
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: t.textMuted),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          TextButton(
+            onPressed: onRetry,
+            child: Text(context.tr('premium_retry')),
+          ),
+        ],
+      ),
     );
   }
 }

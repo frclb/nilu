@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../design_system/app_card.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/services/session_plan.dart';
 import '../../localization/app_localizations.dart';
@@ -13,6 +16,8 @@ import '../../design_system/app_layout.dart';
 /// hiçbir şey başlamıyordu. Ekranda zaten duran poz adları, açıklamaları ve
 /// süreleri gerçek bir akışa dönüştürüldü — yeni bir video ya da varlık
 /// gerekmedi.
+///
+/// Ses, çan ya da nefes ritmi yok: uygulama bunları çalmıyor ve ölçmüyor.
 class SessionScreen extends StatefulWidget {
   const SessionScreen({super.key, required this.plan});
 
@@ -95,27 +100,39 @@ class _SessionScreenState extends State<SessionScreen> {
       appBar: AppBar(
         backgroundColor: t.background,
         elevation: 0,
-        title: Text(context.tr(widget.plan.titleKey)),
-        leading: IconButton(
-          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-          icon: const Icon(Icons.close),
-          onPressed: () => Navigator.of(context).pop(),
+        title: Text(
+          context.tr(widget.plan.titleKey),
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontSize: 21,
+            color: theme.colorScheme.primary,
+          ),
+        ),
+        leading: Padding(
+          padding: const EdgeInsets.all(4),
+          child: IconButton(
+            tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+            style: IconButton.styleFrom(backgroundColor: t.surfaceAlt),
+            icon: Icon(Icons.close, color: theme.colorScheme.primary),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
         ),
       ),
-      body: AppContentWidth(
-        child: SafeArea(
-          child: done
-              ? _Finished(total: widget.plan.total, clock: _clock)
-              : _Active(
-                  plan: widget.plan,
-                  index: index,
-                  elapsed: _elapsed,
-                  running: _running,
-                  clock: _clock,
-                  onToggle: _toggle,
-                  onSkip: _skip,
-                  theme: theme,
-                ),
+      body: AmbientBackground(
+        child: AppContentWidth(
+          child: SafeArea(
+            top: false,
+            child: done
+                ? _Finished(total: widget.plan.total, clock: _clock)
+                : _Active(
+                    plan: widget.plan,
+                    index: index,
+                    elapsed: _elapsed,
+                    running: _running,
+                    clock: _clock,
+                    onToggle: _toggle,
+                    onSkip: _skip,
+                  ),
+          ),
         ),
       ),
     );
@@ -131,7 +148,6 @@ class _Active extends StatelessWidget {
     required this.clock,
     required this.onToggle,
     required this.onSkip,
-    required this.theme,
   });
 
   final SessionPlan plan;
@@ -141,116 +157,262 @@ class _Active extends StatelessWidget {
   final String Function(Duration) clock;
   final VoidCallback onToggle;
   final VoidCallback onSkip;
-  final ThemeData theme;
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final theme = Theme.of(context);
     final step = plan.steps[index];
     final intoStep = elapsed - plan.startOf(index);
     final remaining = step.duration - intoStep;
     final progress = intoStep.inSeconds / step.duration.inSeconds;
+    final next = index + 1 < plan.steps.length ? plan.steps[index + 1] : null;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-      child: Column(
-        children: [
-          Text(
-            context.tr(
-              'session_step_of',
-              params: {'n': '${index + 1}', 'total': '${plan.steps.length}'},
-            ),
-            style: theme.textTheme.labelLarge?.copyWith(
-              letterSpacing: 1,
-              color: t.textMuted,
-            ),
-          ),
-          const SizedBox(height: 24),
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+            children: [
+              Center(
+                child: AppTag(
+                  label: context.tr(
+                    'session_step_of',
+                    params: {
+                      'n': '${index + 1}',
+                      'total': '${plan.steps.length}',
+                    },
+                  ),
+                  dotColor: theme.colorScheme.primary,
+                  background: t.brandTint,
+                  foreground: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 20),
 
-          // Kalan süre halkası.
-          SizedBox(
-            width: 200,
-            height: 200,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox.expand(
-                  child: CircularProgressIndicator(
-                    value: progress.clamp(0.0, 1.0),
-                    strokeWidth: 10,
-                    strokeCap: StrokeCap.round,
-                    backgroundColor: t.brandTint,
-                    valueColor: AlwaysStoppedAnimation(
-                      theme.colorScheme.primary,
+              // Kalan süre halkası.
+              Center(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final size = math.min(230.0, constraints.maxWidth - 40);
+                    return SizedBox.square(
+                      dimension: size,
+                      child: CustomPaint(
+                        painter: _RingPainter(
+                          progress: progress.clamp(0.0, 1.0),
+                          track: t.secondaryTint,
+                          colors: [
+                            t.secondary.withAlpha(150),
+                            t.secondary,
+                            theme.colorScheme.primary,
+                          ],
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(28),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                clock(remaining),
+                                style: theme.textTheme.displayMedium?.copyWith(
+                                  fontSize: 52,
+                                  fontFeatures: const [
+                                    FontFeature.tabularFigures(),
+                                  ],
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              AppCard(
+                padding: const EdgeInsets.all(22),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        context.tr(step.nameKey),
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontSize: 24,
+                          height: 1.2,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
                     ),
+                    const SizedBox(height: 10),
+                    Text(
+                      context.tr(step.descriptionKey),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontSize: 15,
+                        height: 1.6,
+                        color: t.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (next != null) ...[
+                const SizedBox(height: 12),
+                // Sıradaki poz: adı ve süresi; dokunulmuyor, yalnızca bilgi.
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: t.surfaceAlt,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                  ),
+                  child: Row(
+                    children: [
+                      AppIconTile(
+                        icon: Icons.skip_next_rounded,
+                        size: 40,
+                        background: t.surface,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          '${context.tr(next.nameKey)} · '
+                          '${context.tr('duration_minutes', params: {'n': '${next.duration.inMinutes}'})}',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+              ],
+            ],
+          ),
+        ),
+
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+          child: Row(
+            children: [
+              Expanded(
+                child: AppGradientButton(
+                  label: context.tr(
+                    running ? 'session_pause' : 'session_resume',
+                  ),
+                  icon: running
+                      ? Icons.pause_rounded
+                      : Icons.play_arrow_rounded,
+                  height: 56,
+                  radius: AppRadius.pill,
+                  onPressed: onToggle,
+                ),
+              ),
+              const SizedBox(width: 12),
+              _SkipButton(onPressed: onSkip),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Sonraki poza geç: yuvarlak düğme, altında kısa etiket.
+class _SkipButton extends StatelessWidget {
+  const _SkipButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+    return Material(
+      color: t.surfaceAlt,
+      shape: const StadiumBorder(),
+      child: InkWell(
+        onTap: onPressed,
+        customBorder: const StadiumBorder(),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 64, minHeight: 56),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.fast_forward_rounded, size: 22, color: primary),
                 Text(
-                  clock(remaining),
-                  style: theme.textTheme.displayLarge?.copyWith(
-                    fontSize: 44,
-                    fontWeight: FontWeight.bold,
+                  context.tr('session_skip'),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: primary,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 32),
-
-          Text(
-            context.tr(step.nameKey),
-            textAlign: TextAlign.center,
-            style: theme.textTheme.displayLarge?.copyWith(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Text(
-                context.tr(step.descriptionKey),
-                textAlign: TextAlign.center,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontSize: 15,
-                  height: 1.6,
-                ),
-              ),
-            ),
-          ),
-
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: onSkip,
-                  icon: const Icon(Icons.skip_next),
-                  label: Text(context.tr('session_skip')),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(52),
-                    side: BorderSide(color: t.border),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: onToggle,
-                  icon: Icon(running ? Icons.pause : Icons.play_arrow),
-                  label: Text(
-                    context.tr(running ? 'session_pause' : 'session_resume'),
-                  ),
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size.fromHeight(52),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }
+}
+
+/// Geri sayım halkası: soluk iz, üstünde gül → erik degradeli ilerleme.
+class _RingPainter extends CustomPainter {
+  const _RingPainter({
+    required this.progress,
+    required this.track,
+    required this.colors,
+  });
+
+  final double progress;
+  final Color track;
+  final List<Color> colors;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const stroke = 11.0;
+    final rect = (Offset.zero & size).deflate(stroke / 2);
+    canvas.drawArc(
+      rect,
+      0,
+      math.pi * 2,
+      false,
+      Paint()
+        ..color = track
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = stroke,
+    );
+    if (progress <= 0) return;
+    final sweep = math.pi * 2 * progress;
+    canvas.drawArc(
+      rect,
+      -math.pi / 2,
+      sweep,
+      false,
+      Paint()
+        ..shader = SweepGradient(
+          startAngle: 0,
+          endAngle: math.pi * 2,
+          colors: colors,
+          transform: const GradientRotation(-math.pi / 2),
+        ).createShader(rect)
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = stroke,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_RingPainter old) =>
+      old.progress != progress || old.track != track || old.colors != colors;
 }
 
 class _Finished extends StatelessWidget {
@@ -265,42 +427,46 @@ class _Finished extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.check_circle_outline,
-              size: 72,
-              color: theme.colorScheme.primary,
+            AppIconTile(
+              icon: Icons.check_rounded,
+              size: 88,
+              circle: true,
+              gradient: AppGradients.mark(context),
+              color: theme.colorScheme.onPrimary,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Text(
               context.tr('session_done_title'),
-              style: theme.textTheme.displayLarge?.copyWith(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontSize: 28,
+                color: theme.colorScheme.primary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Text(
               context.tr(
                 'session_done_body',
                 params: {'duration': clock(total)},
               ),
               textAlign: TextAlign.center,
-              style: theme.textTheme.labelLarge?.copyWith(
+              style: theme.textTheme.bodyMedium?.copyWith(
                 fontSize: 15,
                 height: 1.6,
                 color: t.textMuted,
               ),
             ),
             const SizedBox(height: 28),
-            FilledButton(
+            AppGradientButton(
+              label: context.tr('session_close'),
+              expand: false,
+              radius: AppRadius.pill,
               onPressed: () => Navigator.of(context).pop(),
-              style: FilledButton.styleFrom(minimumSize: const Size(200, 52)),
-              child: Text(context.tr('session_close')),
             ),
           ],
         ),

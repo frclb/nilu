@@ -1,395 +1,370 @@
 import 'package:flutter/material.dart';
+import '../../../design_system/app_card.dart';
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../localization/app_localizations.dart';
 
+/// Tarifin gövdesi: süre ve zorluk, faydalar, malzemeler, adımlar.
+///
+/// Kalori yok: tek bir sayı porsiyona, malzemenin markasına ve miktarına
+/// göre değişir; uygulama bunların hiçbirini bilmiyor. Puan da yok —
+/// uygulamada değerlendirme diye bir şey yok.
 class RecipeContentSection extends StatelessWidget {
   const RecipeContentSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final t = context.tokens;
+    final primary = Theme.of(context).colorScheme.primary;
 
-    // ── Colour palette ──
-    final bgColor = context.tokens.background;
-    final textColor = context.tokens.text;
-    final mutedColor = context.tokens.textMuted;
-    final surfaceColor = context.tokens.surface;
-    final borderColor = context.tokens.border;
-    final primaryColor = Theme.of(context).colorScheme.primary;
-    final dotColor = context.tokens.border;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: const EdgeInsets.only(left: 24, right: 24, top: 0, bottom: 100),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Badges ──
-          Row(
-            children: [
-              _buildBadge(
-                label: context.tr('recipe_phase_follicular'),
-                bgColor: primaryColor.withAlpha(51),
-                textColor: primaryColor,
-                borderColor: primaryColor.withAlpha(76),
-              ),
-              const SizedBox(width: 8),
-              _buildBadge(
-                label: context.tr('recipe_tag_energizing'),
-                bgColor: surfaceColor,
-                textColor: mutedColor,
-                borderColor: borderColor,
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // ── Title ──
-          Text(
-            context.tr('recipe_salmon_title'),
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: textColor,
-              letterSpacing: -0.5,
-              height: 1.15,
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // ── Meta Row ──
-          Row(
-            children: [
-              Icon(Icons.schedule, size: 18, color: mutedColor),
-              const SizedBox(width: 6),
-              Text(
-                context.tr('duration_minutes', params: {'n': '15'}),
-                style: TextStyle(fontSize: 14, color: mutedColor),
-              ),
-              const SizedBox(width: 12),
-              _dot(dotColor),
-              const SizedBox(width: 12),
-              Icon(Icons.bar_chart, size: 18, color: mutedColor),
-              const SizedBox(width: 6),
-              Text(
-                context.tr('recipe_difficulty_easy'),
-                style: TextStyle(fontSize: 14, color: mutedColor),
-              ),
-              // Buradaki yıldız ve "4.9" puanı sabit yazılıydı: uygulamada
-              // değerlendirme diye bir şey yok, her tarif aynı puanı
-              // gösteriyordu. Olmayan bir veriyi göstermektense kaldırdım.
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // ── Benefits Card ──
+          // ── Süre ve zorluk ──
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
             decoration: BoxDecoration(
-              color: surfaceColor,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: borderColor),
+              color: t.brandTint.withAlpha(170),
+              borderRadius: BorderRadius.circular(AppRadius.md),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  context.tr('recipe_benefits'),
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.2,
-                    color: mutedColor.withAlpha(204),
+            child: IntrinsicHeight(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _Meta(
+                      icon: Icons.schedule,
+                      value: context.tr(
+                        'duration_minutes',
+                        params: {'n': '15'},
+                      ),
+                      label: context.tr('yoga_stat_duration'),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildBenefitItem(
-                        icon: Icons.monitor_heart,
-                        iconBgColor: context.tokens.ovulationTint,
-                        iconColor: context.tokens.ovulation,
-                        title: context.tr('recipe_magnesium'),
-                        subtitle: context.tr('recipe_magnesium_desc'),
-                        textColor: textColor,
-                        mutedColor: mutedColor,
-                      ),
+                  VerticalDivider(
+                    width: 1,
+                    thickness: 1,
+                    color: AppCard.dividerColor(t),
+                  ),
+                  Expanded(
+                    child: _Meta(
+                      icon: Icons.eco_outlined,
+                      value: context.tr('recipe_difficulty_easy'),
+                      label: context.tr('yoga_stat_level'),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildBenefitItem(
-                        icon: Icons.water_drop,
-                        iconBgColor: context.tokens.accentTint,
-                        iconColor: context.tokens.accent,
-                        title: context.tr('recipe_omega3'),
-                        subtitle: context.tr('recipe_omega3_desc'),
-                        textColor: textColor,
-                        mutedColor: mutedColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 28),
 
-          // ── Ingredients ──
-          _sectionTitle(
-            context.tr('recipe_ingredients'),
-            primaryColor,
-            textColor,
+          // ── Faydalar ──
+          Row(
+            children: [
+              Icon(Icons.stars_rounded, size: 20, color: t.secondary),
+              const SizedBox(width: 8),
+              Expanded(child: AppSectionLabel(context.tr('recipe_benefits'))),
+            ],
           ),
-          const SizedBox(height: 20),
-          ..._buildIngredients(context, textColor, mutedColor, borderColor),
-          const SizedBox(height: 32),
+          const SizedBox(height: 12),
+          _Benefit(
+            icon: Icons.monitor_heart_outlined,
+            iconColor: primary,
+            iconBackground: t.surface,
+            background: t.brandTint,
+            title: context.tr('recipe_magnesium'),
+            subtitle: context.tr('recipe_magnesium_desc'),
+          ),
+          const SizedBox(height: 10),
+          _Benefit(
+            icon: Icons.water_drop_outlined,
+            iconColor: t.secondary,
+            iconBackground: t.secondaryTint,
+            background: t.surfaceAlt,
+            title: context.tr('recipe_omega3'),
+            subtitle: context.tr('recipe_omega3_desc'),
+          ),
+          const SizedBox(height: 28),
 
-          // ── Steps ──
-          _sectionTitle(context.tr('recipe_steps'), primaryColor, textColor),
-          const SizedBox(height: 20),
-          _buildStep(
-            index: 1,
-            text: context.tr('recipe_step_1'),
-            surfaceColor: surfaceColor,
-            borderColor: borderColor,
-            primaryColor: primaryColor,
-            mutedColor: mutedColor,
-            isDark: isDark,
+          // ── Malzemeler ──
+          _SectionTitle(
+            icon: Icons.shopping_bag_outlined,
+            title: context.tr('recipe_ingredients'),
           ),
-          const SizedBox(height: 20),
-          _buildStep(
-            index: 2,
-            text: context.tr('recipe_step_2'),
-            surfaceColor: surfaceColor,
-            borderColor: borderColor,
-            primaryColor: primaryColor,
-            mutedColor: mutedColor,
-            isDark: isDark,
+          const SizedBox(height: 12),
+          AppCard(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Column(children: _ingredients(context)),
           ),
-          const SizedBox(height: 20),
-          _buildStep(
-            index: 3,
-            text: context.tr('recipe_step_3'),
-            surfaceColor: surfaceColor,
-            borderColor: borderColor,
-            primaryColor: primaryColor,
-            mutedColor: mutedColor,
-            isDark: isDark,
+          const SizedBox(height: 28),
+
+          // ── Adımlar ──
+          _SectionTitle(
+            icon: Icons.restaurant_outlined,
+            title: context.tr('recipe_steps'),
           ),
+          const SizedBox(height: 12),
+          for (var i = 1; i <= 3; i++) ...[
+            if (i > 1) const SizedBox(height: 10),
+            _Step(index: i, text: context.tr('recipe_step_$i')),
+          ],
         ],
       ),
     );
   }
 
-  // ── Helper Widgets ──
-
-  Widget _dot(Color color) {
-    return Container(
-      width: 4,
-      height: 4,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-    );
-  }
-
-  Widget _buildBadge({
-    required String label,
-    required Color bgColor,
-    required Color textColor,
-    required Color borderColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: borderColor),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: textColor,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBenefitItem({
-    required IconData icon,
-    required Color iconBgColor,
-    required Color iconColor,
-    required String title,
-    required String subtitle,
-    required Color textColor,
-    required Color mutedColor,
-  }) {
-    return Row(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: iconBgColor,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Center(child: Icon(icon, color: iconColor, size: 22)),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: textColor,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(subtitle, style: TextStyle(fontSize: 12, color: mutedColor)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _sectionTitle(String title, Color accentColor, Color textColor) {
-    return Row(
-      children: [
-        Container(
-          width: 4,
-          height: 24,
-          decoration: BoxDecoration(
-            color: accentColor,
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: textColor,
-          ),
-        ),
-      ],
-    );
-  }
-
-  List<Widget> _buildIngredients(
-    BuildContext context,
-    Color textColor,
-    Color mutedColor,
-    Color borderColor,
-  ) {
+  List<Widget> _ingredients(BuildContext context) {
     final items = [
-      {'name': context.tr('recipe_ing_salmon'), 'amount': '150g'},
-      {
-        'name': context.tr('recipe_ing_quinoa'),
-        'amount': context.tr('recipe_ing_quinoa_amount'),
-      },
-      {
-        'name': context.tr('recipe_ing_avocado'),
-        'amount': context.tr('recipe_ing_avocado_amount'),
-      },
-      {
-        'name': context.tr('recipe_ing_spinach'),
-        'amount': context.tr('recipe_ing_spinach_amount'),
-      },
-      {
-        'name': context.tr('recipe_ing_dressing'),
-        'amount': context.tr('recipe_ing_dressing_amount'),
-      },
+      (context.tr('recipe_ing_salmon'), '150g'),
+      (context.tr('recipe_ing_quinoa'), context.tr('recipe_ing_quinoa_amount')),
+      (
+        context.tr('recipe_ing_avocado'),
+        context.tr('recipe_ing_avocado_amount'),
+      ),
+      (
+        context.tr('recipe_ing_spinach'),
+        context.tr('recipe_ing_spinach_amount'),
+      ),
+      (
+        context.tr('recipe_ing_dressing'),
+        context.tr('recipe_ing_dressing_amount'),
+      ),
     ];
 
-    return items.map((item) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 0),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: borderColor)),
-          ),
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    return [
+      for (final (name, amount) in items)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 9),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
             children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: t.brandTint,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.check,
+                  size: 15,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 12),
               // Büyük yazıda ad sarıyor, miktar sağda kalıyor.
               Expanded(
                 child: Text(
-                  item['name']!,
-                  style: TextStyle(
+                  name,
+                  style: theme.textTheme.titleSmall?.copyWith(
                     fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: textColor,
+                    fontWeight: FontWeight.w600,
+                    color: t.text,
                   ),
                 ),
               ),
               const SizedBox(width: 12),
               Text(
-                item['amount']!,
-                style: TextStyle(fontSize: 14, color: mutedColor),
+                amount,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontSize: 13.5,
+                  color: t.textMuted,
+                ),
               ),
             ],
           ),
         ),
-      );
-    }).toList();
+    ];
   }
+}
 
-  Widget _buildStep({
-    required int index,
-    required String text,
-    required Color surfaceColor,
-    required Color borderColor,
-    required Color primaryColor,
-    required Color mutedColor,
-    required bool isDark,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+class _Meta extends StatelessWidget {
+  const _Meta({required this.icon, required this.value, required this.label});
+
+  final IconData icon;
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    return Column(
       children: [
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: surfaceColor,
-            shape: BoxShape.circle,
-            border: Border.all(color: borderColor),
+        Icon(icon, size: 22, color: t.secondary),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          textAlign: TextAlign.center,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: t.text,
           ),
-          child: Center(
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: theme.textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1,
+            color: t.textMuted,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Benefit extends StatelessWidget {
+  const _Benefit({
+    required this.icon,
+    required this.iconColor,
+    required this.iconBackground,
+    required this.background,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBackground;
+  final Color background;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+      child: Row(
+        children: [
+          AppIconTile(
+            icon: icon,
+            size: 46,
+            circle: true,
+            color: iconColor,
+            background: iconBackground,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontSize: 13.5,
+                    color: t.textMuted,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({required this.icon, required this.title});
+
+  final IconData icon;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: context.tokens.secondary),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Semantics(
+            header: true,
             child: Text(
-              '$index',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: primaryColor,
+              title,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontSize: 22,
+                color: theme.colorScheme.primary,
               ),
             ),
           ),
         ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 4),
+      ],
+    );
+  }
+}
+
+class _Step extends StatelessWidget {
+  const _Step({required this.index, required this.text});
+
+  final int index;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: t.brandTint.withAlpha(170),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: scheme.primary,
+              shape: BoxShape.circle,
+            ),
             child: Text(
-              text,
-              style: TextStyle(fontSize: 14, color: mutedColor, height: 1.6),
+              '$index',
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: scheme.onPrimary,
+              ),
             ),
           ),
-        ),
-      ],
+          const SizedBox(width: 14),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                text,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  height: 1.55,
+                  color: t.text,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_tokens.dart';
 import '../widgets/ad_banner.dart';
 import '../../domain/models/article.dart';
@@ -36,7 +37,7 @@ class _HealthLibraryScreenState extends State<HealthLibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = context.tokens.background;
+    final theme = Theme.of(context);
 
     final results = ArticleCatalog.filter(
       category: _category,
@@ -56,40 +57,66 @@ class _HealthLibraryScreenState extends State<HealthLibraryScreen> {
         _category == ArticleCategory.popular;
 
     return Scaffold(
-      backgroundColor: bgColor,
-      appBar: const HealthLibraryAppBar(),
-      body: AppContentWidth(
-        // Makale listesi geniş ekranda iki sütuna açılıyor; tek sütunun
-        // okunur genişliğine sıkıştırılırsa kartlar 280 pt'ye düşer.
-        maxWidth: AppLayout.wideContentMaxWidth,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.only(bottom: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              HealthLibrarySearchBar(
-                controller: _searchController,
-                onChanged: (value) => setState(() => _query = value),
-              ),
-              HealthLibraryCategories(
-                selected: _category,
-                onSelected: (category) => setState(() => _category = category),
-              ),
-              if (showFeatured) HealthLibraryFeaturedArticle(article: featured),
-              HealthLibraryArticleList(
-                articles: showFeatured
-                    ? results.where((a) => !a.isFeatured).toList()
-                    : results,
-                emptyQuery: _query,
-              ),
+      backgroundColor: context.tokens.background,
+      body: AmbientBackground(
+        child: Column(
+          children: [
+            const HealthLibraryAppBar(),
+            Expanded(
+              child: AppContentWidth(
+                // Makale listesi geniş ekranda iki sütuna açılıyor; tek
+                // sütunun okunur genişliğine sıkıştırılırsa kartlar 280
+                // pt'ye düşer.
+                maxWidth: AppLayout.wideContentMaxWidth,
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                        child: Semantics(
+                          header: true,
+                          child: Text(
+                            context.tr('health_library_title'),
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              fontSize: 28,
+                              height: 1.15,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                      HealthLibrarySearchBar(
+                        controller: _searchController,
+                        onChanged: (value) => setState(() => _query = value),
+                      ),
+                      HealthLibraryCategories(
+                        selected: _category,
+                        onSelected: (category) =>
+                            setState(() => _category = category),
+                      ),
+                      if (showFeatured)
+                        HealthLibraryFeaturedArticle(article: featured),
+                      HealthLibraryArticleList(
+                        articles: showFeatured
+                            ? results.where((a) => !a.isFeatured).toList()
+                            : results,
+                        emptyQuery: _query,
+                      ),
 
-              // Reklam yalnızca burada ve içerik ekranlarında. Takvim, kayıt ve
-              // analiz ekranlarında yok: kullanıcının semptom girdiği yerde
-              // reklam göstermek hem rahatsız edici hem bağlam olarak yanlış.
-              const AdBanner(),
-            ],
-          ),
+                      // Reklam yalnızca burada ve içerik ekranlarında.
+                      // Takvim, kayıt ve analiz ekranlarında yok:
+                      // kullanıcının semptom girdiği yerde reklam göstermek
+                      // hem rahatsız edici hem bağlam olarak yanlış.
+                      const AdBanner(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

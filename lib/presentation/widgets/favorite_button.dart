@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../data/repositories/favorites_repository.dart';
+import '../../design_system/app_decor.dart';
+import '../../design_system/app_tokens.dart';
 import '../../localization/app_localizations.dart';
 
 /// İçeriği favorilere ekleyip çıkaran, durumu **kalıcı** düğme.
@@ -73,28 +75,13 @@ class _FavoriteButtonState extends State<FavoriteButton> {
       );
     }
 
-    return ElevatedButton.icon(
+    // Ekranın tek ana eylemi: degrade hap. Kaydedilmişken aynı düğme
+    // çıkarmayı söylüyor; durum ikonda da (dolu kalp) görünüyor.
+    return AppGradientButton(
+      label: context.tr(_isFavorite ? 'favorite_remove' : 'recipe_favorite'),
+      icon: _isFavorite ? Icons.favorite : Icons.favorite_border,
+      radius: AppRadius.pill,
       onPressed: _toggle,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        minimumSize: const Size(double.infinity, 56),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 8,
-        shadowColor: theme.colorScheme.primary.withAlpha(127),
-      ),
-      icon: Icon(
-        _isFavorite ? Icons.favorite : Icons.favorite_border,
-        size: 22,
-      ),
-      label: Text(
-        context.tr(_isFavorite ? 'favorite_remove' : 'recipe_favorite'),
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.3,
-        ),
-      ),
     );
   }
 }

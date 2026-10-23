@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../design_system/app_card.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/models/home_widget_entry.dart';
@@ -17,6 +19,10 @@ import 'home_widget_plan.dart';
 /// Uygulamada ne öneri widget'ı ne partner widget'ı vardı; gösterilen
 /// sayılar da kullanıcının değildi. Artık gerçek widget'ın bugün
 /// göstereceği içerik, aynı plandan (bkz. [HomeWidgetPlan]) çiziliyor.
+///
+/// Önizleme widget'ın **kendisi** gibi görünüyor: sistem zemininde, renkli
+/// degrade yok. Kilit ekranı widget'ı ve widget ayarları da yok — uygulama
+/// yalnızca küçük ve orta boy ana ekran widget'ı sunuyor.
 class WidgetsPreviewScreen extends StatelessWidget {
   const WidgetsPreviewScreen({super.key});
 
@@ -37,7 +43,7 @@ class WidgetsPreviewScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: t.background,
       appBar: AppBar(
-        backgroundColor: t.surface,
+        backgroundColor: t.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
@@ -48,43 +54,54 @@ class WidgetsPreviewScreen extends StatelessWidget {
         ),
         title: Text(
           context.tr('widgets_title'),
-          style: TextStyle(
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontSize: 21,
             color: t.text,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
           ),
         ),
       ),
       body: AppContentWidth(
         child: SafeArea(
           child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
             children: [
               _Baslik(context.tr('widgets_small_title')),
-              Center(
-                child: _Cerceve(
-                  key: const Key('widget_preview_small'),
-                  width: 160,
-                  height: 160,
-                  child: _KucukIcerik(entry: bugun),
+              // Küçük widget kendi boyunda; çevresindeki tül zemin ana
+              // ekrandaki boşluğu andırıyor.
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                decoration: BoxDecoration(
+                  color: t.brandTint.withAlpha(170),
+                  borderRadius: BorderRadius.circular(AppRadius.lg + 4),
+                ),
+                child: Center(
+                  child: _Cerceve(
+                    key: const Key('widget_preview_small'),
+                    width: 160,
+                    height: 160,
+                    child: _KucukIcerik(entry: bugun),
+                  ),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
               _Baslik(context.tr('widgets_medium_title')),
               _Cerceve(
                 key: const Key('widget_preview_medium'),
                 height: 160,
                 child: _OrtaIcerik(entry: bugun),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
               _Not(
-                icon: Icons.add_to_home_screen_outlined,
+                icon: Icons.touch_app_outlined,
                 text: context.tr('widgets_how_to_add'),
+                background: t.surfaceAlt,
+                strong: true,
               ),
               const SizedBox(height: 12),
               _Not(
-                icon: Icons.lock_outline,
+                icon: Icons.visibility_off_outlined,
                 text: context.tr('widgets_privacy_note'),
+                background: t.brandTint.withAlpha(170),
               ),
             ],
           ),
@@ -116,20 +133,13 @@ class _Baslik extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16, left: 4),
-      child: Text(
-        context.upper(text),
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.primary,
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 1.0,
-        ),
-      ),
+      padding: const EdgeInsets.only(bottom: 12, left: 4),
+      child: AppSectionLabel(text),
     );
   }
 }
 
+/// Widget çerçevesi: iOS widget'ı gibi sistem zemininde, yuvarlak köşeli.
 class _Cerceve extends StatelessWidget {
   const _Cerceve({
     super.key,
@@ -150,8 +160,9 @@ class _Cerceve extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: t.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: t.border),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppCard.borderColor(t)),
+        boxShadow: AppShadows.floating(context),
       ),
       padding: const EdgeInsets.all(16),
       child: child,
@@ -226,11 +237,13 @@ class _KucukIcerik extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Text(
               entry.value,
-              style: TextStyle(
-                fontFamily: 'serif',
+              // Widget sistemin serif yazısını kullanıyor; önizlemede
+              // uygulamanın serifi. "serif" adı bir yazı tipine karşılık
+              // gelmiyordu, sayı yedek yazı tipiyle çiziliyordu.
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(
                 fontSize: 40,
                 height: 1.1,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: t.text,
               ),
             ),
@@ -293,10 +306,9 @@ class _OrtaIcerik extends StatelessWidget {
                     child: Text(
                       entry.value,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'serif',
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
                         fontSize: 26,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         color: t.text,
                       ),
                     ),
@@ -343,27 +355,58 @@ class _OrtaIcerik extends StatelessWidget {
   }
 }
 
+/// Açıklama kartı: solda yuvarlak simge, yanında metin.
 class _Not extends StatelessWidget {
-  const _Not({required this.icon, required this.text});
+  const _Not({
+    required this.icon,
+    required this.text,
+    required this.background,
+    this.strong = false,
+  });
 
   final IconData icon;
   final String text;
+  final Color background;
+
+  /// Simge dolu erik dairede (ana bilgi) mi, sönük mü.
+  final bool strong;
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 20, color: t.textMuted),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(fontSize: 14, height: 1.4, color: t.textMuted),
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppIconTile(
+            icon: icon,
+            size: 38,
+            circle: true,
+            color: strong ? scheme.onPrimary : t.textMuted,
+            background: strong ? scheme.primary : t.surface,
           ),
-        ),
-      ],
+          const SizedBox(width: 14),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(
+                text,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontSize: 14,
+                  height: 1.5,
+                  color: strong ? t.text : t.textMuted,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../design_system/app_card.dart';
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../domain/models/period_log.dart';
 import '../../../domain/services/insights_service.dart';
@@ -47,21 +48,25 @@ class _CycleHistoryCardState extends State<CycleHistoryCard> {
         : enYeni.take(CycleHistoryCard.collapsedCount).toList();
     final uzunluklar = dongu.map((p) => p.lengthInDays);
     final ortalama = InsightsService.averageLength(dongu)!;
+    final enKisa = uzunluklar.reduce((a, b) => a < b ? a : b);
+    final enUzun = uzunluklar.reduce((a, b) => a > b ? a : b);
 
     return AppCard(
       key: const Key('cycle_history_card'),
-      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            context.tr('insights_history_title'),
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: t.text,
+          Semantics(
+            header: true,
+            child: Text(
+              context.tr('insights_history_title'),
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontSize: 21,
+                color: theme.colorScheme.primary,
+              ),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             dongu.length == 1
                 ? context.tr(
@@ -73,31 +78,49 @@ class _CycleHistoryCardState extends State<CycleHistoryCard> {
                     params: {
                       'count': '${dongu.length}',
                       'avg': '$ortalama',
-                      'min': '${uzunluklar.reduce((a, b) => a < b ? a : b)}',
-                      'max': '${uzunluklar.reduce((a, b) => a > b ? a : b)}',
+                      'min': '$enKisa',
+                      'max': '$enUzun',
                     },
                   ),
             style: theme.textTheme.bodySmall?.copyWith(color: t.textMuted),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           for (final p in gorunen)
             _Satir(
               key: Key('cycle_history_row_${_gunAnahtari(p.startDate)}'),
               baslangic: p.startDate,
               uzunluk: p.lengthInDays,
               reglGunu: _reglSuresi(vm.periodLogs, p.startDate),
+              enUzun: p.lengthInDays == enUzun && enUzun != enKisa,
             ),
-          if (!_hepsi && enYeni.length > CycleHistoryCard.collapsedCount)
+          if (!_hepsi && enYeni.length > CycleHistoryCard.collapsedCount) ...[
+            const SizedBox(height: 4),
             TextButton(
               key: const Key('cycle_history_show_all'),
               onPressed: () => setState(() => _hepsi = true),
-              child: Text(
-                context.tr(
-                  'insights_history_show_all',
-                  params: {'count': '${enYeni.length}'},
-                ),
+              style: TextButton.styleFrom(
+                backgroundColor: t.surfaceAlt,
+                foregroundColor: theme.colorScheme.primary,
+                minimumSize: const Size.fromHeight(48),
+                shape: const StadiumBorder(),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      context.tr(
+                        'insights_history_show_all',
+                        params: {'count': '${enYeni.length}'},
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.chevron_right, size: 18),
+                ],
               ),
             ),
+          ],
         ],
       ),
     );
@@ -121,11 +144,15 @@ class _Satir extends StatelessWidget {
     required this.baslangic,
     required this.uzunluk,
     required this.reglGunu,
+    required this.enUzun,
   });
 
   final DateTime baslangic;
   final int uzunluk;
   final int? reglGunu;
+
+  /// Listedeki en uzun döngü mü? Uzunluğu ikincil renkte yazılıyor.
+  final bool enUzun;
 
   @override
   Widget build(BuildContext context) {
@@ -136,38 +163,61 @@ class _Satir extends StatelessWidget {
         '${baslangic.year}';
     final regl = reglGunu;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              tarih,
-              style: theme.textTheme.bodyMedium?.copyWith(color: t.text),
-            ),
-          ),
-          if (regl != null) ...[
-            Text(
-              context.tr(
-                regl == 1
-                    ? 'insights_history_period_one'
-                    : 'insights_history_period',
-                params: {'days': '$regl'},
-              ),
-              style: theme.textTheme.bodySmall?.copyWith(color: t.textMuted),
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: t.brandTint.withAlpha(170),
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
+        child: Row(
+          children: [
+            AppIconTile(
+              icon: Icons.water_drop,
+              size: 36,
+              color: t.secondary,
+              background: t.secondaryTint,
             ),
             const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    tarih,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: t.text,
+                    ),
+                  ),
+                  if (regl != null)
+                    Text(
+                      context.tr(
+                        regl == 1
+                            ? 'insights_history_period_one'
+                            : 'insights_history_period',
+                        params: {'days': '$regl'},
+                      ),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: t.textMuted,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              context.tr(
+                'insights_history_cycle_days',
+                params: {'days': '$uzunluk'},
+              ),
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: enUzun ? t.secondary : theme.colorScheme.primary,
+              ),
+            ),
           ],
-          Text(
-            context.tr(
-              'insights_history_cycle_days',
-              params: {'days': '$uzunluk'},
-            ),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: t.text,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

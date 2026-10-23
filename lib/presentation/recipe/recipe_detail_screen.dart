@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_tokens.dart';
 import '../widgets/favorite_button.dart';
 import 'widgets/recipe_hero_header.dart';
@@ -10,69 +11,40 @@ class RecipeDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = context.tokens.background;
-    final bottomBarBg = bgColor;
+    final t = context.tokens;
 
     return Scaffold(
-      backgroundColor: bgColor,
-      body: AppContentWidth(
-        // `Scaffold` gövdeye **gevşek** kısıt veriyor; `Stack` de en uzun
-        // konumlandırılmamış çocuğuna göre büzülüyor. İçerik ekrandan
-        // kısaysa `Positioned(bottom: 0)` ekranın dibine değil içeriğin
-        // dibine yapışıyor ve eylem çubuğu ortada havada kalıyordu.
-        // Telefonda içerik ekranı doldurduğu için görünmüyordu.
-        child: SizedBox.expand(
-          child: Stack(
-            children: [
-              // ── Scrollable Content ──
-              SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  children: [
-                    const RecipeHeroHeader(),
-                    Transform.translate(
-                      offset: const Offset(0, -40),
-                      child: const RecipeContentSection(),
-                    ),
-                  ],
-                ),
-              ),
-
-              // ── Sticky Bottom Bar ──
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: EdgeInsets.only(
-                    left: 24,
-                    right: 24,
-                    top: 24,
-                    bottom: MediaQuery.of(context).padding.bottom + 16,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        bottomBarBg,
-                        bottomBarBg,
-                        bottomBarBg.withAlpha(0),
-                      ],
-                      stops: const [0.0, 0.65, 1.0],
-                    ),
-                  ),
-                  child: const SizedBox(
-                    height: 56,
-                    child: FavoriteButton(
-                      contentId: 'recipe_salmon_quinoa',
-                      expanded: true,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+      backgroundColor: t.background,
+      // Kapağın üstündeki yüzen geri düğmesi yerine sade bir çubuk: geri
+      // oku temanın rengini alıyor, kapak illüstrasyonu kapatılmıyor.
+      // Yanında bir "⋮" menüsü vardı: "Paylaş" ve "Kaydet" yalnızca menüyü
+      // kapatıyordu. Kaydetme alttaki gerçek favori düğmesinde.
+      appBar: AppBar(backgroundColor: t.background),
+      // Eylem çubuğu `Scaffold`'un altında: gövdedeki bir `Stack`e
+      // `Positioned(bottom: 0)` ile konduğunda içerik ekrandan kısayken
+      // ekranın değil içeriğin dibine yapışıyordu.
+      bottomNavigationBar: Container(
+        padding: EdgeInsets.fromLTRB(
+          20,
+          12,
+          20,
+          MediaQuery.of(context).padding.bottom + 12,
+        ),
+        decoration: BoxDecoration(
+          color: t.background,
+          boxShadow: AppShadows.soft(context),
+        ),
+        child: const AppContentWidth(
+          child: FavoriteButton(
+            contentId: 'recipe_salmon_quinoa',
+            expanded: true,
           ),
+        ),
+      ),
+      body: AppContentWidth(
+        child: ListView(
+          physics: const BouncingScrollPhysics(),
+          children: const [RecipeHeroHeader(), RecipeContentSection()],
         ),
       ),
     );
