@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/navigation/route_names.dart';
+import '../../design_system/app_card.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/models/pregnancy.dart';
@@ -163,17 +165,13 @@ class _PregnancySetupScreenState extends State<PregnancySetupScreen> {
     context.watch<CalendarViewModel>();
     final t = context.tokens;
     final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
     final g = _onizleme;
     final ga = g?.gestationOn(_bugun);
     final secili = _kaynak == _Kaynak.lmp ? _sat : _edd;
+    final etkin = _gecerli && !_kaydediliyor;
 
-    TextStyle? baslik() => theme.textTheme.labelLarge?.copyWith(
-      fontSize: 12,
-      letterSpacing: 1.4,
-      fontWeight: FontWeight.w700,
-      color: t.textMuted,
-    );
-    TextStyle? govde([Color? c]) => theme.textTheme.labelLarge?.copyWith(
+    TextStyle? govde([Color? c]) => theme.textTheme.bodyMedium?.copyWith(
       fontSize: 14,
       height: 1.5,
       color: c ?? t.text,
@@ -188,174 +186,370 @@ class _PregnancySetupScreenState extends State<PregnancySetupScreen> {
       ),
       body: AppContentWidth(
         child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-            children: [
-              // ── 1. Tarih ──
-              Text(
-                context.upper(context.tr('preg_setup_date_section')),
-                style: baslik(),
-              ),
-              const SizedBox(height: 10),
-              SegmentedButton<_Kaynak>(
-                segments: [
-                  ButtonSegment(
-                    value: _Kaynak.lmp,
-                    label: Text(context.tr('preg_setup_from_lmp')),
-                  ),
-                  ButtonSegment(
-                    value: _Kaynak.clinician,
-                    label: Text(context.tr('preg_setup_from_clinician')),
-                  ),
-                ],
-                selected: {_kaynak},
-                onSelectionChanged: (s) => setState(() => _kaynak = s.first),
-              ),
-              const SizedBox(height: 12),
-              OutlinedButton.icon(
-                key: const Key('preg_setup_pick_date'),
-                onPressed: _tarihSec,
-                icon: const Icon(Icons.event_outlined, size: 20),
-                label: Text(
-                  secili == null
-                      ? context.tr(
-                          _kaynak == _Kaynak.lmp
-                              ? 'preg_setup_pick_lmp'
-                              : 'preg_setup_pick_due',
-                        )
-                      : _tarih(secili),
+          // Tek sütun, hepsi bir arada kuruluyor: kartlar uzadığında tembel
+          // bir liste alttaki "başlat" düğmesini ekran dışındayken hiç
+          // kurmuyordu.
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // ── 1. Tarih ──
+                _Bolum(context.tr('preg_setup_date_section')),
+                SegmentedButton<_Kaynak>(
+                  segments: [
+                    ButtonSegment(
+                      value: _Kaynak.lmp,
+                      label: Text(context.tr('preg_setup_from_lmp')),
+                    ),
+                    ButtonSegment(
+                      value: _Kaynak.clinician,
+                      label: Text(context.tr('preg_setup_from_clinician')),
+                    ),
+                  ],
+                  selected: {_kaynak},
+                  showSelectedIcon: false,
+                  onSelectionChanged: (s) => setState(() => _kaynak = s.first),
                 ),
-              ),
-              const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
 
-              if (g != null) ...[
+                // Tarih seçici: kart, hangi tarihin sorulduğunu ve seçileni
+                // birlikte gösteriyor.
                 Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: t.surfaceAlt,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: t.border),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        context.tr(
-                          'preg_setup_due_result',
-                          params: {'date': _tarih(g.estimatedDueDate)},
+                  decoration: AppCard.decoration(t),
+                  child: Material(
+                    type: MaterialType.transparency,
+                    borderRadius: BorderRadius.circular(AppCard.radius),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      key: const Key('preg_setup_pick_date'),
+                      onTap: _tarihSec,
+                      child: Padding(
+                        padding: const EdgeInsets.all(AppSpacing.lg),
+                        child: Row(
+                          children: [
+                            AppIconTile(
+                              icon: Icons.event_outlined,
+                              size: 44,
+                              circle: true,
+                              background: t.brandTint,
+                              color: primary,
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    context.tr(
+                                      _kaynak == _Kaynak.lmp
+                                          ? 'preg_setup_pick_lmp'
+                                          : 'preg_setup_pick_due',
+                                    ),
+                                    style: theme.textTheme.labelMedium
+                                        ?.copyWith(
+                                          color: t.textMuted,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                  ),
+                                  if (secili != null) ...[
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      _tarih(secili),
+                                      style: theme.textTheme.titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                            color: t.text,
+                                          ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Icon(
+                              Icons.edit_calendar_outlined,
+                              color: t.secondary,
+                            ),
+                          ],
                         ),
-                        style: govde()?.copyWith(fontWeight: FontWeight.w600),
                       ),
-                      if (ga != null) ...[
-                        const SizedBox(height: 4),
+                    ),
+                  ),
+                ),
+
+                if (g != null) ...[
+                  const SizedBox(height: AppSpacing.md),
+                  // Hesaplanan tarih: kartın en önemli sonucu, serif başlıkla.
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.xl - 4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(AppCard.radius),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [t.brandTint, t.surface],
+                      ),
+                      border: Border.all(color: AppCard.borderColor(t)),
+                      boxShadow: AppCard.shadow(t),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          context.gestationSentence(ga),
-                          style: govde(t.textMuted),
+                          context.tr(
+                            'preg_setup_due_result',
+                            params: {'date': _tarih(g.estimatedDueDate)},
+                          ),
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            fontSize: 21,
+                            height: 1.25,
+                            fontWeight: FontWeight.w600,
+                            color: primary,
+                          ),
+                        ),
+                        if (ga != null) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            context.gestationSentence(ga),
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: t.text,
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: AppSpacing.md),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Icon(
+                                Icons.info_outline,
+                                size: 17,
+                                color: t.secondary,
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Expanded(
+                              child: Text(
+                                context.tr(
+                                  _kaynak == _Kaynak.clinician
+                                      ? 'preg_setup_due_method_clinician'
+                                      : _donguBiliniyor
+                                      ? 'preg_setup_due_method_lmp'
+                                      : 'preg_setup_due_method_lmp_assumed',
+                                  params: {'n': '$_donguUzunlugu'},
+                                ),
+                                style: govde(
+                                  t.textMuted,
+                                )?.copyWith(fontSize: 13),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
-                      const SizedBox(height: 8),
-                      Text(
-                        context.tr(
-                          _kaynak == _Kaynak.clinician
-                              ? 'preg_setup_due_method_clinician'
-                              : _donguBiliniyor
-                              ? 'preg_setup_due_method_lmp'
-                              : 'preg_setup_due_method_lmp_assumed',
-                          params: {'n': '$_donguUzunlugu'},
-                        ),
-                        style: govde(t.textMuted),
+                    ),
+                  ),
+                  if (!_gecerli) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      context.tr('preg_setup_due_passed'),
+                      style: govde(t.warning),
+                    ),
+                  ],
+                ],
+
+                const SizedBox(height: AppSpacing.xxl - 4),
+
+                // ── 2. Bakım takvimi ──
+                _Bolum(context.tr('preg_setup_care_section')),
+                RadioGroup<bool>(
+                  groupValue: _turkiyeSablonu,
+                  onChanged: (v) => setState(() => _turkiyeSablonu = v),
+                  child: Column(
+                    children: [
+                      _SablonKarti(
+                        value: true,
+                        selected: _turkiyeSablonu == true,
+                        title: context.tr('preg_setup_care_tr'),
+                        body: context.tr('preg_setup_care_tr_body'),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      _SablonKarti(
+                        value: false,
+                        selected: _turkiyeSablonu == false,
+                        title: context.tr('preg_setup_care_own'),
+                        body: context.tr('preg_setup_care_own_body'),
                       ),
                     ],
                   ),
                 ),
-                if (!_gecerli) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    context.tr('preg_setup_due_passed'),
-                    style: govde(t.warning),
-                  ),
-                ],
-              ],
 
-              const SizedBox(height: 28),
+                const SizedBox(height: AppSpacing.xxl - 4),
 
-              // ── 2. Bakım takvimi ──
-              Text(
-                context.upper(context.tr('preg_setup_care_section')),
-                style: baslik(),
-              ),
-              const SizedBox(height: 6),
-              RadioGroup<bool>(
-                groupValue: _turkiyeSablonu,
-                onChanged: (v) => setState(() => _turkiyeSablonu = v),
-                child: Column(
-                  children: [
-                    RadioListTile<bool>(
-                      contentPadding: EdgeInsets.zero,
-                      value: true,
-                      title: Text(
-                        context.tr('preg_setup_care_tr'),
-                        style: govde(),
-                      ),
-                      subtitle: Text(
-                        context.tr('preg_setup_care_tr_body'),
-                        style: govde(t.textMuted),
-                      ),
-                    ),
-                    RadioListTile<bool>(
-                      contentPadding: EdgeInsets.zero,
-                      value: false,
-                      title: Text(
-                        context.tr('preg_setup_care_own'),
-                        style: govde(),
-                      ),
-                      subtitle: Text(
-                        context.tr('preg_setup_care_own_body'),
-                        style: govde(t.textMuted),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // ── 3. Ne değişecek ──
-              Text(
-                context.upper(
+                // ── 3. Ne değişecek ──
+                _Bolum(
                   context.tr(
                     widget.fromOnboarding
                         ? 'preg_setup_good_to_know'
                         : 'preg_setup_changes_section',
                   ),
                 ),
-                style: baslik(),
-              ),
-              const SizedBox(height: 10),
-              for (final k in [
-                if (!widget.fromOnboarding) 'preg_setup_change_predictions',
-                'preg_setup_change_bleeding',
-                'preg_setup_change_reminders',
-              ])
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.sm,
+                  ),
+                  decoration: AppCard.decoration(t),
+                  child: Column(
                     children: [
-                      Icon(Icons.info_outline, size: 18, color: t.textMuted),
-                      const SizedBox(width: 10),
-                      Expanded(child: Text(context.tr(k), style: govde())),
+                      for (final (i, (k, icon, renk, zemin)) in [
+                        if (!widget.fromOnboarding)
+                          (
+                            'preg_setup_change_predictions',
+                            Icons.water_drop_outlined,
+                            t.flow,
+                            t.flowTint,
+                          ),
+                        (
+                          'preg_setup_change_bleeding',
+                          Icons.healing_outlined,
+                          t.danger,
+                          t.flowTint,
+                        ),
+                        (
+                          'preg_setup_change_reminders',
+                          Icons.schedule,
+                          primary,
+                          t.brandTint,
+                        ),
+                      ].indexed) ...[
+                        if (i > 0)
+                          Divider(height: 1, color: AppCard.dividerColor(t)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.md,
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              AppIconTile(
+                                icon: icon,
+                                size: 36,
+                                circle: true,
+                                background: zemin,
+                                color: renk,
+                              ),
+                              const SizedBox(width: AppSpacing.md),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 7),
+                                  child: Text(context.tr(k), style: govde()),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
 
-              const SizedBox(height: 24),
-              FilledButton(
-                key: const Key('preg_setup_start'),
-                onPressed: _gecerli && !_kaydediliyor ? _baslat : null,
-                child: Text(context.tr('preg_setup_start')),
+                const SizedBox(height: AppSpacing.xl),
+                // Degrade dolgu yalnızca düğme etkinken: kapalı düğme temanın
+                // soluk görünümünde kalsın, "basılabilir" sanılmasın.
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: etkin ? AppGradients.primary(context) : null,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                    boxShadow: etkin ? AppShadows.floating(context) : null,
+                  ),
+                  child: FilledButton(
+                    key: const Key('preg_setup_start'),
+                    onPressed: etkin ? _baslat : null,
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(54),
+                      backgroundColor: etkin ? Colors.transparent : null,
+                      shadowColor: Colors.transparent,
+                    ),
+                    child: Text(context.tr('preg_setup_start')),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Bölüm etiketi ("TARİH").
+class _Bolum extends StatelessWidget {
+  const _Bolum(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(left: 4, bottom: AppSpacing.sm + 2),
+    child: AppSectionLabel(text),
+  );
+}
+
+/// Bakım takvimi seçeneği: kart içinde radyo satırı. Seçili kart erik
+/// çerçeveyle ayrışıyor.
+class _SablonKarti extends StatelessWidget {
+  const _SablonKarti({
+    required this.value,
+    required this.selected,
+    required this.title,
+    required this.body,
+  });
+
+  final bool value;
+  final bool selected;
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      decoration: AppCard.decoration(t).copyWith(
+        border: Border.all(
+          color: selected ? primary : AppCard.borderColor(t),
+          width: selected ? 1.5 : 1,
+        ),
+      ),
+      child: Material(
+        type: MaterialType.transparency,
+        borderRadius: BorderRadius.circular(AppCard.radius),
+        clipBehavior: Clip.antiAlias,
+        child: RadioListTile<bool>(
+          value: value,
+          contentPadding: const EdgeInsets.fromLTRB(8, 6, 16, 6),
+          title: Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: selected ? primary : t.text,
+            ),
+          ),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text(
+              body,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontSize: 13,
+                height: 1.45,
+                color: t.textMuted,
               ),
-            ],
+            ),
           ),
         ),
       ),

@@ -3,13 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/navigation/route_names.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/models/calendar_day.dart';
 import '../../domain/models/conception_intent.dart';
 import '../../domain/view_models/pregnancy_view_model.dart';
 import '../../localization/app_localizations.dart';
-import 'onboarding_progress.dart';
+import 'widgets/onboarding_chrome.dart';
 import 'widgets/onboarding_option.dart';
 
 /// "Bebek istiyorum" yolunun ilk sorusu: ne zamandır deneniyor?
@@ -56,76 +57,57 @@ class OnboardingConceptionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final primary = Theme.of(context).colorScheme.primary;
     return Scaffold(
       backgroundColor: t.background,
-      body: AppContentWidth(
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.arrow_back, color: t.text),
-                      tooltip: MaterialLocalizations.of(
-                        context,
-                      ).backButtonTooltip,
-                      onPressed: () => onboardingBack(context),
+      body: AmbientBackground(
+        child: AppContentWidth(
+          child: SafeArea(
+            child: Column(
+              children: [
+                const OnboardingTopBar(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Bu adım "Bebek istiyorum" yolunun içinde: etiket
+                        // hangi yolda olunduğunu hatırlatıyor.
+                        OnboardingHeading(
+                          tag: context.tr('onb_goal_ttc'),
+                          tagIcon: Icons.spa_outlined,
+                          title: context.tr('onb_ttc_title'),
+                          description: context.tr('onb_ttc_desc'),
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        OnboardingOption(
+                          key: const Key('onboarding_ttc_now'),
+                          icon: Icons.spa_outlined,
+                          iconColor: primary,
+                          iconBackground: t.brandTint,
+                          title: context.tr('onb_ttc_now'),
+                          body: context.tr('onb_ttc_now_body'),
+                          onTap: () => _kaydet(context, _bugun),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        OnboardingOption(
+                          key: const Key('onboarding_ttc_since'),
+                          icon: Icons.calendar_month_outlined,
+                          iconColor: t.secondary,
+                          iconBackground: t.secondaryTint,
+                          title: context.tr('onb_ttc_since'),
+                          body: context.tr('onb_ttc_since_body'),
+                          onTap: () => _tarihSec(context),
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        const OnboardingPrivacyNote(),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-                  child: Column(
-                    children: [
-                      Text(
-                        context.tr('onb_ttc_title'),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: t.text,
-                          letterSpacing: -0.5,
-                          height: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        context.tr('onb_ttc_desc'),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: t.textMuted,
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      OnboardingOption(
-                        key: const Key('onboarding_ttc_now'),
-                        icon: Icons.today_outlined,
-                        title: context.tr('onb_ttc_now'),
-                        body: context.tr('onb_ttc_now_body'),
-                        onTap: () => _kaydet(context, _bugun),
-                      ),
-                      const SizedBox(height: 16),
-                      OnboardingOption(
-                        key: const Key('onboarding_ttc_since'),
-                        icon: Icons.event_outlined,
-                        title: context.tr('onb_ttc_since'),
-                        body: context.tr('onb_ttc_since_body'),
-                        onTap: () => _tarihSec(context),
-                      ),
-                    ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

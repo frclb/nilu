@@ -3,10 +3,13 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/navigation/route_names.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
 import '../../design_system/app_tokens.dart';
 import '../../localization/app_localizations.dart';
 import 'onboarding_progress.dart';
+import 'widgets/onboarding_chrome.dart';
+import 'widgets/onboarding_day_wheel.dart';
 
 /// "Regliniz kaç gün sürüyor?"
 ///
@@ -80,196 +83,61 @@ class _OnboardingPeriodLengthScreenState
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    final textColor = context.tokens.text;
-    final textSecondaryColor = context.tokens.textMuted;
-    final primaryColor = theme.colorScheme.primary;
+    final t = context.tokens;
 
     return Scaffold(
-      backgroundColor: context.tokens.background,
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: context.tokens.surface,
-          border: Border(top: BorderSide(color: context.tokens.surfaceAlt)),
-        ),
-        child: AppContentWidth(
-          child: ElevatedButton(
-            onPressed: _continue,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: theme.colorScheme.onPrimary,
-              minimumSize: const Size(double.infinity, 56),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              elevation: 8,
-              shadowColor: primaryColor.withAlpha(76),
-            ),
-            child: Text(
-              context.tr('onb_continue'),
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
+      backgroundColor: t.background,
+      bottomNavigationBar: OnboardingBottomBar(
+        child: AppGradientButton(
+          label: context.tr('onb_continue'),
+          onPressed: _continue,
+          radius: AppRadius.pill,
         ),
       ),
-      body: AppContentWidth(
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
+      body: AmbientBackground(
+        child: AppContentWidth(
+          child: SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                OnboardingTopBar(
+                  trailing: OnboardingSkipButton(onPressed: _continue),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      tooltip: MaterialLocalizations.of(
-                        context,
-                      ).backButtonTooltip,
-                      icon: Icon(Icons.arrow_back, color: textColor),
-                      onPressed: () => onboardingBack(context),
-                    ),
-                    TextButton(
-                      onPressed: _continue,
-                      style: TextButton.styleFrom(
-                        foregroundColor: primaryColor,
-                      ),
-                      child: Text(
-                        context.tr('onboarding_skip'),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                const OnboardingStepDots(step: OnboardingStep.periodLength),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        OnboardingHeading(
+                          tag: context.tr('cycle_settings_title'),
+                          tagIcon: Icons.calendar_today_outlined,
+                          title: context.tr('onb_period_length_title'),
+                          description: context.tr('onb_period_length_desc'),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const OnboardingStepDots(step: OnboardingStep.periodLength),
-
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24.0,
-                    vertical: 16.0,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        context.tr('onb_period_length_title'),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: textColor,
-                          letterSpacing: -0.5,
-                          height: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        context.tr('onb_period_length_desc'),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: textSecondaryColor,
-                          height: 1.5,
-                        ),
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      Expanded(
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              height: 64,
-                              decoration: BoxDecoration(
-                                color: primaryColor.withAlpha(
-                                  onboardingHighlightAlpha(isDark),
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.symmetric(
-                                  horizontal: BorderSide(
-                                    color: primaryColor.withAlpha(51),
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            ListWheelScrollView.useDelegate(
-                              controller: _scrollController,
-                              itemExtent: 60,
-                              perspective: 0.005,
-                              diameterRatio: 2.0,
-                              physics: const FixedExtentScrollPhysics(),
-                              onSelectedItemChanged: (index) {
-                                setState(() => _selectedDays = index + _min);
-                              },
-                              childDelegate: ListWheelChildBuilderDelegate(
-                                childCount: _max - _min + 1,
-                                builder: (context, index) {
-                                  final days = index + _min;
-                                  final isSelected = days == _selectedDays;
-                                  return Center(
-                                    child: AnimatedDefaultTextStyle(
-                                      duration: const Duration(
-                                        milliseconds: 200,
-                                      ),
-                                      style: TextStyle(
-                                        fontSize: isSelected ? 36 : 24,
-                                        fontWeight: isSelected
-                                            ? FontWeight.bold
-                                            : FontWeight.w500,
-                                        color: isSelected
-                                            ? primaryColor
-                                            : textSecondaryColor.withAlpha(127),
-                                      ),
-                                      child: Text(
-                                        context.tr(
-                                          'onb_days_count',
-                                          params: {'n': '$days'},
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      TextButton(
-                        onPressed: _resetToDefault,
-                        style: TextButton.styleFrom(
-                          foregroundColor: textSecondaryColor,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
+                        const SizedBox(height: AppSpacing.xl),
+                        OnboardingDayWheel(
+                          controller: _scrollController,
+                          min: _min,
+                          max: _max,
+                          selected: _selectedDays,
+                          onSelected: (days) =>
+                              setState(() => _selectedDays = days),
+                          label: context.tr('cycle_settings_period'),
+                          icon: Icons.water_drop_outlined,
+                          highlight: LinearGradient(
+                            colors: [t.flow, t.secondary],
                           ),
                         ),
-                        child: Text(
-                          context.tr('onb_dont_know'),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
+                        const SizedBox(height: AppSpacing.sm),
+                        OnboardingDontKnowButton(onPressed: _resetToDefault),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

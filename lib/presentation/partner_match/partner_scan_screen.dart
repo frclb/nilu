@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_scrim.dart';
 import 'widgets/partner_unavailable_notice.dart';
 import 'widgets/scan_unavailable.dart';
@@ -180,112 +181,23 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
   }
 
   void _showConfirmationDialog(String code) {
-    final theme = Theme.of(context);
-
     showModalBottomSheet(
       context: context,
       isDismissible: false,
       enableDrag: false,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: context.tokens.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            boxShadow: [
-              BoxShadow(
-                color: AppScrim.veil(51),
-                blurRadius: 20,
-                offset: const Offset(0, -5),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Success Icon Glow
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: context.tokens.success.withAlpha(38),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.check_circle_outline,
-                    color: context.tokens.success,
-                    size: 48,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  context.tr('partner_scan_success_title'),
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: context.tokens.text,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  context.tr('partner_scan_success_desc'),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: context.tokens.textMuted,
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // Confirm Button
-                ElevatedButton(
-                  onPressed: () => _confirmConnection(code),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: AppScrim.ink,
-                    minimumSize: const Size(double.infinity, 56),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 4,
-                  ),
-                  child: Text(
-                    context.tr('partner_scan_confirm'),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                // Cancel Button
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context); // close sheet
-                    setState(() {
-                      _isProcessing = false;
-                    });
-                    _scannerController.start(); // resume scanning
-                  },
-                  style: TextButton.styleFrom(
-                    foregroundColor: context.tokens.textMuted,
-                    minimumSize: const Size(double.infinity, 56),
-                  ),
-                  child: Text(
-                    context.tr('partner_scan_cancel'),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (context) => _ScanConfirmSheet(
+        token: _scannedToken,
+        onConfirm: () => _confirmConnection(code),
+        onCancel: () {
+          Navigator.pop(context); // close sheet
+          setState(() {
+            _isProcessing = false;
+          });
+          _scannerController.start(); // resume scanning
+        },
+      ),
     );
   }
 
@@ -330,6 +242,11 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    // Kamera her temada koyu; geri dönülebiliyorsa buzlu bir daire içinde
+    // geri düğmesi.
+    final canPop = Navigator.of(context).canPop();
+
     return Scaffold(
       backgroundColor:
           AppScrim.cameraBackground, // Better for scanner background
@@ -338,11 +255,24 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppScrim.ink),
-        titleTextStyle: const TextStyle(
+        titleTextStyle: theme.textTheme.headlineSmall?.copyWith(
           color: AppScrim.ink,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
+          fontSize: 21,
+          fontWeight: FontWeight.w600,
         ),
+        leading: canPop
+            ? Center(
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppScrim.frost(36),
+                  ),
+                  child: const BackButton(color: AppScrim.ink),
+                ),
+              )
+            : null,
       ),
       extendBodyBehindAppBar: true,
       body: AppContentWidth(
@@ -369,43 +299,253 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
                 // metnini kenarlardan soluklaştırıyor, köşe parantezleri "Ayarları
                 // aç" düğmesinin üstüne biniyor, altta da "Karekod otomatik olarak
                 // taranacaktır" yazıyordu — hiçbir şeyin taranamayacağı bir ekranda.
-                overlayBuilder: (context, constraints) => Stack(
-                  children: [
-                    // Kesim alanı **gelen genişlikten** hesaplanıyor, ekranınkinden
-                    // değil: geniş ekranda önizleme okunur genişlikte ortalanıyor ve
-                    // ekran genişliğinin %70'i kutunun kendisinden büyük çıkıyordu.
-                    Positioned.fill(
-                      child: Container(
-                        decoration: ShapeDecoration(
-                          shape: _ScannerOverlayShape(
-                            borderColor: Theme.of(context).primaryColor,
-                            borderRadius: 12,
-                            borderLength: 40,
-                            borderWidth: 6,
-                            cutOutSize: constraints.biggest.shortestSide * 0.70,
+                overlayBuilder: (context, constraints) {
+                  // Kesim alanı **gelen genişlikten** hesaplanıyor, ekranınkinden
+                  // değil: geniş ekranda önizleme okunur genişlikte ortalanıyor ve
+                  // ekran genişliğinin %70'i kutunun kendisinden büyük çıkıyordu.
+                  final size = constraints.biggest;
+                  final cutOut = size.shortestSide * 0.70;
+                  final bottomInset = MediaQuery.of(context).padding.bottom;
+                  // İpucu kesimin hemen altında; kısa ekranda alta yaslanıyor.
+                  final hintTop = ((size.height + cutOut) / 2 + 24).clamp(
+                    0.0,
+                    size.height - bottomInset - 72,
+                  );
+                  return Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Container(
+                          decoration: ShapeDecoration(
+                            shape: _ScannerOverlayShape(
+                              borderColor: _reticle,
+                              borderRadius: 20,
+                              borderLength: 34,
+                              borderWidth: 4,
+                              cutOutSize: cutOut,
+                            ),
                           ),
                         ),
                       ),
-                    ),
 
-                    // Helper text at bottom
-                    Positioned(
-                      bottom: MediaQuery.of(context).padding.bottom + 40,
-                      left: 20,
-                      right: 20,
+                      // İpucu hapı
+                      Positioned(
+                        top: hintTop,
+                        left: 20,
+                        right: 20,
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 9,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppScrim.frost(30),
+                              borderRadius: BorderRadius.circular(
+                                AppRadius.pill,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: _reticle,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Flexible(
+                                  child: Text(
+                                    context.tr('partner_scan_helper'),
+                                    textAlign: TextAlign.center,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: AppScrim.ink,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+      ),
+    );
+  }
+}
+
+/// Nişangâhın ve ipucu noktasının rengi: koyu kamera görüntüsü üstünde
+/// parlayan gül. Kamera temayla değişmediği için koyu temanın ikincil rengi
+/// her iki temada da kullanılıyor (bkz. `AppScrim`).
+final Color _reticle = AppTokens.dark.secondary;
+
+/// Karekod okunduktan sonraki onay sayfası.
+///
+/// Kamera ekranının üstünde açıldığı için koyu: açık bir sayfa karanlık
+/// görüntünün üstünde göz alıyordu.
+class _ScanConfirmSheet extends StatelessWidget {
+  const _ScanConfirmSheet({
+    required this.token,
+    required this.onConfirm,
+    required this.onCancel,
+  });
+
+  /// Okunan eşleştirme kodu; hangi kodun onaylandığı görünsün.
+  final String? token;
+  final VoidCallback onConfirm;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    const surface = AppTokens.dark;
+    final code = token;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
+      decoration: BoxDecoration(
+        color: surface.surface,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppRadius.xl),
+        ),
+        boxShadow: AppScrim.lift(
+          blurRadius: 24,
+          offset: const Offset(0, -6),
+          alpha: 70,
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: AppContentWidth(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppScrim.frost(60),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 22),
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: surface.success.withAlpha(40),
+                    ),
+                    child: Icon(
+                      Icons.check_circle_outline,
+                      color: surface.success,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      context.tr('partner_scan_success_title'),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        color: AppScrim.ink,
+                        fontSize: 23,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (code != null) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppScrim.frost(18),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.qr_code_2, color: _reticle, size: 22),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          PairingToken.forDisplay(code),
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: AppScrim.ink,
+                            letterSpacing: 1.6,
+                            fontWeight: FontWeight.w700,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppScrim.frost(10),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 1),
+                      child: Icon(
+                        Icons.info_outline,
+                        color: _reticle,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
                       child: Text(
-                        context.tr('partner_scan_helper'),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        context.tr('partner_scan_success_desc'),
+                        style: theme.textTheme.bodyMedium?.copyWith(
                           color: AppScrim.inkMuted,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                          height: 1.5,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 24),
+              AppGradientButton(
+                label: context.tr('partner_scan_confirm'),
+                icon: Icons.link,
+                onPressed: onConfirm,
+                radius: AppRadius.pill,
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: onCancel,
+                style: TextButton.styleFrom(
+                  foregroundColor: AppScrim.inkMuted,
+                  minimumSize: const Size(double.infinity, 48),
+                ),
+                child: Text(context.tr('partner_scan_cancel')),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -475,47 +615,35 @@ class _ScannerOverlayShape extends ShapeBorder {
       height: cutOutSize,
     );
 
-    // Draw corners
-    Path path = Path();
-
-    // Top left
-    path.moveTo(cutOutRect.left, cutOutRect.top + borderLength);
-    path.quadraticBezierTo(
-      cutOutRect.left,
-      cutOutRect.top,
-      cutOutRect.left + borderRadius,
-      cutOutRect.top,
-    );
-    path.lineTo(cutOutRect.left + borderLength, cutOutRect.top);
-
-    // Top right
-    path.moveTo(cutOutRect.right - borderLength, cutOutRect.top);
-    path.quadraticBezierTo(
-      cutOutRect.right,
-      cutOutRect.top,
-      cutOutRect.right,
-      cutOutRect.top + borderRadius,
-    );
-    path.lineTo(cutOutRect.right, cutOutRect.top + borderLength);
-
-    // Bottom left
-    path.moveTo(cutOutRect.left, cutOutRect.bottom - borderLength);
-    path.quadraticBezierTo(
-      cutOutRect.left,
-      cutOutRect.bottom,
-      cutOutRect.left + borderRadius,
-      cutOutRect.bottom,
-    );
-    path.lineTo(cutOutRect.left + borderLength, cutOutRect.bottom);
-
-    // Bottom right
-    path.moveTo(cutOutRect.right - borderLength, cutOutRect.bottom);
-    path.quadraticBezierTo(
-      cutOutRect.right,
-      cutOutRect.bottom,
-      cutOutRect.right,
-      cutOutRect.bottom - borderLength,
-    );
+    // Köşe parantezleri: kesimin yuvarlak köşesini aynı yarıçapla izliyor.
+    // Önceki eğriler köşeden köşeye farklıydı (sağ alt köşe parantezin
+    // tamamını tek bir eğriyle çiziyordu).
+    final l = cutOutRect.left;
+    final t = cutOutRect.top;
+    final r = cutOutRect.right;
+    final b = cutOutRect.bottom;
+    final arc = Radius.circular(borderRadius);
+    final path = Path()
+      // Sol üst
+      ..moveTo(l, t + borderLength)
+      ..lineTo(l, t + borderRadius)
+      ..arcToPoint(Offset(l + borderRadius, t), radius: arc)
+      ..lineTo(l + borderLength, t)
+      // Sağ üst
+      ..moveTo(r - borderLength, t)
+      ..lineTo(r - borderRadius, t)
+      ..arcToPoint(Offset(r, t + borderRadius), radius: arc)
+      ..lineTo(r, t + borderLength)
+      // Sağ alt
+      ..moveTo(r, b - borderLength)
+      ..lineTo(r, b - borderRadius)
+      ..arcToPoint(Offset(r - borderRadius, b), radius: arc)
+      ..lineTo(r - borderLength, b)
+      // Sol alt
+      ..moveTo(l + borderLength, b)
+      ..lineTo(l + borderRadius, b)
+      ..arcToPoint(Offset(l, b - borderRadius), radius: arc)
+      ..lineTo(l, b - borderLength);
 
     canvas.drawPath(path, borderPaint);
   }

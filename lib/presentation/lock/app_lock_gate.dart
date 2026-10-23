@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../core/app_info.dart';
+import '../../design_system/app_decor.dart';
+import '../../design_system/app_tokens.dart';
+import '../../design_system/brand_lotus.dart';
 import '../../domain/services/app_lock_service.dart';
 import '../../localization/app_localizations.dart';
 
@@ -173,69 +177,186 @@ class _LockScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = context.tokens;
 
     return Material(
-      color: theme.scaffoldBackgroundColor,
-      child: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 88,
-                  height: 88,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withAlpha(25),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.lock_outline,
-                    size: 40,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  context.tr('lock_title'),
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.displayLarge?.copyWith(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  context.tr('lock_subtitle'),
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.labelLarge?.copyWith(height: 1.5),
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: busy ? null : onUnlock,
-                    icon: busy
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.lock_open),
-                    label: Text(context.tr('lock_unlock')),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size.fromHeight(52),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+      color: t.background,
+      child: AmbientBackground(
+        child: SafeArea(
+          child: LayoutBuilder(
+            // Kaydırılabilir ama sığdığında ortada: büyük yazıda ve kısa
+            // ekranda düğme ekran dışına itilmesin.
+            builder: (context, constraints) => SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 24),
+                        const _LockMedallion(),
+                        const SizedBox(height: 28),
+                        Text(
+                          context.tr('lock_title'),
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontSize: 32,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          context.tr('lock_subtitle'),
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontSize: 15,
+                            height: 1.5,
+                            color: t.textMuted,
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        // Gerçekte olan: kayıtlar cihazda şifreli. Tasarımdaki
+                        // "uçtan uca şifreli" alınmadı — bulut kopyası değil.
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: t.surfaceAlt,
+                            borderRadius: BorderRadius.circular(AppRadius.pill),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: t.success,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  context.tr('onboarding_success_privacy'),
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.labelMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: t.textMuted,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 36),
+                        AppGradientButton(
+                          label: context.tr('lock_unlock'),
+                          icon: Icons.lock_open_rounded,
+                          onPressed: busy ? null : onUnlock,
+                          busy: busy,
+                          radius: AppRadius.pill,
+                        ),
+                        const SizedBox(height: 28),
+                        // Sessiz marka imzası.
+                        ExcludeSemantics(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: 18,
+                                child: BrandLotus(color: t.secondary),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                AppInfo.displayName,
+                                style: theme.textTheme.labelLarge?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: t.textMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Lotus ve kilit rozeti: halenin içinde degrade çerçeveli beyaz daire.
+class _LockMedallion extends StatelessWidget {
+  const _LockMedallion();
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final scheme = Theme.of(context).colorScheme;
+    return SizedBox(
+      width: 148,
+      height: 148,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Hale
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: t.secondary.withAlpha(22),
+            ),
+          ),
+          // Degrade çerçeve
+          Container(
+            width: 104,
+            height: 104,
+            padding: const EdgeInsets.all(2.5),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: AppGradients.mark(context),
+              boxShadow: AppShadows.floating(context),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: t.surface,
+              ),
+              padding: const EdgeInsets.all(26),
+              child: BrandLotus(color: scheme.primary, sideColor: t.secondary),
+            ),
+          ),
+          // Kilit rozeti
+          Positioned(
+            right: 26,
+            bottom: 26,
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: scheme.primary,
+                border: Border.all(color: t.surface, width: 2.5),
+              ),
+              child: Icon(
+                Icons.lock_rounded,
+                size: 16,
+                color: scheme.onPrimary,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

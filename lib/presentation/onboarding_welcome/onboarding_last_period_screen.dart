@@ -1,12 +1,14 @@
 import '../../design_system/app_tappable.dart';
 import 'package:flutter/material.dart';
-import '../../design_system/app_scrim.dart';
+import '../../design_system/app_card.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/navigation/route_names.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../localization/app_localizations.dart';
 import 'onboarding_progress.dart';
+import 'widgets/onboarding_chrome.dart';
 import '../../localization/date_names.dart';
 import '../../design_system/app_layout.dart';
 
@@ -52,285 +54,171 @@ class _OnboardingLastPeriodScreenState
     });
   }
 
+  Future<void> _continue() async {
+    // Seçilen tarihi geçici olarak SharedPreferences'a kaydet
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      'onboarding_last_period_date',
+      _selectedDate.toIso8601String(),
+    );
+
+    if (mounted) {
+      context.pushNamed(RouteNames.onboardingPeriodLength);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    final bgColor = context.tokens.background;
-    final cardColor = context.tokens.surface;
-    final textMainColor = context.tokens.text;
-    final textSecondaryColor = context.tokens.textMuted;
-    final primaryColor = theme.colorScheme.primary;
+    final t = context.tokens;
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: t.background,
       // Eylem çubuğu gövdenin değil `Scaffold`'un altında: içerik
       // sütununun içinde kalınca zemini geniş ekranda 600 pt'de
       // kesilip sayfanın üstünde sert kenarlı bir dikdörtgen
       // bırakıyordu. Burada tam genişlikte ve dibe sabitli.
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: context.tokens.surface,
-          border: Border(top: BorderSide(color: context.tokens.surfaceAlt)),
-        ),
-        child: AppContentWidth(
-          // Zemin tam genişlikte, düğme okunur sütunda kalıyor.
-          child: ElevatedButton(
-            onPressed: () async {
-              // Seçilen tarihi geçici olarak SharedPreferences'a kaydet
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.setString(
-                'onboarding_last_period_date',
-                _selectedDate.toIso8601String(),
-              );
-
-              if (context.mounted) {
-                context.pushNamed(RouteNames.onboardingPeriodLength);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              minimumSize: const Size(double.infinity, 56),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              elevation: 8,
-              shadowColor: primaryColor.withAlpha(76),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  context.tr('onb_continue'),
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(width: 8),
-                Icon(Icons.arrow_forward),
-              ],
-            ),
-          ),
+      bottomNavigationBar: OnboardingBottomBar(
+        child: AppGradientButton(
+          label: context.tr('onb_continue'),
+          onPressed: _continue,
+          radius: AppRadius.pill,
         ),
       ),
-      body: AppContentWidth(
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      tooltip: MaterialLocalizations.of(
-                        context,
-                      ).backButtonTooltip,
-                      icon: Icon(Icons.arrow_back, color: textMainColor),
-                      onPressed: () => onboardingBack(context),
-                    ),
-                    const SizedBox(width: 48), // Spacer to balance back button
-                  ],
-                ),
-              ),
-
-              const OnboardingStepDots(step: OnboardingStep.lastPeriod),
-
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 16.0,
-                    ),
+      body: AmbientBackground(
+        child: AppContentWidth(
+          child: SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                const OnboardingTopBar(),
+                const OnboardingStepDots(step: OnboardingStep.lastPeriod),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text(
-                          context.tr('onb_last_period_title'),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: textMainColor,
-                            letterSpacing: -0.5,
-                            height: 1.2,
-                          ),
+                        OnboardingHeading(
+                          tag: context.tr('cycle_settings_title'),
+                          tagIcon: Icons.calendar_today_outlined,
+                          title: context.tr('onb_last_period_title'),
+                          description: context.tr('onb_last_period_desc'),
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          context.tr('onb_last_period_desc'),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: textSecondaryColor,
-                            height: 1.5,
-                          ),
+                        const SizedBox(height: AppSpacing.xl),
+                        Center(child: _buildCalendarCard(context)),
+                        const SizedBox(height: AppSpacing.xl),
+                        OnboardingNote(
+                          text: context.tr('onb_last_period_hint'),
                         ),
-                        const SizedBox(height: 32),
-
-                        // Calendar Container
-                        Container(
-                          width: double.infinity,
-                          constraints: const BoxConstraints(maxWidth: 340),
-                          // Yatay pay 10: gün hücreleri iOS'un önerdiği 44
-                          // pt'nin altına düşmesin (16 iken 43,7 idi).
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 16,
-                          ),
-                          decoration: BoxDecoration(
-                            color: cardColor,
-                            borderRadius: BorderRadius.circular(24),
-                            border: Border.all(color: context.tokens.border),
-                            boxShadow: isDark
-                                ? null
-                                : [
-                                    BoxShadow(
-                                      color: AppScrim.veil(26),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                          ),
-                          child: Column(
-                            children: [
-                              // Month Navigator
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  IconButton(
-                                    tooltip: MaterialLocalizations.of(
-                                      context,
-                                    ).previousMonthTooltip,
-                                    icon: Icon(
-                                      Icons.chevron_left,
-                                      color: textMainColor,
-                                    ),
-                                    onPressed: _previousMonth,
-                                    style: IconButton.styleFrom(
-                                      hoverColor: context.tokens.surfaceAlt,
-                                    ),
-                                  ),
-                                  Text(
-                                    _getFormattedMonth(context, _currentMonth),
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: textMainColor,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    tooltip: MaterialLocalizations.of(
-                                      context,
-                                    ).nextMonthTooltip,
-                                    icon: Icon(
-                                      Icons.chevron_right,
-                                      color: textMainColor,
-                                    ),
-                                    onPressed: _nextMonth,
-                                    style: IconButton.styleFrom(
-                                      hoverColor: context.tokens.surfaceAlt,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-
-                              // Days of Week
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: _weekDayKeys.map((key) {
-                                  final day = context.tr(key);
-                                  return SizedBox(
-                                    width: 40,
-                                    child: Text(
-                                      day,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: context.tokens.textFaint,
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                              const SizedBox(height: 16),
-
-                              // Days Grid
-                              _buildCalendarGrid(
-                                primaryColor,
-                                isDark,
-                                textMainColor,
-                                textSecondaryColor,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 32),
-
-                        // Hint
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: context.tokens.surfaceAlt,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: context.tokens.border),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                size: 16,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                              const SizedBox(width: 8),
-                              Flexible(
-                                child: Text(
-                                  context.tr('onb_last_period_hint'),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: context.tokens.textMuted,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: AppSpacing.lg),
+                        const OnboardingPrivacyNote(),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildCalendarGrid(
-    Color primaryColor,
-    bool isDark,
-    Color textMainColor,
-    Color textSecondaryColor,
-  ) {
+  Widget _buildCalendarCard(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+
+    Widget navButton({
+      required IconData icon,
+      required String tooltip,
+      required VoidCallback onPressed,
+    }) => IconButton(
+      tooltip: tooltip,
+      onPressed: onPressed,
+      icon: Icon(icon, color: primary, size: 22),
+      style: IconButton.styleFrom(
+        backgroundColor: t.brandTint,
+        minimumSize: const Size(44, 44),
+      ),
+    );
+
+    return Container(
+      width: double.infinity,
+      constraints: const BoxConstraints(maxWidth: 360),
+      // Yatay pay 10: gün hücreleri iOS'un önerdiği 44 pt'nin altına
+      // düşmesin (16 iken 43,7 idi).
+      padding: const EdgeInsets.fromLTRB(10, 16, 10, 12),
+      decoration: AppCard.decoration(t),
+      child: Column(
+        children: [
+          // Ay başlığı ve gezinme
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _getFormattedMonth(context, _currentMonth),
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: primary,
+                    ),
+                  ),
+                ),
+                navButton(
+                  icon: Icons.chevron_left,
+                  tooltip: MaterialLocalizations.of(
+                    context,
+                  ).previousMonthTooltip,
+                  onPressed: _previousMonth,
+                ),
+                const SizedBox(width: 6),
+                navButton(
+                  icon: Icons.chevron_right,
+                  tooltip: MaterialLocalizations.of(context).nextMonthTooltip,
+                  onPressed: _nextMonth,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Haftanın günleri
+          Row(
+            children: _weekDayKeys.map((key) {
+              return Expanded(
+                child: Text(
+                  context.upper(context.tr(key)),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.fade,
+                  softWrap: false,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.6,
+                    color: t.textFaint,
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 8),
+
+          _buildCalendarGrid(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalendarGrid(BuildContext context) {
+    final t = context.tokens;
+    final scheme = Theme.of(context).colorScheme;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
     final daysInMonth = DateUtils.getDaysInMonth(
       _currentMonth.year,
       _currentMonth.month,
@@ -346,7 +234,7 @@ class _OnboardingLastPeriodScreenState
     // Calculate empty slots
     List<Widget> gridItems = [];
     for (int i = 1; i < firstWeekday; i++) {
-      gridItems.add(const SizedBox(width: 40, height: 40));
+      gridItems.add(const SizedBox.shrink());
     }
 
     // Add days
@@ -356,6 +244,7 @@ class _OnboardingLastPeriodScreenState
           _selectedDate.year == date.year &&
           _selectedDate.month == date.month &&
           _selectedDate.day == date.day;
+      final isToday = date == today;
 
       gridItems.add(
         AppTappable(
@@ -367,33 +256,32 @@ class _OnboardingLastPeriodScreenState
               _selectedDate = date;
             });
           },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isSelected ? primaryColor : Colors.transparent,
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: primaryColor.withAlpha(76),
-                        blurRadius: 8,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                  : [],
-            ),
-            child: Center(
-              child: Text(
-                '$i',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected
-                      ? Theme.of(context).colorScheme.onPrimary
-                      : (context.tokens.text),
+          // Hücrenin tamamı dokunma alanı; görünen daire biraz küçük.
+          child: Center(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: isSelected ? AppGradients.mark(context) : null,
+                // Bugün halkayla: tarih seçerken nerede durulduğu belli olsun.
+                border: isToday && !isSelected
+                    ? Border.all(color: scheme.primary, width: 1.5)
+                    : null,
+                boxShadow: isSelected ? AppShadows.floating(context) : null,
+              ),
+              child: Center(
+                child: Text(
+                  '$i',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontSize: 15,
+                    height: 1.1,
+                    fontWeight: isSelected || isToday
+                        ? FontWeight.w700
+                        : FontWeight.w500,
+                    color: isSelected ? scheme.onPrimary : t.text,
+                  ),
                 ),
               ),
             ),
@@ -406,7 +294,7 @@ class _OnboardingLastPeriodScreenState
       crossAxisCount: 7,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 8,
+      mainAxisSpacing: 2,
       crossAxisSpacing: 0,
       children: gridItems,
     );

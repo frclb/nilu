@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/navigation/route_names.dart';
+import '../../design_system/app_card.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_theme.dart';
 import '../../design_system/app_tokens.dart';
 import '../../localization/app_localizations.dart';
@@ -45,18 +47,23 @@ class _ConsentSheetState extends State<_ConsentSheet> {
     final t = context.tokens;
     final theme = Theme.of(context);
     final govde = theme.textTheme.bodyMedium?.copyWith(
-      color: t.textMuted,
+      color: t.text,
       height: 1.5,
     );
 
     Widget madde(IconData icon, String key) => Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: theme.colorScheme.primary),
+          AppIconTile(icon: icon, size: 36, background: t.surfaceAlt),
           const SizedBox(width: AppSpacing.md),
-          Expanded(child: Text(context.tr(key), style: govde)),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(context.tr(key), style: govde),
+            ),
+          ),
         ],
       ),
     );
@@ -76,13 +83,35 @@ class _ConsentSheetState extends State<_ConsentSheet> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                context.tr('sync_consent_title'),
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  AppIconTile(
+                    icon: Icons.verified_user_outlined,
+                    size: 40,
+                    circle: true,
+                    background: t.secondaryTint,
+                    color: t.secondary,
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Semantics(
+                      header: true,
+                      child: Text(
+                        context.tr('sync_consent_title'),
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontSize: 23,
+                          height: 1.2,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacing.xl),
+              // Ne gidiyor, nereye gidiyor (uçtan uca şifreli **olmadığı**
+              // dahil), nasıl geri çekilir — onaydan önce, bu sırayla.
               madde(Icons.inventory_2_outlined, 'sync_consent_what'),
               madde(Icons.public, 'sync_consent_where'),
               madde(Icons.undo, 'sync_consent_withdraw'),
@@ -91,37 +120,90 @@ class _ConsentSheetState extends State<_ConsentSheet> {
                 child: TextButton(
                   onPressed: () => context.pushNamed(RouteNames.privacyPolicy),
                   style: TextButton.styleFrom(
+                    foregroundColor: t.secondary,
                     padding: EdgeInsets.zero,
                     minimumSize: const Size(0, 44),
                   ),
-                  child: Text(context.tr('sync_consent_policy')),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(child: Text(context.tr('sync_consent_policy'))),
+                      const Icon(Icons.chevron_right, size: 18),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: AppSpacing.sm),
-              CheckboxListTile(
-                key: const Key('sync_consent_checkbox'),
-                value: _onay,
-                onChanged: (v) => setState(() => _onay = v ?? false),
-                contentPadding: EdgeInsets.zero,
-                controlAffinity: ListTileControlAffinity.leading,
-                title: Text(
-                  context.tr('sync_consent_checkbox'),
-                  style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
+              const SizedBox(height: AppSpacing.md),
+              // Kutucuk kendi zemininde: onayın ne olduğu gözden kaçmasın.
+              // Kendiliğinden işaretli değil.
+              Container(
+                decoration: BoxDecoration(
+                  color: t.surfaceAlt,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(
+                    color: _onay ? t.secondary : AppCard.borderColor(t),
+                  ),
+                ),
+                child: Material(
+                  type: MaterialType.transparency,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  clipBehavior: Clip.antiAlias,
+                  child: CheckboxListTile(
+                    key: const Key('sync_consent_checkbox'),
+                    value: _onay,
+                    onChanged: (v) => setState(() => _onay = v ?? false),
+                    contentPadding: const EdgeInsets.fromLTRB(
+                      AppSpacing.sm,
+                      AppSpacing.xs,
+                      AppSpacing.lg,
+                      AppSpacing.xs,
+                    ),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(
+                      context.tr('sync_consent_checkbox'),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        height: 1.45,
+                        fontWeight: FontWeight.w600,
+                        color: t.text,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(height: AppSpacing.lg),
-              FilledButton(
-                key: const Key('sync_consent_accept'),
-                onPressed: _onay ? () => Navigator.of(context).pop(true) : null,
-                style: AppTheme.dialogAction().copyWith(
-                  minimumSize: const WidgetStatePropertyAll(Size(0, 52)),
+              const SizedBox(height: AppSpacing.xl),
+              // Degrade yalnızca kutucuk işaretliyken: kapalı düğme temanın
+              // soluk görünümünde, "basılabilir" sanılmasın.
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: _onay ? AppGradients.primary(context) : null,
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                  boxShadow: _onay ? AppShadows.floating(context) : null,
                 ),
-                child: Text(context.tr('sync_consent_accept')),
+                child: FilledButton(
+                  key: const Key('sync_consent_accept'),
+                  onPressed: _onay
+                      ? () => Navigator.of(context).pop(true)
+                      : null,
+                  style: AppTheme.dialogAction().copyWith(
+                    minimumSize: const WidgetStatePropertyAll(Size(0, 54)),
+                    shape: const WidgetStatePropertyAll(StadiumBorder()),
+                    backgroundColor: _onay
+                        ? const WidgetStatePropertyAll(Colors.transparent)
+                        : null,
+                    shadowColor: const WidgetStatePropertyAll(
+                      Colors.transparent,
+                    ),
+                  ),
+                  child: Text(context.tr('sync_consent_accept')),
+                ),
               ),
               const SizedBox(height: AppSpacing.sm),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                style: TextButton.styleFrom(minimumSize: const Size(0, 48)),
+                style: TextButton.styleFrom(
+                  foregroundColor: t.textMuted,
+                  minimumSize: const Size(0, 48),
+                ),
                 child: Text(context.tr('cancel')),
               ),
             ],

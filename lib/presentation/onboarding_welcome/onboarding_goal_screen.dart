@@ -3,12 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/navigation/route_names.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/models/life_stage.dart';
 import '../../domain/view_models/pregnancy_view_model.dart';
 import '../../localization/app_localizations.dart';
 import 'onboarding_progress.dart';
+import 'widgets/onboarding_chrome.dart';
 import 'widgets/onboarding_option.dart';
 
 /// Kurulumun yol ayrımı: döngü, gebe kalmaya çalışma, gebelik, lohusalık.
@@ -57,94 +59,76 @@ class OnboardingGoalScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
+    final primary = Theme.of(context).colorScheme.primary;
     return Scaffold(
       backgroundColor: t.background,
-      body: AppContentWidth(
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.arrow_back, color: t.text),
-                      tooltip: MaterialLocalizations.of(
-                        context,
-                      ).backButtonTooltip,
-                      onPressed: () => onboardingBack(context),
+      body: AmbientBackground(
+        child: AppContentWidth(
+          child: SafeArea(
+            child: Column(
+              children: [
+                const OnboardingTopBar(),
+                const OnboardingStepDots(step: OnboardingStep.goal),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        OnboardingHeading(
+                          title: context.tr('onb_goal_title'),
+                          description: context.tr('onb_goal_desc'),
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        OnboardingOption(
+                          key: const Key('onboarding_goal_cycle'),
+                          icon: Icons.water_drop_outlined,
+                          iconColor: t.flow,
+                          iconBackground: t.flowTint,
+                          title: context.tr('onb_goal_cycle'),
+                          body: context.tr('onb_goal_cycle_body'),
+                          onTap: () => _dongu(context),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        OnboardingOption(
+                          key: const Key('onboarding_goal_ttc'),
+                          icon: Icons.spa_outlined,
+                          iconColor: primary,
+                          iconBackground: t.brandTint,
+                          title: context.tr('onb_goal_ttc'),
+                          body: context.tr('onb_goal_ttc_body'),
+                          onTap: () => context.pushNamed(
+                            RouteNames.onboardingConception,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        OnboardingOption(
+                          key: const Key('onboarding_goal_pregnancy'),
+                          icon: Icons.pregnant_woman,
+                          iconColor: t.accent,
+                          iconBackground: t.accentTint,
+                          title: context.tr('onb_goal_pregnancy'),
+                          body: context.tr('onb_goal_pregnancy_body'),
+                          onTap: () => _hamileyim(context),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        OnboardingOption(
+                          key: const Key('onboarding_goal_postpartum'),
+                          icon: Icons.child_friendly_outlined,
+                          iconColor: t.secondary,
+                          iconBackground: t.secondaryTint,
+                          title: context.tr('onb_goal_postpartum'),
+                          body: context.tr('onb_goal_postpartum_body'),
+                          onTap: () => _dogumYaptim(context),
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        const OnboardingPrivacyNote(),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              const OnboardingStepDots(step: OnboardingStep.goal),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-                  child: Column(
-                    children: [
-                      Text(
-                        context.tr('onb_goal_title'),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: t.text,
-                          letterSpacing: -0.5,
-                          height: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        context.tr('onb_goal_desc'),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: t.textMuted,
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      OnboardingOption(
-                        key: const Key('onboarding_goal_cycle'),
-                        icon: Icons.water_drop_outlined,
-                        title: context.tr('onb_goal_cycle'),
-                        body: context.tr('onb_goal_cycle_body'),
-                        onTap: () => _dongu(context),
-                      ),
-                      const SizedBox(height: 16),
-                      OnboardingOption(
-                        key: const Key('onboarding_goal_ttc'),
-                        icon: Icons.spa_outlined,
-                        title: context.tr('onb_goal_ttc'),
-                        body: context.tr('onb_goal_ttc_body'),
-                        onTap: () =>
-                            context.pushNamed(RouteNames.onboardingConception),
-                      ),
-                      const SizedBox(height: 16),
-                      OnboardingOption(
-                        key: const Key('onboarding_goal_pregnancy'),
-                        icon: Icons.pregnant_woman,
-                        title: context.tr('onb_goal_pregnancy'),
-                        body: context.tr('onb_goal_pregnancy_body'),
-                        onTap: () => _hamileyim(context),
-                      ),
-                      const SizedBox(height: 16),
-                      OnboardingOption(
-                        key: const Key('onboarding_goal_postpartum'),
-                        icon: Icons.child_friendly_outlined,
-                        title: context.tr('onb_goal_postpartum'),
-                        body: context.tr('onb_goal_postpartum_body'),
-                        onTap: () => _dogumYaptim(context),
-                      ),
-                    ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

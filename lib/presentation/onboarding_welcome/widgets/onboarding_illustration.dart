@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../design_system/brand_lotus.dart';
 
@@ -38,20 +39,51 @@ enum OnboardingIllustration {
 /// ölçeklendiği için buradaki ölçüler oran belirliyor, mutlak boyut değil.
 const Size _canvas = Size(220, 170);
 
+/// Marka madalyonu: iç içe iki hale, ortada degrade dairede beyaz lotus —
+/// uygulama simgesinin büyütülmüş hâli.
 class _Brand extends StatelessWidget {
   const _Brand();
 
   @override
-  Widget build(BuildContext context) => SizedBox.fromSize(
-    size: _canvas,
-    child: Center(
-      child: SizedBox(
-        width: 150,
-        height: 115,
-        child: BrandLotus(color: Theme.of(context).colorScheme.primary),
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final onMark = Theme.of(context).colorScheme.onPrimary;
+    return SizedBox.fromSize(
+      size: _canvas,
+      child: Center(
+        child: Container(
+          width: 160,
+          height: 160,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: t.secondary.withValues(alpha: 0.08),
+          ),
+          alignment: Alignment.center,
+          child: Container(
+            width: 130,
+            height: 130,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: t.surface.withValues(alpha: 0.7),
+              border: Border.all(color: t.secondary.withValues(alpha: 0.12)),
+            ),
+            alignment: Alignment.center,
+            child: Container(
+              width: 104,
+              height: 104,
+              padding: const EdgeInsets.all(26),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: AppGradients.mark(context),
+                boxShadow: AppShadows.floating(context),
+              ),
+              child: BrandLotus(color: onMark, sideOpacity: 0.8),
+            ),
+          ),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 /// Takvim: bir ay ızgarası ve içinden geçen regl bandı.

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import '../../core/app_info.dart';
+import '../../design_system/app_card.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_tokens.dart';
 import '../../../../localization/app_localizations.dart';
 import '../../../core/navigation/route_names.dart';
 import 'package:go_router/go_router.dart';
 import '../../design_system/app_layout.dart';
 import 'onboarding_progress.dart';
+import 'widgets/onboarding_chrome.dart';
 import 'widgets/onboarding_illustration.dart';
 
 class OnboardingWelcomeScreen extends StatefulWidget {
@@ -36,7 +40,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
   // Rozet kaldırıldıktan sonra sayfada ~90 pt boşaldı; çizim o yeri
   // kullanıyor. Üst sınır: metin yine de `Flexible` sayesinde önceliği
   // koruyor, uzun başlıklarda (Almanca 4. slayt üç satır) kutu küçülüyor.
-  static const double _heroRatio = 0.52;
+  static const double _heroRatio = 0.58;
   static const double _heroRatioWide = 0.60;
   static const double _heroRatioShort = 0.42;
   static const double _heroMin = 100;
@@ -90,263 +94,180 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-
-    final bgColor = context.tokens.background;
-    final textColor = context.tokens.text;
+    final t = context.tokens;
+    final primary = theme.colorScheme.primary;
 
     final pages = [
-      _buildPage(
-        context,
-        theme,
-        textColor,
+      (
         OnboardingIllustration.brand,
-        context.tr('onboarding_welcome_title'),
-        context.tr('onboarding_welcome_desc'),
+        'onboarding_welcome_title',
+        'onboarding_welcome_desc',
       ),
-      _buildPage(
-        context,
-        theme,
-        textColor,
+      (
         OnboardingIllustration.calendar,
-        context.tr('onboarding_page2_title'),
-        context.tr('onboarding_page2_desc'),
+        'onboarding_page2_title',
+        'onboarding_page2_desc',
       ),
-      _buildPage(
-        context,
-        theme,
-        textColor,
+      (
         OnboardingIllustration.log,
-        context.tr('onboarding_page3_title'),
-        context.tr('onboarding_page3_desc'),
+        'onboarding_page3_title',
+        'onboarding_page3_desc',
       ),
-      _buildPage(
-        context,
-        theme,
-        textColor,
+      (
         OnboardingIllustration.partner,
-        context.tr('onboarding_page4_title'),
-        context.tr('onboarding_page4_desc'),
+        'onboarding_page4_title',
+        'onboarding_page4_desc',
       ),
     ];
 
     return Scaffold(
-      backgroundColor: bgColor,
-      // Sarmalayıcı `Stack`'in **içinde**: dekoratif degrade tam genişlikte
-      // kalmalı. Dışarıda olduğunda 600 pt'de kesiliyor ve zeminle arasında
-      // görünür bir dikey dikiş bırakıyordu.
-      body: Stack(
-        children: [
-          // Background Gradient decoration
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: MediaQuery.of(context).size.height * 0.6,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    theme.colorScheme.primary.withAlpha(12),
-                    Colors.transparent,
-                  ],
-                ),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(48),
-                  bottomRight: Radius.circular(48),
-                ),
-              ),
-            ),
-          ),
-
-          AppContentWidth(
-            // Onboarding tam ekran bir tanıtım: 600 pt'lik okuma sütunu
-            // 1032 pt'lik bir ekranda içeriği ortada küçük bir ada
-            // bırakıyordu. Gövde geniş, **metin** kendi içinde dar.
-            maxWidth: _pageMaxWidth,
-            child: SafeArea(
-              child: Column(
-                children: [
-                  // Top Action Bar
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8.0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
+      backgroundColor: t.background,
+      // Işıma `AppContentWidth`'in **dışında**: dekoratif katman tam
+      // genişlikte kalmalı. İçeride olduğunda 600 pt'de kesiliyor ve zeminle
+      // arasında görünür bir dikey dikiş bırakıyordu.
+      body: AmbientBackground(
+        child: AppContentWidth(
+          // Onboarding tam ekran bir tanıtım: 600 pt'lik okuma sütunu
+          // 1032 pt'lik bir ekranda içeriği ortada küçük bir ada
+          // bırakıyordu. Gövde geniş, **metin** kendi içinde dar.
+          maxWidth: _pageMaxWidth,
+          child: SafeArea(
+            child: Column(
+              children: [
+                // Üst çubuk: ortada yazı markası, sağda "Atla".
+                SizedBox(
+                  height: 52,
+                  width: double.infinity,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Text(
+                        AppInfo.displayName,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                          color: primary,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      Positioned(
+                        right: 8,
+                        child: TextButton(
                           onPressed: _completeOnboarding,
                           style: TextButton.styleFrom(
-                            foregroundColor: textColor.withAlpha(153),
+                            foregroundColor: t.textMuted,
+                            minimumSize: const Size(48, 44),
                           ),
-                          child: Text(
-                            context.tr('onboarding_skip'),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                          child: Text(context.tr('onboarding_skip')),
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentPage = index;
+                      });
+                    },
+                    itemCount: pages.length,
+                    itemBuilder: (context, index) {
+                      final (illustration, title, description) = pages[index];
+                      return _buildPage(
+                        context,
+                        illustration,
+                        context.tr(title),
+                        context.tr(description),
+                      );
+                    },
+                  ),
+                ),
+
+                // Alt alan: nokta göstergesi ve düğmeler metinle aynı
+                // genişlikte. Sayfa 760 pt'ye açılınca tam genişlikte bir
+                // "Devam Et" düğmesi hem çirkin hem de dokunma hedefi olarak
+                // abartılı oluyordu.
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
+                  child: AppContentWidth(
+                    maxWidth: _textMaxWidth,
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(pages.length, (index) {
+                            final isActive = index == _currentPage;
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: isActive ? 28 : 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                color: isActive
+                                    ? primary
+                                    : primary.withAlpha(
+                                        onboardingIdleDotAlpha(isDark),
+                                      ),
+                              ),
+                            );
+                          }),
+                        ),
+                        const SizedBox(height: 18),
+                        AppGradientButton(
+                          label: context.tr('onboarding_continue'),
+                          onPressed: _nextPage,
+                          radius: AppRadius.pill,
+                        ),
+                        const SizedBox(height: 10),
+                        OutlinedButton(
+                          onPressed: () {
+                            context.pushNamed(RouteNames.partnerScan);
+                          },
+                          style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 48),
+                            side: BorderSide.none,
+                            backgroundColor: t.brandTint,
+                          ),
+                          child: Text(context.tr('onboarding_partner_login')),
+                        ),
+                        // Yeni cihaz: buluttaki kayıtları geri al. Hesap
+                        // isteğe bağlı olduğu için ikincil bir bağlantı.
+                        TextButton(
+                          key: const Key('onboarding_restore'),
+                          onPressed: () {
+                            context.pushNamed(RouteNames.accountRestore);
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: t.textMuted,
+                            minimumSize: const Size(double.infinity, 44),
+                          ),
+                          child: Text(context.tr('onboarding_restore')),
+                        ),
+                        const OnboardingPrivacyNote(),
                       ],
                     ),
                   ),
-                  Expanded(
-                    child: PageView.builder(
-                      controller: _pageController,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentPage = index;
-                        });
-                      },
-                      itemCount: 4,
-                      itemBuilder: (context, index) => pages[index],
-                    ),
-                  ),
-
-                  // Bottom Area
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.only(
-                      left: 24,
-                      right: 24,
-                      top: 16,
-                      bottom: 8,
-                    ),
-                    decoration: BoxDecoration(color: bgColor.withAlpha(204)),
-                    // Nokta göstergesi ve düğmeler metinle aynı genişlikte:
-                    // sayfa 760 pt'ye açılınca tam genişlikte bir "Devam Et"
-                    // düğmesi hem çirkin hem de dokunma hedefi olarak abartılı
-                    // oluyordu.
-                    child: AppContentWidth(
-                      maxWidth: _textMaxWidth,
-                      child: Column(
-                        children: [
-                          // Dots Indicator (6 dots)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(4, (index) {
-                              final isActive = index == _currentPage;
-                              return AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                ),
-                                width: isActive ? 24 : 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: isActive
-                                      ? theme.colorScheme.primary
-                                      : theme.colorScheme.primary.withAlpha(
-                                          onboardingIdleDotAlpha(isDark),
-                                        ),
-                                ),
-                              );
-                            }),
-                          ),
-
-                          const SizedBox(height: 24),
-
-                          // CTA Button
-                          ElevatedButton(
-                            onPressed: _nextPage,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.colorScheme.primary,
-                              foregroundColor: Theme.of(
-                                context,
-                              ).colorScheme.onPrimary,
-                              minimumSize: const Size(double.infinity, 56),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              elevation: 8,
-                              shadowColor: theme.colorScheme.primary.withAlpha(
-                                76,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  context.tr('onboarding_continue'),
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                const Icon(Icons.arrow_forward, size: 20),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          OutlinedButton(
-                            onPressed: () {
-                              context.pushNamed(RouteNames.partnerScan);
-                            },
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: theme.colorScheme.primary,
-                              minimumSize: const Size(double.infinity, 56),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              side: BorderSide(
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
-                            child: Text(
-                              context.tr('onboarding_partner_login'),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                          // Yeni cihaz: buluttaki kayıtları geri al. Hesap
-                          // isteğe bağlı olduğu için ikincil bir bağlantı.
-                          TextButton(
-                            key: const Key('onboarding_restore'),
-                            onPressed: () {
-                              context.pushNamed(RouteNames.accountRestore);
-                            },
-                            style: TextButton.styleFrom(
-                              foregroundColor: textColor.withAlpha(178),
-                              minimumSize: const Size(double.infinity, 44),
-                            ),
-                            child: Text(
-                              context.tr('onboarding_restore'),
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildPage(
     BuildContext context,
-    ThemeData theme,
-    Color textColor,
     OnboardingIllustration illustration,
     String title,
     String description,
   ) {
+    final theme = Theme.of(context);
+    final t = context.tokens;
+
     // Sayfa kaydırılabilir: sığdığında ortalanıyor, sığmadığında kayıyor.
     // Önceden sabit bir sütundu ve çizim `Expanded` içindeydi — yazı boyutu
     // büyüdüğünde çizime kalan yer içeriğinden küçülüyor, ekran taşıyordu.
@@ -364,6 +285,8 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
           _heroMin,
           _heroMax,
         );
+        // Kısa sayfada kartın iç payı da daralıyor: metin önce.
+        final inset = short ? 14.0 : 24.0;
 
         // `Flexible` sınırlı bir dikey alan istiyor; kaydırma görünümü
         // sınırsız veriyor. Sayfa alanı kadar sabit bir kutu veriliyor ve
@@ -374,97 +297,107 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen> {
             child: SizedBox(
               height: constraints.maxHeight,
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 8,
-                ),
+                // Alt pay kartın gölgesine yer: sayfa görünümü kenarda
+                // kırpıyor, gölge sert bir çizgiyle kesiliyordu.
+                padding: EdgeInsets.fromLTRB(20, 4, 20, short ? 10 : 18),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Hero illustration area
-                    //
-                    // Yükseklik sınırlı, içerik `FittedBox` ile küçülüyor: yazı
-                    // büyüdüğünde çizim ezilmek yerine orantılı olarak küçülüyor.
-                    // `Flexible`: çizim metinden **artan** yeri alıyor.
-                    //
-                    // Sabit bir yükseklik dile göre çöküyordu. Almanca 4.
-                    // slaytın başlığı ("Lade deine Partnerin oder deinen
-                    // Partner ein") 32 puntoda üç satıra, 144 pt'ye çıkıyor;
-                    // sabit bir çizim ona yer bırakmayıp açıklamayı sayfanın
-                    // dışına itiyordu. Fransızca 4. ve Portekizce 3. slaytta
-                    // da aynısı oluyordu.
-                    //
-                    // `Flexible` + `FittedBox` birlikte: yer daralınca önce
-                    // kutu küçülüyor, sonra içindeki çizim orantılı olarak.
-                    // Metin hiçbir zaman sıkıştırılmıyor.
+                    // Kahraman kart: çizim, başlık ve açıklama aynı tül
+                    // zeminde. İçeriği kadar uzuyor, sayfadan büyükse
+                    // çizim küçülüyor.
                     Flexible(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxHeight: heroMaxHeight,
-                          minHeight: _heroMin,
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(28),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [t.brandTint, t.surface],
+                          ),
+                          border: Border.all(color: AppCard.borderColor(t)),
+                          boxShadow: AppCard.shadow(t),
                         ),
-                        child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(24),
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                theme.colorScheme.primary.withAlpha(20),
-                                theme.colorScheme.primary.withAlpha(5),
-                              ],
+                        padding: EdgeInsets.all(inset),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Kahraman çizim
+                            //
+                            // Yükseklik sınırlı, içerik `FittedBox` ile
+                            // küçülüyor: yazı büyüdüğünde çizim ezilmek yerine
+                            // orantılı olarak küçülüyor. `Flexible`: çizim
+                            // metinden **artan** yeri alıyor.
+                            //
+                            // Sabit bir yükseklik dile göre çöküyordu. Almanca
+                            // 4. slaytın başlığı ("Lade deine Partnerin oder
+                            // deinen Partner ein") üç satıra çıkıyor; sabit
+                            // bir çizim ona yer bırakmayıp açıklamayı sayfanın
+                            // dışına itiyordu. Fransızca 4. ve Portekizce 3.
+                            // slaytta da aynısı oluyordu.
+                            //
+                            // `Flexible` + `FittedBox` birlikte: yer daralınca
+                            // önce kutu küçülüyor, sonra içindeki çizim
+                            // orantılı olarak. Metin hiçbir zaman
+                            // sıkıştırılmıyor.
+                            Flexible(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxHeight: heroMaxHeight,
+                                  minHeight: _heroMin,
+                                ),
+                                // Tam genişlik şart: gevşek kısıtta
+                                // `FittedBox` çizimi doğal boyutunda
+                                // bırakıyor ve geniş ekranda kart boş
+                                // kalıyor.
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: FittedBox(
+                                    fit: BoxFit.contain,
+                                    child: illustration.build(context),
+                                  ),
+                                ),
+                              ),
                             ),
-                            border: Border.all(
-                              color: theme.colorScheme.primary.withAlpha(25),
+
+                            SizedBox(height: short ? 12 : 20),
+
+                            // Kahraman çizim sayfa kadar geniş olabiliyor ama
+                            // metin okunur kalmalı: 760 pt'lik bir açıklama
+                            // satırı gözün satır başını bulmasını
+                            // zorlaştırıyor.
+                            AppContentWidth(
+                              maxWidth: _textMaxWidth,
+                              child: Column(
+                                children: [
+                                  Text(
+                                    title,
+                                    textAlign: TextAlign.center,
+                                    style: theme.textTheme.headlineMedium
+                                        ?.copyWith(
+                                          fontSize: short
+                                              ? _titleSizeShort
+                                              : _titleSize,
+                                          height: 1.12,
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    description,
+                                    textAlign: TextAlign.center,
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      fontSize: 15,
+                                      height: 1.5,
+                                      color: t.textMuted,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          child: FittedBox(
-                            // `contain`: çizim kutuyu dolduruyor. Dar ekranda
-                            // eskiden `scaleDown` kullanılıyordu çünkü rozetle
-                            // birlikte kahraman alanı 300 pt'ye çıkıp açıklamayı
-                            // ekran dışına itiyordu. Rozet kalktı, o yer boşaldı;
-                            // `scaleDown` ise çizimi doğal boyutundan büyütmediği
-                            // için kart yarı boş kalıyordu.
-                            fit: BoxFit.contain,
-                            child: illustration.build(context),
-                          ),
+                          ],
                         ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Text Content
-                    //
-                    // Kahraman çizim sayfa kadar geniş olabiliyor ama metin
-                    // okunur kalmalı: 760 pt'lik bir açıklama satırı gözün
-                    // satır başını bulmasını zorlaştırıyor.
-                    AppContentWidth(
-                      maxWidth: _textMaxWidth,
-                      child: Column(
-                        children: [
-                          Text(
-                            title,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: short ? _titleSizeShort : _titleSize,
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.primary,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            description,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: textColor.withAlpha(204),
-                              height: 1.5,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                   ],

@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/navigation/route_names.dart';
+import '../../design_system/app_tokens.dart';
+import '../../localization/app_localizations.dart';
 
 /// Onboarding adımlarının geri düğmesi.
 ///
@@ -46,35 +48,75 @@ abstract final class OnboardingStep {
 }
 
 /// Soru ekranlarının ilerleme göstergesi.
+///
+/// Sekiz parçalı şerit: geçilen adımlar dolu erik, bulunulan adım parlayan
+/// böğürtlen gülü, kalanlar soluk. Sağında "5 / 8. ADIM" yazıyor; ekran
+/// okuyucu da aynı cümleyi duyuyor, şeridin kendisi süs.
 class OnboardingStepDots extends StatelessWidget {
   const OnboardingStepDots({super.key, required this.step});
 
-  /// Etkin nokta (bkz. [OnboardingStep]).
+  /// Etkin parça (bkz. [OnboardingStep]).
   final int step;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = context.tokens;
     final isDark = theme.brightness == Brightness.dark;
     final primary = theme.colorScheme.primary;
+    final label = context.tr(
+      'session_step_of',
+      params: {'n': '${step + 1}', 'total': '$onboardingStepCount'},
+    );
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(onboardingStepCount, (index) {
-          final isActive = index == step;
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 6),
-            width: isActive ? 24 : 10,
-            height: 10,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              color: isActive
-                  ? primary
-                  : primary.withAlpha(onboardingIdleDotAlpha(isDark)),
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+      child: Semantics(
+        label: label,
+        excludeSemantics: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              label,
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.1,
+                color: t.textMuted,
+              ),
             ),
-          );
-        }),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                for (var i = 0; i < onboardingStepCount; i++) ...[
+                  if (i > 0) const SizedBox(width: 5),
+                  Expanded(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      height: i == step ? 7 : 5,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: i == step
+                            ? t.secondary
+                            : i < step
+                            ? primary
+                            : primary.withAlpha(onboardingIdleDotAlpha(isDark)),
+                        boxShadow: i == step
+                            ? [
+                                BoxShadow(
+                                  color: t.secondary.withAlpha(110),
+                                  blurRadius: 10,
+                                ),
+                              ]
+                            : null,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
