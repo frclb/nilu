@@ -60,3 +60,6 @@ firebase-debug.log
 firestore-debug.log
 ui-debug.log
 firebase_tests/node_modules/
+
+# Claude Code çalışma kopyaları (paralel ekipler); depoya girmez.
+.claude/worktrees/
