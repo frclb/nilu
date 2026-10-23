@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/app_card.dart';
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
-import '../../../localization/app_localizations.dart';
+import 'settings_surface.dart';
 
 class SettingsItem {
   final String title;
@@ -27,6 +28,8 @@ class SettingsItem {
   });
 }
 
+/// Başlıklı ayar grubu: küçük büyük harfli etiket, altında beyaz kartta
+/// simge kutulu satırlar.
 class SettingsGroup extends StatelessWidget {
   final String title;
   final List<SettingsItem> items;
@@ -35,122 +38,98 @@ class SettingsGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final t = context.tokens;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-          child: Text(
-            context.upper(title),
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: context.tokens.textMuted,
-              letterSpacing: 1.0,
-            ),
-          ),
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+          child: AppSectionLabel(title),
         ),
         // Kenarlık açık temada `Colors.grey[100]` idi — beyaz yüzeye karşı
         // görünmüyordu ve grup zeminden ayrışmıyordu. Gölge de yoktu.
-        Container(
-          decoration: AppCard.decoration(context.tokens),
-          clipBehavior: Clip.antiAlias,
+        SettingsCard(
+          padding: const EdgeInsets.all(6),
           child: Column(
-            children: items.asMap().entries.map((entry) {
-              final index = entry.key;
-              final item = entry.value;
-              final isLast = index == items.length - 1;
-
-              return Column(
-                children: [
-                  // Satır ve sağdaki anahtar tek öğe: VoiceOver anahtarı ayrı ve
-                  // etiketsiz okuyordu ("anahtar, kapalı" — neyin anahtarı?).
-                  MergeSemantics(
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: item.onTap,
-                        borderRadius: isLast
-                            ? const BorderRadius.vertical(
-                                bottom: Radius.circular(12),
-                              )
-                            : index == 0
-                            ? const BorderRadius.vertical(
-                                top: Radius.circular(12),
-                              )
-                            : BorderRadius.zero,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: isDark
-                                      ? item.iconBgColor.withAlpha(12)
-                                      : item.iconBgColor,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  item.icon,
-                                  color: item.iconColor,
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item.title,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    if (item.subtitle != null) ...[
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        item.subtitle!,
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: context.tokens.textMuted,
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                              item.trailing ??
-                                  Icon(
-                                    Icons.chevron_right,
-                                    color: isDark
-                                        ? context.tokens.textMuted
-                                        : context.tokens.textFaint,
-                                  ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+            children: [
+              for (var i = 0; i < items.length; i++) ...[
+                _SettingsRow(item: items[i]),
+                if (i != items.length - 1)
+                  Divider(
+                    height: 1,
+                    thickness: 1,
+                    // Simge kutusunun sağından başlıyor: satırlar simge
+                    // sütunuyla birbirine bağlı görünsün.
+                    indent: 68,
+                    endIndent: 14,
+                    color: AppCard.dividerColor(t),
                   ),
-                  if (!isLast)
-                    Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: context.tokens.surfaceAlt,
-                      indent: 72,
-                    ),
-                ],
-              );
-            }).toList(),
+              ],
+            ],
           ),
         ),
       ],
+    );
+  }
+}
+
+class _SettingsRow extends StatelessWidget {
+  const _SettingsRow({required this.item});
+
+  final SettingsItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+
+    // Satır ve sağdaki anahtar tek öğe: VoiceOver anahtarı ayrı ve
+    // etiketsiz okuyordu ("anahtar, kapalı" — neyin anahtarı?).
+    return MergeSemantics(
+      child: InkWell(
+        onTap: item.onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 60),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                AppIconTile(
+                  icon: item.icon,
+                  color: item.iconColor,
+                  background: item.iconBgColor,
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(item.title, style: SettingsText.title(context)),
+                      if (item.subtitle != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          item.subtitle!,
+                          style: SettingsText.subtitle(
+                            context,
+                          )?.copyWith(fontSize: 12.5),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                item.trailing ??
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      size: 22,
+                      color: t.textFaint,
+                    ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

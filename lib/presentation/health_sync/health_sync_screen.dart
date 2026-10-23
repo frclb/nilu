@@ -4,10 +4,12 @@ import 'package:provider/provider.dart';
 import '../../data/datasources/health_datasource.dart';
 import '../../data/repositories/health_write_back.dart';
 import '../../data/repositories/period_repository.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/services/health_import.dart';
 import '../../localization/app_localizations.dart';
 import '../calendar/view_models/calendar_view_model.dart';
+import '../profile/widgets/settings_surface.dart';
 import '../../design_system/app_layout.dart';
 
 /// Apple Sağlık / Health Connect eşitlemesi.
@@ -166,79 +168,122 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(context.tr('health_sync_title'))),
-      body: AppContentWidth(
-        child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: t.brandTint,
-                borderRadius: BorderRadius.circular(AppRadius.lg),
+      appBar: SettingsAppBar(title: context.tr('health_sync_title')),
+      body: AmbientBackground(
+        child: AppContentWidth(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+            children: [
+              SettingsCard(
+                padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+                child: Column(
+                  children: [
+                    AppIconTile(
+                      icon: Icons.favorite_rounded,
+                      size: 68,
+                      gradient: AppGradients.mark(context),
+                      color: theme.colorScheme.onPrimary,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      context.tr('health_sync_desc'),
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: t.textMuted,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: Icon(
-                Icons.favorite_outline,
-                size: 34,
-                color: theme.colorScheme.primary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              context.tr('health_sync_desc'),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: t.textMuted,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xl),
-
-            _Bullet(text: context.tr('health_sync_point_watch')),
-            _Bullet(text: context.tr('health_sync_point_merge')),
-            _Bullet(text: context.tr('health_sync_point_local')),
-
-            const SizedBox(height: AppSpacing.xxl),
-
-            if (!_available)
-              Text(
-                context.tr('health_unavailable'),
-                style: theme.textTheme.bodyMedium?.copyWith(color: t.textMuted),
-              )
-            else
-              FilledButton.icon(
-                onPressed: _busy ? null : _import,
-                icon: _busy
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.download_outlined),
-                label: Text(context.tr('health_import_button')),
-              ),
-
-            if (_available) ...[
               const SizedBox(height: AppSpacing.lg),
-              SwitchListTile(
-                key: const Key('health_write_back'),
-                contentPadding: EdgeInsets.zero,
-                title: Text(context.tr('health_write_title')),
-                subtitle: Text(context.tr('health_write_body')),
-                value: _writeBackOn,
-                onChanged: _busy ? null : _setWriteBack,
+
+              if (!_available)
+                SettingsNote(
+                  text: context.tr('health_unavailable'),
+                  icon: Icons.info_outline_rounded,
+                )
+              else ...[
+                // Yazma anahtarı ekranın üst yarısında: sonuç metni ve
+                // izin istemi ona bağlı, aşağıda kaybolmasın.
+                SettingsCard(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
+                  child: SwitchListTile(
+                    key: const Key('health_write_back'),
+                    contentPadding: EdgeInsets.zero,
+                    isThreeLine: true,
+                    secondary: AppIconTile(
+                      icon: Icons.event_available_outlined,
+                      circle: true,
+                      color: t.secondary,
+                      background: t.secondaryTint,
+                    ),
+                    title: Text(
+                      context.tr('health_write_title'),
+                      style: SettingsText.title(context),
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        context.tr('health_write_body'),
+                        style: SettingsText.subtitle(context),
+                      ),
+                    ),
+                    value: _writeBackOn,
+                    onChanged: _busy ? null : _setWriteBack,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: t.brandTint,
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AppGradientButton(
+                        label: context.tr('health_import_button'),
+                        icon: Icons.download_rounded,
+                        busy: _busy,
+                        onPressed: _busy ? null : _import,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      _Bullet(
+                        text: context.tr('health_sync_point_merge'),
+                        icon: Icons.info_outline_rounded,
+                        iconColor: t.secondary,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              if (_result != null) ...[
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  _result!,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: t.text,
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: AppSpacing.lg),
+              SettingsCard(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                child: Column(
+                  children: [
+                    _Bullet(text: context.tr('health_sync_point_watch')),
+                    _Bullet(text: context.tr('health_sync_point_local')),
+                  ],
+                ),
               ),
             ],
-
-            if (_result != null) ...[
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                _result!,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium,
-              ),
-            ],
-          ],
+          ),
         ),
       ),
     );
@@ -247,8 +292,14 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
 
 class _Bullet extends StatelessWidget {
   final String text;
+  final IconData icon;
+  final Color? iconColor;
 
-  const _Bullet({required this.text});
+  const _Bullet({
+    required this.text,
+    this.icon = Icons.verified_user_outlined,
+    this.iconColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -259,7 +310,7 @@ class _Bullet extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.check_circle_outline, size: 18, color: t.success),
+          Icon(icon, size: 18, color: iconColor ?? t.success),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Text(

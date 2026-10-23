@@ -2,6 +2,8 @@ import '../../domain/view_models/pregnancy_view_model.dart';
 import 'dart:io';
 import 'dart:isolate';
 import 'package:flutter/material.dart';
+import '../../design_system/app_card.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_theme.dart';
 import '../../design_system/app_tokens.dart';
 import 'package:file_selector/file_selector.dart';
@@ -23,6 +25,7 @@ import '../../domain/view_models/user_view_model.dart';
 import '../calendar/view_models/calendar_view_model.dart';
 import '../../localization/app_localizations.dart';
 import '../../design_system/app_layout.dart';
+import 'widgets/settings_surface.dart';
 
 class PrivacySecurityScreen extends StatefulWidget {
   const PrivacySecurityScreen({super.key});
@@ -113,69 +116,34 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.tokens;
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: context.tokens.surfaceAlt,
-      appBar: AppBar(
-        title: Text(
-          context.tr('privacy_title'),
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: context.tokens.text,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        backgroundColor: context.tokens.surfaceAlt,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: context.tokens.text,
-            size: 20,
-          ),
-          onPressed: () => context.pop(),
-        ),
+      appBar: SettingsAppBar(
+        title: context.tr('privacy_title'),
+        onBack: () => context.pop(),
       ),
       body: AppContentWidth(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : ListView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: context.tokens.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: context.tokens.border),
-                    ),
-                    child: Column(
-                      children: [
-                        // Eskiden burada iki anahtar vardı — "Biyometrik
-                        // Kilit" ve "PIN Kodu" — ve ikisi de yalnızca bir
-                        // tercih kaydediyordu. Tek anahtara indirildi:
-                        // uygulama kendi PIN'ini saklamıyor, cihazın kimlik
-                        // doğrulamasını kullanıyor (biyometri, yoksa cihaz
-                        // şifresi). Parola saklamamak, saklamanın her
-                        // türlüsünden güvenli.
-                        _buildSwitchTile(
-                          context.tr('privacy_app_lock'),
-                          _lockEnabled,
-                          _toggleLock,
-                          isDark,
-                          Icons.lock_outline,
-                          true,
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8, left: 4, right: 4),
-                    child: Text(
-                      switch (_capability) {
+                  // Eskiden burada iki anahtar vardı — "Biyometrik Kilit" ve
+                  // "PIN Kodu" — ve ikisi de yalnızca bir tercih
+                  // kaydediyordu. Tek anahtara indirildi: uygulama kendi
+                  // PIN'ini saklamıyor, cihazın kimlik doğrulamasını
+                  // kullanıyor (biyometri, yoksa cihaz şifresi). Parola
+                  // saklamamak, saklamanın her türlüsünden güvenli.
+                  SettingsCard(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+                    child: _buildSwitchTile(
+                      context.tr('privacy_app_lock'),
+                      _lockEnabled,
+                      _toggleLock,
+                      Icons.lock_outline_rounded,
+                      subtitle: switch (_capability) {
                         LockCapability.biometric => context.tr(
                           'lock_hint_biometric',
                         ),
@@ -184,70 +152,48 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                         ),
                         LockCapability.none => context.tr('lock_unavailable'),
                       },
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: context.tokens.textMuted,
-                      ),
                     ),
                   ),
+                  const SizedBox(height: AppSpacing.lg),
 
-                  const SizedBox(height: 12),
                   // Hassas alanların görünürlüğü.
-                  Container(
-                    decoration: BoxDecoration(
-                      color: context.tokens.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: context.tokens.border),
-                    ),
-                    child: SwitchListTile(
-                      key: const Key('privacy_sexual_log'),
-                      value: _sexualLogging,
-                      onChanged: (v) async {
+                  SettingsCard(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+                    child: _buildSwitchTile(
+                      context.tr('privacy_sexual_log'),
+                      _sexualLogging,
+                      (v) async {
                         setState(() => _sexualLogging = v);
                         await _repository.setSexualActivityLogging(v);
                       },
-                      title: Text(
-                        context.tr('privacy_sexual_log'),
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: context.tokens.text,
-                        ),
-                      ),
-                      subtitle: Text(
-                        context.tr('privacy_sexual_log_desc'),
-                        style: TextStyle(
-                          fontSize: 12,
-                          height: 1.4,
-                          color: context.tokens.textMuted,
-                        ),
-                      ),
+                      Icons.favorite_border_rounded,
+                      subtitle: context.tr('privacy_sexual_log_desc'),
+                      key: const Key('privacy_sexual_log'),
                     ),
                   ),
+                  const SizedBox(height: AppSpacing.lg),
 
-                  const SizedBox(height: 12),
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppSpacing.lg + 2),
                     decoration: BoxDecoration(
-                      color: context.tokens.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: context.tokens.border),
+                      color: t.brandTint,
+                      borderRadius: BorderRadius.circular(AppCard.radius),
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.lock_outline,
-                          size: 18,
-                          color: context.tokens.success,
+                        AppIconTile(
+                          icon: Icons.shield_outlined,
+                          circle: true,
+                          background: t.surface,
+                          color: t.success,
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 14),
                         Expanded(
                           child: Text(
                             context.tr('privacy_encryption_notice'),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: context.tokens.textMuted,
-                            ),
+                            style: SettingsText.title(
+                              context,
+                            )?.copyWith(fontSize: 15, height: 1.35),
                           ),
                         ),
                       ],
@@ -257,97 +203,111 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
                   // Reklam bildirimi. Ücretsiz sürümde reklam gösteriliyorsa
                   // kullanıcı bunu gizlilik ekranında görmeli — hem de ne
                   // toplanmadığıyla birlikte.
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: context.tokens.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: context.tokens.border),
-                    ),
-                    child: Row(
+                  const SizedBox(height: AppSpacing.lg),
+                  SettingsCard(
+                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.campaign_outlined,
-                          size: 18,
-                          color: context.tokens.textMuted,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.campaign_outlined,
+                              size: 22,
+                              color: t.secondary,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
                                 context.tr('privacy_ads_title'),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: context.tokens.text,
-                                ),
+                                style: SettingsText.title(context),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                context.tr('privacy_ads_notice'),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  height: 1.5,
-                                  color: context.tokens.textMuted,
-                                ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          context.tr('privacy_ads_notice'),
+                          style: SettingsText.subtitle(
+                            context,
+                          )?.copyWith(fontSize: 13.5, height: 1.5),
+                        ),
+                        if (_adPrivacyOptions)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: TextButton(
+                              onPressed: AdConsent.showPrivacyOptions,
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                minimumSize: const Size(0, 44),
+                                visualDensity: VisualDensity.standard,
                               ),
-                              if (_adPrivacyOptions)
-                                Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: TextButton(
-                                    onPressed: AdConsent.showPrivacyOptions,
-                                    style: TextButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                      ),
-                                      minimumSize: const Size(0, 44),
-                                      visualDensity: VisualDensity.standard,
-                                    ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Flexible(
                                     child: Text(
                                       context.tr('privacy_ads_options'),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: theme.colorScheme.primary,
-                                      ),
+                                      style: theme.textTheme.labelLarge
+                                          ?.copyWith(
+                                            fontSize: 13.5,
+                                            fontWeight: FontWeight.w700,
+                                            color: t.secondary,
+                                          ),
                                     ),
                                   ),
-                                ),
-                            ],
-                          ),
-                        ),
+                                  Icon(
+                                    Icons.chevron_right_rounded,
+                                    size: 18,
+                                    color: t.secondary,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        else
+                          const SizedBox(height: 6),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 24),
-                  _buildActionTile(
-                    context,
-                    context.tr('privacy_export'),
-                    Icons.file_download_outlined,
-                    isDark,
-                    onTap: () => _showExportDataDialog(context, isDark),
+                  const SizedBox(height: AppSpacing.xl),
+                  SettingsCard(
+                    padding: const EdgeInsets.all(6),
+                    child: Column(
+                      children: [
+                        _buildActionTile(
+                          context,
+                          context.tr('privacy_export'),
+                          Icons.download_rounded,
+                          onTap: () => _showExportDataDialog(context),
+                        ),
+                        Divider(
+                          height: 1,
+                          thickness: 1,
+                          indent: 68,
+                          endIndent: 14,
+                          color: AppCard.dividerColor(t),
+                        ),
+                        _buildActionTile(
+                          context,
+                          context.tr('privacy_import'),
+                          Icons.settings_backup_restore_rounded,
+                          onTap: () => _showImportDialog(context),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  _buildActionTile(
-                    context,
-                    context.tr('privacy_import'),
-                    Icons.file_upload_outlined,
-                    isDark,
-                    onTap: () => _showImportDialog(context),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildActionTile(
-                    context,
-                    context.tr('privacy_delete_account'),
-                    Icons.person_remove_outlined,
-                    isDark,
-                    isDestructive: true,
-                    onTap: () => _showDeleteAccountDialog(context, isDark),
+                  const SizedBox(height: AppSpacing.lg),
+                  SettingsCard(
+                    padding: const EdgeInsets.all(6),
+                    child: _buildActionTile(
+                      context,
+                      context.tr('privacy_delete_account'),
+                      Icons.delete_outline_rounded,
+                      isDestructive: true,
+                      onTap: () => _showDeleteAccountDialog(context),
+                    ),
                   ),
                 ],
               ),
@@ -359,72 +319,57 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     String title,
     bool value,
     ValueChanged<bool> onChanged,
-    bool isDark,
-    IconData icon,
-    bool hasBorder,
-  ) {
-    return Container(
-      decoration: BoxDecoration(
-        border: hasBorder
-            ? Border(bottom: BorderSide(color: context.tokens.border))
-            : null,
+    IconData icon, {
+    String? subtitle,
+    Key? key,
+  }) {
+    return SwitchListTile(
+      key: key,
+      contentPadding: EdgeInsets.zero,
+      // Açıklamalar uzun: simge ve anahtar başlık hizasında dursun.
+      isThreeLine: subtitle != null,
+      secondary: AppIconTile(
+        icon: icon,
+        circle: true,
+        background: context.tokens.brandTint,
       ),
-      child: SwitchListTile(
-        title: Row(
-          children: [
-            Icon(icon, size: 20, color: context.tokens.textMuted),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: context.tokens.text,
-                ),
-              ),
+      title: Text(title, style: SettingsText.title(context)),
+      subtitle: subtitle == null
+          ? null
+          : Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(subtitle, style: SettingsText.subtitle(context)),
             ),
-          ],
-        ),
-        value: value,
-        onChanged: onChanged,
-      ),
+      value: value,
+      onChanged: onChanged,
     );
   }
 
   Widget _buildActionTile(
     BuildContext context,
     String title,
-    IconData icon,
-    bool isDark, {
+    IconData icon, {
     required VoidCallback onTap,
     bool isDestructive = false,
   }) {
-    final color = isDestructive ? context.tokens.danger : context.tokens.text;
+    final t = context.tokens;
+    final color = isDestructive ? t.danger : t.text;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: context.tokens.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: context.tokens.border),
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      leading: AppIconTile(
+        icon: icon,
+        color: isDestructive ? t.danger : null,
+        background: isDestructive ? t.danger.withAlpha(28) : t.brandTint,
       ),
-      child: ListTile(
-        leading: Icon(icon, size: 20, color: color),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-            color: color,
-          ),
-        ),
-        trailing: Icon(
-          Icons.chevron_right,
-          size: 20,
-          color: context.tokens.textFaint,
-        ),
-        onTap: onTap,
+      title: Text(title, style: SettingsText.title(context, color: color)),
+      trailing: Icon(
+        Icons.chevron_right_rounded,
+        size: 22,
+        color: isDestructive ? t.danger : t.textFaint,
       ),
+      onTap: onTap,
     );
   }
 
@@ -437,6 +382,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        icon: const _DialogIcon(Icons.settings_backup_restore_rounded),
         title: Text(ctx.tr('privacy_import')),
         content: Text(
           ctx.tr('privacy_import_desc'),
@@ -547,7 +493,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     }
   }
 
-  void _showExportDataDialog(BuildContext context, bool isDark) {
+  void _showExportDataDialog(BuildContext context) {
     // Katman ekranın kendi bağlamından okunuyor, diyalogunkinden değil.
     //
     // Metin katmana göre değişiyor: ücretsiz kullanıcıya üretilmeyecek
@@ -577,6 +523,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     return showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
+        icon: const _DialogIcon(Icons.lock_open_rounded),
         title: Text(ctx.tr('privacy_import_password_title')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -733,12 +680,16 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     return XFile(file.path);
   }
 
-  void _showDeleteAccountDialog(BuildContext context, bool isDark) {
+  void _showDeleteAccountDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         // Kırmızı burada yerinde — işlem gerçekten geri alınamaz. Ama ham
         // `Colors.red` değil paletin uyarı rengi kullanılıyor.
+        icon: const _DialogIcon(
+          Icons.delete_forever_outlined,
+          destructive: true,
+        ),
         title: Text(
           context.tr('privacy_delete_account'),
           style: Theme.of(
@@ -886,11 +837,12 @@ class _ExportDialogState extends State<_ExportDialog> {
         hata != null && (_parola.text.isNotEmpty || _tekrar.text.isNotEmpty);
 
     return AlertDialog(
+      icon: const _DialogIcon(Icons.download_rounded),
       title: Text(context.tr('privacy_export')),
       scrollable: true,
       content: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             context.tr(
@@ -900,23 +852,55 @@ class _ExportDialogState extends State<_ExportDialog> {
             ),
             style: TextStyle(color: t.textMuted),
           ),
-          const SizedBox(height: 12),
-          SwitchListTile(
-            key: const Key('privacy_export_protect'),
-            contentPadding: EdgeInsets.zero,
-            value: _koru,
-            onChanged: (v) => setState(() => _koru = v),
-            title: Text(
-              context.tr('privacy_export_protect'),
-              style: TextStyle(fontWeight: FontWeight.w600, color: t.text),
+          const SizedBox(height: 16),
+          // Parola seçeneği tül zeminli bir kutuda: yedeğin kendisinden
+          // ayrı, isteğe bağlı bir katman olduğu görünsün.
+          Material(
+            color: t.brandTint,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            clipBehavior: Clip.antiAlias,
+            child: SwitchListTile(
+              key: const Key('privacy_export_protect'),
+              contentPadding: const EdgeInsets.only(left: 12, right: 4),
+              secondary: Icon(
+                Icons.enhanced_encryption_outlined,
+                color: t.secondary,
+              ),
+              value: _koru,
+              onChanged: (v) => setState(() => _koru = v),
+              title: Text(
+                context.tr('privacy_export_protect'),
+                style: TextStyle(fontWeight: FontWeight.w600, color: t.text),
+              ),
             ),
           ),
           if (_koru) ...[
-            Text(
-              context.tr('privacy_export_protect_desc'),
-              style: TextStyle(fontSize: 13, height: 1.4, color: t.textMuted),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: t.surfaceAlt,
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.key_off_outlined, size: 18, color: t.secondary),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      context.tr('privacy_export_protect_desc'),
+                      style: TextStyle(
+                        fontSize: 13,
+                        height: 1.4,
+                        color: t.textMuted,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 16),
             TextField(
               key: const Key('privacy_export_password'),
               controller: _parola,
@@ -928,6 +912,7 @@ class _ExportDialogState extends State<_ExportDialog> {
                 labelText: context.tr('privacy_export_password'),
               ),
             ),
+            const SizedBox(height: 12),
             TextField(
               key: const Key('privacy_export_password_repeat'),
               controller: _tekrar,
@@ -957,16 +942,32 @@ class _ExportDialogState extends State<_ExportDialog> {
           onPressed: hata != null
               ? null
               : () => widget.onExport(_koru ? _parola.text : null),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
+          style: AppTheme.dialogAction(),
           child: Text(context.tr('privacy_export_confirm')),
         ),
       ],
+    );
+  }
+}
+
+/// Diyalogların başındaki yuvarlak simge.
+class _DialogIcon extends StatelessWidget {
+  const _DialogIcon(this.icon, {this.destructive = false});
+
+  final IconData icon;
+
+  /// Geri alınamaz işlem: uyarı renginde.
+  final bool destructive;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return AppIconTile(
+      icon: icon,
+      size: 56,
+      circle: true,
+      color: destructive ? t.danger : t.secondary,
+      background: destructive ? t.danger.withAlpha(28) : t.secondaryTint,
     );
   }
 }

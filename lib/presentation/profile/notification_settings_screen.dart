@@ -9,8 +9,11 @@ import '../../domain/services/reminder_planner.dart';
 import '../../core/platform/app_settings_link.dart';
 import '../../localization/app_localizations.dart';
 import '../calendar/view_models/calendar_view_model.dart';
+import '../../design_system/app_card.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_tokens.dart';
 import '../../design_system/app_layout.dart';
+import 'widgets/settings_surface.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({
@@ -224,6 +227,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final t = context.tokens;
     final theme = Theme.of(context);
 
     // Hormonal doğum kontrolünde doğurganlık verisi kaynakta hiç
@@ -236,167 +240,202 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       (vm) => vm.cycleInfo.fertilityTracked,
     );
 
+    // Her hatırlatıcı bir blok: anahtar ve (açıksa) ona bağlı ayrıntı.
+    final bloklar = <List<Widget>>[
+      [
+        _buildSwitchTile(
+          context.tr('notif_period_reminders'),
+          _settings.periodReminders,
+          (val) => _update(_settings.copyWith(periodReminders: val)),
+          Icons.water_drop_outlined,
+        ),
+        if (_settings.periodReminders)
+          _buildValueTile(
+            key: const Key('notif_lead_days'),
+            title: context.tr('notif_lead_days'),
+            value: _leadLabel(_settings.periodLeadDays),
+            onTap: _pickLeadDays,
+          ),
+      ],
+      [
+        _buildSwitchTile(
+          context.tr('notif_late_setting'),
+          _settings.lateReminder,
+          (val) => _update(_settings.copyWith(lateReminder: val)),
+          Icons.hourglass_bottom_outlined,
+          subtitle: context.tr(
+            'notif_late_setting_body',
+            params: {'n': '${ReminderPlanner.lateAfterDays}'},
+          ),
+          key: const Key('notif_late_switch'),
+        ),
+      ],
+      if (tracksFertility)
+        [
+          _buildSwitchTile(
+            context.tr('notif_fertile_window'),
+            _settings.fertileWindow,
+            (val) => _update(_settings.copyWith(fertileWindow: val)),
+            Icons.flare_rounded,
+          ),
+        ],
+      [
+        _buildSwitchTile(
+          context.tr('notif_daily_logs'),
+          _settings.dailyLogs,
+          (val) => _update(_settings.copyWith(dailyLogs: val)),
+          Icons.edit_note,
+        ),
+        if (_settings.dailyLogs)
+          _buildValueTile(
+            key: const Key('notif_daily_log_time'),
+            title: context.tr('notif_daily_log_time'),
+            value: _timeLabel(_settings.dailyLogMinuteOfDay),
+            onTap: () => _pickTime(
+              _settings.dailyLogMinuteOfDay,
+              (m) => _settings.copyWith(dailyLogMinuteOfDay: m),
+            ),
+          ),
+      ],
+      // Gebelik ve lohusalık izlemleri, taramalar, destekler ve gebelik
+      // planlama (folik asit, hekime başvuru).
+      [
+        _buildSwitchTile(
+          context.tr('notif_care_setting'),
+          _settings.careReminders,
+          (val) => _update(_settings.copyWith(careReminders: val)),
+          Icons.volunteer_activism_outlined,
+        ),
+      ],
+    ];
+
     return Scaffold(
-      backgroundColor: context.tokens.background,
-      appBar: AppBar(
-        title: Text(
-          context.tr('notif_general_title'),
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: context.tokens.text,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        backgroundColor: context.tokens.background,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: context.tokens.text,
-            size: 20,
-          ),
-          onPressed: () => context.pop(),
-        ),
+      appBar: SettingsAppBar(
+        title: context.tr('notif_general_title'),
+        onBack: () => context.pop(),
       ),
       body: AppContentWidth(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : ListView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
                 children: [
                   if (_permissionBlocked) _buildPermissionNotice(),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: context.tokens.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: context.tokens.border),
-                    ),
+                  SettingsCard(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Column(
                       children: [
-                        _buildSwitchTile(
-                          context.tr('notif_period_reminders'),
-                          _settings.periodReminders,
-                          (val) =>
-                              _update(_settings.copyWith(periodReminders: val)),
-                          Icons.water_drop_outlined,
-                          true,
-                        ),
-                        if (_settings.periodReminders)
-                          _buildValueTile(
-                            key: const Key('notif_lead_days'),
-                            title: context.tr('notif_lead_days'),
-                            value: _leadLabel(_settings.periodLeadDays),
-                            onTap: _pickLeadDays,
+                        for (var i = 0; i < bloklar.length; i++) ...[
+                          if (i > 0)
+                            Divider(
+                              height: 9,
+                              thickness: 1,
+                              indent: 16,
+                              endIndent: 16,
+                              color: AppCard.dividerColor(t),
+                            ),
+                          ...bloklar[i],
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  // Saat ayrı kartta: tek bir türün değil, gün içindeki
+                  // bütün hatırlatıcıların saati.
+                  SettingsCard(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ListTile(
+                          key: const Key('notif_reminder_time'),
+                          contentPadding: EdgeInsets.zero,
+                          onTap: () => _pickTime(
+                            _settings.reminderMinuteOfDay,
+                            (m) => _settings.copyWith(reminderMinuteOfDay: m),
                           ),
-                        _buildSwitchTile(
-                          context.tr('notif_late_setting'),
-                          _settings.lateReminder,
-                          (val) =>
-                              _update(_settings.copyWith(lateReminder: val)),
-                          Icons.hourglass_bottom_outlined,
-                          true,
-                          subtitle: context.tr(
-                            'notif_late_setting_body',
-                            params: {'n': '${ReminderPlanner.lateAfterDays}'},
+                          leading: _tile(Icons.schedule_rounded),
+                          title: Text(
+                            context.tr('notif_reminder_time'),
+                            style: SettingsText.title(context),
                           ),
-                          key: const Key('notif_late_switch'),
-                        ),
-                        if (tracksFertility)
-                          _buildSwitchTile(
-                            context.tr('notif_fertile_window'),
-                            _settings.fertileWindow,
-                            (val) =>
-                                _update(_settings.copyWith(fertileWindow: val)),
-                            Icons.child_care,
-                            true,
-                          ),
-                        _buildSwitchTile(
-                          context.tr('notif_daily_logs'),
-                          _settings.dailyLogs,
-                          (val) => _update(_settings.copyWith(dailyLogs: val)),
-                          Icons.edit_note,
-                          true,
-                        ),
-                        if (_settings.dailyLogs)
-                          _buildValueTile(
-                            key: const Key('notif_daily_log_time'),
-                            title: context.tr('notif_daily_log_time'),
-                            value: _timeLabel(_settings.dailyLogMinuteOfDay),
-                            onTap: () => _pickTime(
-                              _settings.dailyLogMinuteOfDay,
-                              (m) => _settings.copyWith(dailyLogMinuteOfDay: m),
+                          trailing: Container(
+                            padding: const EdgeInsets.fromLTRB(14, 7, 8, 7),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary,
+                              borderRadius: BorderRadius.circular(
+                                AppRadius.pill,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  _timeLabel(_settings.reminderMinuteOfDay),
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: theme.colorScheme.onPrimary,
+                                  ),
+                                ),
+                                const SizedBox(width: 2),
+                                Icon(
+                                  Icons.expand_more_rounded,
+                                  size: 18,
+                                  color: theme.colorScheme.onPrimary,
+                                ),
+                              ],
                             ),
                           ),
-                        // Gebelik ve lohusalık izlemleri, taramalar, destekler
-                        // ve gebelik planlama (folik asit, hekime başvuru).
-                        _buildSwitchTile(
-                          context.tr('notif_care_setting'),
-                          _settings.careReminders,
-                          (val) =>
-                              _update(_settings.copyWith(careReminders: val)),
-                          Icons.event_note_outlined,
-                          false,
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Container(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          decoration: BoxDecoration(
+                            color: t.brandTint,
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                          ),
+                          child: Text(
+                            context.tr('notif_reminder_time_body'),
+                            style: SettingsText.subtitle(
+                              context,
+                            )?.copyWith(fontSize: 13.5, height: 1.5),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  // Saat ayrı kartta: tek bir türün değil, gün içindeki
-                  // bütün hatırlatıcıların saati.
-                  Container(
-                    decoration: BoxDecoration(
-                      color: context.tokens.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: context.tokens.border),
-                    ),
-                    child: _buildValueTile(
-                      key: const Key('notif_reminder_time'),
-                      title: context.tr('notif_reminder_time'),
-                      subtitle: context.tr('notif_reminder_time_body'),
-                      value: _timeLabel(_settings.reminderMinuteOfDay),
-                      icon: Icons.schedule,
-                      hasBorder: false,
-                      onTap: () => _pickTime(
-                        _settings.reminderMinuteOfDay,
-                        (m) => _settings.copyWith(reminderMinuteOfDay: m),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.lg),
                   // Gizlilik ayrı kartta: bir hatırlatıcı türü değil, hepsinin
                   // nasıl görüneceği.
-                  Container(
-                    decoration: BoxDecoration(
-                      color: context.tokens.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: context.tokens.border),
-                    ),
-                    child: SwitchListTile(
-                      key: const Key('notif_discreet_switch'),
-                      secondary: Icon(
-                        Icons.visibility_off_outlined,
-                        color: context.tokens.textMuted,
-                      ),
-                      title: Text(
-                        context.tr('notif_discreet_setting'),
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: context.tokens.text,
+                  SettingsCard(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SwitchListTile(
+                          key: const Key('notif_discreet_switch'),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                          ),
+                          secondary: _tile(Icons.lock_outline_rounded),
+                          title: Text(
+                            context.tr('notif_discreet_setting'),
+                            style: SettingsText.title(context),
+                          ),
+                          subtitle: Text(
+                            context.tr('notif_discreet_setting_body'),
+                            style: SettingsText.subtitle(context),
+                          ),
+                          value: _settings.discreet,
+                          onChanged: (val) =>
+                              _update(_settings.copyWith(discreet: val)),
                         ),
-                      ),
-                      subtitle: Text(
-                        context.tr('notif_discreet_setting_body'),
-                        style: TextStyle(
-                          fontSize: 13,
-                          height: 1.4,
-                          color: context.tokens.textMuted,
-                        ),
-                      ),
-                      value: _settings.discreet,
-                      onChanged: (val) =>
-                          _update(_settings.copyWith(discreet: val)),
+                        if (_settings.discreet)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                            child: _DiscreetPreview(),
+                          ),
+                      ],
                     ),
                   ),
                 ],
@@ -405,36 +444,47 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     );
   }
 
+  /// Satır başındaki yuvarlak simge kutusu.
+  Widget _tile(IconData icon) => AppIconTile(
+    icon: icon,
+    circle: true,
+    background: context.tokens.brandTint,
+  );
+
   /// İzin yokken anahtarların üstünde duran açıklama.
   Widget _buildPermissionNotice() {
+    final t = context.tokens;
     return Container(
       key: const Key('notif_permission_notice'),
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       decoration: BoxDecoration(
-        color: context.tokens.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: context.tokens.border),
+        color: t.secondaryTint,
+        borderRadius: BorderRadius.circular(AppRadius.lg - 4),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.notifications_off_outlined,
-            size: 18,
-            color: context.tokens.textMuted,
+          AppIconTile(
+            icon: Icons.notifications_off_outlined,
+            size: 36,
+            circle: true,
+            background: t.surface,
+            color: t.secondary,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  context.tr('notif_permission_off'),
-                  style: TextStyle(
-                    fontSize: 12,
-                    height: 1.5,
-                    color: context.tokens.textMuted,
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(
+                    context.tr('notif_permission_off'),
+                    style: SettingsText.subtitle(
+                      context,
+                      color: t.text,
+                    )?.copyWith(fontSize: 13.5, height: 1.45),
                   ),
                 ),
                 // iOS sistem istemini ikinci kez göstermiyor; o zaman düğme
@@ -450,9 +500,9 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   child: Text(
                     context.tr('notif_permission_allow'),
                     style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: t.secondary,
                     ),
                   ),
                 ),
@@ -527,65 +577,56 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   }
 
   /// Bir hatırlatıcının ayrıntısı: dokununca seçim açılır.
+  ///
+  /// Üstteki anahtarın simge sütunundan içeride, tül zeminli bir kutu:
+  /// neye ait olduğu görünsün.
   Widget _buildValueTile({
     required Key key,
     required String title,
     required String value,
     required VoidCallback onTap,
-    String? subtitle,
-    IconData? icon,
-    bool hasBorder = true,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        border: hasBorder
-            ? Border(bottom: BorderSide(color: context.tokens.border))
-            : null,
-      ),
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(68, 0, 16, 8),
       child: ListTile(
         key: key,
         onTap: onTap,
-        // Simgesiz satır üstteki anahtarın altına girintili: neye ait
-        // olduğu görünsün.
-        contentPadding: EdgeInsets.only(
-          left: icon == null ? 48 : 16,
-          right: 16,
+        tileColor: t.brandTint,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
-        leading: icon == null
-            ? null
-            : Icon(icon, size: 20, color: context.tokens.textMuted),
+        contentPadding: const EdgeInsets.only(left: 16, right: 8),
         title: Text(
           title,
-          style: TextStyle(fontSize: 15, color: context.tokens.text),
+          style: SettingsText.subtitle(context)?.copyWith(fontSize: 14),
         ),
-        subtitle: subtitle == null
-            ? null
-            : Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 13,
-                  height: 1.4,
-                  color: context.tokens.textMuted,
+        trailing: Container(
+          padding: const EdgeInsets.fromLTRB(12, 6, 6, 6),
+          decoration: BoxDecoration(
+            color: t.surface,
+            borderRadius: BorderRadius.circular(AppRadius.pill),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                value,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.primary,
                 ),
               ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.primary,
+              const SizedBox(width: 2),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 18,
+                color: theme.colorScheme.primary,
               ),
-            ),
-            const SizedBox(width: 4),
-            Icon(
-              Icons.chevron_right,
-              size: 20,
-              color: context.tokens.textMuted,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -595,50 +636,76 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     String title,
     bool value,
     ValueChanged<bool> onChanged,
-    IconData icon,
-    bool hasBorder, {
+    IconData icon, {
     String? subtitle,
     Key? key,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        border: hasBorder
-            ? Border(bottom: BorderSide(color: context.tokens.border))
-            : null,
-      ),
-      child: SwitchListTile(
-        key: key,
-        subtitle: subtitle == null
-            ? null
-            : Padding(
-                padding: const EdgeInsets.only(left: 32),
-                child: Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 13,
-                    height: 1.4,
-                    color: context.tokens.textMuted,
-                  ),
-                ),
-              ),
-        title: Row(
-          children: [
-            Icon(icon, size: 20, color: context.tokens.textMuted),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: context.tokens.text,
-                ),
-              ),
-            ),
-          ],
+    return SwitchListTile(
+      key: key,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      secondary: _tile(icon),
+      title: Text(title, style: SettingsText.title(context)),
+      subtitle: subtitle == null
+          ? null
+          : Text(subtitle, style: SettingsText.subtitle(context)),
+      value: value,
+      onChanged: onChanged,
+    );
+  }
+}
+
+/// Gizli bildirimin kilit ekranında nasıl göründüğü: başlık ve gövde,
+/// planlayıcının gizli bildirimde kullandığı metinlerin aynısı.
+class _DiscreetPreview extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    // Açıklama zaten alt satırda yazıyor; VoiceOver aynı cümleyi iki kez
+    // okumasın.
+    return ExcludeSemantics(
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: t.brandTint,
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
-        value: value,
-        onChanged: onChanged,
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            color: t.surface,
+            borderRadius: BorderRadius.circular(AppRadius.sm),
+            boxShadow: AppShadows.soft(context),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const AppLogoMark(size: 28),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      context.tr('notif_discreet_title'),
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: t.text,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      context.tr('notif_discreet_body'),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: t.text,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -1,65 +1,88 @@
 import 'package:flutter/material.dart';
 
 import '../../core/app_info.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_theme.dart';
 import '../../design_system/app_tokens.dart';
 import '../../localization/app_localizations.dart';
 import '../../design_system/app_layout.dart';
+import '../profile/widgets/settings_surface.dart';
 
-class TermsOfServiceScreen extends StatelessWidget {
+class TermsOfServiceScreen extends StatefulWidget {
   const TermsOfServiceScreen({super.key});
+
+  /// Şartlardaki bölüm sayısı. Sözlükteki `terms_sectionN_*` anahtarlarıyla
+  /// uyuşması testle doğrulanıyor.
+  static const int _sectionCount = 12;
+
+  @override
+  State<TermsOfServiceScreen> createState() => _TermsOfServiceScreenState();
+}
+
+class _TermsOfServiceScreenState extends State<TermsOfServiceScreen> {
+  /// Bölüm dizinindeki bir başlığa dokununca o bölüme kaydırmak için.
+  final _sections = List.generate(
+    TermsOfServiceScreen._sectionCount,
+    (_) => GlobalKey(),
+  );
+
+  void _jumpTo(int index) {
+    final ctx = _sections[index].currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOutCubic,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final textColor = context.tokens.text;
-    final mutedColor = context.tokens.textMuted;
+    final t = context.tokens;
+    final titles = [
+      for (var i = 1; i <= TermsOfServiceScreen._sectionCount; i++)
+        context.tr('terms_section${i}_title'),
+    ];
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        title: Text(
-          context.tr('terms_of_service_title'),
-          style: TextStyle(
-            color: textColor,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-          icon: Icon(Icons.arrow_back_ios, color: textColor),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+      appBar: SettingsAppBar(
+        title: context.tr('terms_of_service_title'),
+        onBack: () => Navigator.of(context).pop(),
       ),
       body: AppContentWidth(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.only(top: 8, bottom: 40),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                context.tr('terms_last_updated'),
-                style: TextStyle(color: mutedColor, fontSize: 13),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: AppTag(
+                  label: context.tr('terms_last_updated'),
+                  icon: Icons.history_rounded,
+                  background: t.brandTint,
+                  foreground: t.textMuted,
+                ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.lg),
+              _SectionIndex(titles: titles, onTap: _jumpTo),
+              const SizedBox(height: AppSpacing.lg),
               // Politika ekranıyla aynı kalıp: bölümler tek tek
               // yazılmıyor, sayı tek yerde duruyor.
-              for (var i = 1; i <= _sectionCount; i++)
-                _buildSection(
-                  context,
-                  textColor,
-                  mutedColor,
-                  title: context.tr('terms_section${i}_title'),
-                  content: context.tr(
-                    'terms_section${i}_content',
-                    params: {'email': _email(context)},
+              for (var i = 0; i < titles.length; i++)
+                Padding(
+                  key: _sections[i],
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: _buildSection(
+                    context,
+                    title: titles[i],
+                    content: context.tr(
+                      'terms_section${i + 1}_content',
+                      params: {'email': _email(context)},
+                    ),
                   ),
                 ),
-              const SizedBox(height: 32),
             ],
           ),
         ),
@@ -67,37 +90,84 @@ class TermsOfServiceScreen extends StatelessWidget {
     );
   }
 
-  /// Şartlardaki bölüm sayısı. Sözlükteki `terms_sectionN_*` anahtarlarıyla
-  /// uyuşması testle doğrulanıyor.
-  static const int _sectionCount = 12;
-
   Widget _buildSection(
-    BuildContext context,
-    Color textColor,
-    Color mutedColor, {
+    BuildContext context, {
     required String title,
     required String content,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 24),
+    final t = context.tokens;
+    return SettingsCard(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Ölçüler makale okuyucusuyla aynı (başlık 18, gövde 15): ikisi
-          // de uzun metin ekranı. Ama stiller `TextStyle` ile sıfırdan
-          // yazıldığı için başlıklar gövde yazı tipinde kalıyordu; makale
-          // başlıkları `displayLarge` yani serif. Aynı uygulamanın iki
-          // uzun metin ekranı iki farklı yazı ailesi kullanıyordu.
-          Text(
-            title,
-            style: AppTheme.readingHeading(context, color: textColor),
+          // Ölçüler makale okuyucusuyla aynı (gövde 15): ikisi de uzun
+          // metin ekranı. Ama stiller `TextStyle` ile sıfırdan yazıldığı
+          // için başlıklar gövde yazı tipinde kalıyordu; makale başlıkları
+          // `displayLarge` yani serif. Aynı uygulamanın iki uzun metin
+          // ekranı iki farklı yazı ailesi kullanıyordu.
+          Semantics(
+            header: true,
+            child: Text(
+              title,
+              style: AppTheme.readingHeading(
+                context,
+                color: Theme.of(context).colorScheme.primary,
+              )?.copyWith(fontSize: 20, fontWeight: FontWeight.w600),
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
             content,
-            style: AppTheme.readingBody(context, color: mutedColor),
+            style: AppTheme.readingBody(context, color: t.textMuted),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Bölüm dizini: yatay kayan başlık hapları; dokununca o bölüme gider.
+class _SectionIndex extends StatelessWidget {
+  const _SectionIndex({required this.titles, required this.onTap});
+
+  final List<String> titles;
+  final ValueChanged<int> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    return SizedBox(
+      height: 44,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: titles.length,
+        separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
+        itemBuilder: (context, i) => Material(
+          color: t.surface,
+          shape: StadiumBorder(side: BorderSide(color: t.border)),
+          child: InkWell(
+            onTap: () => onTap(i),
+            customBorder: const StadiumBorder(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Center(
+                widthFactor: 1,
+                child: Text(
+                  titles[i],
+                  maxLines: 1,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: t.text,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

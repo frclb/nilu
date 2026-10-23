@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_tokens.dart';
+import '../../design_system/content_illustration.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../localization/app_localizations.dart';
 import '../../design_system/app_layout.dart';
+import 'widgets/settings_surface.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
   const PersonalInfoScreen({super.key});
@@ -79,184 +82,209 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: context.tokens.surfaceAlt,
-      appBar: AppBar(
-        title: Text(
-          context.tr('personal_info_title'),
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: context.tokens.text,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        backgroundColor: context.tokens.surfaceAlt,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: context.tokens.text,
-            size: 20,
-          ),
-          onPressed: () => context.pop(),
-        ),
+      appBar: SettingsAppBar(
+        title: context.tr('personal_info_title'),
+        onBack: () => context.pop(),
       ),
-      body: AppContentWidth(
-        child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : Form(
-                key: _formKey,
-                child: ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    _buildTextField(
-                      context,
-                      label: context.tr('personal_info_name'),
-                      hint: context.tr('personal_info_name_hint'),
-                      controller: _nameController,
-                      isDark: isDark,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTextField(
-                      context,
-                      label: context.tr('personal_info_email'),
-                      hint: context.tr('personal_info_email_hint'),
-                      controller: _emailController,
-                      isDark: isDark,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        final text = value?.trim() ?? '';
-                        if (text.isEmpty) return null; // İsteğe bağlı alan
-                        final valid = RegExp(
-                          r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
-                        ).hasMatch(text);
-                        return valid
-                            ? null
-                            : context.tr('personal_info_email_invalid');
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    _buildBirthDateField(context, isDark),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: _save,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        foregroundColor: Theme.of(
-                          context,
-                        ).colorScheme.onPrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+      body: AmbientBackground(
+        child: AppContentWidth(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Form(
+                  key: _formKey,
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+                    children: [
+                      // Baş harf yazdıkça güncelleniyor: kullanıcı neyin
+                      // kaydedileceğini görsün.
+                      ValueListenableBuilder<TextEditingValue>(
+                        valueListenable: _nameController,
+                        builder: (context, value, _) {
+                          final ad = value.text.trim();
+                          return Column(
+                            children: [
+                              ExcludeSemantics(
+                                child: InitialAvatar(name: ad, size: 88),
+                              ),
+                              if (ad.isNotEmpty) ...[
+                                const SizedBox(height: AppSpacing.md),
+                                Text(
+                                  ad,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.headlineSmall
+                                      ?.copyWith(
+                                        fontSize: 26,
+                                        fontWeight: FontWeight.w500,
+                                        letterSpacing: -0.3,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                ),
+                              ],
+                            ],
+                          );
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.xl),
+                      SettingsCard(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _buildTextField(
+                              context,
+                              label: context.tr('personal_info_name'),
+                              hint: context.tr('personal_info_name_hint'),
+                              controller: _nameController,
+                              icon: Icons.badge_outlined,
+                            ),
+                            const SizedBox(height: 18),
+                            _buildTextField(
+                              context,
+                              label: context.tr('personal_info_email'),
+                              hint: context.tr('personal_info_email_hint'),
+                              controller: _emailController,
+                              icon: Icons.alternate_email,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) {
+                                final text = value?.trim() ?? '';
+                                if (text.isEmpty) {
+                                  return null; // İsteğe bağlı alan
+                                }
+                                final valid = RegExp(
+                                  r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+                                ).hasMatch(text);
+                                return valid
+                                    ? null
+                                    : context.tr('personal_info_email_invalid');
+                              },
+                            ),
+                            const SizedBox(height: 18),
+                            _buildBirthDateField(context),
+                          ],
                         ),
                       ),
-                      child: Text(
-                        context.tr('save'),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      const SizedBox(height: AppSpacing.xxl),
+                      AppGradientButton(
+                        label: context.tr('save'),
+                        icon: Icons.done_all_rounded,
+                        onPressed: _save,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }
+
+  /// Alanın üstündeki küçük etiket.
+  Widget _label(BuildContext context, String text) => Padding(
+    padding: const EdgeInsets.only(left: 4, bottom: 8),
+    child: Text(
+      text,
+      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: context.tokens.textMuted,
+      ),
+    ),
+  );
+
+  /// Kartın beyazından ayrışan alan zemini.
+  Color _fieldFill(BuildContext context) =>
+      context.tokens.brandTint.withAlpha(170);
 
   Widget _buildTextField(
     BuildContext context, {
     required String label,
     required String hint,
     required TextEditingController controller,
-    required bool isDark,
+    required IconData icon,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: context.tokens.textMuted,
-          ),
-        ),
-        const SizedBox(height: 8),
+        _label(context, label),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           validator: validator,
-          style: TextStyle(fontSize: 16, color: context.tokens.text),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: context.tokens.text,
+          ),
           decoration: InputDecoration(
             hintText: hint,
-            filled: true,
-            fillColor: context.tokens.surface,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: context.tokens.border),
-            ),
+            fillColor: _fieldFill(context),
+            suffixIcon: Icon(icon, size: 20, color: context.tokens.textMuted),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildBirthDateField(BuildContext context, bool isDark) {
+  Widget _buildBirthDateField(BuildContext context) {
+    final t = context.tokens;
     final value = _birthDate;
     final text = value == null
         ? context.tr('personal_info_birthdate_hint')
         : '${value.day.toString().padLeft(2, '0')}/'
               '${value.month.toString().padLeft(2, '0')}/${value.year}';
+    final radius = BorderRadius.circular(AppRadius.md);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          context.tr('personal_info_birthdate'),
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: context.tokens.textMuted,
+        _label(context, context.tr('personal_info_birthdate')),
+        Material(
+          color: _fieldFill(context),
+          // Kenar, temadaki metin alanlarınınkiyle aynı.
+          shape: RoundedRectangleBorder(
+            borderRadius: radius,
+            side:
+                Theme.of(
+                  context,
+                ).inputDecorationTheme.enabledBorder?.borderSide ??
+                BorderSide(color: t.border),
           ),
-        ),
-        const SizedBox(height: 8),
-        InkWell(
-          onTap: _pickBirthDate,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            decoration: BoxDecoration(
-              color: context.tokens.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: context.tokens.border),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  text,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: value == null
-                        ? (context.tokens.textMuted)
-                        : (context.tokens.text),
-                  ),
+          child: InkWell(
+            onTap: _pickBirthDate,
+            borderRadius: radius,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 52),
+              child: Padding(
+                // Metin ve simge, üstteki metin alanlarındakiyle aynı
+                // hizada.
+                padding: const EdgeInsetsDirectional.fromSTEB(22, 14, 14, 14),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        text,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: value == null ? t.textFaint : t.text,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      size: 20,
+                      color: t.textMuted,
+                    ),
+                  ],
                 ),
-                Icon(
-                  Icons.calendar_today_outlined,
-                  size: 18,
-                  color: context.tokens.textMuted,
-                ),
-              ],
+              ),
             ),
           ),
         ),
