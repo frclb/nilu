@@ -196,6 +196,10 @@ void main() {
       testWidgets('galeri · ${entry.key} · ${variant.key}', skip: !_enabled, (
         tester,
       ) async {
+        // flutter_test gölge bulanıklığını kapatıyor; galeri gerçek
+        // görünüşü göstermeli. Test bitmeden geri açılmalı (çerçeve
+        // denetliyor).
+        debugDisableShadows = false;
         await _seedFor(entry.key);
         final (size, dark) = variant.value;
         await _pump(tester, entry.value, size: size, dark: dark);
@@ -203,6 +207,7 @@ void main() {
         // Taşma gibi düzen hataları galeriyi durdurmasın; zaten
         // `every_screen_test` onları yakalıyor.
         tester.takeException();
+        debugDisableShadows = true;
       });
     }
   }
