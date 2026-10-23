@@ -63,41 +63,52 @@ class AppTheme {
     final isLight = brightness == Brightness.light;
     final base = isLight ? ThemeData.light() : ThemeData.dark();
 
-    // Başlıklar Lora (serif), gövde Inter.
+    // Başlıklar Newsreader (serif), gövde Plus Jakarta Sans.
     //
-    // Öncesinde her şey Inter'dı ve ekranlar birbirinden ayrışmıyordu.
-    // Başlıkta serif kullanmak sağlık uygulamasına klinik değil sakin bir
-    // ton veriyor; gövdede grotesk kalması okunurluğu koruyor.
-    //
-    // Önce Fraunces denendi ama o bir "wonky" tasarım serifi: breve'i çok
-    // küçük çiziyor ve 20px'te `ğ` ile `g` birbirinden ayrılmıyordu.
-    // Türkçe birincil dil olduğu için diakritikleri sağlam çizen Lora
-    // seçildi.
-    // Yazı tipleri pakete gömülü (bkz. pubspec `fonts:`). Önce
-    // `google_fonts` ile çalışma anında indiriliyorlardı; ilk açılışta ağ
-    // yavaşsa ekran sistem yazı tipiyle açılıp sonra değişiyordu.
+    // "Luminous Editorial Wellness" yenilemesi: başlıkta dergi tadında,
+    // yumuşak bir serif; gövdede geometrik ama sıcak bir grotesk. Önceki
+    // Fraunces 20px'te `ğ`'nin breve'ini çok küçük çiziyordu; Newsreader'ın
+    // optik boyutu (28) diakritikleri net bırakıyor.
+    // Yazı tipleri pakete gömülü (bkz. pubspec `fonts:`): ilk açılışta ağ
+    // yavaşsa ekran sistem yazı tipiyle açılıp sonra değişmesin diye.
     final body = base.textTheme
-        .apply(fontFamily: 'Inter')
+        .apply(fontFamily: 'PlusJakartaSans')
         .apply(bodyColor: t.text, displayColor: t.text);
 
     final display = base.textTheme
-        .apply(fontFamily: 'Fraunces')
+        .apply(fontFamily: 'Newsreader')
         .apply(bodyColor: t.text, displayColor: t.text);
 
     final textTheme = body.copyWith(
       displayLarge: display.displayLarge?.copyWith(
-        fontWeight: FontWeight.w600,
-        letterSpacing: -0.5,
+        fontWeight: FontWeight.w500,
+        letterSpacing: -0.8,
       ),
       displayMedium: display.displayMedium?.copyWith(
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w500,
+        letterSpacing: -0.6,
+      ),
+      displaySmall: display.displaySmall?.copyWith(
+        fontWeight: FontWeight.w500,
         letterSpacing: -0.4,
       ),
-      displaySmall: display.displaySmall?.copyWith(fontWeight: FontWeight.w600),
-      headlineMedium: display.headlineMedium?.copyWith(
-        fontWeight: FontWeight.w600,
+      headlineLarge: display.headlineLarge?.copyWith(
+        fontWeight: FontWeight.w500,
+        letterSpacing: -0.4,
       ),
-      titleLarge: body.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+      headlineMedium: display.headlineMedium?.copyWith(
+        fontWeight: FontWeight.w500,
+        letterSpacing: -0.3,
+      ),
+      headlineSmall: display.headlineSmall?.copyWith(
+        fontWeight: FontWeight.w500,
+      ),
+      titleLarge: body.titleLarge?.copyWith(
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.2,
+      ),
+      titleMedium: body.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+      titleSmall: body.titleSmall?.copyWith(fontWeight: FontWeight.w600),
       labelLarge: body.labelLarge?.copyWith(color: t.textMuted),
       bodyMedium: body.bodyMedium?.copyWith(height: 1.5),
     );
@@ -109,14 +120,28 @@ class AppTheme {
         ).copyWith(
           primary: brand,
           onPrimary: isLight ? Colors.white : AppPalette.night900,
-          secondary: t.brandTint,
-          onSecondary: t.text,
+          secondary: t.secondary,
+          onSecondary: isLight ? Colors.white : AppPalette.night900,
+          secondaryContainer: t.secondaryTint,
           tertiary: t.accent,
           surface: t.surface,
           onSurface: t.text,
+          onSurfaceVariant: t.textMuted,
           outline: t.border,
+          outlineVariant: t.border,
           error: t.danger,
         );
+
+    // Kenarlıklar erik tonlu ve çok ince: gri çizgi sıcak zeminde kirli
+    // duruyordu.
+    final hairline = isLight ? brand.withAlpha(20) : t.border;
+    final fieldBorder = isLight ? brand.withAlpha(31) : t.border;
+
+    final buttonText = textTheme.titleMedium?.copyWith(
+      fontSize: 15,
+      fontWeight: FontWeight.w700,
+      letterSpacing: -0.1,
+    );
 
     return ThemeData(
       useMaterial3: true,
@@ -125,6 +150,7 @@ class AppTheme {
       scaffoldBackgroundColor: t.background,
       textTheme: textTheme,
       extensions: [t],
+      splashFactory: InkSparkle.splashFactory,
 
       appBarTheme: AppBarTheme(
         backgroundColor: t.background,
@@ -133,25 +159,29 @@ class AppTheme {
         scrolledUnderElevation: 0,
         centerTitle: true,
         iconTheme: IconThemeData(color: t.text),
-        titleTextStyle: textTheme.titleLarge?.copyWith(fontSize: 18),
+        titleTextStyle: textTheme.titleLarge?.copyWith(fontSize: 17),
         systemOverlayStyle: isLight
             ? SystemUiOverlayStyle.dark
             : SystemUiOverlayStyle.light,
       ),
 
-      // Gölge yerine kenarlık: sıcak zeminde gölge kirli görünüyor,
-      // ince kenarlık kartları daha net ayırıyor.
       cardTheme: CardThemeData(
         color: t.surface,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          side: BorderSide(color: t.border),
+          side: BorderSide(color: hairline),
         ),
       ),
 
-      dividerTheme: DividerThemeData(color: t.border, thickness: 1, space: 1),
+      dividerTheme: DividerThemeData(color: hairline, thickness: 1, space: 1),
+
+      listTileTheme: ListTileThemeData(
+        iconColor: brand,
+        titleTextStyle: textTheme.titleMedium?.copyWith(color: t.text),
+        subtitleTextStyle: textTheme.bodySmall?.copyWith(color: t.textMuted),
+      ),
 
       dialogTheme: DialogThemeData(
         backgroundColor: t.surface,
@@ -169,15 +199,19 @@ class AppTheme {
           maxWidth: AppLayout.contentMaxWidth,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
         ),
-        titleTextStyle: textTheme.titleLarge,
+        titleTextStyle: textTheme.headlineSmall?.copyWith(
+          fontSize: 22,
+          color: t.text,
+        ),
         contentTextStyle: textTheme.bodyMedium?.copyWith(color: t.textMuted),
       ),
 
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: t.surface,
         surfaceTintColor: Colors.transparent,
+        dragHandleColor: t.border,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(AppRadius.xl),
@@ -187,35 +221,33 @@ class AppTheme {
 
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: t.surfaceAlt,
+        fillColor: isLight ? Colors.white.withAlpha(204) : t.surfaceAlt,
         hintStyle: textTheme.bodyMedium?.copyWith(color: t.textFaint),
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.md,
+          horizontal: AppSpacing.lg + 2,
+          vertical: AppSpacing.md + 2,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
-          borderSide: BorderSide(color: t.border),
+          borderSide: BorderSide(color: fieldBorder),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
-          borderSide: BorderSide(color: t.border),
+          borderSide: BorderSide(color: fieldBorder),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
-          borderSide: BorderSide(color: scheme.primary, width: 1.5),
+          borderSide: BorderSide(color: t.secondary, width: 1.5),
         ),
       ),
 
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
           minimumSize: const Size.fromHeight(52),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.md),
-          ),
-          textStyle: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          shape: const StadiumBorder(),
+          textStyle: buttonText,
         ),
       ),
 
@@ -225,38 +257,58 @@ class AppTheme {
           foregroundColor: scheme.onPrimary,
           minimumSize: const Size.fromHeight(52),
           elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.md),
-          ),
-          textStyle: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          shape: const StadiumBorder(),
+          textStyle: buttonText,
         ),
       ),
 
+      // İkincil düğme: hafif erik zeminli "hayalet" hap.
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: scheme.primary,
+          backgroundColor: isLight ? brand.withAlpha(13) : t.surfaceAlt,
           minimumSize: const Size.fromHeight(52),
-          side: BorderSide(color: t.border),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.md),
-          ),
-          textStyle: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          side: BorderSide(color: fieldBorder),
+          shape: const StadiumBorder(),
+          textStyle: buttonText,
         ),
       ),
 
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: scheme.primary),
+        style: TextButton.styleFrom(
+          foregroundColor: scheme.primary,
+          textStyle: textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+          shape: const StadiumBorder(),
+        ),
+      ),
+
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: SegmentedButton.styleFrom(
+          backgroundColor: t.surfaceAlt,
+          selectedBackgroundColor: t.surface,
+          selectedForegroundColor: scheme.primary,
+          foregroundColor: t.textMuted,
+          side: BorderSide(color: hairline),
+          shape: const StadiumBorder(),
+          textStyle: textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
 
       chipTheme: ChipThemeData(
-        backgroundColor: t.surfaceAlt,
-        side: BorderSide(color: t.border),
-        labelStyle: textTheme.bodyMedium,
+        backgroundColor: isLight ? Colors.white.withAlpha(179) : t.surfaceAlt,
+        selectedColor: t.brandTint,
+        checkmarkColor: scheme.primary,
+        side: BorderSide(color: hairline),
+        labelStyle: textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+          height: 1.2,
+        ),
         shape: const StadiumBorder(),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       ),
 
       switchTheme: SwitchThemeData(
@@ -264,9 +316,35 @@ class AppTheme {
           (s) => s.contains(WidgetState.selected) ? Colors.white : t.surface,
         ),
         trackColor: WidgetStateProperty.resolveWith(
-          (s) =>
-              s.contains(WidgetState.selected) ? scheme.primary : t.surfaceAlt,
+          (s) => s.contains(WidgetState.selected) ? t.secondary : t.surfaceAlt,
         ),
+        trackOutlineColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected)
+              ? Colors.transparent
+              : fieldBorder,
+        ),
+      ),
+
+      checkboxTheme: CheckboxThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+        fillColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? t.secondary : null,
+        ),
+        side: BorderSide(color: fieldBorder, width: 1.5),
+      ),
+
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith(
+          (s) =>
+              s.contains(WidgetState.selected) ? scheme.primary : t.textFaint,
+        ),
+      ),
+
+      sliderTheme: SliderThemeData(
+        activeTrackColor: t.secondary,
+        inactiveTrackColor: t.secondaryTint,
+        thumbColor: scheme.primary,
+        overlayColor: t.secondary.withAlpha(30),
       ),
 
       snackBarTheme: SnackBarThemeData(

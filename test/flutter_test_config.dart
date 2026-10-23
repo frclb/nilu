@@ -23,15 +23,17 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
 
 /// `pubspec.yaml`'daki `fonts:` bloğuyla aynı listeyi taşır.
 const _families = <String, List<String>>{
-  'Inter': [
-    'assets/fonts/Inter-Regular.ttf',
-    'assets/fonts/Inter-Medium.ttf',
-    'assets/fonts/Inter-SemiBold.ttf',
-    'assets/fonts/Inter-Bold.ttf',
+  'PlusJakartaSans': [
+    'assets/fonts/PlusJakartaSans-Regular.ttf',
+    'assets/fonts/PlusJakartaSans-Medium.ttf',
+    'assets/fonts/PlusJakartaSans-SemiBold.ttf',
+    'assets/fonts/PlusJakartaSans-Bold.ttf',
+    'assets/fonts/PlusJakartaSans-ExtraBold.ttf',
   ],
-  'Fraunces': [
-    'assets/fonts/Fraunces-SemiBold.ttf',
-    'assets/fonts/Fraunces-Bold.ttf',
+  'Newsreader': [
+    'assets/fonts/Newsreader-Regular.ttf',
+    'assets/fonts/Newsreader-Medium.ttf',
+    'assets/fonts/Newsreader-SemiBold.ttf',
   ],
 };
 

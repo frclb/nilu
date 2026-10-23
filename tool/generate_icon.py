@@ -32,10 +32,10 @@ C = SIZE * SS
 # Merkez yaprak bir basamak açıldı (rose200 -> rose50): yeni zemin eskisinden
 # açık olduğu için yaprakların ayrımı 38px'te kayboluyordu. Yan yaprak paletin
 # eski tona en yakın sabiti.
-BG_TOP = (0x6B, 0x2F, 0x55)     # plum700 — birincil marka
-BG_BOTTOM = (0x3E, 0x1B, 0x33)  # plum900 — degradenin dibi
-PETAL = (0xFB, 0xEE, 0xF1)      # rose50  — merkez yaprak
-PETAL_SIDE = (0xC7, 0x9B, 0xB4)  # plum300 — geri çekilen yan yapraklar
+BG_TOP = (0x54, 0x19, 0x42)     # plum700 — birincil marka
+BG_BOTTOM = (0x3A, 0x02, 0x2C)  # plum900 — degradenin dibi
+PETAL = (0xFF, 0xF0, 0xF6)      # rose50  — merkez yaprak
+PETAL_SIDE = (0xFF, 0xAE, 0xDE)  # plum300 — geri çekilen yan yapraklar
 
 
 def build():

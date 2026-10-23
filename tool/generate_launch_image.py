@@ -24,10 +24,10 @@ from lotus import lotus_polygons
 
 # lib/design_system/app_palette.dart ile aynı olmalı; `launch_screen_test.dart`
 # ikisini karşılaştırıyor.
-SAND_50 = (0xFB, 0xF8, 0xF5)   # AppPalette.sand50   — açık temada zemin
-NIGHT_900 = (0x15, 0x10, 0x14)  # AppPalette.night900 — koyu temada zemin
-PLUM_700 = (0x6B, 0x2F, 0x55)   # AppPalette.plum700  — açık temada marka
-ROSE_200 = (0xF0, 0xCD, 0xD5)   # AppPalette.rose200  — koyu temada işaret
+SAND_50 = (0xFB, 0xF7, 0xF6)   # AppPalette.sand50   — açık temada zemin
+NIGHT_900 = (0x15, 0x0E, 0x12)  # AppPalette.night900 — koyu temada zemin
+PLUM_700 = (0x54, 0x19, 0x42)   # AppPalette.plum700  — açık temada marka
+ROSE_200 = (0xFB, 0xCF, 0xE8)   # AppPalette.rose200  — koyu temada işaret
 
 # Koyu temada işaret neden `plum300` değil:
 #

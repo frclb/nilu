@@ -84,6 +84,10 @@ dev_dependencies:
 
 # Uygulama ikonu. Kaynak görseli `python3 tool/generate_icon.py` üretir,
 # platform boyutlarını `dart run flutter_launcher_icons` oluşturur.
+# DİKKAT: araç Runner.xcodeproj'daki ALTERNATE_APPICON_NAMES değerini
+# `AppIcon` yapıp sade simgeyi bozuyor; çalıştırdıktan sonra
+# `git checkout -- ios/Runner.xcodeproj/project.pbxproj` (bkz.
+# test/tool/ios_alternate_icon_test.dart).
 # Uygulama yalnızca iOS için çıkıyor. `android:` anahtarları buradayken
 # `dart run flutter_launcher_icons` Android'i önce üretmeye çalışıp
 # AndroidManifest.xml bulamadan çöküyor ve iOS ikonlarına hiç sıra gelmiyor.
@@ -122,22 +126,30 @@ flutter:
   # Tek bir 800 kullanımı için ayrı dosya taşınmıyor; Flutter en yakın
   # kalınlığa düşüyor.
   fonts:
-    - family: Inter
+    # Başlıklar Newsreader (serif), gövde Plus Jakarta Sans. İkisi de
+    # Google Fonts'tan, OFL lisanslı (assets/fonts/*-OFL.txt). Değişken
+    # yazı tiplerinden sabit kalınlıklar üretildi: Flutter `fontWeight`'i
+    # değişken eksene kendiliğinden bağlamıyor.
+    - family: Newsreader
       fonts:
-        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Newsreader-Regular.ttf
           weight: 400
-        - asset: assets/fonts/Inter-Medium.ttf
+        - asset: assets/fonts/Newsreader-Medium.ttf
           weight: 500
-        - asset: assets/fonts/Inter-SemiBold.ttf
+        - asset: assets/fonts/Newsreader-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/Inter-Bold.ttf
-          weight: 700
-    - family: Fraunces
+    - family: PlusJakartaSans
       fonts:
-        - asset: assets/fonts/Fraunces-SemiBold.ttf
+        - asset: assets/fonts/PlusJakartaSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/PlusJakartaSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/PlusJakartaSans-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/Fraunces-Bold.ttf
+        - asset: assets/fonts/PlusJakartaSans-Bold.ttf
           weight: 700
+        - asset: assets/fonts/PlusJakartaSans-ExtraBold.ttf
+          weight: 800
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

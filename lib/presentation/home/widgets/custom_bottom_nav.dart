@@ -1,8 +1,8 @@
 import '../../../domain/models/life_stage.dart';
 import '../../../domain/view_models/pregnancy_view_model.dart';
 import 'package:flutter/material.dart';
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
-import '../../../design_system/app_scrim.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../domain/view_models/user_view_model.dart';
@@ -64,14 +64,14 @@ const NavDestination _careDestination = NavDestination(
 const List<NavDestination> _standardDestinations = [
   NavDestination(
     branchIndex: 0,
-    icon: Icons.home_outlined,
-    activeIcon: Icons.home_filled,
+    icon: Icons.spa_outlined,
+    activeIcon: Icons.spa,
     labelKey: 'nav_home',
   ),
   NavDestination(
     branchIndex: 1,
-    icon: Icons.calendar_month_outlined,
-    activeIcon: Icons.calendar_month,
+    icon: Icons.calendar_today_outlined,
+    activeIcon: Icons.calendar_today,
     labelKey: 'nav_calendar',
   ),
   NavDestination(
@@ -82,8 +82,8 @@ const List<NavDestination> _standardDestinations = [
   ),
   NavDestination(
     branchIndex: 3,
-    icon: Icons.auto_stories_outlined,
-    activeIcon: Icons.auto_stories,
+    icon: Icons.local_library_outlined,
+    activeIcon: Icons.local_library,
     labelKey: 'nav_library',
   ),
   NavDestination(
@@ -138,27 +138,24 @@ class CustomBottomNav extends StatelessWidget {
       stage: context.watch<PregnancyViewModel>().stage,
     );
 
+    final t = context.tokens;
+    final dark = theme.brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: theme.colorScheme.outline.withAlpha(127),
-            width: 1,
-          ),
-        ),
+        color: t.surface.withAlpha(dark ? 255 : 235),
+        border: Border(top: BorderSide(color: t.border.withAlpha(110))),
         boxShadow: [
           BoxShadow(
-            color: AppScrim.veil(31),
-            blurRadius: 15,
-            offset: Offset(0, -5),
+            color: theme.colorScheme.primary.withAlpha(dark ? 0 : 8),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
           ),
         ],
       ),
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: Row(
             children: [
               for (final destination in destinations)
@@ -191,9 +188,9 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final primary = theme.colorScheme.primary;
-    final muted = theme.textTheme.labelLarge?.color ?? context.tokens.textMuted;
-    final color = isActive ? primary : muted;
+    final scheme = theme.colorScheme;
+    final muted = context.tokens.textMuted;
+    final color = isActive ? scheme.onPrimary : muted;
     final label = context.tr(destination.labelKey);
 
     return Semantics(
@@ -204,60 +201,74 @@ class _NavItem extends StatelessWidget {
       selected: isActive,
       label: label,
       excludeSemantics: true,
-      child: InkWell(
-        onTap: () {
-          if (isActive) {
-            // Seçili sekmeye tekrar basmak kök ekrana döner; bu bir gezinme
-            // değil, o yüzden hafif geri bildirim.
-            HapticFeedback.selectionClick();
-          } else {
-            HapticFeedback.lightImpact();
-          }
-          onTap();
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                curve: Curves.easeOut,
-                width: 56,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: isActive
-                      ? theme.colorScheme.secondary
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Icon(
-                  isActive ? destination.activeIcon : destination.icon,
-                  color: color,
-                  size: 22,
-                ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 2),
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: () {
+              if (isActive) {
+                // Seçili sekmeye tekrar basmak kök ekrana döner; bu bir
+                // gezinme değil, o yüzden hafif geri bildirim.
+                HapticFeedback.selectionClick();
+              } else {
+                HapticFeedback.lightImpact();
+              }
+              onTap();
+            },
+            borderRadius: BorderRadius.circular(16),
+            // Seçili sekme dolu bir erik hap: yalnızca renkle değil şekille
+            // de ayrışıyor.
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+              constraints: const BoxConstraints(minHeight: 48),
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: isActive ? AppGradients.mark(context) : null,
+                boxShadow: isActive
+                    ? [
+                        BoxShadow(
+                          color: scheme.primary.withAlpha(64),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
+                    : null,
               ),
-              const SizedBox(height: 4),
-              // Etiket sistem yazı ölçeğiyle büyüyor ama bir yere kadar:
-              // ölçeksiz bırakılırsa en büyük erişilebilirlik ayarında satır
-              // taşıyor, tamamen sabitlenirse düşük görmeyen kullanıcı için
-              // okunmuyor.
-              MediaQuery.withClampedTextScaling(
-                maxScaleFactor: 1.3,
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    isActive ? destination.activeIcon : destination.icon,
                     color: color,
+                    size: 21,
                   ),
-                ),
+                  const SizedBox(height: 2),
+                  // Etiket sistem yazı ölçeğiyle büyüyor ama bir yere kadar:
+                  // ölçeksiz bırakılırsa en büyük erişilebilirlik ayarında
+                  // satır taşıyor, tamamen sabitlenirse düşük görmeyen
+                  // kullanıcı için okunmuyor.
+                  MediaQuery.withClampedTextScaling(
+                    maxScaleFactor: 1.3,
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontSize: 10,
+                        fontWeight: isActive
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                        color: color,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

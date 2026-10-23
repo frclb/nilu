@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'app_palette.dart';
 import 'app_tokens.dart';
 
 /// Uygulamanın standart kartı.
@@ -12,7 +13,9 @@ import 'app_tokens.dart';
 ///   eski kenarlık `t.border` → 1.35:1  — pratikte görünmüyordu
 ///   eski gölge %2 opaklık          — hiçbir şey yapmıyordu
 ///
-/// Buradaki gölge iki katman: yere değdiği yerde keskin, yukarıda yayvan.
+/// Ekim 2026 yenilemesi: beyaz kart, 24 pt köşe, neredeyse görünmez pembe
+/// kenar ve erik tonlu yayvan gölge. Gölge iki katman: yere değdiği yerde
+/// keskin, yukarıda yayvan.
 class AppCard extends StatelessWidget {
   const AppCard({
     super.key,
@@ -29,30 +32,44 @@ class AppCard extends StatelessWidget {
   /// diye dışarı açık.
   static const double radius = 24;
 
-  /// Kart kenarlığı — zeminden ayrılacak kadar koyu.
-  static Color borderColor(AppTokens t) => t.textFaint.withAlpha(120);
+  static bool _isLight(AppTokens t) => t.background.computeLuminance() > 0.5;
+
+  /// Kart kenarlığı — beyaz kartı sıcak zeminden ayıran çok açık pembe.
+  /// Asıl ayrımı gölge yapıyor (bkz. [shadow]).
+  static Color borderColor(AppTokens t) =>
+      _isLight(t) ? const Color(0xFFF5E4EB) : t.border;
 
   /// Bölümleri ayıran çizgi.
-  static Color dividerColor(AppTokens t) => t.textFaint.withAlpha(110);
+  static Color dividerColor(AppTokens t) =>
+      _isLight(t) ? const Color(0xFFF0DEE6) : t.border;
 
-  static List<BoxShadow> shadow() => [
-    BoxShadow(
-      color: Colors.black.withAlpha(12),
-      blurRadius: 2,
-      offset: const Offset(0, 1),
-    ),
-    BoxShadow(
-      color: Colors.black.withAlpha(26),
-      blurRadius: 22,
-      offset: const Offset(0, 10),
-    ),
-  ];
+  /// Erik tonlu ortam gölgesi: kart, gri bir boşlukta yüzmek yerine sıcak
+  /// bir ışıkta duruyor gibi görünsün.
+  static List<BoxShadow> shadow([AppTokens? t]) {
+    final dark = t != null && !_isLight(t);
+    return [
+      BoxShadow(
+        color: dark
+            ? Colors.black.withAlpha(60)
+            : AppPalette.plum700.withAlpha(15),
+        blurRadius: 36,
+        offset: const Offset(0, 12),
+      ),
+      BoxShadow(
+        color: dark
+            ? Colors.black.withAlpha(30)
+            : AppPalette.plum700.withAlpha(6),
+        blurRadius: 6,
+        offset: const Offset(0, 2),
+      ),
+    ];
+  }
 
   static BoxDecoration decoration(AppTokens t) => BoxDecoration(
     color: t.surface,
     borderRadius: BorderRadius.circular(radius),
     border: Border.all(color: borderColor(t)),
-    boxShadow: shadow(),
+    boxShadow: shadow(t),
   );
 
   @override

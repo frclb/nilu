@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../../design_system/app_layout.dart';
+import '../../../design_system/app_tokens.dart';
 import '../../../domain/view_models/user_view_model.dart';
 import '../../../localization/app_localizations.dart';
 import 'custom_bottom_nav.dart';
@@ -50,7 +51,7 @@ class SideNavRail extends StatelessWidget {
         onTap?.call(destination.branchIndex);
       },
       backgroundColor: theme.colorScheme.surface,
-      indicatorColor: theme.colorScheme.secondary,
+      indicatorColor: context.tokens.brandTint,
       minWidth: AppLayout.railWidth,
       groupAlignment: -0.85,
       labelType: NavigationRailLabelType.all,

@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'app_tokens.dart';
 import '../localization/app_localizations.dart';
-import 'app_colors.dart';
 
 /// İçerik görselleri için uygulama içinde çizilen illüstrasyon.
 ///
@@ -177,34 +177,51 @@ class InitialAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = context.tokens;
     final isDark = theme.brightness == Brightness.dark;
     final initial = _initialOf(context, name);
 
+    // İnce degrade halka (gül → marka tülü → kehribar), içinde baş harf.
     return Container(
       width: size,
       height: size,
-      alignment: Alignment.center,
+      padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isDark
-            ? theme.colorScheme.primary.withAlpha(60)
-            : AppColors.secondaryPinkLight,
-        border: Border.all(color: theme.colorScheme.secondary, width: 2),
+        gradient: LinearGradient(
+          begin: Alignment.bottomLeft,
+          end: Alignment.topRight,
+          colors: [t.secondaryTint, t.brandTint, t.accentTint],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.primary.withAlpha(25),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: initial == null
-          ? Icon(
-              Icons.person_outline,
-              size: size * 0.5,
-              color: theme.colorScheme.primary,
-            )
-          : Text(
-              initial,
-              style: TextStyle(
-                fontSize: size * 0.4,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : theme.colorScheme.primary,
+      child: Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: isDark ? t.surfaceAlt : t.surface,
+        ),
+        child: initial == null
+            ? Icon(
+                Icons.person_outline,
+                size: size * 0.5,
+                color: theme.colorScheme.primary,
+              )
+            : Text(
+                initial,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontSize: size * 0.42,
+                  height: 1,
+                  color: theme.colorScheme.primary,
+                ),
               ),
-            ),
+      ),
     );
   }
 

@@ -82,6 +82,19 @@ class AppTokens extends ThemeExtension<AppTokens> {
   final Color warning;
   final Color danger;
 
+  /// İkincil vurgu: bağlantılar, "Tümünü gör", etkin durum metinleri.
+  /// Tema çeşidine göre değişir (erikte böğürtlen gülü). Metin olarak AA.
+  final Color secondary;
+
+  /// [secondary]'nin tülü — rozet ve hap zemini.
+  final Color secondaryTint;
+
+  /// Açık zeminde (tül üstünde) okunacak regl ve yumurtlama metni.
+  /// [flow] ve [ovulation] dolgu için canlı; küçük metinde koyu tonları
+  /// gerekiyor.
+  final Color flowText;
+  final Color ovulationText;
+
   const AppTokens({
     required this.background,
     required this.surface,
@@ -105,6 +118,10 @@ class AppTokens extends ThemeExtension<AppTokens> {
     required this.success,
     required this.warning,
     required this.danger,
+    required this.secondary,
+    required this.secondaryTint,
+    required this.flowText,
+    required this.ovulationText,
   });
 
   /// Seçili çeşide göre rol renkleri.
@@ -112,9 +129,11 @@ class AppTokens extends ThemeExtension<AppTokens> {
   /// Yalnızca marka rengi ve tonu değişir; nötrler, akış ve yumurtlama
   /// sabit kalır (bkz. [AppFlavor]).
   static AppTokens of(AppFlavor flavor, Brightness brightness) {
-    final base = brightness == Brightness.light ? light : dark;
+    final isLight = brightness == Brightness.light;
+    final base = isLight ? light : dark;
     return base.copyWith(
-      brandTint: brightness == Brightness.light ? flavor.tint : base.brandTint,
+      brandTint: isLight ? flavor.tint : base.brandTint,
+      secondary: isLight ? flavor.secondary : flavor.secondaryDark,
     );
   }
 
@@ -131,16 +150,20 @@ class AppTokens extends ThemeExtension<AppTokens> {
     accentTint: AppPalette.clay100,
     flow: AppPalette.rose600,
     flowSoft: AppPalette.rose400,
-    flowTint: AppPalette.rose200,
+    flowTint: AppPalette.rose100,
     ovulation: AppPalette.iris500,
     ovulationTint: AppPalette.iris100,
-    fertile: AppPalette.rose200,
-    phaseFollicular: AppPalette.success,
-    phaseLuteal: AppPalette.clay600,
-    phaseSuppressed: AppPalette.plum300,
+    fertile: AppPalette.pink400,
+    phaseFollicular: AppPalette.sage600,
+    phaseLuteal: AppPalette.amber600,
+    phaseSuppressed: AppPalette.orchid400,
     success: AppPalette.success,
     warning: AppPalette.warning,
     danger: AppPalette.danger,
+    secondary: AppPalette.berry600,
+    secondaryTint: AppPalette.berry100,
+    flowText: AppPalette.rose800,
+    ovulationText: AppPalette.iris700,
   );
 
   static const dark = AppTokens(
@@ -150,27 +173,30 @@ class AppTokens extends ThemeExtension<AppTokens> {
     brandTint: AppPalette.night700,
     text: AppPalette.nightInk,
     textMuted: AppPalette.nightInkMuted,
-    textFaint: Color(0xFF8A7B85),
+    textFaint: Color(0xFF9C8892),
     border: AppPalette.night600,
     accent: AppPalette.clay400,
-    accentTint: Color(0xFF3D2A22),
+    accentTint: Color(0xFF3D2620),
     flow: AppPalette.rose400,
     flowSoft: AppPalette.rose600,
-    flowTint: Color(0xFF43222C),
-    ovulation: Color(0xFF9E85C6),
-    ovulationTint: Color(0xFF2E2540),
-    // Açık pembe her iki zeminde de okunuyor; rol rengi ikisinde de aynı.
-    fertile: AppPalette.rose200,
-    phaseFollicular: Color(0xFF5FB3A1),
-    phaseLuteal: AppPalette.clay400,
-    // Koyu temada `plum300` regl gülünden daha **açık** kalıyordu ve
-    // hiyerarşi tersine dönüyordu: kanama günleri geri planda, baskılanmış
-    // günler önde. Aynı hüenin daha sönük tonu kullanılıyor — kanama en
-    // parlak, geri kalanı sakin.
+    flowTint: Color(0xFF4A1F2B),
+    ovulation: Color(0xFFA78BFA),
+    ovulationTint: Color(0xFF2E2545),
+    // Açık pembe her iki zeminde de okunuyor.
+    fertile: Color(0xFFF9A8D4),
+    phaseFollicular: Color(0xFF34D399),
+    phaseLuteal: Color(0xFFFBBF24),
+    // Koyu temada açık orkide regl gülünden daha **açık** kalıp hiyerarşiyi
+    // ters çeviriyordu: kanama günleri geri planda, baskılanmış günler
+    // önde. Aynı hüenin daha sönük tonu — kanama en parlak, gerisi sakin.
     phaseSuppressed: Color(0xFFA0788F),
-    success: Color(0xFF5FB3A1),
-    warning: Color(0xFFD9A845),
-    danger: Color(0xFFD4736D),
+    success: Color(0xFF34D399),
+    warning: Color(0xFFFBBF24),
+    danger: Color(0xFFF87171),
+    secondary: Color(0xFFFF8FAB),
+    secondaryTint: Color(0xFF4A1F2E),
+    flowText: AppPalette.rose400,
+    ovulationText: Color(0xFFC4B5FD),
   );
 
   @override
@@ -197,6 +223,10 @@ class AppTokens extends ThemeExtension<AppTokens> {
     Color? success,
     Color? warning,
     Color? danger,
+    Color? secondary,
+    Color? secondaryTint,
+    Color? flowText,
+    Color? ovulationText,
   }) {
     return AppTokens(
       background: background ?? this.background,
@@ -221,6 +251,10 @@ class AppTokens extends ThemeExtension<AppTokens> {
       success: success ?? this.success,
       warning: warning ?? this.warning,
       danger: danger ?? this.danger,
+      secondary: secondary ?? this.secondary,
+      secondaryTint: secondaryTint ?? this.secondaryTint,
+      flowText: flowText ?? this.flowText,
+      ovulationText: ovulationText ?? this.ovulationText,
     );
   }
 
@@ -251,6 +285,10 @@ class AppTokens extends ThemeExtension<AppTokens> {
       success: mix(success, other.success),
       warning: mix(warning, other.warning),
       danger: mix(danger, other.danger),
+      secondary: mix(secondary, other.secondary),
+      secondaryTint: mix(secondaryTint, other.secondaryTint),
+      flowText: mix(flowText, other.flowText),
+      ovulationText: mix(ovulationText, other.ovulationText),
     );
   }
 }
@@ -271,10 +309,10 @@ class AppSpacing {
 
 class AppRadius {
   const AppRadius._();
-  static const sm = 10.0;
+  static const sm = 12.0;
   static const md = 16.0;
-  static const lg = 22.0;
-  static const xl = 28.0;
+  static const lg = 24.0;
+  static const xl = 32.0;
   static const pill = 999.0;
 }
 
