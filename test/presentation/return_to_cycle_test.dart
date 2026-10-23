@@ -49,6 +49,9 @@ void main() {
 
     final satir = find.text(ctx.tr('pp_return_to_cycle'));
     await tester.scrollUntilVisible(satir, 300);
+    // Kısmen görünür olabilir: tam görünür kılıp çiz, sonra dokun.
+    await tester.ensureVisible(satir);
+    await tester.pump();
     await tester.tap(satir);
     await onayla(tester);
 
@@ -72,6 +75,9 @@ void main() {
     final ctx = tester.element(find.byType(ProfileSettingsScreen));
     final satir = find.text(ctx.tr('pp_return_to_cycle'));
     await tester.scrollUntilVisible(satir, 300);
+    // Kısmen görünür olabilir: tam görünür kılıp çiz, sonra dokun.
+    await tester.ensureVisible(satir);
+    await tester.pump();
     await tester.tap(satir);
     await tester.pumpAndSettle();
     await tester.tap(find.text(ctx.tr('cancel')));
@@ -92,6 +98,9 @@ void main() {
 
     final dugme = find.byKey(const Key('pp_return_button'));
     await tester.scrollUntilVisible(dugme, 300);
+    // Kısmen görünür olabilir: tam görünür kılıp çiz, sonra dokun.
+    await tester.ensureVisible(dugme);
+    await tester.pump();
     await tester.tap(dugme);
     await onayla(tester);
 

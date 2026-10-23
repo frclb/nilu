@@ -154,9 +154,13 @@ class AppGradientButton extends StatelessWidget {
           Icon(icon, size: 20, color: fg),
         if (busy || icon != null) const SizedBox(width: 10),
         Flexible(
+          // İki satıra kadar sarıyor: Almanca "Meine Periode hat begonnen"
+          // 1.5× yazıda dar telefonda tek satıra sığmayıp "…" ile
+          // kesiliyordu. Düğme yüksekliği içeriğe göre büyüyor.
           child: Text(
             label,
-            maxLines: 1,
+            maxLines: 2,
+            textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: fg,
@@ -176,7 +180,7 @@ class AppGradientButton extends StatelessWidget {
         duration: const Duration(milliseconds: 150),
         opacity: enabled || busy ? 1 : 0.45,
         child: Container(
-          height: height,
+          constraints: BoxConstraints(minHeight: height),
           width: expand ? double.infinity : null,
           decoration: BoxDecoration(
             gradient: gradient ?? AppGradients.primary(context),
@@ -189,8 +193,14 @@ class AppGradientButton extends StatelessWidget {
               onTap: enabled ? onPressed : null,
               borderRadius: BorderRadius.circular(radius),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: content,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 8,
+                ),
+                // `heightFactor: 1`: ortalayıcı içerik kadar yükseliyor.
+                // Olmadan, yüksekliği sınırlı bir yerde (iskeletin alt
+                // çubuğu) bütün alanı kaplıyor ve düğme ekranı örtüyordu.
+                child: Center(widthFactor: 1, heightFactor: 1, child: content),
               ),
             ),
           ),
@@ -392,7 +402,9 @@ class AppIconTile extends StatelessWidget {
       child: Icon(
         icon,
         size: size * 0.5,
-        color: color ?? (gradient != null ? Colors.white : scheme.primary),
+        // Degradenin üstünde `onPrimary`: koyu temada marka açık pembe ve
+        // beyaz simge üstünde okunmuyordu.
+        color: color ?? (gradient != null ? scheme.onPrimary : scheme.primary),
       ),
     );
   }

@@ -159,7 +159,12 @@ class AppTheme {
         scrolledUnderElevation: 0,
         centerTitle: true,
         iconTheme: IconThemeData(color: t.text),
-        titleTextStyle: textTheme.titleLarge?.copyWith(fontSize: 17),
+        // Alt sayfa başlıkları serif: tasarımdaki dergi tonu her ekranda
+        // aynı (ekipler ayrı ayrı yazınca bazıları serif, bazıları değildi).
+        titleTextStyle: textTheme.headlineSmall?.copyWith(
+          fontSize: 21,
+          color: t.text,
+        ),
         systemOverlayStyle: isLight
             ? SystemUiOverlayStyle.dark
             : SystemUiOverlayStyle.light,

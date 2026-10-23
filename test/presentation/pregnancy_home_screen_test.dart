@@ -87,6 +87,8 @@ void main() {
     );
     final kart = find.byKey(const Key('preg_months_card'));
     await tester.ensureVisible(kart);
+    // Kaydırma bir sonraki karede yerleşiyor; dokunmadan önce çiz.
+    await tester.pump();
     await tester.tap(kart);
     await settleAsync(tester);
     expect(find.byType(PregnancyMonthsScreen), findsOneWidget);
@@ -113,6 +115,7 @@ void main() {
     final ctx = tester.element(find.byType(PregnancyHomeScreen));
 
     await tester.ensureVisible(find.text(ctx.tr('preg_danger_entry_title')));
+    await tester.pump();
     await tester.tap(find.text(ctx.tr('preg_danger_entry_title')));
     await settleAsync(tester);
 
