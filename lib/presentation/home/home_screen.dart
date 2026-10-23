@@ -9,6 +9,7 @@ import 'widgets/daily_suggestion_card.dart';
 import 'widgets/two_column_widgets.dart';
 import 'widgets/intimacy_section.dart';
 import 'widgets/log_entry_fab.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -30,27 +31,35 @@ class HomeScreen extends StatelessWidget {
       // geniş ekranda aradaki boşlukta yapayalnız kalıyordu.
       floatingActionButtonLocation: const ContentEndFloatFab(),
       floatingActionButton: showFab ? const LogEntryFab() : null,
-      body: AppContentWidth(
-        child: RefreshIndicator(
-          onRefresh: () => context.read<CalendarViewModel>().refreshData(),
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: [
-              const SliverToBoxAdapter(child: HomeHeader()),
-              SliverPadding(
-                // Listenin sonu FAB'ın altında kalmasın.
-                padding: EdgeInsets.only(bottom: showFab ? 120 : 24),
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    const CycleMasthead(),
-                    PeriodToggleButton(),
-                    DailySuggestionCard(reserveFabSpace: showFab),
-                    const TwoColumnWidgets(),
-                    if (isOwner) const IntimacySection(),
-                  ]),
-                ),
+      body: AmbientBackground(
+        child: SafeArea(
+          bottom: false,
+          child: AppContentWidth(
+            child: RefreshIndicator(
+              onRefresh: () => context.read<CalendarViewModel>().refreshData(),
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  const SliverToBoxAdapter(child: HomeBrandBar()),
+                  const SliverToBoxAdapter(
+                    child: HomeHeader(trailing: HomePhasePill()),
+                  ),
+                  SliverPadding(
+                    // Listenin sonu FAB'ın altında kalmasın.
+                    padding: EdgeInsets.only(bottom: showFab ? 104 : 24),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        const CycleMasthead(),
+                        const PeriodToggleButton(),
+                        DailySuggestionCard(reserveFabSpace: showFab),
+                        const TwoColumnWidgets(),
+                        if (isOwner) const IntimacySection(),
+                      ]),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

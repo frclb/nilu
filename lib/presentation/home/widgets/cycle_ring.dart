@@ -6,13 +6,19 @@ import '../../../design_system/app_tokens.dart';
 import '../../../localization/app_localizations.dart';
 import 'cycle_ring_data.dart';
 
-/// Döngüyü papatya çelengi olarak çizer ve düzen değiştiğinde yeniler.
+/// Döngüyü boncuk dizisi olarak çizer ve düzen değiştiğinde yeniler.
 ///
-/// Döngü tahmin edildiği kadar sürmeyebilir: erken biterse çiçek sayısı azalır,
-/// gecikirse artar. Yeni düzene sıçrayarak geçmek çelengi bozuk gösteriyordu.
+/// Her gün bir boncuk; geçmiş günler dolu ama soluk, bugün hâleli ve büyük,
+/// önümüzdeki (tahmin edilen) günler içi açık halka. Renkler veriden
+/// geliyor (bkz. [CycleRingData]): regl gül, foliküler adaçayı, yumurtlama
+/// menekşe, luteal kehribar — takvimdekiyle aynı anlam.
 ///
-/// Yenileme iki evre: eski çelenk sırayla kapanıyor, sonra yenisi 1. günden
-/// itibaren sırayla açılıyor. Canlandırma yalnızca bu alanı kapsıyor —
+/// Döngü tahmin edildiği kadar sürmeyebilir: erken biterse boncuk sayısı
+/// azalır, gecikirse artar. Yeni düzene sıçrayarak geçmek diziyi bozuk
+/// gösteriyordu.
+///
+/// Yenileme iki evre: eski dizi sırayla sönüyor, sonra yenisi 1. günden
+/// itibaren sırayla yanıyor. Canlandırma yalnızca bu alanı kapsıyor —
 /// kartın geri kalanı ve ekranın diğer bölümleri sabit.
 class CycleRing extends StatefulWidget {
   const CycleRing({
@@ -20,6 +26,8 @@ class CycleRing extends StatefulWidget {
     required this.data,
     required this.center,
     this.caption,
+    this.markerIndex,
+    this.size = 232,
   });
 
   final CycleRingData data;
@@ -30,11 +38,18 @@ class CycleRing extends StatefulWidget {
   /// aradaki boşluk kartı seyrek gösteriyordu.
   final Widget center;
 
-  /// Merkezin altındaki küçük satır. Verilmezse "N günlük döngü".
+  /// Merkezin altındaki küçük satır (bkz. [RingCaption]).
   ///
-  /// Gebelik panosu aynı çelengi 40 haftayla kullanıyor; orada "40 günlük
-  /// döngü" yazması yanlış olurdu.
-  final String? caption;
+  /// Gebelik panosu aynı diziyi 40 haftayla kullanıyor; orada "40 günlük
+  /// döngü" yazması yanlış olurdu, o yüzden her pano kendi satırını veriyor.
+  final Widget? caption;
+
+  /// Ayrıca işaretlenen boncuk (0 tabanlı) — döngüde tahmini yumurtlama
+  /// günü. Bugünün vurgusu her zaman önce gelir.
+  final int? markerIndex;
+
+  /// Halkanın kenar uzunluğu.
+  final double size;
 
   @override
   State<CycleRing> createState() => _CycleRingState();
@@ -44,7 +59,7 @@ class _CycleRingState extends State<CycleRing>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
-  /// Kapanacak olan düzen.
+  /// Sönecek olan düzen.
   late CycleRingData _from;
 
   @override
@@ -55,10 +70,10 @@ class _CycleRingState extends State<CycleRing>
       vsync: this,
     );
 
-    // Uygulama açıldığında döngü çoktan uzamışsa çelenk yenileniyor: önce
-    // tahmin edilen düzen kapanıyor, sonra bugüne kadar uzayan düzen açılıyor.
+    // Uygulama açıldığında döngü çoktan uzamışsa dizi yenileniyor: önce
+    // tahmin edilen düzen sönüyor, sonra bugüne kadar uzayan düzen yanıyor.
     // Kullanıcı "regl hâlâ sürüyor" bilgisini bir sıçrama olarak değil,
-    // çelengin yeniden kurulması olarak görüyor.
+    // dizinin yeniden kurulması olarak görüyor.
     final target = widget.data;
     final start = target.clampedToExpected();
     if (start != target) {
@@ -76,8 +91,8 @@ class _CycleRingState extends State<CycleRing>
     if (old.data == widget.data) return;
 
     // Önceki yenileme sürüyorsa onu bitmiş sayıp yeniden başlıyoruz. Yarım
-    // kalmış bir çelengin üzerine ikinci bir sıra başlatmak, henüz açılmamış
-    // çiçekleri kapanıyor gösteriyordu.
+    // kalmış bir dizinin üzerine ikinci bir sıra başlatmak, henüz yanmamış
+    // boncukları sönüyor gösteriyordu.
     _from = old.data;
     _controller.forward(from: 0);
   }
@@ -91,47 +106,51 @@ class _CycleRingState extends State<CycleRing>
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
-    final theme = Theme.of(context);
+    final size = widget.size;
+
+    // Merkezdeki içerik boncukların iç çemberine sığmalı. Büyük yazıda
+    // taşmak yerine bütün blok orantılı küçülüyor.
+    final innerWidth = size * 0.72;
+    final innerHeight = size * 0.62;
 
     return Center(
       child: SizedBox(
-        width: 232,
-        height: 232,
+        width: size,
+        height: size,
         child: AnimatedBuilder(
           animation: _controller,
           builder: (context, child) => CustomPaint(
-            size: const Size.square(232),
-            painter: _WreathPainter(
+            size: Size.square(size),
+            painter: _BeadRingPainter(
               from: _from,
               to: widget.data,
               progress: _controller.value,
+              marker: widget.markerIndex,
               track: t.border,
-              core: t.surface,
+              surface: t.surface,
+              glow: [t.flowTint, t.accentTint, t.ovulationTint],
             ),
             child: child,
           ),
           child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 34),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  widget.center,
-                  const SizedBox(height: 6),
-                  Text(
-                    widget.caption ??
-                        context.tr(
-                          'home_ring_cycle_length',
-                          params: {'n': '${widget.data.expected}'},
-                        ),
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      fontSize: 11,
-                      height: 1.35,
-                      color: t.textMuted,
-                    ),
+            child: SizedBox(
+              width: innerWidth,
+              height: innerHeight,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: SizedBox(
+                  width: innerWidth,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      widget.center,
+                      if (widget.caption != null) ...[
+                        const SizedBox(height: 8),
+                        widget.caption!,
+                      ],
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -141,50 +160,130 @@ class _CycleRingState extends State<CycleRing>
   }
 }
 
-class _WreathPainter extends CustomPainter {
-  _WreathPainter({
+/// Halkanın merkezindeki küçük alt satır.
+///
+/// Döngü panosunda süre bir hap içinde ("● 28 günlük döngü"); gebelik ve
+/// lohusalıkta düz, soluk bir satır.
+class RingCaption extends StatelessWidget {
+  const RingCaption(this.text, {super.key}) : pill = false;
+
+  /// Noktalı hap görünümü.
+  const RingCaption.pill(this.text, {super.key}) : pill = true;
+
+  final String text;
+  final bool pill;
+
+  /// "N günlük döngü" tek satırda.
+  ///
+  /// Sözlükteki metin halkanın eski, dar merkezine göre iki satıra
+  /// bölünmüştü ("28 günlük\ndöngü"). Hap tek satır; tireyle bölünmüş
+  /// birleşik sözcük ("28-Tage-\nZyklus") birleşik kalıyor.
+  static String cycleLength(BuildContext context, int days) => context
+      .tr('home_ring_cycle_length', params: {'n': '$days'})
+      .replaceAll('-\n', '-')
+      .replaceAll('\n', ' ');
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    final style = theme.textTheme.labelMedium?.copyWith(
+      fontSize: 11.5,
+      height: 1.3,
+      fontWeight: FontWeight.w500,
+      color: t.textMuted,
+    );
+
+    if (!pill) {
+      return Text(text, textAlign: TextAlign.center, style: style);
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: t.surfaceAlt.withAlpha(200),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: t.border.withAlpha(130)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: t.secondary,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 5),
+          Flexible(
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              style: style,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BeadRingPainter extends CustomPainter {
+  _BeadRingPainter({
     required this.from,
     required this.to,
     required this.progress,
+    required this.marker,
     required this.track,
-    required this.core,
+    required this.surface,
+    required this.glow,
   });
 
   final CycleRingData from;
   final CycleRingData to;
   final double progress;
 
-  /// Çiçeklerin dizildiği ince iz.
+  /// Ayrıca işaretlenen boncuk (bkz. [CycleRing.markerIndex]).
+  final int? marker;
+
+  /// Dizi boşken yörüngenin rengi.
   final Color track;
 
-  /// Papatyaların göbek rengi — kartın yüzeyiyle aynı.
-  final Color core;
+  /// Kartın yüzeyi: içi açık boncukların zemini ve bugünün göbeği.
+  final Color surface;
 
-  // Zaman çizelgesi. Aradeğerleme yerine kapan-aç ayrımı tercih edildi:
-  // döngü uzunluğu değiştiğinde çiçekler yer değiştirirken hangisinin hangisi
-  // olduğu okunmuyordu. Kapanıp yeniden açılmak değişimi açıkça anlatıyor.
+  /// Merkezin arkasındaki yumuşak ışımanın üç tonu.
+  final List<Color> glow;
+
+  // Zaman çizelgesi. Aradeğerleme yerine sön-yan ayrımı tercih edildi:
+  // döngü uzunluğu değiştiğinde boncuklar yer değiştirirken hangisinin
+  // hangisi olduğu okunmuyordu. Sönüp yeniden yanmak değişimi açıkça
+  // anlatıyor.
   //
-  //   0.00 - 0.46   kapanma  (1. günden sona doğru)
-  //   0.46 - 0.54   çelenk boş
-  //   0.54 - 1.00   açılma   (1. günden sona doğru)
+  //   0.00 - 0.46   sönme   (1. günden sona doğru)
+  //   0.46 - 0.54   dizi boş
+  //   0.54 - 1.00   yanma   (1. günden sona doğru)
   static const double _outStagger = 0.30;
   static const double _outSpan = 0.16;
   static const double _inStart = 0.54;
   static const double _inStagger = 0.34;
   static const double _inSpan = 0.12;
 
-  /// Sıradaki çiçeğin gecikmesi. Tek çiçekli halkada bölme yapılmıyor.
+  /// Sıradaki boncuğun gecikmesi. Tek boncuklu halkada bölme yapılmıyor.
   double _offset(int index, int count, double stagger) =>
       count <= 1 ? 0 : (index / (count - 1)) * stagger;
 
-  /// Eski çelenkteki bir çiçeğin ölçeği: 1'den 0'a.
+  /// Eski dizideki bir boncuğun ölçeği: 1'den 0'a.
   double _outScale(int index, int count) {
     final begin = _offset(index, count, _outStagger);
     final local = ((progress - begin) / _outSpan).clamp(0.0, 1.0);
     return 1 - Curves.easeInCubic.transform(local);
   }
 
-  /// Yeni çelenkteki bir çiçeğin ölçeği: 0'dan 1'e.
+  /// Yeni dizideki bir boncuğun ölçeği: 0'dan 1'e.
   double _inScale(int index, int count) {
     final begin = _inStart + _offset(index, count, _inStagger);
     final local = ((progress - begin) / _inSpan).clamp(0.0, 1.0);
@@ -194,148 +293,184 @@ class _WreathPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = math.min(size.width, size.height) / 2 - 18;
+    // Bugünün hâlesi kenara taşmasın.
+    final radius = math.min(size.width, size.height) / 2 - 15;
 
-    // Çiçeklerin dizildiği ince iz. Çelenk boşken alanın ne olduğunu gösteren
-    // tek şey bu, o yüzden her zaman çiziliyor.
-    canvas.drawCircle(
-      center,
-      radius,
-      Paint()
-        ..color = track
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1,
-    );
+    _paintGlow(canvas, center, radius);
+    _paintTrack(canvas, center, radius);
 
-    // Kapanan eski çelenk.
-    _paintWreath(
+    // Sönen eski dizi.
+    _paintBeads(
       canvas,
       center: center,
       radius: radius,
       data: from,
       scaleOf: (i) => _outScale(i, from.length),
-      spinOf: (i) => (1 - _outScale(i, from.length)) * 0.5,
     );
 
-    // Açılan yeni çelenk.
-    _paintWreath(
+    // Yanan yeni dizi.
+    _paintBeads(
       canvas,
       center: center,
       radius: radius,
       data: to,
       scaleOf: (i) => _inScale(i, to.length),
-      // Açılırken yerine dönüyor: çiçek "açılıyor" gibi okunuyor.
-      spinOf: (i) => (1 - _inScale(i, to.length)) * -0.6,
     );
   }
 
-  void _paintWreath(
+  /// Merkezin arkasındaki ışıma: gül → kehribar → menekşe, yumuşak kenarlı.
+  void _paintGlow(Canvas canvas, Offset center, double radius) {
+    final r = radius - 14;
+    if (r <= 0) return;
+    final rect = Rect.fromCircle(center: center, radius: r);
+    canvas.drawCircle(
+      center,
+      r,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            glow[0].withAlpha(150),
+            glow[1].withAlpha(110),
+            glow[2].withAlpha(150),
+          ],
+        ).createShader(rect)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
+    );
+  }
+
+  /// Boncukların dizildiği kesik çizgili yörünge. Her parça altındaki günün
+  /// renginde, çok soluk; dizi boşken alanın ne olduğunu gösteren tek şey.
+  void _paintTrack(Canvas canvas, Offset center, double radius) {
+    const dash = 3.0;
+    const gap = 3.5;
+    final circumference = 2 * math.pi * radius;
+    final count = (circumference / (dash + gap)).floor();
+    if (count <= 0) return;
+    final step = 2 * math.pi / count;
+    final sweep = step * dash / (dash + gap);
+    final rect = Rect.fromCircle(center: center, radius: radius);
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round;
+    final n = to.length;
+
+    for (var k = 0; k < count; k++) {
+      final start = -math.pi / 2 + k * step;
+      if (n > 0) {
+        final i = ((k + 0.5) / count * n).floor().clamp(0, n - 1);
+        paint.color = to.colors[i].withValues(alpha: 0.3);
+      } else {
+        paint.color = track;
+      }
+      canvas.drawArc(rect, start, sweep, false, paint);
+    }
+  }
+
+  void _paintBeads(
     Canvas canvas, {
     required Offset center,
     required double radius,
     required CycleRingData data,
     required double Function(int) scaleOf,
-    required double Function(int) spinOf,
   }) {
-    if (data.length <= 0) return;
+    final n = data.length;
+    if (n <= 0) return;
 
-    // Taban boyut, bugünün büyütülmüş çiçeğine yer kalacak şekilde
-    // hesaplanıyor. İki komşu merkez arası `slot` kadar; bugünün yarıçapı ile
-    // komşusunun yarıçapının toplamı bunun altında kalmalı:
-    //
-    //   base/2 * todayScale + base/2 <= slot * clearance
-    const todayScale = 1.28;
-    const clearance = 0.94;
-    final slot = 2 * math.pi * radius / data.length;
-    final base = math.min(slot * 2 * clearance / (todayScale + 1), 20.0);
+    // Boncuk boyu dilime göre: uzun döngüde (ya da 40 haftada) komşular
+    // birbirine değmesin.
+    final slot = 2 * math.pi * radius / n;
+    final bead = math.min(4.4, slot * 0.3);
+    final today = data.todayIndex;
 
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < n; i++) {
       final scale = scaleOf(i);
       if (scale <= 0.01) continue;
 
-      final isToday = i == data.todayIndex;
-
-      // Saat 12'den başla; çiçek dilimin ortasında dursun.
-      final angle = -math.pi / 2 + (i + 0.5) * (2 * math.pi / data.length);
-
-      // Bugünün çiçeği bir tık dışarıda: açısal aralık sabit olduğundan dışa
-      // çıkmak komşularla arayı açıyor ve çelengin üzerinde kabarmış gibi
-      // görünüyor.
-      final r = isToday ? radius + base * 0.22 : radius;
+      // Saat 12'den başla; boncuk dilimin ortasında dursun.
+      final angle = -math.pi / 2 + (i + 0.5) * (2 * math.pi / n);
       final at = Offset(
-        center.dx + r * math.cos(angle),
-        center.dy + r * math.sin(angle),
+        center.dx + radius * math.cos(angle),
+        center.dy + radius * math.sin(angle),
       );
-
       final color = data.colors[i];
 
-      if (isToday) {
-        // Yumuşak bir hâle: bugünü büyütmeye fazla yüklenmeden ayırıyor.
-        // Çiçekle birlikte büyüyüp küçülüyor.
-        canvas.drawCircle(
-          at,
-          base * 0.95 * scale,
-          Paint()..color = color.withAlpha((38 * scale).round()),
-        );
+      if (i == today) {
+        _paintToday(canvas, at, bead * scale, color);
+        continue;
       }
 
-      _drawDaisy(
-        canvas,
-        at: at,
-        size: base * (isToday ? todayScale : 1) * scale,
-        petal: color,
-        core: core,
-        petals: 8,
-        spin: spinOf(i),
-      );
+      if (i == marker) {
+        _paintMarker(canvas, at, bead * scale, color);
+        continue;
+      }
+
+      if (today == null || i > today) {
+        // Henüz yaşanmadı: içi açık halka. Tahmin edilen regl günleri
+        // veride zaten bir ton açık (`flowSoft`).
+        canvas.drawCircle(
+          at,
+          bead * scale,
+          Paint()..color = Color.alphaBlend(color.withAlpha(40), surface),
+        );
+        canvas.drawCircle(
+          at,
+          math.max(bead * scale - 0.75, 0),
+          Paint()
+            ..color = color
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.5 * scale,
+        );
+      } else {
+        // Geçmiş: dolu; solukluk veride (bkz. `CycleRingData`).
+        canvas.drawCircle(at, bead * scale, Paint()..color = color);
+      }
     }
   }
 
-  /// Tek bir papatya çizer.
-  ///
-  /// Taç yaprakları merkez çevresinde döndürülmüş elipsler. Yaprak sayısı
-  /// tekil çiçeği tanınır kılacak kadar çok, küçük boyutta lekeye dönüşmeyecek
-  /// kadar az.
-  void _drawDaisy(
-    Canvas canvas, {
-    required Offset at,
-    required double size,
-    required Color petal,
-    required Color core,
-    required int petals,
-    required double spin,
-  }) {
-    final paint = Paint()
-      ..color = petal
-      ..isAntiAlias = true;
-    final petalLength = size * 0.52;
-    final petalWidth = size * 0.30;
+  /// Bugün: yumuşak hâle, saydam halka, dolu boncuk, beyaz göbek.
+  void _paintToday(Canvas canvas, Offset at, double bead, Color color) {
+    canvas.drawCircle(
+      at,
+      bead * 3.2,
+      Paint()
+        ..color = color.withAlpha(60)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
+    canvas.drawCircle(at, bead * 2.15, Paint()..color = color.withAlpha(90));
+    canvas.drawCircle(at, bead * 1.42, Paint()..color = color);
+    canvas.drawCircle(at, bead * 0.55, Paint()..color = surface);
+  }
 
-    canvas.save();
-    canvas.translate(at.dx, at.dy);
-    canvas.rotate(spin);
-    for (var i = 0; i < petals; i++) {
-      canvas.save();
-      canvas.rotate(2 * math.pi * i / petals);
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: Offset(0, -petalLength * 0.52),
-          width: petalWidth,
-          height: petalLength,
-        ),
-        paint,
-      );
-      canvas.restore();
-    }
-    canvas.drawCircle(Offset.zero, size * 0.17, Paint()..color = core);
-    canvas.restore();
+  /// İşaretli gün: dışta ince halka, içte küçük dolu boncuk.
+  void _paintMarker(Canvas canvas, Offset at, double bead, Color color) {
+    canvas.drawCircle(
+      at,
+      bead * 1.3,
+      Paint()..color = Color.alphaBlend(color.withAlpha(70), surface),
+    );
+    canvas.drawCircle(
+      at,
+      bead * 1.3,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
+    canvas.drawCircle(at, bead * 0.65, Paint()..color = color);
   }
 
   @override
-  bool shouldRepaint(_WreathPainter old) =>
+  bool shouldRepaint(_BeadRingPainter old) =>
       old.progress != progress ||
       old.from != from ||
       old.to != to ||
+      old.marker != marker ||
       old.track != track ||
-      old.core != core;
+      old.surface != surface ||
+      old.glow[0] != glow[0] ||
+      old.glow[1] != glow[1] ||
+      old.glow[2] != glow[2];
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/navigation/route_names.dart';
+import '../../design_system/app_decor.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/models/life_stage.dart';
 import '../../localization/app_localizations.dart';
@@ -25,21 +26,25 @@ class StageBleedingNote extends StatelessWidget {
 
     return Container(
       key: const Key('stage_bleeding_note'),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.fromLTRB(12, 12, 14, 12),
       decoration: BoxDecoration(
-        color: t.surfaceAlt,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: t.border),
+        color: gebelik ? t.accentTint.withAlpha(150) : t.surfaceAlt,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: gebelik ? t.warning.withAlpha(50) : t.border),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            gebelik ? Icons.health_and_safety_outlined : Icons.info_outline,
-            size: 20,
+          AppIconTile(
+            icon: gebelik
+                ? Icons.health_and_safety_outlined
+                : Icons.info_outline_rounded,
+            size: 32,
+            circle: true,
+            background: t.surface.withAlpha(200),
             color: gebelik ? t.warning : t.textMuted,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,13 +55,18 @@ class StageBleedingNote extends StatelessWidget {
                         ? 'calendar_preg_bleeding_note'
                         : 'calendar_pp_bleeding_note',
                   ),
-                  style: TextStyle(fontSize: 13, height: 1.45, color: t.text),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontSize: 13.5,
+                    height: 1.45,
+                    color: t.text,
+                  ),
                 ),
                 if (gebelik)
                   TextButton(
                     style: TextButton.styleFrom(
+                      foregroundColor: t.secondary,
                       padding: EdgeInsets.zero,
-                      minimumSize: const Size(0, 36),
+                      minimumSize: const Size(0, 44),
                     ),
                     onPressed: () => context.pushNamed(
                       RouteNames.dangerSigns,

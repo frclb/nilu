@@ -1,5 +1,8 @@
-import '../../../design_system/app_tappable.dart';
 import 'package:flutter/material.dart';
+
+import '../../../design_system/app_card.dart';
+import '../../../design_system/app_decor.dart';
+import '../../../design_system/app_tappable.dart';
 import '../../../design_system/app_tokens.dart';
 import 'package:provider/provider.dart';
 import '../../../domain/models/calendar_day.dart';
@@ -71,162 +74,185 @@ class TwoColumnWidgets extends StatelessWidget {
       }
     }
 
+    final t = context.tokens;
+
+    // İki kutu aynı boyda; büyük yazıda içerik uzarsa ikisi birlikte uzuyor
+    // (sabit yükseklik taşma demekti).
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: AppTappable(
-              onTap: () {
-                NavigationService().push(RouteNames.partner);
-              },
-              child: Container(
-                height: 120,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.secondary,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: context.tokens.border),
-                ),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Positioned(
-                      right: -10,
-                      bottom: -10,
-                      child: Icon(
-                        Icons.favorite,
-                        size: 80,
-                        color: theme.colorScheme.primary.withAlpha(12),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: AppTappable(
+                onTap: () {
+                  NavigationService().push(RouteNames.partner);
+                },
+                child: Container(
+                  constraints: const BoxConstraints(minHeight: 142),
+                  decoration: BoxDecoration(
+                    gradient: AppGradients.blush(context),
+                    borderRadius: BorderRadius.circular(_radius),
+                    border: Border.all(color: t.flowTint.withAlpha(170)),
+                    boxShadow: AppShadows.soft(context),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        right: -8,
+                        bottom: -8,
+                        child: ExcludeSemantics(
+                          child: Icon(
+                            Icons.favorite_rounded,
+                            size: 68,
+                            color: t.secondary.withAlpha(24),
+                          ),
+                        ),
                       ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              width: 28,
-                              height: 28,
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.surface,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
+                            Row(
+                              children: [
+                                AppIconTile(
+                                  icon: hasPartner
+                                      ? Icons.favorite_rounded
+                                      : Icons.person_add_alt_1_rounded,
+                                  size: 26,
+                                  background: t.secondaryTint,
+                                  color: t.secondary,
+                                ),
+                                const SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    context.upper(
+                                      context.tr('home_partner_title'),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 1,
+                                      color: t.secondary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              context.tr(
                                 hasPartner
-                                    ? Icons.favorite
-                                    : Icons.person_add_alt_1,
-                                size: 16,
-                                color: theme.colorScheme.primary,
+                                    ? 'home_partner_connected'
+                                    : 'profile_partner_connect',
+                              ),
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w700,
+                                height: 1.25,
+                                color: t.text,
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const Spacer(),
+                            const SizedBox(height: 8),
                             Text(
-                              context.upper(context.tr('home_partner_title')),
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.primary,
-                                letterSpacing: 0.5,
+                              context.tr(
+                                hasPartner
+                                    ? 'home_partner_connected_desc'
+                                    : 'home_partner_connect_desc',
+                              ),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                fontSize: 11.5,
+                                height: 1.4,
+                                color: t.textMuted,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          context.tr(
-                            hasPartner
-                                ? 'home_partner_connected'
-                                : 'profile_partner_connect',
-                          ),
-                          style: theme.textTheme.displayLarge?.copyWith(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          context.tr(
-                            hasPartner
-                                ? 'home_partner_connected_desc'
-                                : 'home_partner_connect_desc',
-                          ),
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            fontSize: 10,
-                            height: 1.3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: AppTappable(
-              onTap: () {
-                NavigationService().push(RouteNames.logEntry);
-              },
-              child: Container(
-                height: 120,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: theme.colorScheme.outline),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          context.upper(context.tr('home_last_log_title')),
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
+            const SizedBox(width: 12),
+            Expanded(
+              child: AppTappable(
+                onTap: () {
+                  NavigationService().push(RouteNames.logEntry);
+                },
+                child: Container(
+                  constraints: const BoxConstraints(minHeight: 142),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: t.surface,
+                    borderRadius: BorderRadius.circular(_radius),
+                    border: Border.all(color: AppCard.borderColor(t)),
+                    boxShadow: AppShadows.soft(context),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              context.upper(context.tr('home_last_log_title')),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1,
+                                color: t.textMuted,
+                              ),
+                            ),
                           ),
-                        ),
-                        Icon(
-                          Icons.edit_note,
+                          const SizedBox(width: 6),
+                          AppIconTile(
+                            icon: Icons.edit_rounded,
+                            size: 26,
+                            background: t.surfaceAlt,
+                            color: t.textMuted,
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      const SizedBox(height: 10),
+                      Text(
+                        lastLogDate,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          fontSize: 19,
+                          height: 1.2,
                           color: theme.colorScheme.primary,
-                          size: 20,
                         ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          lastLogDate,
-                          style: theme.textTheme.displayLarge?.copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        lastLogInfo,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontSize: 11.5,
+                          height: 1.4,
+                          color: t.textMuted,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          lastLogInfo,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
+
+  static const double _radius = 22;
 }

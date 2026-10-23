@@ -1,6 +1,7 @@
 import '../../../design_system/app_tappable.dart';
 import 'package:flutter/material.dart';
 import '../../../design_system/app_card.dart';
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
 import 'package:provider/provider.dart';
 import '../../../domain/view_models/intimacy_view_model.dart';
@@ -26,18 +27,22 @@ class IntimacySection extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              // Kart 1 — Cinsel İstek
-              Expanded(child: _MiniDesireCard(viewModel: viewModel)),
-              const SizedBox(width: 12),
-              // Kart 2 — Sevgi İhtiyacı
-              Expanded(child: _MiniAffectionCard(viewModel: viewModel)),
-            ],
+          // İki kart aynı boyda; büyük yazıda birlikte uzuyorlar.
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Kart 1 — Cinsel İstek
+                Expanded(child: _MiniDesireCard(viewModel: viewModel)),
+                const SizedBox(width: 12),
+                // Kart 2 — Sevgi İhtiyacı
+                Expanded(child: _MiniAffectionCard(viewModel: viewModel)),
+              ],
+            ),
           ),
           const SizedBox(height: 12),
           _ShareControls(viewModel: viewModel),
@@ -227,18 +232,9 @@ class _MiniDesireCard extends StatelessWidget {
     return AppTappable(
       onTap: () => _showDesireSheet(context),
       child: Container(
-        height: 120,
+        constraints: const BoxConstraints(minHeight: 124),
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: hasSelection
-                ? theme.colorScheme.primary.withAlpha(60)
-                : theme.colorScheme.outline,
-          ),
-          boxShadow: AppCard.shadow(),
-        ),
+        decoration: _miniCardDecoration(context, selected: hasSelection),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
@@ -249,7 +245,7 @@ class _MiniDesireCard extends StatelessWidget {
               child: Icon(
                 Icons.favorite_rounded,
                 size: 48,
-                color: theme.colorScheme.primary.withAlpha(12),
+                color: context.tokens.secondary.withAlpha(22),
               ),
             ),
             Column(
@@ -261,13 +257,13 @@ class _MiniDesireCard extends StatelessWidget {
                       width: 26,
                       height: 26,
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withAlpha(20),
-                        shape: BoxShape.circle,
+                        color: context.tokens.secondaryTint,
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         icon,
                         size: 14,
-                        color: theme.colorScheme.primary,
+                        color: context.tokens.secondary,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -275,10 +271,10 @@ class _MiniDesireCard extends StatelessWidget {
                       child: Text(
                         context.tr('intimacy_sexual_desire_title'),
                         style: theme.textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 10.5,
                           letterSpacing: 0.5,
-                          color: theme.colorScheme.primary,
+                          color: context.tokens.secondary,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -286,6 +282,7 @@ class _MiniDesireCard extends StatelessWidget {
                   ],
                 ),
                 const Spacer(),
+                const SizedBox(height: 10),
                 Text(
                   hasSelection
                       ? _getDesireLabel(context, selected)
@@ -360,7 +357,7 @@ class _MiniDesireCard extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
           decoration: BoxDecoration(
             color: context.tokens.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -431,18 +428,9 @@ class _MiniAffectionCard extends StatelessWidget {
     return AppTappable(
       onTap: () => _showAffectionSheet(context),
       child: Container(
-        height: 120,
+        constraints: const BoxConstraints(minHeight: 124),
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: hasSelection
-                ? theme.colorScheme.primary.withAlpha(60)
-                : theme.colorScheme.outline,
-          ),
-          boxShadow: AppCard.shadow(),
-        ),
+        decoration: _miniCardDecoration(context, selected: hasSelection),
         child: Stack(
           clipBehavior: Clip.none,
           children: [
@@ -453,7 +441,7 @@ class _MiniAffectionCard extends StatelessWidget {
               child: Icon(
                 Icons.volunteer_activism_rounded,
                 size: 48,
-                color: theme.colorScheme.primary.withAlpha(12),
+                color: context.tokens.secondary.withAlpha(22),
               ),
             ),
             Column(
@@ -465,13 +453,13 @@ class _MiniAffectionCard extends StatelessWidget {
                       width: 26,
                       height: 26,
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withAlpha(20),
-                        shape: BoxShape.circle,
+                        color: context.tokens.secondaryTint,
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         Icons.volunteer_activism_rounded,
                         size: 14,
-                        color: theme.colorScheme.primary,
+                        color: context.tokens.secondary,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -479,10 +467,10 @@ class _MiniAffectionCard extends StatelessWidget {
                       child: Text(
                         context.tr('intimacy_affection_title'),
                         style: theme.textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 10.5,
                           letterSpacing: 0.5,
-                          color: theme.colorScheme.primary,
+                          color: context.tokens.secondary,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -490,6 +478,7 @@ class _MiniAffectionCard extends StatelessWidget {
                   ],
                 ),
                 const Spacer(),
+                const SizedBox(height: 10),
                 Text(
                   summaryText,
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -608,7 +597,7 @@ class _MiniAffectionCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: context.tokens.surface,
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(24),
+                  top: Radius.circular(32),
                 ),
               ),
               child: Column(
@@ -704,24 +693,9 @@ class _MiniAffectionCard extends StatelessWidget {
                   // Tamam Butonu
                   SizedBox(
                     width: double.infinity,
-                    height: 44,
-                    child: ElevatedButton(
+                    child: FilledButton(
                       onPressed: () => Navigator.pop(ctx),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.colorScheme.primary,
-                        foregroundColor: theme.colorScheme.onPrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        context.tr('ok'),
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
+                      child: Text(context.tr('ok')),
                     ),
                   ),
                 ],
@@ -732,6 +706,23 @@ class _MiniAffectionCard extends StatelessWidget {
       },
     );
   }
+}
+
+/// Mini kartların zemini: beyaz kart; seçim varsa gül tonlu kenar.
+BoxDecoration _miniCardDecoration(
+  BuildContext context, {
+  required bool selected,
+}) {
+  final t = context.tokens;
+  return BoxDecoration(
+    color: t.surface,
+    borderRadius: BorderRadius.circular(22),
+    border: Border.all(
+      color: selected ? t.secondary.withAlpha(90) : AppCard.borderColor(t),
+      width: selected ? 1.5 : 1,
+    ),
+    boxShadow: AppShadows.soft(context),
+  );
 }
 
 // ══════════════════════════════════════════════════════════════

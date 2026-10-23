@@ -1,14 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/navigation/navigation_service.dart';
-import '../../../core/navigation/route_names.dart';
-import '../../../data/repositories/profile_repository.dart';
-import '../../../domain/view_models/user_view_model.dart';
-import '../../../design_system/content_illustration.dart';
-import '../../../localization/app_localizations.dart';
 
+import '../../../data/repositories/profile_repository.dart';
+import '../../../design_system/app_decor.dart';
+import '../../../design_system/app_tokens.dart';
+import '../../../design_system/phase_colors.dart';
+import '../../../domain/models/cycle_info.dart';
+import '../../../domain/view_models/user_view_model.dart';
+import '../../../localization/app_localizations.dart';
+import '../../calendar/view_models/calendar_view_model.dart';
+import '../../widgets/profile_avatar_button.dart';
+
+/// Panoların en üstü: marka çubuğu (logo, "Nilu", profil düğmesi).
+///
+/// Döngü, gebelik ve lohusalık panosu aynı çubuğu kullanıyor; profil
+/// düğmesi eskiden selamlamanın yanındaydı.
+class HomeBrandBar extends StatelessWidget {
+  const HomeBrandBar({super.key});
+
+  @override
+  Widget build(BuildContext context) =>
+      const AppBrandBar(trailing: ProfileAvatarButton());
+}
+
+/// Selamlama ve ad; sağda isteğe bağlı bir hap (ör. döngü evresi).
 class HomeHeader extends StatefulWidget {
-  const HomeHeader({super.key});
+  const HomeHeader({super.key, this.trailing});
+
+  /// Satırın sağındaki öğe. Döngü panosunda evre hapı ([HomePhasePill]).
+  final Widget? trailing;
 
   @override
   State<HomeHeader> createState() => _HomeHeaderState();
@@ -31,57 +51,119 @@ class _HomeHeaderState extends State<HomeHeader> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.tokens;
     final theme = Theme.of(context);
-    final userViewModel = context.watch<UserViewModel>();
-    final isPartner = userViewModel.isPartner;
+    final isPartner = context.watch<UserViewModel>().isPartner;
+
+    final serif = theme.textTheme.headlineLarge?.copyWith(
+      fontSize: 32,
+      height: 1.1,
+      letterSpacing: -0.5,
+      color: theme.colorScheme.primary,
+    );
 
     return Padding(
-      padding: const EdgeInsets.only(left: 24, right: 24, top: 48, bottom: 16),
+      padding: const EdgeInsets.fromLTRB(20, 2, 20, 14),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                isPartner
-                    ? (context.tr('home_greeting_partner'))
-                    : context.tr('home_greeting'),
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 4),
-              // Ad profilden gelir; girilmemişse nötr bir hitap kullanılır.
-              if (!isPartner)
-                Text(
-                  (_name?.isNotEmpty ?? false)
-                      ? _name!
-                      : context.tr('home_greeting_no_name'),
-                  style: theme.textTheme.displayLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                    color: theme.colorScheme.primary, // #551b26 in light
+          Expanded(
+            child: isPartner
+                // Partner modunda ad yok; "Partnerinin Döngüsü" başlığın
+                // kendisi.
+                ? Text(
+                    context.tr('home_greeting_partner'),
+                    style: serif?.copyWith(fontSize: 28),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        context.tr('home_greeting'),
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.2,
+                          color: t.textMuted,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      // Ad profilden gelir; girilmemişse nötr bir hitap.
+                      Text(
+                        (_name?.isNotEmpty ?? false)
+                            ? _name!
+                            : context.tr('home_greeting_no_name'),
+                        style: serif,
+                      ),
+                    ],
                   ),
-                ),
-            ],
           ),
-          // VoiceOver'da "Profil, düğme": baş harf tek başına bir şey
-          // söylemiyor.
-          Semantics(
-            button: true,
-            label: context.tr('nav_profile'),
-            excludeSemantics: true,
-            child: GestureDetector(
-              onTap: () {
-                NavigationService().go(RouteNames.profile);
-              },
-              // Avatar da uzak bir adresten geliyordu — üstelik her
-              // kullanıcıya **aynı** fotoğrafı gösteriyordu. Kullanıcının
-              // kendi adının baş harfi hem doğru hem çevrimdışı çalışıyor.
-              child: InitialAvatar(name: _name),
+          // Hap ekranın en fazla %45'ini alıyor; büyük yazıda ad ezilmesin.
+          if (widget.trailing != null)
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.sizeOf(context).width * 0.45,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 12),
+                child: widget.trailing,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Bugünün döngü evresi: renk noktası ve evrenin adı.
+///
+/// Evre bilinmiyorsa (kayıt yok) ya da hormonal korunmada evreler
+/// ayrılmıyorsa hiçbir şey göstermiyor — orada söylenecek bir evre yok.
+class HomePhasePill extends StatelessWidget {
+  const HomePhasePill({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    final phase = context.select<CalendarViewModel, CyclePhase>(
+      (vm) => vm.cycleInfo.currentPhase,
+    );
+
+    if (phase == CyclePhase.unknown || phase == CyclePhase.suppressed) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: t.surface.withAlpha(190),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: t.flowTint),
+        boxShadow: AppShadows.soft(context),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: phase.color(t),
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              context.tr('phase_title_${phase.name}'),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: t.text,
+              ),
             ),
           ),
         ],

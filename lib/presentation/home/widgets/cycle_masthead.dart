@@ -3,9 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../../core/navigation/navigation_service.dart';
 import '../../../core/navigation/route_names.dart';
-import '../../../design_system/app_card.dart';
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
-import '../../../design_system/phase_colors.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../localization/date_names.dart';
 import '../../calendar/view_models/calendar_view_model.dart';
@@ -15,13 +14,13 @@ import '../../../domain/models/cycle_info.dart';
 import '../../../domain/services/cycle_agenda.dart';
 import 'cycle_ring.dart';
 import 'cycle_ring_data.dart';
+import 'home_hero_card.dart';
 
-/// Ana ekranın üst bloğu.
+/// Ana ekranın üst bloğu: bugünün tarihi, döngü halkası ve sıradakiler.
 ///
-/// Önceki düzen ortada 280 piksellik bir halka, içinde gün sayısı, altında
-/// rozetler taşıyordu — bu kategorideki hemen her uygulamayla aynı görüntü.
-/// Buradaki yerleşim bir almanak sayfası gibi: sola dayalı, büyük serif
-/// rakam, küçük harfli etiketler ve döngünün tamamını gösteren bir şerit.
+/// Halkanın ortasında bir sayı değil cümle duruyor ("9 gün var"): çıplak bir
+/// sayının döngü günü olduğunu bilmek gerekiyordu. Kartın altında yaklaşan
+/// üç olay, her biri halkadaki renginde.
 class CycleMasthead extends StatelessWidget {
   const CycleMasthead({super.key});
 
@@ -47,62 +46,94 @@ class CycleMasthead extends StatelessWidget {
 
     final agenda = CycleAgenda.upcoming(info, now: now);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-      // Kart görünümü paylaşılan bileşenden: yarıçap, kenarlık ve gölge
-      // tek yerde tanımlı olsun ki ekranlar arasında derinlik tutarlı olsun.
-      child: AppSectionedCard(
-        onTap: () => NavigationService().push(RouteNames.calendar),
-        header: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Bugünün tarihi. Ajandadaki satırlar "4 gün", "23 gün" diyor;
-            // bunların neye göre sayıldığı ekranda yazılı olmalı.
-            Text(
-              '${now.day} ${context.monthName(now.month)} '
-              '${now.year} · ${context.weekdayName(now.weekday)}',
-              style: theme.textTheme.labelLarge?.copyWith(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: t.text,
-              ),
-            ),
-            const SizedBox(height: 6),
+    // Başlık zaten "Döngü günü N" diyorsa üstteki hap aynı şeyi
+    // tekrarlamasın.
+    final headlineIsCycleDay =
+        day != null &&
+        phase != CyclePhase.menstruation &&
+        daysLate <= 0 &&
+        daysUntil == null;
 
-            // Cevap şekle kodlanmıyor, cümleyle söyleniyor.
-            //
-            // Halkanın içindeki çıplak bir sayı ("5") bir saniyede
-            // okunmuyor: onun döngü günü olduğunu bilmek gerekiyor.
-            // Merkezde duran şey bir sayı değil, cümle.
+    // Kurulumda gebelik yolunu seçen kullanıcı döngü süresini hiç
+    // söylemedi; varsayılan 28'i "/ 28" diye onunmuş gibi yazmıyoruz.
+    final dayPill = day == null || headlineIsCycleDay
+        ? null
+        : context.tr('calendar_cycle_day', params: {'day': '$day'}) +
+              (takvim.cycleLengthKnown ? ' / ${info.averageCycleLength}' : '');
+
+    // Tahmini yumurtlama günü halkada ayrıca işaretleniyor — yalnızca
+    // doğurganlık izleniyorsa ve o gün gerçekten yumurtlama rengindeyse.
+    final ovulationDay = info.averageCycleLength - 14;
+    final marker =
+        day != null &&
+            ovulationDay >= 1 &&
+            info.phaseForRingDay(ovulationDay) == CyclePhase.ovulation
+        ? ovulationDay - 1
+        : null;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: HomeHeroCard(
+        onTap: () => NavigationService().push(RouteNames.calendar),
+        // Altta "Bu tahmin nasıl hesaplandı?" düğmesinin kendi boşluğu var.
+        padding: EdgeInsets.fromLTRB(
+          20,
+          20,
+          20,
+          daysLate <= 0 && agenda.isNotEmpty ? 12 : 20,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            HeroDateLine(
+              date: now,
+              trailing: dayPill == null
+                  ? null
+                  : AppTag(
+                      label: dayPill,
+                      background: t.accentTint.withAlpha(200),
+                      foreground: t.accent,
+                      border: t.phaseLuteal.withAlpha(60),
+                    ),
+            ),
+            const SizedBox(height: 10),
             CycleRing(
               data: CycleRingData.from(
                 info: info,
                 currentDay: day ?? 0,
                 tokens: t,
               ),
-              // Kurulumda gebelik yolunu seçen kullanıcı döngü süresini hiç
-              // söylemedi; gebelik bitince halka varsayılan 28'i "28 günlük
-              // döngü" diye onunmuş gibi yazıyordu.
+              markerIndex: marker,
               caption: takvim.cycleLengthKnown
-                  ? null
-                  : context.tr('home_ring_cycle_length_unknown'),
+                  ? RingCaption.pill(
+                      RingCaption.cycleLength(context, info.averageCycleLength),
+                    )
+                  : RingCaption(context.tr('home_ring_cycle_length_unknown')),
               center: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    context.upper(
-                      context.tr(_headlineLabelKey(phase, daysLate)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 2,
                     ),
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      fontSize: 11,
-                      letterSpacing: 2.2,
-                      fontWeight: FontWeight.w700,
-                      // Etiket gri değil evre renginde: çelenkteki
-                      // renkle aynı şeyi söylüyor.
-                      color: phase.color(t),
+                    decoration: BoxDecoration(
+                      color: t.secondaryTint.withAlpha(140),
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                    ),
+                    child: Text(
+                      context.upper(
+                        context.tr(_headlineLabelKey(phase, daysLate)),
+                      ),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontSize: 10,
+                        letterSpacing: 2,
+                        fontWeight: FontWeight.w700,
+                        color: t.secondary,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
@@ -117,65 +148,51 @@ class CycleMasthead extends StatelessWidget {
                         afterPregnancy: afterPregnancy,
                       ),
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.displayLarge?.copyWith(
-                        fontSize: 34,
-                        height: 1.1,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.8,
+                      style: theme.textTheme.displaySmall?.copyWith(
+                        fontSize: 36,
+                        height: 1.05,
+                        letterSpacing: -0.6,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
+            // Gecikmede ajanda boş (tahmin zinciri kaçırılmış bir
+            // başlangıca dayanıyor). Yerine bir sebep öne sürmeyen kısa bir
+            // not: kayma sık, gebelik olasılığı varsa test sonucu bugüne
+            // kaydedilebilir.
+            if (daysLate > 0) ...[
+              const SizedBox(height: 14),
+              const HeroDivider(),
+              const SizedBox(height: 14),
+              const _LateNote(),
+            ] else if (agenda.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              const HeroDivider(),
+              const SizedBox(height: 14),
+              AppSectionLabel(context.tr('home_agenda_title')),
+              const SizedBox(height: 10),
+              for (var i = 0; i < agenda.length; i++) ...[
+                if (i > 0) const SizedBox(height: 6),
+                _AgendaRow(
+                  entry: agenda[i],
+                  // Sonraki regl tek gün değil aralık: kesinlik iddia
+                  // etmesin (bkz. `PredictionBasis`).
+                  range:
+                      agenda[i].kind == AgendaKind.periodStart &&
+                          info.basis != null &&
+                          agenda[i].date == info.predictedNextPeriod
+                      ? (info.basis!.earliest, info.basis!.latest)
+                      : null,
+                ),
+              ],
+              const SizedBox(height: 2),
+              const _PredictionHowLink(),
+            ],
           ],
         ),
-        // Gecikmede ajanda boş (tahmin zinciri kaçırılmış bir başlangıca
-        // dayanıyor). Yerine bir sebep öne sürmeyen kısa bir not: kayma sık,
-        // gebelik olasılığı varsa test sonucu bugüne kaydedilebilir.
-        footer: daysLate > 0
-            ? const _LateNote()
-            : agenda.isEmpty
-            ? null
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 14),
-                  Text(
-                    context.upper(context.tr('home_agenda_title')),
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      fontSize: 10,
-                      letterSpacing: 2,
-                      fontWeight: FontWeight.w600,
-                      color: t.textMuted,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  for (var i = 0; i < agenda.length; i++)
-                    _AgendaRow(
-                      entry: agenda[i],
-                      divided: i > 0,
-                      // Sonraki regl tek gün değil aralık: kesinlik iddia
-                      // etmesin (bkz. `PredictionBasis`).
-                      range:
-                          agenda[i].kind == AgendaKind.periodStart &&
-                              info.basis != null &&
-                              agenda[i].date == info.predictedNextPeriod
-                          ? (info.basis!.earliest, info.basis!.latest)
-                          : null,
-                    ),
-                  TextButton(
-                    key: const Key('home_prediction_how'),
-                    onPressed: () =>
-                        NavigationService().push(RouteNames.predictionInfo),
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: const Size(0, 44),
-                    ),
-                    child: Text(context.tr('home_prediction_how')),
-                  ),
-                ],
-              ),
       ),
     );
   }
@@ -242,95 +259,148 @@ String _headline(
 String _formatDate(BuildContext context, DateTime date) =>
     '${date.day} ${context.monthName(date.month)}';
 
-/// Ajandadaki tek satır: tarih, olay, kalan gün.
+/// Ajandadaki tek satır: simge, tarih ve olay, kalan gün.
 class _AgendaRow extends StatelessWidget {
-  const _AgendaRow({required this.entry, required this.divided, this.range});
+  const _AgendaRow({required this.entry, this.range});
 
   final AgendaEntry entry;
 
   /// Tahmin aralığı; verilirse tarih yerine o yazılıyor.
   final (DateTime, DateTime)? range;
 
-  /// İlk satırın üstünde çizgi olmuyor: kartın kendi bölüm ayrımı yeterli.
-  final bool divided;
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final theme = Theme.of(context);
+    final period = entry.kind == AgendaKind.periodStart;
+
+    // Renk satırı halkayla eşliyor: aynı olay ekranda iki yerde aynı
+    // renkte görünsün.
+    final color = period ? t.flow : t.ovulation;
+    final deep = period
+        ? Color.lerp(t.flow, t.flowText, 0.35)!
+        : Color.lerp(t.ovulation, t.ovulationText, 0.6)!;
+    final tint = period ? t.flowTint : t.ovulationTint;
+    final ink = period ? t.flowText : t.ovulationText;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: t.brandTint.withAlpha(150),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: tint.withAlpha(120)),
+      ),
+      child: Row(
+        children: [
+          AppIconTile(
+            icon: switch (entry.kind) {
+              AgendaKind.periodStart => Icons.water_drop_rounded,
+              AgendaKind.fertileStart => Icons.egg_rounded,
+              // Halkada yumurtlama günü de halka içinde nokta.
+              AgendaKind.ovulation => Icons.radio_button_checked_rounded,
+            },
+            size: 32,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [color, deep],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  switch (range) {
+                    (final a, final b) => context.dayRange(a, b),
+                    null => _formatDate(context, entry.date),
+                  },
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontSize: 13.5,
+                    height: 1.25,
+                    color: t.text,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  context.tr(entry.labelKey),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontSize: 12,
+                    height: 1.3,
+                    color: t.textMuted,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Uzun etiket ("Tahmini doğurgan dönem başlıyor") kalan güne
+          // yapışmasın.
+          const SizedBox(width: 8),
+          AppTag(
+            label: context.tr(
+              'agenda_days_away',
+              params: {'n': '${entry.daysAway}'},
+            ),
+            background: tint,
+            foreground: ink,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// "Bu tahmin nasıl hesaplandı?" satırı.
+class _PredictionHowLink extends StatelessWidget {
+  const _PredictionHowLink();
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
     final theme = Theme.of(context);
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 2),
-      child: Container(
-        decoration: BoxDecoration(
-          border: divided ? Border(top: BorderSide(color: t.border)) : null,
+    return SizedBox(
+      width: double.infinity,
+      child: TextButton(
+        key: const Key('home_prediction_how'),
+        onPressed: () => NavigationService().push(RouteNames.predictionInfo),
+        style: TextButton.styleFrom(
+          foregroundColor: t.textMuted,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          minimumSize: const Size(0, 44),
+          alignment: Alignment.centerLeft,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.sm),
+          ),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
-            // Renk noktası satırı halkayla eşliyor: aynı olay ekranda iki
-            // yerde aynı renkte görünsün.
-            Container(
-              width: 8,
-              height: 8,
-              margin: const EdgeInsets.only(right: 12),
-              decoration: BoxDecoration(
-                color: _entryColor(entry.kind, t),
-                shape: BoxShape.circle,
-              ),
+            Icon(
+              Icons.insights_rounded,
+              size: 17,
+              color: theme.colorScheme.primary.withAlpha(190),
             ),
-            // Tam ay adı için yer bırakılıyor: dar sütunda "28 Ağustos"
-            // ikiye bölünüyordu.
-            SizedBox(
-              width: 96,
-              child: Text(
-                switch (range) {
-                  (final a, final b) => context.dayRange(a, b),
-                  null => _formatDate(context, entry.date),
-                },
-                maxLines: range == null ? 1 : 2,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: t.text,
-                ),
-              ),
-            ),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
-                context.tr(entry.labelKey),
+                context.tr('home_prediction_how'),
                 style: theme.textTheme.labelLarge?.copyWith(
-                  fontSize: 14,
-                  color: t.text,
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w500,
+                  color: t.textMuted,
                 ),
               ),
             ),
-            // Uzun etiket ("Tahmini yumurtlama") kalan güne yapışmasın.
-            const SizedBox(width: 8),
-            Text(
-              context.tr(
-                'agenda_days_away',
-                params: {'n': '${entry.daysAway}'},
-              ),
-              style: theme.textTheme.labelLarge?.copyWith(
-                fontSize: 14,
-                color: t.textMuted,
-              ),
-            ),
+            Icon(Icons.chevron_right_rounded, size: 18, color: t.textFaint),
           ],
         ),
       ),
     );
   }
 }
-
-/// Ajanda satırındaki renk noktası — halkadaki evre renkleriyle aynı.
-Color _entryColor(AgendaKind kind, AppTokens t) => switch (kind) {
-  AgendaKind.periodStart => t.flow,
-  AgendaKind.fertileStart => t.ovulation,
-  AgendaKind.ovulation => t.ovulation,
-};
 
 /// Gecikmedeki not ve bugünün kaydını açan düğme.
 class _LateNote extends StatelessWidget {
@@ -339,27 +409,58 @@ class _LateNote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
-    return Column(
+    final theme = Theme.of(context);
+
+    return Container(
       key: const Key('home_late_note'),
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 14),
-        Text(
-          context.tr('home_late_note'),
-          style: TextStyle(fontSize: 14, height: 1.45, color: t.textMuted),
-        ),
-        const SizedBox(height: 4),
-        TextButton(
-          key: const Key('home_late_log_today'),
-          onPressed: () =>
-              showDayDetailSheet(context, DateTime.now().plusDays(0)),
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            minimumSize: const Size(0, 44),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 4),
+      decoration: BoxDecoration(
+        color: t.brandTint.withAlpha(150),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: t.flowTint.withAlpha(120)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 1),
+                child: Icon(
+                  Icons.info_outline_rounded,
+                  size: 18,
+                  color: t.textMuted,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  context.tr('home_late_note'),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 13.5,
+                    height: 1.45,
+                    color: t.text,
+                  ),
+                ),
+              ),
+            ],
           ),
-          child: Text(context.tr('home_late_log_today')),
-        ),
-      ],
+          const SizedBox(height: 2),
+          TextButton.icon(
+            key: const Key('home_late_log_today'),
+            onPressed: () =>
+                showDayDetailSheet(context, DateTime.now().plusDays(0)),
+            icon: const Icon(Icons.edit_note_rounded, size: 18),
+            label: Text(context.tr('home_late_log_today')),
+            style: TextButton.styleFrom(
+              foregroundColor: t.secondary,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              minimumSize: const Size(0, 44),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

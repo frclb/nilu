@@ -11,6 +11,7 @@ import 'package:period_tracker/domain/models/daily_log.dart';
 import 'package:period_tracker/domain/models/period_log.dart';
 import 'package:period_tracker/presentation/calendar/calendar_screen.dart';
 import 'package:period_tracker/presentation/home/home_screen.dart';
+import 'package:period_tracker/presentation/home/widgets/cycle_ring.dart';
 import 'package:period_tracker/presentation/insights/insights_screen.dart';
 import 'package:period_tracker/presentation/partner_match/partner_dashboard_screen.dart';
 import 'package:period_tracker/presentation/profile/profile_settings_screen.dart';
@@ -215,10 +216,7 @@ void main() {
             if (profile.periods.length == 1) {
               expect(
                 find.text(
-                  context.tr(
-                    'home_ring_cycle_length',
-                    params: {'n': '${profile.cycleLength}'},
-                  ),
+                  RingCaption.cycleLength(context, profile.cycleLength),
                 ),
                 findsOneWidget,
                 reason:

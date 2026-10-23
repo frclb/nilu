@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_snack.dart';
 import '../../../design_system/app_theme.dart';
 import '../../../localization/date_names.dart';
@@ -186,41 +187,40 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
           };
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(
-            height: 52,
+            height: 54,
             child: switch (action) {
-              PeriodAction.start => FilledButton.icon(
-                onPressed: _busy
-                    ? null
-                    : () async {
-                        if (!await _confirmEarlyStart(viewModel)) return;
-                        if (!mounted) return;
-                        await _run(viewModel.startPeriodToday);
-                      },
-                icon: const Icon(Icons.water_drop_outlined, size: 20),
-                label: Text(context.tr('home_period_start')),
-                style: FilledButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
+              // Ekranın tek degrade düğmesi: en sık yapılan iş.
+              PeriodAction.start => AppGradientButton(
+                label: context.tr('home_period_start'),
+                icon: Icons.water_drop_rounded,
+                busy: _busy,
+                radius: AppRadius.md,
+                onPressed: () async {
+                  if (!await _confirmEarlyStart(viewModel)) return;
+                  if (!mounted) return;
+                  await _run(viewModel.startPeriodToday);
+                },
               ),
 
               // Bitirme yıkıcı bir eylem değil ama geri alınabilir olduğu belli
-              // olsun diye daha sakin duruyor.
+              // olsun diye daha sakin duruyor: degradesiz, ince kenarlı.
               PeriodAction.end => OutlinedButton.icon(
                 onPressed: _busy ? null : () => _run(viewModel.endPeriodToday),
                 icon: const Icon(Icons.stop_circle_outlined, size: 20),
                 label: Text(context.tr('home_period_end')),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: theme.colorScheme.primary,
-                  side: BorderSide(color: t.border),
+                  backgroundColor: t.surface.withAlpha(200),
+                  side: BorderSide(color: t.flowTint, width: 1.5),
+                  minimumSize: const Size.fromHeight(54),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
                 ),
               ),
@@ -235,11 +235,13 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
           // telefonlarda ikisini de sıkıştırıyordu — Almanca "Meine Periode
           // ist vorbei" tek başına satırın çoğunu alıyor.
           if (undo != null)
-            TextButton.icon(
-              onPressed: _busy ? null : () => _undo(undo),
-              icon: const Icon(Icons.undo, size: 18),
-              label: Text(context.tr('home_period_undo')),
-              style: TextButton.styleFrom(foregroundColor: t.textMuted),
+            Center(
+              child: TextButton.icon(
+                onPressed: _busy ? null : () => _undo(undo),
+                icon: const Icon(Icons.undo_rounded, size: 18),
+                label: Text(context.tr('home_period_undo')),
+                style: TextButton.styleFrom(foregroundColor: t.textMuted),
+              ),
             ),
         ],
       ),
@@ -257,8 +259,8 @@ class _EndedToday extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: t.surfaceAlt,
-        borderRadius: BorderRadius.circular(16),
+        color: t.surface.withAlpha(200),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: t.border),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 18),

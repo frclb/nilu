@@ -12,6 +12,7 @@ import 'package:period_tracker/localization/app_localizations.dart';
 import 'package:period_tracker/presentation/calendar/calendar_screen.dart';
 import 'package:period_tracker/presentation/calendar/widgets/day_detail_bottom_sheet.dart';
 import 'package:period_tracker/presentation/home/widgets/cycle_masthead.dart';
+import 'package:period_tracker/presentation/home/widgets/cycle_ring.dart';
 
 import 'pregnancy_fixtures.dart';
 import 'screen_harness.dart';
@@ -110,8 +111,9 @@ void main() {
       return tester.element(find.byType(CycleMasthead));
     }
 
-    String sure(BuildContext ctx, int n) =>
-        ctx.tr('home_ring_cycle_length', params: {'n': '$n'});
+    // Halkanın hapı süreyi tek satırda yazıyor (bkz.
+    // `RingCaption.cycleLength`).
+    String sure(BuildContext ctx, int n) => RingCaption.cycleLength(ctx, n);
 
     testWidgets('gebelik yolundan gelen: süre söylenmedi, kayıt yok', (
       tester,
