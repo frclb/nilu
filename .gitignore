@@ -33,6 +33,9 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Mağaza görselleri: tool/store_screenshots.py yeniden üretiyor (~110 MB).
+/store_assets/
+
 # Symbolication related
 app.*.symbols
 

@@ -3,7 +3,6 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -19,6 +18,7 @@ import 'package:period_tracker/localization/app_localizations.dart';
 import '../presentation/all_screens.dart';
 import '../presentation/pregnancy_fixtures.dart';
 import '../presentation/screen_harness.dart';
+import 'gallery_fonts.dart';
 
 /// Ekran galerisi: her ekranı PNG olarak çizer — gözle inceleme için.
 ///
@@ -102,26 +102,6 @@ Future<void> _seedFor(String screen) async {
   }
 }
 
-Future<void> _loadMaterialIcons() async {
-  // flutter_tester: <flutter>/bin/cache/artifacts/engine/<platform>/…
-  final artifacts = File(Platform.resolvedExecutable).parent.parent.parent;
-  final candidates = [
-    '${artifacts.path}/material_fonts/MaterialIcons-Regular.otf',
-    if (Platform.environment['FLUTTER_ROOT'] case final root?)
-      '$root/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
-  ];
-  for (final path in candidates) {
-    final file = File(path);
-    if (!file.existsSync()) continue;
-    final loader = FontLoader('MaterialIcons')
-      ..addFont(file.readAsBytes().then(ByteData.sublistView));
-    await loader.load();
-    return;
-  }
-  // ignore: avoid_print
-  print('Uyarı: MaterialIcons bulunamadı; simgeler kutu olarak çizilecek.');
-}
-
 Future<void> _pump(
   WidgetTester tester,
   Widget screen, {
@@ -181,7 +161,7 @@ void main() {
 
   setUpAll(() async {
     mockMissingPlatformChannels();
-    if (_enabled) await _loadMaterialIcons();
+    if (_enabled) await loadMaterialIcons();
   });
 
   const variants = {

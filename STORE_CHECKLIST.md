@@ -100,51 +100,79 @@ python3 tool/generate_launch_image.py
 > olmak zorunda; `test/design_system/launch_screen_test.dart` ikisini
 > karşılaştırıyor.
 
-**Ekran görüntüleri** ✅ — `~/Desktop/RCApp Ekran Goruntuleri/`, dile göre
-ayrılmış: altı dilin her birinde iPhone 6.9" beş, iPad 13" üç kare.
-Toplam 48 görsel, hepsi doğru boyutta ve alfasız.
+**Ekran görüntüleri ve yaratıcı görseller** ✅ — `store_assets/` (git
+dışında), dile göre ayrılmış. İki komutla baştan üretiliyor:
 
 ```bash
-python3 tool/store_screenshots.py phone 1320 2868 tr
-python3 tool/store_screenshots.py pad   2064 2752 tr
+flutter test test/gallery/store_screens_test.dart --dart-define=STORE=true
+python3 tool/store_screenshots.py
 ```
 
-> Ham kareleri dil başına ayrı klasörden okuyor (`shots_<dil>/`). Dili
-> değiştirmek için simülatöre:
-> ```bash
-> xcrun simctl spawn <device> defaults write "Apple Global Domain" \
->   AppleLanguages -array "de"
-> ```
-> ve uygulamayı yeniden başlatın — uygulamanın kendi dil ayarı yok, sistemi
-> izliyor.
->
-> **Tablette ek bir adım var.** iPad durum çubuğu saatin yanında tarihi de
-> gösteriyor ve o tarih SpringBoard'dan geliyor; dil değişince kendiliğinden
-> güncellenmiyor. İlk denemede İngilizce ekranın üstünde "21 Eyl Pzt"
-> yazıyordu. Dili değiştirdikten sonra:
-> ```bash
-> xcrun simctl spawn <device> launchctl stop com.apple.SpringBoard
-> ```
-> ve durum çubuğu geçersiz kılmasını **yeniden** uygulayın; respring onu
-> sıfırlıyor.
+İlki ekranları uygulamanın kendi widget'larıyla, demo veriyle ve altı dilde
+çiziyor (`build/store_raw/`) ve her ekranda büyütülecek öğenin yerini
+ölçüyor; ikincisi görselleri kuruyor. Simülatöre gerek yok; tasarım
+değişince komutlar yeniden koşuluyor.
 
-> Kareler tek bir yatay degradeden kesiliyor: mağazada kaydırırken zemin
-> kesintisiz akıyor. Başlıklar uygulamanın kendi yazı tipleriyle (Fraunces +
-> Inter). Ham kareler simülatörden, durum çubuğu 9:41'e sabitlenerek alındı.
+> **Tasarım:** koyu mürdüm–böğürtlen zemin, ışık lekeleri ve ince gren.
+> Sekiz panel tek bir geniş zeminden kesiliyor; döngü halkasının evre
+> renkli boncukları başlık ile cihaz arasından bütün panellere akıyor,
+> mağazada kaydırınca görseller birbirine bağlanıyor. Her panelde ekranın
+> asıl öğesi (halka, takvim, belirtiler, trend, cevap…) büyütülüp cihazın
+> dışına taşıyor; başlıklarda bir kelime pembe degradeyle vurgulu. Çizim
+> parçaları `tool/store_kit.py`'de, kurgu ve metinler
+> `tool/store_screenshots.py`'de.
+
+| Görsel | Boyut | Dil başına |
+|---|---|---|
+| App Store iPhone 6,9" (Dynamic Island, büyük) | 1320×2868 | 8 |
+| App Store iPhone 6,3" (Dynamic Island, orta — **zorunlu**) | 1206×2622 | 8 |
+| App Store iPad 13" | 2064×2752 | 8 |
+| App Store ürün sayfası başlığı (21:9) | 3840×1646 | 1 |
+| App Store arama sonucu görseli (3:2) | 3840×2560 | 1 |
+| Google Play telefon (9:16) | 1080×1920 | 8 |
+| Google Play 10" tablet (9:16) | 1440×2560 | 8 |
+| Google Play öne çıkan görsel | 1024×500 | 1 |
+| Google Play simgesi | 512×512 | tek |
+
+Hepsi alfasız RGB; başlık ve arama görselleri JPEG (gren dokusuyla PNG
+10 MB'ı geçiyordu), diğerleri PNG. Sıra mağazadaki sıra; ilk üçü (ana sayfa, takvim,
+gizlilik) arama sonuçlarında görünüyor.
+
+> **iPhone'da zorunlu olan "Dynamic Island, orta ekran"** (1206×2622).
+> Apple'ın sayfası büyük ekran için iki ayrı yedek kuralı veriyor ve
+> birbirine işaret ediyor; belirsizlik kalmasın diye iki set de yükleniyor.
+> 6,3" seti 6,9" panellerden küçültülüyor (oranlar aynı). iPhone Duo
+> (katlanabilir) kareleri Nisan 2027'den itibaren iOS 27.1 SDK ile derlenen
+> sürümlerde zorunlu olacak; o zaman `_devices` listesine eklenmeli.
 >
-> Kütüphane ve makale ekranlarında reklam bandı var ve gerçek AdMob
-> kimlikleri bağlanana kadar üstünde "Test mode" yazıyor. Telefonda bant ilk
-> ekranda görünmüyor; **tablette görünüyor**, o yüzden iPad setinde kütüphane
-> karesi yok.
+> **Başlık ve arama sonucu görselleri** (iOS/iPadOS 27, 5 Ekim 2026'dan
+> beri) sürümden bağımsız yüklenebiliyor ama ilk sürüm onaylandıktan sonra.
+> Güvenli alanlar Apple'ın şablonundan: başlıkta x 1097–2743, y 493–1154
+> (iPhone'da görünen orta karenin, gezinme çubuğu ile simge/ad katmanı
+> arasındaki bandı); arama görselinde x 836–3004, y 765–1795. Yazı ve asıl
+> içerik bunların içinde. Görsellerde fiyat, indirim, URL, © ya da başka
+> platform adı yok.
+>
+> **Durum çubuğu** iPhone 17 Pro Max simülatöründen ölçülüp çizildi (9:41,
+> tam sinyal, dolu pil); Apple'ın görseli depoda tutulmuyor. Emojiler
+> macOS'un Apple Color Emoji yazı tipiyle çiziliyor, betik bu yüzden macOS
+> istiyor.
+>
+> Ham ekranlarda reklam bandı yok: test ortamında reklam SDK'sı çalışmıyor.
+> Ücretsiz sürümde bant var; mağaza görselinde göstermek zorunlu değil.
+>
+> **Google Play görselleri hazır ama uygulamanın Android derlemesi yok.**
+> Kareler Android ölçülerinde (Pixel sınıfı telefon, 10" tablet) ve Android
+> durum çubuğuyla çizildi; Play metinleri için bkz.
+> [STORE_LISTING.md](STORE_LISTING.md) "Google Play".
 
 Uygulama hem iPhone hem iPad'i hedefliyor, dolayısıyla App Store Connect
 **her ikisi için de** ekran görüntüsü ister ve inceleme uygulamayı iPad'de de
 açar. Düzen iki tarafta da doğrulandı (bkz. "Ekran uyumu" bölümü).
 
-Ekran görüntülerini [TESTING.md](TESTING.md)'deki simülatör akışıyla
-alabilirsiniz. Her boyut için 3–10 adet istenir; App Store Connect o an hangi
-cihaz boyutunu zorunlu tuttuğunu formda gösterir. iPad görüntülerini yatayda
-almak yan menüyü gösterdiği için daha iyi tanıtır.
+Her boyut için 1–10 kare kabul ediliyor; App Store Connect o an hangi cihaz
+boyutunu zorunlu tuttuğunu formda gösterir. iPad 13" portrede 1032 pt geniş;
+yan menü bu genişlikte zaten açılıyor, kareler onu gösteriyor.
 
 ---
 

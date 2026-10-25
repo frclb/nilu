@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""STORE_LISTING.md içindeki metinleri App Store sınırlarına göre denetler.
+"""STORE_LISTING.md içindeki metinleri App Store ve Google Play sınırlarına
+göre denetler.
 
 Sınırlar App Store Connect'te kaydederken zorlanıyor: uzun bir alan
 yapıştırıldığında sessizce kırpılmıyor, kaydetme reddediliyor. Altı dilde
@@ -19,6 +20,10 @@ LIMITS = {
     "promo": 170,
     "keywords": 100,
     "description": 4000,
+    # Google Play
+    "play_title": 30,
+    "play_short": 80,
+    "play_full": 4000,
 }
 
 # Alan adları dile göre değişiyor; başlıktaki etiketi türe eşliyoruz.
@@ -46,9 +51,14 @@ LABELS = {
         "descripción",
         "descrição",
     },
+    # Play alanlarının etiketi her dilde Türkçe: başlık zaten dili söylüyor.
+    "play_title": {"google play başlık"},
+    "play_short": {"google play kısa açıklama"},
+    "play_full": {"google play tam açıklama"},
 }
 
-# Denetlenmesi beklenen diller. Biri eksik kalırsa betik düşüyor.
+# Denetlenmesi beklenen diller (her biri App Store ve Google Play için).
+# Biri eksik kalırsa betik düşüyor.
 LANGUAGES = ("Türkçe", "English", "Deutsch", "Español", "Français", "Português")
 
 FIELD_OF_LABEL = {
