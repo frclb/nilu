@@ -114,19 +114,19 @@ python3 tool/store_screenshots.py
 değişince komutlar yeniden koşuluyor.
 
 > **Tasarım:** koyu mürdüm–böğürtlen zemin, ışık lekeleri ve ince gren.
-> Sekiz panel tek bir geniş zeminden kesiliyor; döngü halkasının evre
-> renkli boncukları başlık ile cihaz arasından bütün panellere akıyor,
-> mağazada kaydırınca görseller birbirine bağlanıyor. Her panelde ekranın
+> Sekiz panel tek bir geniş zeminden kesiliyor; paneller arasında iki ipek
+> şerit akıyor: her panel sınırında çaprazlanıyorlar, her panelde biri
+> cihazın arkasından yukarı kıvrılıyor, öteki cihazın altından önüne
+> geçiyor (önden arkaya geçiş sınırda, görünmeyen yerde). Döngü halkasının
+> evre renkli boncukları şeridin üstünde; mağazada kaydırınca görseller
+> birbirine bağlanıyor. Başlık, arama sonucu ve öne çıkan görselde şerit
+> cihazların arkasından, yazının altından geçiyor. Her panelde ekranın
 > asıl öğesi (halka, takvim, belirtiler, trend, cevap…) büyütülüp cihazın
 > dışına taşıyor; başlıklarda bir kelime pembe degradeyle vurgulu. Çizim
 > parçaları `tool/store_kit.py`'de, kurgu ve metinler
 > `tool/store_screenshots.py`'de.
 >
-> **Google Play'de** paneller arasında iki ipek şerit akıyor: her panel
-> sınırında çaprazlanıyorlar, her panelde biri cihazın arkasından yukarı
-> kıvrılıyor, öteki cihazın altından önüne geçiyor (önden arkaya geçiş
-> sınırda, görünmeyen yerde). Boncuklar şeridin üstünde. Öne çıkan görsel
-> aynı şeridi kullanıyor. Sekiz panelin ikisi Android'e özgü: ana ekran
+> **Google Play'de** sekiz panelin ikisi Android'e özgü: ana ekran
 > widget'ı (widget önizleme ekranından kesilen kartlarla kurulan bir ana
 > ekran) ve Health Connect; asistan ve kütüphane yalnızca App Store'da.
 
