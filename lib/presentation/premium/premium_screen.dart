@@ -152,7 +152,11 @@ class _ActiveState extends StatelessWidget {
   /// ediliyor.
   Future<void> _openManageSubscriptions(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
-    final hint = context.tr(AppPlatform.storeKey('premium_manage_hint'));
+    final hint = context.tr(
+      AppPlatform.isAndroid
+          ? 'premium_manage_hint_android'
+          : 'premium_manage_hint',
+    );
     if (AppPlatform.isAndroid) {
       try {
         final opened = await launchUrl(
@@ -237,7 +241,11 @@ class _OfferStateState extends State<_OfferState> {
 
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  context.tr(AppPlatform.storeKey('premium_disclaimer')),
+                  context.tr(
+                    AppPlatform.isAndroid
+                        ? 'premium_disclaimer_android'
+                        : 'premium_disclaimer',
+                  ),
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: t.textMuted,

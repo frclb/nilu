@@ -25,10 +25,6 @@ abstract final class AppPlatform {
   /// Ana ekran widget'ı. Yalnızca iOS'ta (WidgetKit) yazıldı.
   static bool get homeWidget => !isAndroid;
 
-  /// Mağazaya göre metin anahtarı: ödeme ve abonelik yönetimi App Store'da
-  /// ya da Google Play'de. Android karşılığı `<anahtar>_android`.
-  static String storeKey(String key) => isAndroid ? '${key}_android' : key;
-
   /// Play'in abonelikler sayfası; bu uygulamanınkini açıyor.
   static const String playSubscriptionsUrl =
       'https://play.google.com/store/account/subscriptions'

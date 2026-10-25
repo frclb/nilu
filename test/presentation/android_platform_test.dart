@@ -45,14 +45,4 @@ void main() {
     // Profilin geri kalanı yerinde.
     expect(find.text(ctx.tr('profile_notifications')), findsOneWidget);
   });
-
-  test('mağaza metni platforma göre', () {
-    AppPlatform.debugAndroid = true;
-    expect(
-      AppPlatform.storeKey('premium_disclaimer'),
-      'premium_disclaimer_android',
-    );
-    AppPlatform.debugAndroid = false;
-    expect(AppPlatform.storeKey('premium_disclaimer'), 'premium_disclaimer');
-  });
 }
