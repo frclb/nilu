@@ -18,6 +18,9 @@ extension RelativeTimeFormatting on BuildContext {
     if (duration.inHours < 24) {
       return tr('time_hours_ago', params: {'n': '${duration.inHours}'});
     }
-    return tr('time_days_ago', params: {'n': '${duration.inDays}'});
+    return tr(
+      duration.inDays == 1 ? 'time_days_ago_one' : 'time_days_ago',
+      params: {'n': '${duration.inDays}'},
+    );
   }
 }

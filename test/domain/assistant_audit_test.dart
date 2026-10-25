@@ -71,7 +71,8 @@ void main() {
           isNot('assistant_next_period_today'),
           reason: '$late gün gecikmişken "bugün başlıyor" deniyor',
         );
-        expect(answer.key, 'assistant_late');
+        // 1 gün için tekil anahtar ("1 day late", "1 days late" değil).
+        expect(answer.key, late == 1 ? 'assistant_late_one' : 'assistant_late');
         expect(answer.params['days'], '$late');
       });
     }

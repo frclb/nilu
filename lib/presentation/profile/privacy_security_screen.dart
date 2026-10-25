@@ -481,7 +481,9 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
             report.totalAdded == 0
                 ? message('privacy_import_nothing_new')
                 : message(
-                    'privacy_import_done',
+                    report.totalAdded == 1
+                        ? 'privacy_import_done_one'
+                        : 'privacy_import_done',
                     params: {'n': '${report.totalAdded}'},
                   ),
           ),

@@ -232,9 +232,12 @@ String _headline(
     // "3. gün" deyince kullanıcı hâlâ regl gününde olduğunu okuyor ve
     // hemen altındaki "Reglin bugün bitti" ile çelişiyordu.
     if (finishedToday) {
+      final n = periodLength ?? day;
       return context.tr(
-        'home_headline_period_finished',
-        params: {'n': '${periodLength ?? day}'},
+        n == 1
+            ? 'home_headline_period_finished_one'
+            : 'home_headline_period_finished',
+        params: {'n': '$n'},
       );
     }
     return context.tr('home_headline_period_day', params: {'n': '$day'});
@@ -242,13 +245,19 @@ String _headline(
   // Gecikme kendi cümlesini hak ediyor. `daysUntil` sıfırın altına inmediği
   // için gecikmenin her gününde "bugün başlıyor" yazıyordu.
   if (daysLate > 0) {
-    return context.tr('home_headline_late', params: {'n': '$daysLate'});
+    return context.tr(
+      daysLate == 1 ? 'home_headline_late_one' : 'home_headline_late',
+      params: {'n': '$daysLate'},
+    );
   }
   if (daysUntil == null) {
     return context.tr('home_headline_cycle_day', params: {'n': '$day'});
   }
   if (daysUntil == 0) return context.tr('home_headline_period_today');
-  return context.tr('home_headline_days_left', params: {'n': '$daysUntil'});
+  return context.tr(
+    daysUntil == 1 ? 'home_headline_days_left_one' : 'home_headline_days_left',
+    params: {'n': '$daysUntil'},
+  );
 }
 
 /// Ajanda satırındaki kısa tarih.
@@ -341,7 +350,7 @@ class _AgendaRow extends StatelessWidget {
           const SizedBox(width: 8),
           AppTag(
             label: context.tr(
-              'agenda_days_away',
+              entry.daysAway == 1 ? 'agenda_days_away_one' : 'agenda_days_away',
               params: {'n': '${entry.daysAway}'},
             ),
             background: tint,

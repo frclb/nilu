@@ -86,7 +86,9 @@ class SymptomAnalysisCard extends StatelessWidget {
                       frequencies.isEmpty
                           ? context.tr('insights_symptoms_subtitle')
                           : context.tr(
-                              'insights_symptoms_basis',
+                              loggedDays == 1
+                                  ? 'insights_symptoms_basis_one'
+                                  : 'insights_symptoms_basis',
                               params: {'days': '$loggedDays'},
                             ),
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -265,7 +267,7 @@ class _SymptomBar extends StatelessWidget {
     // yanıltıcı, "%100 · 1 gün" değil. Yüzde kısmı vurgulu, gün sayısı
     // sönük; ayraç yoksa (başka bir dilde) metin tek parça kalıyor.
     final count = context.tr(
-      'insights_symptoms_count',
+      dayCount == 1 ? 'insights_symptoms_count_one' : 'insights_symptoms_count',
       params: {'percent': '$percentage', 'days': '$dayCount'},
     );
     final split = count.indexOf('·');
@@ -282,7 +284,9 @@ class _SymptomBar extends StatelessWidget {
 
     return Semantics(
       label: context.tr(
-        'insights_symptoms_semantics',
+        dayCount == 1
+            ? 'insights_symptoms_semantics_one'
+            : 'insights_symptoms_semantics',
         params: {
           'symptom': label,
           'percent': '$percentage',

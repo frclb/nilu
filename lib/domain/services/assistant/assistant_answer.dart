@@ -33,6 +33,9 @@ class AssistantAnswer {
 ///
 /// Veri yetmiyorsa **tahmin üretilmez**; sağlık uygulamasında "makul görünen"
 /// bir cevap, cevapsızlıktan kötüdür.
+///
+/// Sayı 1 olduğunda `_one` anahtarı seçilir: Türkçede tekil/çoğul ayrımı yok
+/// ama diğer beş dilde var; tek anahtarla İngilizce "in 1 days" yazıyordu.
 class AssistantAnswerBuilder {
   const AssistantAnswerBuilder._();
 
@@ -86,13 +89,17 @@ class AssistantAnswerBuilder {
     // taşınmamıştı.
     if (days < 0) {
       return AssistantAnswer(
-        'assistant_late',
+        days == -1 ? 'assistant_late_one' : 'assistant_late',
         params: {'days': '${-days}', 'date': _format(next)},
       );
     }
 
     return AssistantAnswer(
-      days == 0 ? 'assistant_next_period_today' : 'assistant_next_period',
+      switch (days) {
+        0 => 'assistant_next_period_today',
+        1 => 'assistant_next_period_one',
+        _ => 'assistant_next_period',
+      },
       params: {'days': '$days', 'date': _format(next)},
     );
   }
@@ -147,7 +154,9 @@ class AssistantAnswerBuilder {
       );
     }
     return AssistantAnswer(
-      'assistant_cycle_length',
+      cycles.length == 1
+          ? 'assistant_cycle_length_one'
+          : 'assistant_cycle_length',
       params: {
         'days': '$average',
         'count': '${cycles.length}',
@@ -161,9 +170,10 @@ class AssistantAnswerBuilder {
     if (completed.isEmpty) {
       return const AssistantAnswer('assistant_no_data', needsData: true);
     }
+    final days = info.averagePeriodLength;
     return AssistantAnswer(
-      'assistant_period_length',
-      params: {'days': '${info.averagePeriodLength}'},
+      days == 1 ? 'assistant_period_length_one' : 'assistant_period_length',
+      params: {'days': '$days'},
     );
   }
 
@@ -183,6 +193,8 @@ class AssistantAnswerBuilder {
 
     return AssistantAnswer(
       switch (regularity) {
+        CycleRegularity.steady when spread == 1 =>
+          'assistant_regular_steady_one',
         CycleRegularity.steady => 'assistant_regular_steady',
         CycleRegularity.typical => 'assistant_regular_typical',
         CycleRegularity.irregular => 'assistant_regular_irregular',
@@ -219,7 +231,9 @@ class AssistantAnswerBuilder {
         );
       }
       return AssistantAnswer(
-        'assistant_symptom_count_only',
+        count == 1
+            ? 'assistant_symptom_count_only_one'
+            : 'assistant_symptom_count_only',
         params: {'symptom': code, 'count': '$count'},
       );
     }

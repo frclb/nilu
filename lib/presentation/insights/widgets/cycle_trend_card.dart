@@ -67,7 +67,9 @@ class CycleTrendCard extends StatelessWidget {
                             points.isEmpty
                                 ? context.tr('insights_trend_no_data_subtitle')
                                 : context.tr(
-                                    'insights_trend_cycles',
+                                    points.length == 1
+                                        ? 'insights_trend_cycles_one'
+                                        : 'insights_trend_cycles',
                                     params: {'count': '${points.length}'},
                                   ),
                             style: theme.textTheme.labelMedium?.copyWith(
@@ -132,10 +134,17 @@ class CycleTrendCard extends StatelessWidget {
   ///
   /// Tek döngü varken yorum yapılmaz: iki ölçüm olmadan "düzenli" ya da
   /// "değişken" demek veriye dayanmaz.
+  ///
+  /// 1 gün için ayrı anahtar: Türkçede tekil/çoğul ayrımı yok ama diğer beş
+  /// dilde var; tek anahtarla İngilizce "only 1 days" yazıyordu.
   String? _insightText(BuildContext context, int? variation) {
     if (variation == null) return null;
     return context.tr(
-      variation <= 3 ? 'insights_trend_steady' : 'insights_trend_variable',
+      switch (variation) {
+        1 => 'insights_trend_steady_one',
+        <= 3 => 'insights_trend_steady',
+        _ => 'insights_trend_variable',
+      },
       params: {'days': '$variation'},
     );
   }
@@ -283,7 +292,9 @@ class _UnlockHistoryNote extends StatelessWidget {
               Expanded(
                 child: Text(
                   context.tr(
-                    'insights_history_locked',
+                    hidden == 1
+                        ? 'insights_history_locked_one'
+                        : 'insights_history_locked',
                     params: {'count': '$hidden'},
                   ),
                   style: Theme.of(

@@ -156,7 +156,7 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
     setState(() {
       _busy = false;
       _result = context.tr(
-        'health_import_done',
+        fresh.length == 1 ? 'health_import_done_one' : 'health_import_done',
         params: {'count': '${fresh.length}'},
       );
     });

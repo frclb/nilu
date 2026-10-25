@@ -69,10 +69,15 @@ class DataExportService {
         });
       }
       if (clinical.averagePeriodDays != null) {
-        line('export_clinical_period', {
-          'avg': '${clinical.averagePeriodDays}',
-          'max': '${clinical.longestPeriodDays}',
-        });
+        line(
+          clinical.longestPeriodDays == 1
+              ? 'export_clinical_period_one'
+              : 'export_clinical_period',
+          {
+            'avg': '${clinical.averagePeriodDays}',
+            'max': '${clinical.longestPeriodDays}',
+          },
+        );
       }
       if (clinical.heavyFlowDays > 0) {
         line('export_clinical_heavy', {'n': '${clinical.heavyFlowDays}'});
@@ -149,7 +154,10 @@ class DataExportService {
       }
       if (variation != null) {
         cycleLines.add(
-          translate('export_variation', params: {'days': '$variation'}),
+          translate(
+            variation == 1 ? 'export_variation_one' : 'export_variation',
+            params: {'days': '$variation'},
+          ),
         );
       }
       for (final cycle in cycles) {

@@ -155,7 +155,9 @@ class _ShareControls extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               context.tr(
-                'intimacy_remaining_shares',
+                viewModel.remainingShares == 1
+                    ? 'intimacy_remaining_shares_one'
+                    : 'intimacy_remaining_shares',
                 params: {'count': '${viewModel.remainingShares}'},
               ),
               textAlign: TextAlign.center,
@@ -501,7 +503,9 @@ class _MiniAffectionCard extends StatelessWidget {
                     Text(
                       hasSelection
                           ? context.tr(
-                              'intimacy_selected_count',
+                              needs.length == 1
+                                  ? 'intimacy_selected_count_one'
+                                  : 'intimacy_selected_count',
                               params: {'n': '${needs.length}'},
                             )
                           : context.tr('intimacy_change'),

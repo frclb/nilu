@@ -40,7 +40,9 @@ class PredictionInfoScreen extends StatelessWidget {
         case PredictionSource.history:
           hesap.add(
             context.tr(
-              'prediction_info_history_avg',
+              basis.cyclesAveraged == 1
+                  ? 'prediction_info_history_avg_one'
+                  : 'prediction_info_history_avg',
               params: {
                 'k': '${basis.cyclesAveraged}',
                 'n': '${basis.cycleLength}',
@@ -61,7 +63,9 @@ class PredictionInfoScreen extends StatelessWidget {
           } else {
             hesap.add(
               context.tr(
-                'prediction_info_few',
+                basis.cyclesConsidered == 1
+                    ? 'prediction_info_few_one'
+                    : 'prediction_info_few',
                 params: {
                   'm': '${basis.cyclesConsidered}',
                   'p': '${PredictionBasis.fewCyclesMargin}',
