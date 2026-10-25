@@ -286,13 +286,15 @@ class _DayDetailBottomSheetState extends State<DayDetailBottomSheet> {
                         spacing: 8,
                         children: [
                           Text(
-                            context.tr(
-                              'log_date_other',
-                              params: {
-                                'day': '${d.day}',
-                                'month': context.monthName(d.month),
-                                'year': '${d.year}',
-                              },
+                            context.capitalized(
+                              context.tr(
+                                'log_date_other',
+                                params: {
+                                  'day': '${d.day}',
+                                  'month': context.monthName(d.month),
+                                  'year': '${d.year}',
+                                },
+                              ),
                             ),
                             style: theme.textTheme.headlineSmall?.copyWith(
                               fontSize: 26,

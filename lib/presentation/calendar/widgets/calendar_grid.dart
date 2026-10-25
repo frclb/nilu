@@ -147,7 +147,6 @@ class CalendarGrid extends StatelessWidget {
       context.tr('calendar_day_sun'),
     ];
 
-    final currentMonthName = context.monthName(month);
     final t = context.tokens;
     final primary = theme.colorScheme.primary;
 
@@ -206,13 +205,7 @@ class CalendarGrid extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 2),
                             child: Text(
-                              context.tr(
-                                'calendar_month_year',
-                                params: {
-                                  'month': currentMonthName,
-                                  'year': year.toString(),
-                                },
-                              ),
+                              context.monthYear(currentMonth),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.headlineSmall?.copyWith(

@@ -112,7 +112,9 @@ class CycleTrendChart extends StatelessWidget {
               for (var i = 0; i < points.length; i++)
                 Expanded(
                   child: Text(
-                    context.shortMonthName(points[i].startDate.month),
+                    context.capitalized(
+                      context.shortMonthName(points[i].startDate.month),
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,

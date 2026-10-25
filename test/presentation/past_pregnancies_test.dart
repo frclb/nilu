@@ -72,7 +72,7 @@ void main() {
 
   String aralik(BuildContext ctx, Pregnancy g) {
     String ay(DateTime d) => '${ctx.monthName(d.month)} ${d.year}';
-    return '${ay(g.gestationStart)} – ${ay(g.endedAt!)}';
+    return ctx.capitalized('${ay(g.gestationStart)} – ${ay(g.endedAt!)}');
   }
 
   group('liste', () {

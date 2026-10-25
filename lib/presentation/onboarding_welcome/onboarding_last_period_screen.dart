@@ -160,7 +160,7 @@ class _OnboardingLastPeriodScreenState
               children: [
                 Expanded(
                   child: Text(
-                    _getFormattedMonth(context, _currentMonth),
+                    context.monthYear(_currentMonth),
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
@@ -249,7 +249,7 @@ class _OnboardingLastPeriodScreenState
       gridItems.add(
         AppTappable(
           selected: isSelected,
-          label: '$i ${_getFormattedMonth(context, date)}',
+          label: '$i ${context.monthName(date.month)} ${date.year}',
           excludeChildSemantics: true,
           onTap: () {
             setState(() {
@@ -298,9 +298,5 @@ class _OnboardingLastPeriodScreenState
       crossAxisSpacing: 0,
       children: gridItems,
     );
-  }
-
-  String _getFormattedMonth(BuildContext context, DateTime date) {
-    return '${context.monthName(date.month)} ${date.year}';
   }
 }

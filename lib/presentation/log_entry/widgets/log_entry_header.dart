@@ -33,14 +33,16 @@ class LogEntryHeader extends StatelessWidget {
 
     final dateText = Text(
       // Gün ve ay ayrı parametre: İngilizce ayı öne alıyor, İspanyolca
-      // ve Portekizce araya "de" koyuyor.
-      context.tr(
-        today ? 'log_date_today' : 'log_date_other',
-        params: {
-          'day': '${day.day}',
-          'month': context.monthName(day.month),
-          'year': '${day.year}',
-        },
+      // ve Portekizce araya "de" koyuyor. Ay öne gelirse ilk harf büyük.
+      context.capitalized(
+        context.tr(
+          today ? 'log_date_today' : 'log_date_other',
+          params: {
+            'day': '${day.day}',
+            'month': context.monthName(day.month),
+            'year': '${day.year}',
+          },
+        ),
       ),
       style: theme.textTheme.headlineSmall?.copyWith(
         fontSize: 28,

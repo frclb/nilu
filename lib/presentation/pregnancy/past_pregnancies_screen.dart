@@ -106,10 +106,13 @@ class _Kart extends StatelessWidget {
   final Pregnancy gebelik;
 
   /// "Ağustos 2025 – Mart 2026": bir gebelik iki takvim yılına yayılıyor,
-  /// ay ve yıl ikisini birbirinden ayırmaya yetiyor.
+  /// ay ve yıl ikisini birbirinden ayırmaya yetiyor. Yalnızca baştaki ay
+  /// büyüyor: "Août 2025 – mars 2026".
   String _aralik(BuildContext context) {
     String ay(DateTime d) => '${context.monthName(d.month)} ${d.year}';
-    return '${ay(gebelik.gestationStart)} – ${ay(gebelik.endedAt!)}';
+    return context.capitalized(
+      '${ay(gebelik.gestationStart)} – ${ay(gebelik.endedAt!)}',
+    );
   }
 
   @override

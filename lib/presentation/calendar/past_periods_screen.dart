@@ -292,7 +292,7 @@ class _Ay extends StatelessWidget {
             child: Semantics(
               header: true,
               child: Text(
-                '${context.monthName(ay.month)} ${ay.year}',
+                context.monthYear(ay),
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontSize: 21,
                   fontWeight: FontWeight.w600,
