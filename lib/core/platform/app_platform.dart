@@ -4,9 +4,9 @@ import 'package:flutter/foundation.dart';
 
 /// Platforma göre değişen özellikler — tek yerde.
 ///
-/// Uygulama önce yalnızca iOS için yazıldı; Android'de henüz olmayan ya da
-/// farklı olan şeyler ekranlara dağılmış `Platform.isIOS` kontrolleri yerine
-/// burada.
+/// Uygulama önce yalnızca iOS için yazıldı; Android'de farklı olan şeyler
+/// (mağaza, Apple Sağlık yerine Health Connect) ekranlara dağılmış
+/// `Platform.isIOS` kontrolleri yerine buradan soruluyor.
 ///
 /// Karar `defaultTargetPlatform`'dan değil gerçek işletim sisteminden: o
 /// değer `flutter_test`'te varsayılan olarak Android ve mevcut testler iOS
@@ -17,13 +17,6 @@ abstract final class AppPlatform {
   static bool? debugAndroid;
 
   static bool get isAndroid => debugAndroid ?? (!kIsWeb && Platform.isAndroid);
-
-  /// Apple Sağlık eşitlemesi. Android'de Health Connect henüz bağlanmadı:
-  /// izin beyanı ve Play'in sağlık verisi formu ayrı bir iş.
-  static bool get healthSync => !isAndroid;
-
-  /// Ana ekran widget'ı. Yalnızca iOS'ta (WidgetKit) yazıldı.
-  static bool get homeWidget => !isAndroid;
 
   /// Play'in abonelikler sayfası; bu uygulamanınkini açıyor.
   static const String playSubscriptionsUrl =

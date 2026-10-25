@@ -33,6 +33,12 @@ class _SahteSaglik extends HealthDatasource {
   Future<bool> isAvailable() async => true;
 
   @override
+  Future<bool> requestHistoryAccess() async => true;
+
+  @override
+  Future<bool> canInstall() async => false;
+
+  @override
   Future<HealthAccess> requestPermissions({bool includeWrite = false}) async {
     yazmaIstendi = includeWrite;
     return erisim;

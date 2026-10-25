@@ -27,7 +27,9 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.furkan.rcperiodtracker"
-    compileSdk = flutter.compileSdkVersion
+    // flutter_secure_storage 11 Android 37 SDK'sıyla derleniyor; uygulama da
+    // en az onunla derlenmeli (geriye uyumlu). Hedef sürüm aşağıda, 36.
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

@@ -626,7 +626,9 @@ GÜNLÜK HAYATINDA
 • Verine sor — "Reglime kaç gün kaldı?" gibi sorulara kendi kayıtlarından hesaplanan cevaplar. Sohbet robotu değil; soruların telefonundan çıkmaz
 • Kütüphane — hormonlar, beslenme, PMS ve ruh hâli üzerine kaynak gösterilen yazılar
 • Hareket — dönemine göre hafif yoga ve esneme akışları
+• Health Connect — regl kayıtlarını içeri al; istersen işaretlediğin günleri geri yaz
 • Hatırlatıcılar — kaç gün önce ve hangi saatte, sen seç; bildirimler telefonunda hazırlanır, içerikleri hiçbir yere gitmez
+• Ana ekran widget'ı — döngü günün, gebelik haftan ya da lohusalık günün bir bakışta
 
 GEBELİKTE VE DOĞUMDAN SONRA
 
@@ -699,7 +701,9 @@ WHAT IT DOES
 • Ask your data — answers to questions like “How many days until my period?”, calculated from your own entries. Not a chatbot; your questions never leave your phone
 • Health library — sourced articles on hormones, nutrition, PMS and mood
 • Movement — gentle yoga and stretching flows matched to your phase
+• Health Connect — import your period records and, if you want, write the days you mark back
 • Reminders — you choose how many days ahead and what time; notifications are built on your device and their contents go nowhere
+• Home screen widget — your cycle day, pregnancy week or postnatal day at a glance
 
 PREGNANCY AND AFTER BIRTH
 
@@ -768,7 +772,9 @@ WAS DIE APP KANN
 • Frag deine Daten — Antworten auf Fragen wie „Wie viele Tage bis zu meiner Periode?“, berechnet aus deinen eigenen Einträgen. Kein Chatbot; deine Fragen verlassen dein Handy nicht
 • Gesundheitsbibliothek — belegte Artikel zu Hormonen, Ernährung, PMS und Stimmung
 • Bewegung — sanfte Yoga- und Dehnabläufe passend zur Zyklusphase
+• Health Connect — Periodendaten importieren und, wenn du willst, eingetragene Tage zurückschreiben
 • Erinnerungen — du wählst, wie viele Tage vorher und um wie viel Uhr; Mitteilungen entstehen auf deinem Gerät, ihre Inhalte gehen nirgendwohin
+• Widget für den Startbildschirm — Zyklustag, Schwangerschaftswoche oder Tag im Wochenbett auf einen Blick
 
 SCHWANGERSCHAFT UND NACH DER GEBURT
 
@@ -837,7 +843,9 @@ QUÉ HACE
 • Pregunta a tus datos — respuestas a preguntas como «¿Cuántos días faltan para mi regla?», calculadas a partir de tus propios registros. No es un chatbot; tus preguntas no salen de tu móvil
 • Biblioteca de salud — artículos con fuentes sobre hormonas, alimentación, SPM y ánimo
 • Movimiento — yoga suave y estiramientos según la fase del ciclo
+• Health Connect — importa tus registros de regla y, si quieres, guarda allí los días que marcas
 • Recordatorios — tú eliges cuántos días antes y a qué hora; las notificaciones se crean en tu dispositivo y su contenido no va a ninguna parte
+• Widget de pantalla de inicio — tu día del ciclo, tu semana de embarazo o tu día de posparto de un vistazo
 
 EMBARAZO Y DESPUÉS DEL PARTO
 
@@ -906,7 +914,9 @@ CE QU'ELLE FAIT
 • Interroge tes données — des réponses à des questions comme « Combien de jours avant mes règles ? », calculées à partir de tes propres saisies. Pas un chatbot ; tes questions ne quittent pas ton téléphone
 • Bibliothèque santé — des articles sourcés sur les hormones, l'alimentation, le SPM et l'humeur
 • Mouvement — yoga doux et étirements adaptés à ta phase
+• Health Connect — importe tes règles et, si tu veux, enregistre-y les jours que tu notes
 • Rappels — tu choisis combien de jours avant et à quelle heure ; les notifications sont créées sur ton appareil et leur contenu ne part nulle part
+• Widget d'écran d'accueil — ton jour du cycle, ta semaine de grossesse ou ton jour de post-partum en un coup d'œil
 
 GROSSESSE ET APRÈS LA NAISSANCE
 
@@ -975,7 +985,9 @@ O QUE ELE FAZ
 • Pergunte aos seus dados — respostas para perguntas como “Quantos dias faltam para meu período?”, calculadas a partir dos seus próprios registros. Não é um chatbot; suas perguntas não saem do seu celular
 • Biblioteca de saúde — artigos com fontes sobre hormônios, alimentação, TPM e humor
 • Movimento — ioga leve e alongamentos de acordo com a fase do ciclo
+• Health Connect — importe seus registros de menstruação e, se quiser, grave lá os dias que você marca
 • Lembretes — você escolhe quantos dias antes e em que horário; as notificações são criadas no seu aparelho e o conteúdo não vai para lugar nenhum
+• Widget da tela inicial — seu dia do ciclo, sua semana de gravidez ou seu dia de pós-parto num relance
 
 GRAVIDEZ E DEPOIS DO PARTO
 
@@ -1024,9 +1036,11 @@ O Nilu não faz diagnóstico, não indica tratamento e não é um método contra
 henüz bir cihazda denenmedi. Metin, Android sürümünün iOS'la aynı
 özelliklere sahip olduğunu söylüyor; şu farklar dışında:
 
-- **Apple Sağlık ve ana ekran widget'ı çıkarıldı.** İkisi de yalnızca
-  iOS'ta var; Android'de Health Connect ve Glance widget'ı yazılmadıkça
-  vaat edilmemeli.
+- **Apple Sağlık yerine Health Connect.** Okuma, isteğe bağlı yazma ve
+  geçmiş verisi izni; Play Console'da Health Connect izin beyanı gerekiyor
+  (SETUP_KEYS.md §10.6).
+- **Ana ekran widget'ı Android'de de var** (küçük ve orta); uygulamanın
+  içinden "Ana ekrana ekle" ile eklenebiliyor.
 - **"Reklam kimliğin kullanılmıyor" yazılmadı.** Manifest reklam kimliği
   iznini kaldırıyor, ama AdMob SDK'sı kişiselleştirilmemiş reklamda da
   başka cihaz tanımlayıcıları (App Set ID) okuyabiliyor; Data safety

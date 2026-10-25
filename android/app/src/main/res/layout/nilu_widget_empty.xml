@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gösterilecek gün yokken: uygulama hiç açılmadı ya da yazılan günler
+     geride kaldı. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/empty"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:visibility="gone">
+
+    <ImageView
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_widget_calendar" />
+
+    <TextView
+        android:id="@+id/empty_text"
+        style="@style/NiluWidget.Muted"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:maxLines="3"
+        android:text="@string/widget_open_app" />
+</LinearLayout>

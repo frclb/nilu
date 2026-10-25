@@ -70,6 +70,51 @@ class HealthDatasource {
     }
   }
 
+  /// Geçmiş verisine erişim (yalnız Android).
+  ///
+  /// Health Connect, ayrı bir izin olmadan yalnızca izin verilmeden önceki
+  /// 30 günü okutuyor. Regl geçmişi tahminlerin temeli; bu izin olmadan
+  /// içeri aktarma tek bir dönemle kalırdı. iOS'ta böyle bir sınır yok.
+  ///
+  /// Geçmiş okunabiliyorsa `true`.
+  Future<bool> requestHistoryAccess() async {
+    if (defaultTargetPlatform != TargetPlatform.android) return true;
+    try {
+      if (!await _health.isHealthDataHistoryAvailable()) return false;
+      if (await _health.isHealthDataHistoryAuthorized()) return true;
+      return await _health.requestHealthDataHistoryAuthorization();
+    } on Exception catch (e) {
+      debugPrint('Health history authorization failed: $e');
+      return false;
+    }
+  }
+
+  /// Health Connect kurulabilir ya da güncellenebilir mi (yalnız Android).
+  ///
+  /// Android 13 ve öncesinde Health Connect ayrı bir uygulama; kurulu değilse
+  /// ya da eskiyse Play'deki sayfası açılabiliyor. Cihaz hiç desteklemiyorsa
+  /// `false`: açılacak bir sayfa yok.
+  Future<bool> canInstall() async {
+    if (defaultTargetPlatform != TargetPlatform.android) return false;
+    try {
+      final status = await _health.getHealthConnectSdkStatus();
+      return status ==
+          HealthConnectSdkStatus.sdkUnavailableProviderUpdateRequired;
+    } on Exception catch (e) {
+      debugPrint('Health Connect status check failed: $e');
+      return false;
+    }
+  }
+
+  /// Health Connect'in Play sayfasını açar.
+  Future<void> install() async {
+    try {
+      await _health.installHealthConnect();
+    } on Exception catch (e) {
+      debugPrint('Health Connect install failed: $e');
+    }
+  }
+
   /// İzin ister.
   ///
   /// iOS izin **durumunu** güvenilir biçimde bildirmiyor (gizlilik gereği:

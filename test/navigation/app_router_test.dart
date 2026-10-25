@@ -39,6 +39,38 @@ void main() {
     });
   });
 
+  group('kök adres', () {
+    // Android'de Health Connect'in politika bağlantısı uygulamayı yeni bir
+    // pencerede "/" ile açıyor; rota olmadığı için "sayfa bulunamadı"
+    // çıkıyordu.
+    test('splash gibi: yüklenince ana ekrana ya da onboarding\'e', () {
+      expect(
+        resolveRedirect(
+          isLoaded: false,
+          onboardingComplete: true,
+          location: '/',
+        ),
+        splashPath,
+      );
+      expect(
+        resolveRedirect(
+          isLoaded: true,
+          onboardingComplete: true,
+          location: '/',
+        ),
+        homePath,
+      );
+      expect(
+        resolveRedirect(
+          isLoaded: true,
+          onboardingComplete: false,
+          location: '/',
+        ),
+        onboardingPath,
+      );
+    });
+  });
+
   group('splash\'ten çıkış', () {
     test('onboarding tamamlanmışsa ana ekrana geçer', () {
       // Regresyon: initialLocation asenkron okumadan önce hesaplandığı için

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget'ın kendi metinleri: uygulama hiç veri yazmadan önce ve widget
+     seçicideki önizlemede. Önizleme metinleri uygulamanın sözlüğünden
+     (widget_cycle_day, phase_title_follicular, widget_period_in). -->
+<resources>
+    <string name="widget_description">Döngü gününü, gebelik haftanı ya da lohusalık gününü gösterir.</string>
+    <string name="widget_open_app">Başlamak için Nilu\'yu aç</string>
+    <string name="widget_preview_label">DÖNGÜ GÜNÜ</string>
+    <string name="widget_preview_value">14</string>
+    <string name="widget_preview_caption">Foliküler Faz</string>
+    <string name="widget_preview_detail">Regle 14 gün kaldı</string>
+</resources>

@@ -240,30 +240,33 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                                 ),
                                 // Ana ekran widget'ı uygulamada var ama onu
                                 // tanıtan ekran hiçbir yerden açılmıyordu:
-                                // rota tanımlıydı, kapısı yoktu. Android'de
-                                // widget (ve Sağlık eşitlemesi) henüz yok.
-                                if (AppPlatform.homeWidget)
-                                  SettingsItem(
-                                    title: context.tr('widgets_title'),
-                                    icon: Icons.widgets_outlined,
-                                    iconColor: primary,
-                                    iconBgColor: tint,
-                                    onTap: () {
-                                      context.pushNamed(
-                                        RouteNames.widgetsPreview,
-                                      );
-                                    },
+                                // rota tanımlıydı, kapısı yoktu.
+                                SettingsItem(
+                                  title: context.tr('widgets_title'),
+                                  icon: Icons.widgets_outlined,
+                                  iconColor: primary,
+                                  iconBgColor: tint,
+                                  onTap: () {
+                                    context.pushNamed(
+                                      RouteNames.widgetsPreview,
+                                    );
+                                  },
+                                ),
+                                SettingsItem(
+                                  // Android'de Apple Sağlık'ın karşılığı
+                                  // Health Connect.
+                                  title: context.tr(
+                                    AppPlatform.isAndroid
+                                        ? 'health_connect_sync_title'
+                                        : 'health_sync_title',
                                   ),
-                                if (AppPlatform.healthSync)
-                                  SettingsItem(
-                                    title: context.tr('health_sync_title'),
-                                    icon: Icons.monitor_heart_outlined,
-                                    iconColor: primary,
-                                    iconBgColor: tint,
-                                    onTap: () {
-                                      context.pushNamed(RouteNames.healthSync);
-                                    },
-                                  ),
+                                  icon: Icons.monitor_heart_outlined,
+                                  iconColor: primary,
+                                  iconBgColor: tint,
+                                  onTap: () {
+                                    context.pushNamed(RouteNames.healthSync);
+                                  },
+                                ),
                               ],
                               SettingsItem(
                                 title: context.tr('appearance_title'),

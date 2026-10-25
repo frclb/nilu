@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/platform/app_platform.dart';
+import '../../data/datasources/widget_datasource.dart';
 import '../../design_system/app_card.dart';
 import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
@@ -83,6 +85,7 @@ class WidgetsPreviewScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              const _PinButton(medium: false),
               const SizedBox(height: 28),
               _Baslik(context.tr('widgets_medium_title')),
               _Cerceve(
@@ -90,23 +93,74 @@ class WidgetsPreviewScreen extends StatelessWidget {
                 height: 160,
                 child: _OrtaIcerik(entry: bugun),
               ),
+              const _PinButton(medium: true),
               const SizedBox(height: 28),
               _Not(
                 icon: Icons.touch_app_outlined,
-                text: context.tr('widgets_how_to_add'),
+                // Ekleme yolu ve kilit ekranı davranışı platforma göre:
+                // Android'de widget yalnızca ana ekranda, Bekleme modu yok.
+                text: context.tr(
+                  AppPlatform.isAndroid
+                      ? 'widgets_how_to_add_android'
+                      : 'widgets_how_to_add',
+                ),
                 background: t.surfaceAlt,
                 strong: true,
               ),
               const SizedBox(height: 12),
               _Not(
                 icon: Icons.visibility_off_outlined,
-                text: context.tr('widgets_privacy_note'),
+                text: context.tr(
+                  AppPlatform.isAndroid
+                      ? 'widgets_privacy_note_android'
+                      : 'widgets_privacy_note',
+                ),
                 background: t.brandTint.withAlpha(170),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Android'de widget'ı doğrudan ana ekrana ekleyen düğme.
+///
+/// Başlatıcı uygulamanın içinden eklemeye izin vermiyorsa (ya da iOS'ta)
+/// çizilmiyor; yol aşağıdaki notta tarif ediliyor.
+class _PinButton extends StatefulWidget {
+  const _PinButton({required this.medium});
+
+  final bool medium;
+
+  @override
+  State<_PinButton> createState() => _PinButtonState();
+}
+
+class _PinButtonState extends State<_PinButton> {
+  static const _widgets = WidgetDatasource();
+  late final Future<bool> _supported = _widgets.canPin();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: _supported,
+      builder: (context, snapshot) {
+        if (snapshot.data != true) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: OutlinedButton.icon(
+            key: Key(widget.medium ? 'widget_pin_medium' : 'widget_pin_small'),
+            onPressed: () => _widgets.pin(medium: widget.medium),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(48),
+            ),
+            icon: const Icon(Icons.add_to_home_screen_rounded, size: 20),
+            label: Text(context.tr('widgets_add_to_home')),
+          ),
+        );
+      },
     );
   }
 }

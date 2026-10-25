@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../core/platform/app_platform.dart';
 import '../../domain/models/calendar_day.dart';
 import '../../domain/models/daily_log.dart';
 import '../../domain/models/period_log.dart';
 import '../../domain/services/health_export.dart';
 import '../datasources/health_datasource.dart';
 
-/// Regl günlerini Apple Sağlık'a yazma; isteğe bağlı, varsayılan kapalı.
+/// Regl günlerini Apple Sağlık'a / Health Connect'e yazma; isteğe bağlı,
+/// varsayılan kapalı.
 ///
 /// Açıkken her regl değişikliğinden sonra son [windowYears] yıl ayna olarak
 /// yeniden yazılıyor (bkz. `HealthDatasource.mirrorPeriods`). Veri cihazın
@@ -29,9 +29,6 @@ class HealthWriteBack {
   Future<void> _sira = Future.value();
 
   Future<bool> isEnabled() async {
-    // Android'de Sağlık eşitlemesi yok; başka bir cihazdan gelen bir ayar
-    // bağlanmamış Health Connect'e yazmayı denemesin.
-    if (!AppPlatform.healthSync) return false;
     try {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getBool(_key) ?? false;

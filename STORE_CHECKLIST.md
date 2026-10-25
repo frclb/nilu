@@ -268,6 +268,11 @@ Play Console → Uygulama içeriği → Veri güvenliği. Aynı tablodan; Play'd
   Reklam kimliği izni manifestte kaldırıldı (SETUP_KEYS.md §10.5).
 - **Firebase:** [Firebase'in Play beyan rehberi](https://firebase.google.com/docs/android/play-data-disclosure)
   — Authentication ve Firestore'un topladıkları yukarıdaki kalemlerle örtüşüyor.
+- **Health Connect:** okunan regl günleri cihazda işleniyor; yalnızca
+  bulut eşitleme açıksa (açık rızayla) kayıtlarla birlikte hesaba gidiyor —
+  yukarıdaki "Sağlık bilgisi" kalemi bunu kapsıyor. Health Connect verisi
+  reklam için kullanılmıyor, kimseyle paylaşılmıyor (Health Connect
+  politikasının şartı).
 - **Güvenlik:** aktarımda şifreli — **Evet**. Kullanıcı silme isteyebilir —
   **Evet** (uygulama içinden; dışarıdan: sitede `support/#delete-account`).
 

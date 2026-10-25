@@ -103,7 +103,12 @@ String? resolveRedirect({
   }
 
   // Okuma bitti: splash'ten gidilecek yere geç.
-  if (location == splashPath) {
+  //
+  // Kök adres ("/") da splash gibi: Android'de uygulamayı bir sistem
+  // ekranı (Health Connect'in politika bağlantısı) yeni bir pencerede
+  // açınca Flutter "/" ile başlıyor; rota olmadığı için "sayfa bulunamadı"
+  // çıkıyordu.
+  if (location == splashPath || location == '/') {
     return onboardingComplete ? homePath : onboardingPath;
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/platform/app_platform.dart';
 import '../../data/datasources/health_datasource.dart';
 import '../../data/repositories/health_write_back.dart';
 import '../../data/repositories/period_repository.dart';
@@ -14,8 +15,10 @@ import '../../design_system/app_layout.dart';
 
 /// Apple Sağlık / Health Connect eşitlemesi.
 ///
-/// Apple Watch ve diğer uygulamaların verisi HealthKit'e akıyor; buradan
-/// içeri almak, kullanıcının aynı bilgiyi iki kez girmesini önlüyor.
+/// Apple Watch ve diğer uygulamaların verisi HealthKit'e, Android'de saat ve
+/// başka uygulamaların verisi Health Connect'e akıyor; buradan içeri almak,
+/// kullanıcının aynı bilgiyi iki kez girmesini önlüyor. Akış iki platformda
+/// aynı; değişen metinler ve Android'in geçmiş verisi izni.
 class HealthSyncScreen extends StatefulWidget {
   const HealthSyncScreen({
     super.key,
@@ -32,13 +35,17 @@ class HealthSyncScreen extends StatefulWidget {
   State<HealthSyncScreen> createState() => _HealthSyncScreenState();
 }
 
-class _HealthSyncScreenState extends State<HealthSyncScreen> {
+class _HealthSyncScreenState extends State<HealthSyncScreen>
+    with WidgetsBindingObserver {
   late final HealthDatasource _health = widget.health ?? HealthDatasource();
   final PeriodRepository _repository = const PeriodRepository();
   late final HealthWriteBack _writeBack =
       widget.writeBack ?? HealthWriteBack(datasource: _health);
 
   bool _available = true;
+
+  /// Android: Health Connect yok ya da eski; Play sayfası açılabilir.
+  bool _canInstall = false;
   bool _busy = false;
   bool _writeBackOn = false;
   String? _result;
@@ -46,11 +53,33 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _checkAvailability();
     _writeBack.isEnabled().then((on) {
       if (mounted) setState(() => _writeBackOn = on);
     });
   }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // Play'den Health Connect kurulup dönülünce ekran kendini güncellesin.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && !_available) {
+      _checkAvailability();
+    }
+  }
+
+  /// Metin anahtarı: Android'de Apple Sağlık yerine Health Connect.
+  ///
+  /// `health_sync_title` → `health_connect_sync_title`: aynı anahtarın
+  /// `health_` önekinden (7 harf) sonrası.
+  String _k(String key) =>
+      AppPlatform.isAndroid ? 'health_connect_${key.substring(7)}' : key;
 
   /// Sağlık'a yazmayı açar ya da kapatır.
   ///
@@ -63,7 +92,7 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
       if (!mounted) return;
       setState(() {
         _writeBackOn = false;
-        _result = context.tr('health_write_off');
+        _result = context.tr(_k('health_write_off'));
       });
       return;
     }
@@ -72,8 +101,8 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
       _busy = true;
       _result = null;
     });
-    final denied = context.tr('health_permission_denied');
-    final unavailable = context.tr('health_permission_unavailable');
+    final denied = context.tr(_k('health_permission_denied'));
+    final unavailable = context.tr(_k('health_permission_unavailable'));
     final calendar = context.read<CalendarViewModel>();
 
     final access = await _health.requestPermissions(includeWrite: true);
@@ -95,14 +124,20 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
     setState(() {
       _busy = false;
       _writeBackOn = ok;
-      _result = context.tr(ok ? 'health_write_done' : 'health_write_failed');
+      _result = context.tr(
+        _k(ok ? 'health_write_done' : 'health_write_failed'),
+      );
     });
   }
 
   Future<void> _checkAvailability() async {
     final available = await _health.isAvailable();
+    final canInstall = !available && await _health.canInstall();
     if (!mounted) return;
-    setState(() => _available = available);
+    setState(() {
+      _available = available;
+      _canInstall = canInstall;
+    });
   }
 
   Future<void> _import() async {
@@ -111,9 +146,10 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
       _result = null;
     });
 
-    final denied = context.tr('health_permission_denied');
-    final unavailable = context.tr('health_permission_unavailable');
+    final denied = context.tr(_k('health_permission_denied'));
+    final unavailable = context.tr(_k('health_permission_unavailable'));
     final noneFound = context.tr('health_import_none');
+    final historyLimited = context.tr('health_connect_history_limited');
     final calendar = context.read<CalendarViewModel>();
 
     final access = await _health.requestPermissions();
@@ -127,6 +163,11 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
       });
       return;
     }
+
+    // Android: geçmiş izni yoksa Health Connect yalnızca son 30 günü
+    // veriyor. Reddedilirse yine de okunuyor ama kullanıcıya söyleniyor.
+    final fullHistory = await _health.requestHistoryAccess();
+    if (!mounted) return;
 
     // Bir yıl geriye bak: daha eskisi tahminleri etkilemiyor ve okuma
     // süresini gereksiz uzatıyor.
@@ -143,7 +184,7 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
     if (fresh.isEmpty) {
       setState(() {
         _busy = false;
-        _result = noneFound;
+        _result = fullHistory ? noneFound : '$noneFound $historyLimited';
       });
       return;
     }
@@ -153,12 +194,13 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
     await calendar.refreshData();
 
     if (!mounted) return;
+    final done = context.tr(
+      fresh.length == 1 ? 'health_import_done_one' : 'health_import_done',
+      params: {'count': '${fresh.length}'},
+    );
     setState(() {
       _busy = false;
-      _result = context.tr(
-        fresh.length == 1 ? 'health_import_done_one' : 'health_import_done',
-        params: {'count': '${fresh.length}'},
-      );
+      _result = fullHistory ? done : '$done $historyLimited';
     });
   }
 
@@ -168,7 +210,7 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: SettingsAppBar(title: context.tr('health_sync_title')),
+      appBar: SettingsAppBar(title: context.tr(_k('health_sync_title'))),
       body: AmbientBackground(
         child: AppContentWidth(
           child: ListView(
@@ -186,7 +228,7 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     Text(
-                      context.tr('health_sync_desc'),
+                      context.tr(_k('health_sync_desc')),
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: t.textMuted,
@@ -198,12 +240,21 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              if (!_available)
+              if (!_available) ...[
                 SettingsNote(
-                  text: context.tr('health_unavailable'),
+                  text: context.tr(_k('health_unavailable')),
                   icon: Icons.info_outline_rounded,
-                )
-              else ...[
+                ),
+                if (_canInstall) ...[
+                  const SizedBox(height: AppSpacing.lg),
+                  AppGradientButton(
+                    key: const Key('health_connect_install'),
+                    label: context.tr('health_connect_install'),
+                    icon: Icons.download_rounded,
+                    onPressed: _health.install,
+                  ),
+                ],
+              ] else ...[
                 // Yazma anahtarı ekranın üst yarısında: sonuç metni ve
                 // izin istemi ona bağlı, aşağıda kaybolmasın.
                 SettingsCard(
@@ -219,13 +270,13 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
                       background: t.secondaryTint,
                     ),
                     title: Text(
-                      context.tr('health_write_title'),
+                      context.tr(_k('health_write_title')),
                       style: SettingsText.title(context),
                     ),
                     subtitle: Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
-                        context.tr('health_write_body'),
+                        context.tr(_k('health_write_body')),
                         style: SettingsText.subtitle(context),
                       ),
                     ),
@@ -244,7 +295,7 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       AppGradientButton(
-                        label: context.tr('health_import_button'),
+                        label: context.tr(_k('health_import_button')),
                         icon: Icons.download_rounded,
                         busy: _busy,
                         onPressed: _busy ? null : _import,
@@ -277,7 +328,7 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
                 child: Column(
                   children: [
-                    _Bullet(text: context.tr('health_sync_point_watch')),
+                    _Bullet(text: context.tr(_k('health_sync_point_watch'))),
                     _Bullet(text: context.tr('health_sync_point_local')),
                   ],
                 ),

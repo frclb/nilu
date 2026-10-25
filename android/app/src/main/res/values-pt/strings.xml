@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget'ın kendi metinleri: uygulama hiç veri yazmadan önce ve widget
+     seçicideki önizlemede. Önizleme metinleri uygulamanın sözlüğünden
+     (widget_cycle_day, phase_title_follicular, widget_period_in). -->
+<resources>
+    <string name="widget_description">Mostra seu dia do ciclo, sua semana de gravidez ou seu dia de pós-parto.</string>
+    <string name="widget_open_app">Abra o Nilu para começar</string>
+    <string name="widget_preview_label">DIA DO CICLO</string>
+    <string name="widget_preview_value">14</string>
+    <string name="widget_preview_caption">Fase folicular</string>
+    <string name="widget_preview_detail">Período em 14 dias</string>
+</resources>

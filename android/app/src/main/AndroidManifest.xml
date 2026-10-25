@@ -13,6 +13,15 @@
     <!-- Uygulama kilidi. -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
+    <!-- Health Connect: yalnızca regl akışı (iOS'ta Apple Sağlık'ın
+         karşılığı). Geçmiş verisi izni olmadan Health Connect, izin
+         verilmeden önceki 30 günden eskisini okutmuyor; tahminler için
+         geçmiş döngüler gerekiyor. Play Console'da her biri için gerekçe
+         beyan ediliyor (SETUP_KEYS.md §10.6). -->
+    <uses-permission android:name="android.permission.health.READ_MENSTRUATION" />
+    <uses-permission android:name="android.permission.health.WRITE_MENSTRUATION" />
+    <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_HISTORY" />
+
     <!-- Reklam kimliği kullanılmıyor: reklamlar kişiselleştirilmemiş
          (AdsDatasource). AdMob SDK'sının eklediği izin burada siliniyor;
          iOS'ta da IDFA istenmiyor. Play'in "Data safety" formunda reklam
@@ -61,7 +70,49 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Health Connect izin ekranındaki "gizlilik politikası"
+                 bağlantısı (Android 13 ve öncesi). Uygulama açılınca
+                 politikayı gösteriyor (MainActivity → nilu/launch). -->
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
         </activity>
+
+        <!-- Aynı bağlantı, Android 14+. -->
+        <activity-alias
+            android:name="ViewPermissionUsageActivity"
+            android:exported="true"
+            android:targetActivity=".MainActivity"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- Ana ekran widget'ı: iOS'taki gibi küçük ve orta (NiluWidget.kt). -->
+        <receiver
+            android:name=".NiluWidgetSmall"
+            android:exported="false"
+            android:label="Nilu">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/nilu_widget_small_info" />
+        </receiver>
+        <receiver
+            android:name=".NiluWidgetMedium"
+            android:exported="false"
+            android:label="Nilu">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/nilu_widget_medium_info" />
+        </receiver>
 
         <!-- AdMob App ID. Şimdilik Google'ın örnek kimliği (SDK kimliksiz
              açılışta çöküyor). Yayından önce ReleaseConfig.admobAppIdAndroid
@@ -93,7 +144,7 @@
             android:value="2" />
     </application>
     <!-- Paket görünürlüğü (Android 11+): metin işleme, bağlantı açma
-         (politika, kaynaklar) ve e-posta (destek adresi). -->
+         (politika, kaynaklar), e-posta (destek adresi) ve Health Connect. -->
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
@@ -106,6 +157,11 @@
         <intent>
             <action android:name="android.intent.action.SENDTO" />
             <data android:scheme="mailto" />
+        </intent>
+        <!-- Health Connect kurulu mu (Android 13 ve öncesinde ayrı uygulama). -->
+        <package android:name="com.google.android.apps.healthdata" />
+        <intent>
+            <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
         </intent>
     </queries>
 </manifest>

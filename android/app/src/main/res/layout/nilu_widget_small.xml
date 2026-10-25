@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Küçük widget (2×2). Tasarım iOS'taki CycleWidget'ın küçük boyuyla aynı:
+     etiket, serif büyük değer, altta iki satır. Varsayılan metinler widget
+     seçicisindeki önizleme için. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:padding="16dp"
+    android:theme="@style/NiluWidget">
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/label"
+            style="@style/NiluWidget.Label"
+            android:text="@string/widget_preview_label" />
+
+        <TextView
+            android:id="@+id/value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:fontFamily="serif"
+            android:maxLines="1"
+            android:text="@string/widget_preview_value"
+            android:textColor="@color/widget_text"
+            android:textSize="38sp"
+            android:textStyle="bold" />
+
+        <!-- RemoteViews düz View'ı kabul etmiyor; boşluk bir FrameLayout. -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/caption"
+            style="@style/NiluWidget.Muted"
+            android:maxLines="1"
+            android:text="@string/widget_preview_caption" />
+
+        <TextView
+            android:id="@+id/detail"
+            style="@style/NiluWidget.Muted"
+            android:maxLines="2"
+            android:text="@string/widget_preview_detail" />
+    </LinearLayout>
+
+    <include layout="@layout/nilu_widget_empty" />
+</FrameLayout>

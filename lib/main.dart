@@ -9,6 +9,8 @@ import 'design_system/app_theme.dart';
 import 'localization/app_localizations.dart';
 import 'localization/supported_locales.dart';
 import 'core/navigation/app_router.dart';
+import 'core/navigation/route_names.dart';
+import 'core/platform/launch_actions.dart';
 import 'domain/view_models/theme_view_model.dart';
 import 'data/datasources/ads_datasource.dart';
 import 'presentation/account/cloud_sync_trigger.dart';
@@ -151,6 +153,62 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
 
   late final AccountViewModel _account =
       widget.accountViewModel ?? AccountViewModel();
+
+  @override
+  void initState() {
+    super.initState();
+    LaunchActions.attach(_onLaunchAction);
+  }
+
+  /// Health Connect'in "gizlilik politikası" bağlantısı uygulamayı açtı.
+  ///
+  /// Politika yönlendirici açılış ekranından çıkıp yerine oturduktan sonra
+  /// açılıyor; durum yüklenirken açılınca açılış yönlendirmesi onu
+  /// eziyordu. Politika kapanınca, pencere yalnızca onun için açıldıysa
+  /// kapanıyor: kullanıcı ana sayfaya değil Health Connect'in izin
+  /// ekranına dönüyor.
+  void _onLaunchAction(String action) {
+    if (action != LaunchActions.privacyPolicy) return;
+    final delegate = _router.routerDelegate;
+    bool settled() {
+      if (!widget.userViewModel.isLoaded) return false;
+      final path = delegate.currentConfiguration.uri.path;
+      return path.isNotEmpty && path != '/' && path != splashPath;
+    }
+
+    // Kapanışı yönlendiricinin konumundan izle: sistem geri tuşuyla
+    // kapanan sayfada `pushNamed`'in döndürdüğü bekleme tamamlanmıyor.
+    void open() {
+      final policy = _router.namedLocation(RouteNames.privacyPolicy);
+      var shown = false;
+      late final VoidCallback watch;
+      watch = () {
+        // `push` adresi değiştirmiyor; açılan sayfa yığının son öğesi.
+        final config = delegate.currentConfiguration;
+        final path = config.isEmpty ? '' : config.last.matchedLocation;
+        if (path == policy) {
+          shown = true;
+        } else if (shown) {
+          delegate.removeListener(watch);
+          LaunchActions.done();
+        }
+      };
+      delegate.addListener(watch);
+      _router.pushNamed(RouteNames.privacyPolicy);
+    }
+
+    if (settled()) {
+      open();
+      return;
+    }
+    late final VoidCallback listener;
+    listener = () {
+      if (!settled()) return;
+      delegate.removeListener(listener);
+      WidgetsBinding.instance.addPostFrameCallback((_) => open());
+    };
+    delegate.addListener(listener);
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget renkleri: uygulamanın zemini ve metinleri (AppPalette sand50 / ink900 / ink600 / plum700). -->
+<resources>
+    <color name="widget_background">#FBF7F6</color>
+    <color name="widget_text">#21191E</color>
+    <color name="widget_text_muted">#51434A</color>
+    <color name="widget_brand">#541942</color>
+</resources>

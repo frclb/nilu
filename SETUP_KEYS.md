@@ -513,9 +513,11 @@ RevenueCat ve AdMob'da **aynı projelere** Android uygulaması ekleniyor.
 | En düşük sürüm | Android 8.0 (API 26) — health eklentisi |
 | Hedef sürüm | Android 16 (API 36) — Play 31 Ağustos 2026'dan beri istiyor |
 
-Android'de henüz olmayanlar: **Apple Sağlık eşitlemesi** (Health Connect
-bağlanmadı) ve **ana ekran widget'ı**. Profil ekranında görünmüyorlar
-(`lib/core/platform/app_platform.dart`); mağaza metni de onları saymıyor.
+Android'de Apple Sağlık'ın yerini **Health Connect** alıyor (regl okuma,
+isteğe bağlı yazma, geçmiş verisi izni); **ana ekran widget'ı** iOS'taki
+gibi küçük ve orta boyda (`NiluWidget.kt`) ve uygulamanın içinden "Ana
+ekrana ekle" ile eklenebiliyor. Platform farkları
+`lib/core/platform/app_platform.dart`'ta.
 
 **Derleme ortamı (bu Mac'te kurulu):**
 
@@ -534,8 +536,9 @@ flutter run -d emulator-5554
 ```
 
 Debug ve yayın derlemesi (AAB, R8 küçültmeli) emülatörde denendi: kurulum,
-bildirim izni, hatırlatıcıların planlanması, profilde gizlenen girişler,
-simge ve açılış ekranı. Derlemeler ~3 GB ara dosya bırakıyor
+bildirim izni, hatırlatıcıların planlanması, simge ve açılış ekranı; Health
+Connect izinleri, yazma, içeri aktarma (geçmiş izniyle ve izinsiz), izin
+ekranındaki politika bağlantısı; iki widget'ın eklenmesi ve güncellenmesi. Derlemeler ~3 GB ara dosya bırakıyor
 (`build/app/intermediates`); disk dolarsa silinebilir.
 
 **10.1 Play Console hesabı:** [play.google.com/console](https://play.google.com/console)
@@ -640,7 +643,19 @@ STORE_CHECKLIST.md "Google Play" bölümünde ayrıntılı.
 - Uygulama erişimi: bütün özellikler girişsiz kullanılabiliyor
 - **Sağlık uygulamaları beyanı:** her uygulama için zorunlu; "Period
   tracking" (regl takibi) ve gebelik ile ilgili seçenekler işaretlenir.
-  Health Connect kullanılmadığı için onun izin formu yok.
+- **Health Connect izin beyanı:** her izin için gerekçe isteniyor ve
+  Google inceliyor. Önerilen gerekçeler:
+  - `READ_MENSTRUATION` — kullanıcının başka uygulamalarda ya da saatinde
+    kaydettiği regl günlerini içeri alıp döngü tahminlerinde kullanmak;
+    yalnızca kullanıcı "içeri aktar"a dokununca okunuyor.
+  - `WRITE_MENSTRUATION` — kullanıcı açarsa uygulamada işaretlediği regl
+    günlerini Health Connect'e yazmak (varsayılan kapalı).
+  - `READ_HEALTH_DATA_HISTORY` — tahminler için geçmiş döngüler gerekiyor;
+    izin verilmezse yalnızca son 30 gün okunuyor ve kullanıcıya söyleniyor.
+  Health Connect'in izin ekranındaki "gizlilik politikası" bağlantısı
+  uygulamada politikayı açıyor (inceleme bunu arıyor); politikanın §8'i
+  Health Connect'i anlatıyor. Health Connect verisi reklam için
+  kullanılmıyor ve kimseyle paylaşılmıyor.
 - **Veri güvenliği (Data safety):** STORE_CHECKLIST.md §4 → "Google Play —
   Data safety"
 - **Hesap silme bağlantısı:** `…/tr/support/#delete-account` (sitede
