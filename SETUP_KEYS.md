@@ -641,21 +641,47 @@ STORE_CHECKLIST.md "Google Play" bölümünde ayrıntılı.
 - Gizlilik politikası: sitenin `…/tr/privacy/` adresi
 - Reklam içeriyor: **Evet**
 - Uygulama erişimi: bütün özellikler girişsiz kullanılabiliyor
-- **Sağlık uygulamaları beyanı:** her uygulama için zorunlu; "Period
-  tracking" (regl takibi) ve gebelik ile ilgili seçenekler işaretlenir.
-- **Health Connect izin beyanı:** her izin için gerekçe isteniyor ve
-  Google inceliyor. Önerilen gerekçeler:
-  - `READ_MENSTRUATION` — kullanıcının başka uygulamalarda ya da saatinde
-    kaydettiği regl günlerini içeri alıp döngü tahminlerinde kullanmak;
-    yalnızca kullanıcı "içeri aktar"a dokununca okunuyor.
-  - `WRITE_MENSTRUATION` — kullanıcı açarsa uygulamada işaretlediği regl
-    günlerini Health Connect'e yazmak (varsayılan kapalı).
-  - `READ_HEALTH_DATA_HISTORY` — tahminler için geçmiş döngüler gerekiyor;
-    izin verilmezse yalnızca son 30 gün okunuyor ve kullanıcıya söyleniyor.
+- **Sağlık uygulamaları beyanı (Health apps):** her uygulama için
+  zorunlu; Health Connect izinleri de bu formun ikinci sayfasında beyan
+  ediliyor. Google'ın rehberi önce Veri güvenliği formunun doldurulmasını
+  istiyor. İki adım:
+  1. **Özellikler:** Sağlık ve fitness → **Period tracking** (regl,
+     yumurtlama tahmini, doğurganlık farkındalığı). Gebelik ve doğum
+     sonrası modu için Tıbbi → **Reproductive and sexual health**
+     (kadın sağlığı ihtiyaçları). Bu ikinci seçim mağaza açıklamasında
+     "tıbbi cihaz değildir" uyarısını şart koşuyor; metinlerde var
+     (STORE_LISTING.md). Sağlık kütüphanesi genel bilgi verdiği için
+     "Medical reference and education" seçilmiyor; inceleme sorarsa
+     eklenir.
+  2. **Health Connect veri türleri:** "Reproductive and sexual health"
+     grubunda yalnızca **Menstruation** doldurulur (kod
+     `MENSTRUATION_FLOW` okuyup yazıyor). Geçmiş verisi izni için ayrı
+     bir alan çıkarsa üçüncü gerekçe oraya. Gerekçeler İngilizce
+     (inceleme İngilizce yürüyor):
+     - **Read menstruation:** "Users can import period days they logged in
+       other apps or on their watch into Nilu. Nilu uses them to show the
+       user's cycle history and to predict the next period and fertile
+       window. Data is read only when the user taps Import on the Health
+       Connect screen. It is stored with the user's other entries on the
+       device, copied to the user's own cloud backup only if they turned
+       on sync, never used for advertising and never shared with third
+       parties."
+     - **Write menstruation:** "If the user turns on 'Write my period days
+       to Health Connect' (off by default), the period days they mark in
+       Nilu are written to Health Connect so their other health apps and
+       devices see the same cycle. Turning it off stops writing; data
+       already written stays under the user's control in Health
+       Connect."
+     - **Read historical data (READ_HEALTH_DATA_HISTORY):** "Cycle
+       predictions need several past cycles; one cycle is about a month.
+       With history access Nilu imports up to one year of the user's
+       period data on request. If the user declines, Nilu imports only
+       the last 30 days and tells the user that older cycles were not
+       read."
   Health Connect'in izin ekranındaki "gizlilik politikası" bağlantısı
   uygulamada politikayı açıyor (inceleme bunu arıyor); politikanın §8'i
-  Health Connect'i anlatıyor. Health Connect verisi reklam için
-  kullanılmıyor ve kimseyle paylaşılmıyor.
+  Health Connect'i anlatıyor ve mağaza kaydındaki politika adresiyle aynı
+  olmalı.
 - **Veri güvenliği (Data safety):** STORE_CHECKLIST.md §4 → "Google Play —
   Data safety"
 - **Hesap silme bağlantısı:** `…/tr/support/#delete-account` (sitede

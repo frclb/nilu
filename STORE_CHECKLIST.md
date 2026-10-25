@@ -260,35 +260,57 @@ kapsayarak yapılmalı — Apple isteğe bağlı toplanan veriyi de beyan istiyo
   politika §4 isteğe bağlı olduğunu anlatıyor.
 
 ### Google Play — Data safety
-Play Console → Uygulama içeriği → Veri güvenliği. Aynı tablodan; Play'de
-"isteğe bağlı" işareti **var**, kullanılmalı.
+Play Console → Politika → Uygulama içeriği → Veri güvenliği. Formun
+sırasıyla; cevaplar koddan ve SDK'ların kendi beyan rehberlerinden
+(bağlantılar aşağıda). Firebase'in toplamadığı bir ürün (Analytics,
+Crashlytics, Messaging) uygulamada yok.
 
-- **Toplanan veri** (cihazdan çıkan), hepsi **isteğe bağlı**, amaç
-  **Uygulama işlevselliği**, hiçbiri **paylaşılmıyor** (partnere gönderilen
-  yakınlık durumu kullanıcının kendi başlattığı bir aktarım; Play bunu
-  paylaşım saymıyor):
-  - **Sağlık ve fitness → Sağlık bilgisi:** bulut eşitleme açıksa kayıtların
-    kopyası; partner paylaşımı açıksa yakınlık durumu
-  - **Kişisel bilgiler → Ad, E-posta adresi:** Apple ya da Google ile giriş
-  - **Kişisel bilgiler → Kullanıcı kimlikleri:** hesap kimliği, partner için
-    anonim kimlik
-  - **Uygulama etkinliği → Kullanıcı tarafından oluşturulan diğer içerik:**
-    eşitleme açıksa gün notları
-  - **Finansal bilgiler → Satın alma geçmişi:** abonelik (RevenueCat)
-- **Reklam SDK'sı:** Google'ın
-  [Google Mobile Ads SDK beyan rehberine](https://developers.google.com/admob/android/privacy/play-data-disclosure)
-  göre doldurulmalı (IP adresinden yaklaşık konum, uygulama etkileşimleri,
-  tanılama, cihaz kimlikleri — amaç reklam ve dolandırıcılık önleme).
-  Reklam kimliği izni manifestte kaldırıldı (SETUP_KEYS.md §10.5).
+**1. Veri toplama ve güvenlik**
+
+| Soru | Cevap |
+|---|---|
+| Gerekli kullanıcı verisi türlerinden birini topluyor ya da paylaşıyor mu? | **Evet** |
+| Toplanan bütün veri aktarımda şifreli mi? | **Evet** (Firebase HTTPS, AdMob ve RevenueCat TLS) |
+| Kullanıcılar hesap oluşturabiliyor mu? | **Evet — OAuth** (Apple ya da Google ile giriş; isteğe bağlı) |
+| Hesap silme bağlantısı | `…/tr/support/#delete-account` |
+| Hesabı silmeden veri silme isteme yolu var mı? | **Evet** — eşitlemeyi kapatınca buluttaki kopya, partner paylaşımını kapatınca sunucudaki durum siliniyor; sitede aynı sayfa |
+
+**2. Veri türleri.** Hiçbiri geçici işlenmiyor ("ephemeral" **Hayır**).
+"Paylaşılıyor" yalnızca AdMob satırlarında: Google'ın rehberi SDK'nın
+verisini paylaşılan sayıyor. Partnere giden yakınlık durumu kullanıcının
+kendi başlattığı aktarım; Play bunu paylaşım saymıyor.
+
+| Play'deki tür | Kaynak | Toplanıyor | Paylaşılıyor | Zorunlu mu | Amaç |
+|---|---|---|---|---|---|
+| Konum → Yaklaşık konum | AdMob (IP adresi) | Evet | Evet | Zorunlu | Reklam veya pazarlama, Analiz, Dolandırıcılık önleme/güvenlik/uyumluluk |
+| Kişisel bilgiler → Ad | Apple/Google ile giriş | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği, Hesap yönetimi |
+| Kişisel bilgiler → E-posta adresi | Apple/Google ile giriş | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği, Hesap yönetimi |
+| Kişisel bilgiler → Kullanıcı kimlikleri | Hesap kimliği; partner için anonim kimlik | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği, Hesap yönetimi |
+| Finansal bilgiler → Satın alma geçmişi | RevenueCat | Evet | Hayır | Zorunlu (RevenueCat'in rehberi) | Uygulama işlevselliği, Analiz |
+| Sağlık ve fitness → Sağlık bilgisi | Bulut eşitleme açıksa kayıtların kopyası (Health Connect'ten alınanlar dahil); partner paylaşımı açıksa yakınlık durumu | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği |
+| Uygulama etkinliği → Uygulama etkileşimleri | AdMob | Evet | Evet | Zorunlu | Reklam veya pazarlama, Analiz, Dolandırıcılık önleme/güvenlik/uyumluluk |
+| Uygulama etkinliği → Kullanıcının oluşturduğu diğer içerik | Bulut eşitleme açıksa gün notları | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği |
+| Uygulama bilgileri ve performansı → Teşhis | AdMob | Evet | Evet | Zorunlu | Reklam veya pazarlama, Analiz, Dolandırıcılık önleme/güvenlik/uyumluluk |
+| Cihaz veya diğer kimlikler | AdMob (App Set ID; reklam kimliği izni kaldırıldı) | Evet | Evet | Zorunlu | Reklam veya pazarlama, Analiz, Dolandırıcılık önleme/güvenlik/uyumluluk |
+
+- **AdMob:** [Google Mobile Ads SDK beyan rehberi](https://developers.google.com/admob/android/privacy/play-data-disclosure)
+  — IP adresi, uygulama etkileşimleri, tanılama ve cihaz kimlikleri;
+  toplanıyor ve paylaşılıyor, amaç reklam, analiz ve dolandırıcılık
+  önleme. Reklam kimliği izni manifestte kaldırıldı (SETUP_KEYS.md §10.5)
+  ama App Set ID yine okunuyor; bu yüzden "Cihaz veya diğer kimlikler"
+  beyan ediliyor.
 - **Firebase:** [Firebase'in Play beyan rehberi](https://firebase.google.com/docs/android/play-data-disclosure)
-  — Authentication ve Firestore'un topladıkları yukarıdaki kalemlerle örtüşüyor.
+  — Authentication kayıt ve girişte kötüye kullanımı önlemek için IP adresi
+  topluyor (yalnızca giriş yapılırsa); Firestore yalnızca kimliğe
+  bağlanmayan SDK bilgisi gönderiyor. Kullanıma bağlı veriler (kimlik,
+  e-posta, eşitlenen kayıtlar) tabloda.
+- **RevenueCat:** [RevenueCat'in Data safety rehberi](https://www.revenuecat.com/docs/platform-resources/google-platform-resources/google-plays-data-safety)
+  — satın alma geçmişi zorunlu, amaç uygulama işlevselliği ve analiz.
+  Müşteri özniteliği ya da reklam kimliği entegrasyonu kullanılmıyor.
 - **Health Connect:** okunan regl günleri cihazda işleniyor; yalnızca
   bulut eşitleme açıksa (açık rızayla) kayıtlarla birlikte hesaba gidiyor —
-  yukarıdaki "Sağlık bilgisi" kalemi bunu kapsıyor. Health Connect verisi
-  reklam için kullanılmıyor, kimseyle paylaşılmıyor (Health Connect
-  politikasının şartı).
-- **Güvenlik:** aktarımda şifreli — **Evet**. Kullanıcı silme isteyebilir —
-  **Evet** (uygulama içinden; dışarıdan: sitede `support/#delete-account`).
+  "Sağlık bilgisi" satırı bunu kapsıyor. Health Connect verisi reklam için
+  kullanılmıyor, kimseyle paylaşılmıyor (Health Connect politikasının şartı).
 
 ### Hesap silme ✅
 Apple, hesap oluşturan uygulamalarda **uygulama içinden hesap silmeyi**
