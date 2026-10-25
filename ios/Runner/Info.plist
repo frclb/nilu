@@ -60,7 +60,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Partnerinle eşleşmek için onun QR kodunu okutmak üzere kamera kullanılır. Görüntü cihazından çıkmaz.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Uygulama kilidi açıkken sağlık verilerinize yalnızca siz erişebilesiniz diye Face ID kullanılır.</string>
+	<string>Uygulama kilidi açıkken sağlık verilerine yalnızca sen erişebilesin diye Face ID kullanılır.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Regl verilerin Sağlık uygulamasından okunur; döngü tahminlerini iyileştirmek için kullanılır.</string>
 	<key>NSHealthUpdateUsageDescription</key>

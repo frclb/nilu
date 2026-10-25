@@ -129,7 +129,7 @@ void main() {
     expect(
       find.text(tr(tester, 'onboarding_success_desc')),
       findsNothing,
-      reason: '"Döngünüz ayarlandı" — ayarlanan bir döngü yok',
+      reason: '"Döngün ayarlandı" — ayarlanan bir döngü yok',
     );
     expect(kullanici.onboardingComplete, isFalse, reason: 'Henüz son ekran');
 
