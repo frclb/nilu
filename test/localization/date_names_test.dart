@@ -89,6 +89,63 @@ void main() {
       );
     });
 
+    // Gün, ay, yıl ve aynı aydaki aralık. İspanyolca ve Portekizcede
+    // araya "de", Almancada günün ardına nokta giriyor.
+    const tarihler = {
+      'tr': ('25 Ekim', '25 Ekim 2026', '20–23 Ekim'),
+      'en': ('25 October', '25 October 2026', '20–23 October'),
+      'de': ('25. Oktober', '25. Oktober 2026', '20.–23. Oktober'),
+      'es': ('25 de octubre', '25 de octubre de 2026', '20–23 de octubre'),
+      'fr': ('25 octobre', '25 octobre 2026', '20–23 octobre'),
+      'pt': ('25 de outubro', '25 de outubro de 2026', '20–23 de outubro'),
+    };
+    for (final MapEntry(key: dil, value: (gunAy, gunAyYil, aralik))
+        in tarihler.entries) {
+      testWidgets('tarih biçimleri ($dil)', (tester) async {
+        late BuildContext ctx;
+        await pumpScreen(
+          tester,
+          Builder(
+            builder: (c) {
+              ctx = c;
+              return const SizedBox();
+            },
+          ),
+          size: screenSizes['iPhone 16e']!,
+          locale: Locale(dil),
+        );
+        final gun = DateTime(2026, 10, 25);
+        expect(ctx.dayMonth(gun), gunAy);
+        expect(ctx.dayMonthYear(gun), gunAyYil);
+        expect(ctx.dayRange(gun, gun), gunAy);
+        expect(
+          ctx.dayRange(DateTime(2026, 10, 20), DateTime(2026, 10, 23)),
+          aralik,
+        );
+      });
+    }
+
+    testWidgets('ay değişen aralık kısa adlarla, küçük harf (fr)', (
+      tester,
+    ) async {
+      late BuildContext ctx;
+      await pumpScreen(
+        tester,
+        Builder(
+          builder: (c) {
+            ctx = c;
+            return const SizedBox();
+          },
+        ),
+        size: screenSizes['iPhone 16e']!,
+        locale: const Locale('fr'),
+      );
+      expect(
+        ctx.dayRange(DateTime(2026, 9, 30), DateTime(2026, 10, 2)),
+        '30 sept – 2 oct',
+      );
+    });
+
     // Gün önde: ay küçük kalıyor. İngilizcede ay önde ve zaten büyük.
     // Geçmiş bir gün: bugün olsaydı başlık "Bugün, …" olurdu.
     const beklenen = {

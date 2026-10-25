@@ -139,9 +139,7 @@ class _OnboardingBirthScreenState extends State<OnboardingBirthScreen> {
                                       const SizedBox(width: AppSpacing.md),
                                       Expanded(
                                         child: Text(
-                                          '${_dogum.day} '
-                                          '${context.monthName(_dogum.month)} '
-                                          '${_dogum.year}',
+                                          context.dayMonthYear(_dogum),
                                           style: theme.textTheme.titleMedium
                                               ?.copyWith(
                                                 fontWeight: FontWeight.w700,

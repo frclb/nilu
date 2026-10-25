@@ -537,9 +537,7 @@ class _GebelikBolumu extends StatelessWidget {
         if (vm.conception case final niyet?)
           SettingsItem(
             title: context.tr('profile_preg_ttc_since'),
-            subtitle:
-                '${niyet.since.day} ${context.monthName(niyet.since.month)} '
-                '${niyet.since.year}',
+            subtitle: context.dayMonthYear(niyet.since),
             icon: Icons.event_outlined,
             iconColor: renk,
             iconBgColor: zemin,
@@ -558,11 +556,7 @@ class _GebelikBolumu extends StatelessWidget {
       LifeStage.pregnancy => [
         SettingsItem(
           title: context.tr('profile_preg_due'),
-          subtitle: g == null
-              ? null
-              : '${g.estimatedDueDate.day} '
-                    '${context.monthName(g.estimatedDueDate.month)} '
-                    '${g.estimatedDueDate.year}',
+          subtitle: g == null ? null : context.dayMonthYear(g.estimatedDueDate),
           icon: Icons.event_outlined,
           iconColor: renk,
           iconBgColor: zemin,

@@ -40,11 +40,7 @@ Future<void> showDueDateSheet(BuildContext context) async {
         content: Text(
           ctx.tr(
             'preg_due_source_body',
-            params: {
-              'date':
-                  '${secilen.day} ${ctx.monthName(secilen.month)} '
-                  '${secilen.year}',
-            },
+            params: {'date': ctx.dayMonthYear(secilen)},
           ),
           style: TextStyle(color: t.textMuted, height: 1.5),
         ),

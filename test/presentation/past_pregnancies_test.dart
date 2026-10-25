@@ -142,8 +142,7 @@ void main() {
       return tester.element(find.byType(CareSummaryScreen));
     }
 
-    String tamTarih(BuildContext ctx, DateTime d) =>
-        '${d.day} ${ctx.monthName(d.month)} ${d.year}';
+    String tamTarih(BuildContext ctx, DateTime d) => ctx.dayMonthYear(d);
 
     testWidgets('gebeliğin kendi dönemi: öncesi ve doğumdan sonrası yok', (
       tester,

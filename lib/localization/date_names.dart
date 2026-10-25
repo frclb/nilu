@@ -49,12 +49,39 @@ extension DateNames on BuildContext {
     ),
   );
 
+  /// Gün ve ay: "25 Ekim", "25. Oktober", "25 de octubre".
+  ///
+  /// Sıra ve bağlaç dile göre `calendar_day_month` şablonunda: elle
+  /// `'$gün $ay'` yazınca İspanyolca ve Portekizcede "de", Almancada gün
+  /// sonundaki nokta düşüyordu.
+  String dayMonth(DateTime date) => tr(
+    'calendar_day_month',
+    params: {'day': '${date.day}', 'month': monthName(date.month)},
+  );
+
+  /// Gün, ay ve yıl: "25 Ekim 2026", "25 de octubre de 2026".
+  String dayMonthYear(DateTime date) => tr(
+    'calendar_day_month_year',
+    params: {
+      'day': '${date.day}',
+      'month': monthName(date.month),
+      'year': '${date.year}',
+    },
+  );
+
   /// İki gün arası: aynı ayda "20–23 Ekim", ay değişiyorsa kısa adlarla
   /// "30 Eyl – 2 Eki". Aynı günse tek tarih.
   String dayRange(DateTime a, DateTime b) {
     if (a.year == b.year && a.month == b.month) {
-      if (a.day == b.day) return '${a.day} ${monthName(a.month)}';
-      return '${a.day}–${b.day} ${monthName(a.month)}';
+      if (a.day == b.day) return dayMonth(a);
+      return tr(
+        'calendar_day_range',
+        params: {
+          'from': '${a.day}',
+          'to': '${b.day}',
+          'month': monthName(a.month),
+        },
+      );
     }
     return '${a.day} ${shortMonthName(a.month)} – '
         '${b.day} ${shortMonthName(b.month)}';

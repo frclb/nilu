@@ -120,8 +120,8 @@ class HeroDateLine extends StatelessWidget {
             const SizedBox(width: 6),
             Flexible(
               child: Text(
-                '${date.day} ${context.monthName(date.month)} '
-                '${date.year} · ${context.weekdayName(date.weekday)}',
+                '${context.dayMonthYear(date)} · '
+                '${context.weekdayName(date.weekday)}',
                 style: theme.textTheme.labelLarge?.copyWith(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w500,

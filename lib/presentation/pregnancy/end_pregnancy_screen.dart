@@ -309,8 +309,7 @@ class _TarihKarti extends StatelessWidget {
                       AppSectionLabel(context.tr('preg_end_date')),
                       const SizedBox(height: 2),
                       Text(
-                        '${tarih.day} ${context.monthName(tarih.month)} '
-                        '${tarih.year}',
+                        context.dayMonthYear(tarih),
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontSize: 17,
                           fontWeight: FontWeight.w700,

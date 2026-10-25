@@ -131,10 +131,7 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
         content: Text(
           ctx.tr(
             'home_period_early_body',
-            params: {
-              'n': '$daysLeft',
-              'date': '${predicted.day} ${ctx.monthName(predicted.month)}',
-            },
+            params: {'n': '$daysLeft', 'date': ctx.dayMonth(predicted)},
           ),
         ),
         actions: [

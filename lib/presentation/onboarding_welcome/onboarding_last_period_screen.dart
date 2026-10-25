@@ -249,7 +249,7 @@ class _OnboardingLastPeriodScreenState
       gridItems.add(
         AppTappable(
           selected: isSelected,
-          label: '$i ${context.monthName(date.month)} ${date.year}',
+          label: context.dayMonthYear(date),
           excludeChildSemantics: true,
           onTap: () {
             setState(() {

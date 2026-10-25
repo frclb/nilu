@@ -47,8 +47,7 @@ class CalendarDayHeader extends StatelessWidget {
       isPredicted: viewModel.isPredictedPeriodDay(selectedDate),
     );
 
-    final dateStr =
-        '${selectedDate.day} ${context.monthName(selectedDate.month)}';
+    final dateStr = context.dayMonth(selectedDate);
 
     // Gebelik ya da lohusalık günü: döngü günü yerine kaçıncı hafta ve ay
     // ya da doğumdan sonraki gün.

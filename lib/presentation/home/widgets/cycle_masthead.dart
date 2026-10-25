@@ -260,14 +260,6 @@ String _headline(
   );
 }
 
-/// Ajanda satırındaki kısa tarih.
-///
-/// Ay adları için ayrı bir liste tutmuyoruz: uygulamada zaten
-/// `context.monthName` var ve takvim de onu kullanıyor. İki ayrı listenin
-/// zamanla birbirinden ayrılması kaçınılmazdı.
-String _formatDate(BuildContext context, DateTime date) =>
-    '${date.day} ${context.monthName(date.month)}';
-
 /// Ajandadaki tek satır: simge, tarih ve olay, kalan gün.
 class _AgendaRow extends StatelessWidget {
   const _AgendaRow({required this.entry, this.range});
@@ -323,7 +315,7 @@ class _AgendaRow extends StatelessWidget {
                 Text(
                   switch (range) {
                     (final a, final b) => context.dayRange(a, b),
-                    null => _formatDate(context, entry.date),
+                    null => context.dayMonth(entry.date),
                   },
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

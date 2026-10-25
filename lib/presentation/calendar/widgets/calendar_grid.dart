@@ -606,7 +606,7 @@ class _DayTile extends StatelessWidget {
     // VoiceOver yalnızca "17" okuyordu: ayı, reglin ya da tahminin
     // olduğunu söylemiyordu. Renklerin anlattığı her şey burada yazıyla.
     final etiket = [
-      '${date.day} ${context.monthName(date.month)} ${date.year}',
+      context.dayMonthYear(date),
       if (isToday) MaterialLocalizations.of(context).currentDateLabel,
       if (isPeriod) context.tr('calendar_legend_period'),
       if (isPredicted && !isPeriod) context.tr('calendar_legend_predicted'),

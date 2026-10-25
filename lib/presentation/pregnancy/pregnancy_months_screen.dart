@@ -239,12 +239,11 @@ class _AyKarti extends StatelessWidget {
     final theme = Theme.of(context);
     final bas = ay.startIn(gebelik);
     final son = ay.endIn(gebelik);
-    String tarih(DateTime d) => '${d.day} ${context.monthName(d.month)}';
     final haftalar = context.tr(
       'preg_month_weeks',
       params: {'a': '${ay.fromWeek}', 'b': '${ay.toWeek}'},
     );
-    final tarihler = '${tarih(bas)} – ${tarih(son)}';
+    final tarihler = '${context.dayMonth(bas)} – ${context.dayMonth(son)}';
 
     if (durum == _Durum.simdi) {
       return _SimdikiAy(
@@ -525,11 +524,7 @@ class _DogumKarti extends StatelessWidget {
                 Text(
                   context.tr(
                     'preg_due_caption',
-                    params: {
-                      'date':
-                          '${edd.day} ${context.monthName(edd.month)} '
-                          '${edd.year}',
-                    },
+                    params: {'date': context.dayMonthYear(edd)},
                   ),
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontSize: 20,

@@ -182,9 +182,7 @@ class _HaftaKarti extends StatelessWidget {
               caption: RingCaption(
                 context.tr(
                   'preg_due_caption',
-                  params: {
-                    'date': '${edd.day} ${context.monthName(edd.month)}',
-                  },
+                  params: {'date': context.dayMonth(edd)},
                 ),
               ),
               center: Column(

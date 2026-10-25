@@ -70,9 +70,7 @@ void main() {
         find.text(
           ctx.tr(
             'preg_setup_due_result',
-            params: {
-              'date': '${edd.day} ${ctx.monthName(edd.month)} ${edd.year}',
-            },
+            params: {'date': ctx.dayMonthYear(edd)},
           ),
         ),
         findsOneWidget,
@@ -157,9 +155,7 @@ void main() {
         find.text(
           ctx.tr(
             'preg_setup_due_result',
-            params: {
-              'date': '${edd.day} ${ctx.monthName(edd.month)} ${edd.year}',
-            },
+            params: {'date': ctx.dayMonthYear(edd)},
           ),
         ),
         findsOneWidget,

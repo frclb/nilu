@@ -158,9 +158,7 @@ class _Satir extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
     final theme = Theme.of(context);
-    final tarih =
-        '${baslangic.day} ${context.monthName(baslangic.month)} '
-        '${baslangic.year}';
+    final tarih = context.dayMonthYear(baslangic);
     final regl = reglGunu;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),

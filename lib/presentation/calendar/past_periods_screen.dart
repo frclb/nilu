@@ -417,7 +417,7 @@ class _Ay extends StatelessWidget {
         : t.text;
 
     final etiket = [
-      '${gun.day} ${context.monthName(gun.month)} ${gun.year}',
+      context.dayMonthYear(gun),
       if (kayit) context.tr('past_periods_day_recorded'),
     ].join(', ');
 

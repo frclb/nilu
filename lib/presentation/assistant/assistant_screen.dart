@@ -111,7 +111,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
   String _formatDate(String iso) {
     final date = DateTime.tryParse(iso);
     if (date == null) return iso;
-    return '${date.day} ${context.monthName(date.month)}';
+    return context.dayMonth(date);
   }
 
   @override

@@ -18,7 +18,7 @@ extension CareText on BuildContext {
       final saat =
           '${randevu.hour.toString().padLeft(2, '0')}:'
           '${randevu.minute.toString().padLeft(2, '0')}';
-      return '${randevu.day} ${monthName(randevu.month)} · $saat';
+      return '${dayMonth(randevu)} · $saat';
     }
     if (e.isCustom) return tr('care_no_date');
 

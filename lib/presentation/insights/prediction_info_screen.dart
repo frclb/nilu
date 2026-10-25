@@ -32,8 +32,6 @@ class PredictionInfoScreen extends StatelessWidget {
     final next = info.predictedNextPeriod;
     final gecikti = info.daysLateAt(DateTime.now()) > 0;
 
-    String tarih(DateTime d) => '${d.day} ${context.monthName(d.month)}';
-
     final hesap = <String>[];
     if (basis != null) {
       switch (basis.source) {
@@ -147,7 +145,7 @@ class PredictionInfoScreen extends StatelessWidget {
                     child: AppTag(
                       label: context.tr(
                         'prediction_info_likely',
-                        params: {'date': tarih(next)},
+                        params: {'date': context.dayMonth(next)},
                       ),
                       dotColor: t.secondary,
                       foreground: t.flowText,

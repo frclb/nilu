@@ -156,9 +156,6 @@ class _PregnancySetupScreenState extends State<PregnancySetupScreen> {
     );
   }
 
-  String _tarih(DateTime d) =>
-      '${d.day} ${context.monthName(d.month)} ${d.year}';
-
   @override
   Widget build(BuildContext context) {
     // Takvim yüklenince ön dolu tarih ve döngü uzunluğu güncellensin.
@@ -255,7 +252,7 @@ class _PregnancySetupScreenState extends State<PregnancySetupScreen> {
                                   if (secili != null) ...[
                                     const SizedBox(height: 2),
                                     Text(
-                                      _tarih(secili),
+                                      context.dayMonthYear(secili),
                                       style: theme.textTheme.titleMedium
                                           ?.copyWith(
                                             fontWeight: FontWeight.w700,
@@ -299,7 +296,9 @@ class _PregnancySetupScreenState extends State<PregnancySetupScreen> {
                         Text(
                           context.tr(
                             'preg_setup_due_result',
-                            params: {'date': _tarih(g.estimatedDueDate)},
+                            params: {
+                              'date': context.dayMonthYear(g.estimatedDueDate),
+                            },
                           ),
                           style: theme.textTheme.headlineSmall?.copyWith(
                             fontSize: 21,

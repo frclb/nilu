@@ -157,11 +157,7 @@ class CareSummaryScreen extends StatelessWidget {
                   ),
                   tarih: context.tr(
                     'care_summary_generated',
-                    params: {
-                      'date':
-                          '${bugun.day} ${context.monthName(bugun.month)} '
-                          '${bugun.year}',
-                    },
+                    params: {'date': context.dayMonthYear(bugun)},
                   ),
                 ),
                 for (final b in bolumler) ...[
@@ -212,12 +208,10 @@ class CareSummaryScreen extends StatelessWidget {
     BuildContext context,
     PregnancySummary o,
   ) {
-    String tamTarih(DateTime d) =>
-        '${d.day} ${context.monthName(d.month)} ${d.year}';
+    String tamTarih(DateTime d) => context.dayMonthYear(d);
     // Geçmiş kayıt yıllar sonra okunabilir ve gebelik iki takvim yılına
     // yayılıyor: yılsız "12 Mart" hangi yılın olduğunu söylemez.
-    String tarih(DateTime d) =>
-        o.past ? tamTarih(d) : '${d.day} ${context.monthName(d.month)}';
+    String tarih(DateTime d) => o.past ? tamTarih(d) : context.dayMonth(d);
     final yok = SummaryLine(context.tr('care_summary_none'), muted: true);
     final g = o.pregnancy;
     final lohusa = o.stage == LifeStage.postpartum;
@@ -475,11 +469,7 @@ class CareSummaryScreen extends StatelessWidget {
       ..writeln(
         context.tr(
           'care_summary_generated',
-          params: {
-            'date':
-                '${bugun.day} ${context.monthName(bugun.month)} '
-                '${bugun.year}',
-          },
+          params: {'date': context.dayMonthYear(bugun)},
         ),
       )
       ..writeln()

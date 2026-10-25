@@ -75,7 +75,7 @@ void main() {
       final bugun = today;
       final etiket = find.bySemanticsLabel(
         RegExp(
-          '^${bugun.day} ${ctx.monthName(bugun.month)} ${bugun.year}, '
+          '^${RegExp.escape(ctx.dayMonthYear(bugun))}, '
           '.*${RegExp.escape(ctx.tr('calendar_legend_period'))}',
         ),
       );

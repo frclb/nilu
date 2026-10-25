@@ -112,7 +112,7 @@ class CycleSummaryScreen extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    '${now.day} ${context.monthName(now.month)} ${now.year}',
+                    context.dayMonthYear(now),
                     style: theme.textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: t.textMuted,

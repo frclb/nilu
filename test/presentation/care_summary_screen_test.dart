@@ -105,12 +105,7 @@ void main() {
     );
     final ctx = tester.element(find.byType(CareSummaryScreen));
 
-    expect(
-      metin(
-        '${daysAgo(2).day} ${ctx.monthName(daysAgo(2).month)} — 150/95 mmHg',
-      ),
-      findsOneWidget,
-    );
+    expect(metin('${ctx.dayMonth(daysAgo(2))} — 150/95 mmHg'), findsOneWidget);
     expect(
       metin(
         ctx.tr(
@@ -186,9 +181,7 @@ void main() {
     expect(dosya, contains(ctx.tr('care_summary_title')));
     expect(
       dosya,
-      contains(
-        '! ${daysAgo(2).day} ${ctx.monthName(daysAgo(2).month)} — 150/95 mmHg',
-      ),
+      contains('! ${ctx.dayMonth(daysAgo(2))} — 150/95 mmHg'),
       reason: 'Yüksek tansiyon metinde de işaretli olmalı',
     );
     expect(dosya, contains('Demir ilacını sor'));
