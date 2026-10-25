@@ -19,7 +19,9 @@ pluginManagement {
 
 plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"
-    id("com.android.application") version "8.11.1" apply false
+    // 8.13: flutter_secure_storage 11 compileSdk 37 istiyor ve SDK'da o
+    // platform "android-37.0" adıyla geliyor; 8.11 bu adı tanımıyordu.
+    id("com.android.application") version "8.13.2" apply false
     id("org.jetbrains.kotlin.android") version "2.2.20" apply false
     // Firebase: yalnızca app/google-services.json varken uygulanıyor.
     id("com.google.gms.google-services") version "4.4.4" apply false

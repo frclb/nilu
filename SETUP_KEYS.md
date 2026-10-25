@@ -517,6 +517,27 @@ Android'de henüz olmayanlar: **Apple Sağlık eşitlemesi** (Health Connect
 bağlanmadı) ve **ana ekran widget'ı**. Profil ekranında görünmüyorlar
 (`lib/core/platform/app_platform.dart`); mağaza metni de onları saymıyor.
 
+**Derleme ortamı (bu Mac'te kurulu):**
+
+| | |
+|---|---|
+| Android SDK | `/opt/homebrew/share/android-commandlinetools` (Homebrew `android-commandlinetools`) |
+| JDK | 21, Homebrew `openjdk@21` — Gradle 8.14 sistemdeki JDK 25'te çalışmıyor |
+| Flutter ayarı | `flutter config --android-sdk … --jdk-dir /opt/homebrew/opt/openjdk@21` |
+| Emülatör | `Nilu_Android16` (Pixel 8, Android 16, arm64) |
+
+```bash
+/opt/homebrew/share/android-commandlinetools/emulator/emulator -avd Nilu_Android16
+```
+```bash
+flutter run -d emulator-5554
+```
+
+Debug ve yayın derlemesi (AAB, R8 küçültmeli) emülatörde denendi: kurulum,
+bildirim izni, hatırlatıcıların planlanması, profilde gizlenen girişler,
+simge ve açılış ekranı. Derlemeler ~3 GB ara dosya bırakıyor
+(`build/app/intermediates`); disk dolarsa silinebilir.
+
 **10.1 Play Console hesabı:** [play.google.com/console](https://play.google.com/console)
 → geliştirici hesabı (tek seferlik ücret, kimlik doğrulaması).
 
