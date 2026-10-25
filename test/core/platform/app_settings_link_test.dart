@@ -33,8 +33,8 @@ void main() {
     }
   });
 
-  test('destek yalnızca iOS içindir', () {
-    expect(AppSettingsLink.isSupported, Platform.isIOS);
+  test('destek iOS ve Android\'de', () {
+    expect(AppSettingsLink.isSupported, Platform.isIOS || Platform.isAndroid);
   });
 
   test('açma başarısız olursa çökmez', () async {

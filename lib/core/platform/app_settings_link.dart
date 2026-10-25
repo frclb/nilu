@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Uygulamanın **kendi** ayar sayfasını açar.
@@ -27,12 +28,18 @@ class AppSettingsLink {
 
   /// Bu platformda ayar sayfası açılabiliyor mu?
   ///
-  /// Yalnızca iOS. Android'de uygulamanın ayarlarına gitmek bir intent
-  /// gerektiriyor ve bu sürüm iOS için yayınlanıyor. Desteklenmeyen yerde
-  /// düğme hiç çizilmiyor — dokunulduğunda hiçbir şey olmayan bir düğme,
-  /// kullanıcıya arıza gibi görünür.
+  /// iOS'ta `app-settings:` bağlantısı; Android'de uygulama ayrıntıları
+  /// sayfası, bir intent'le (`MainActivity`, [_androidChannel]).
+  /// Desteklenmeyen yerde düğme hiç çizilmiyor — dokunulduğunda hiçbir şey
+  /// olmayan bir düğme, kullanıcıya arıza gibi görünür.
   static bool get isSupported =>
-      debugSupportedOverride ?? (!kIsWeb && Platform.isIOS);
+      debugSupportedOverride ??
+      (!kIsWeb && (Platform.isIOS || Platform.isAndroid));
+
+  /// Android'de ayar sayfasını açan kanal; `MainActivity.kt` ile aynı ad.
+  static const MethodChannel _androidChannel = MethodChannel(
+    'nilu/app_settings',
+  );
 
   /// Testte platform kararını değiştirmek için.
   ///
@@ -50,6 +57,9 @@ class AppSettingsLink {
   static Future<bool> open() async {
     if (!isSupported) return false;
     try {
+      if (!kIsWeb && Platform.isAndroid) {
+        return await _androidChannel.invokeMethod<bool>('open') ?? false;
+      }
       return await launcher(Uri.parse(uri));
     } catch (e) {
       debugPrint('Could not open app settings: $e');

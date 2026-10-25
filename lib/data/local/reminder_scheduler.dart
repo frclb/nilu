@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
@@ -12,7 +13,18 @@ import '../../domain/services/reminder_planner.dart';
 /// ama hiçbir zaman bildirim almıyordu.
 class ReminderScheduler {
   static const String _channelId = 'cycle_reminders';
-  static const String _channelName = 'Cycle Reminders';
+
+  /// Kanalın adı Android'in bildirim ayarlarında görünüyor: kullanıcının
+  /// dilinde ve nötr ("Hatırlatıcılar"), ne takip edildiğini söylemiyor.
+  static const String _channelNameKey = 'notification_channel_reminders';
+
+  /// Durum çubuğundaki simge: beyaz lotus siluet
+  /// (tool/generate_android_assets.py). Renkli uygulama simgesi orada beyaz
+  /// bir kare olarak görünürdü.
+  static const String _androidIcon = '@drawable/ic_stat_nilu';
+
+  /// Bildirimin vurgu rengi: markanın mürdümü (plum700).
+  static const Color _androidColor = Color(0xFF541942);
 
   final FlutterLocalNotificationsPlugin _plugin;
 
@@ -28,7 +40,7 @@ class ReminderScheduler {
     tz_data.initializeTimeZones();
 
     const settings = InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      android: AndroidInitializationSettings(_androidIcon),
       iOS: DarwinInitializationSettings(
         // İzin açılışta değil, kullanıcı hatırlatıcıyı açtığında istenir.
         requestAlertPermission: false,
@@ -116,14 +128,16 @@ class ReminderScheduler {
           title: reminder.literalTitle ?? localize(reminder.titleKey),
           body: localize(reminder.bodyKey),
           scheduledDate: tz.TZDateTime.from(reminder.when, tz.local),
-          notificationDetails: const NotificationDetails(
+          notificationDetails: NotificationDetails(
             android: AndroidNotificationDetails(
               _channelId,
-              _channelName,
+              localize(_channelNameKey),
               importance: Importance.defaultImportance,
               priority: Priority.defaultPriority,
+              icon: _androidIcon,
+              color: _androidColor,
             ),
-            iOS: DarwinNotificationDetails(),
+            iOS: const DarwinNotificationDetails(),
           ),
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
           matchDateTimeComponents: reminder.type == ReminderType.dailyLog

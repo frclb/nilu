@@ -1020,20 +1020,20 @@ O Nilu não faz diagnóstico, não indica tratamento e não é um método contra
 
 ## Google Play notları
 
-**Uygulamanın Android derlemesi henüz yok** (`android/` klasörü yok).
-Metin, Android sürümünün iOS'la aynı özelliklere sahip olacağını
-varsayıyor; şu farklar dışında:
+**Android projesi hazır** (`android/`, kurulum: SETUP_KEYS.md §10) ama
+henüz bir cihazda denenmedi. Metin, Android sürümünün iOS'la aynı
+özelliklere sahip olduğunu söylüyor; şu farklar dışında:
 
 - **Apple Sağlık ve ana ekran widget'ı çıkarıldı.** İkisi de yalnızca
   iOS'ta var; Android'de Health Connect ve Glance widget'ı yazılmadıkça
   vaat edilmemeli.
-- **"Reklam kimliğin kullanılmıyor" çıkarıldı.** iOS'ta ATT istenmediği
-  için IDFA sıfır geliyor; Android'de AdMob kişiselleştirilmemiş reklamda
-  bile reklam kimliğini sıklık sınırı ve dolandırıcılık önleme için
-  okuyabiliyor. Data safety formunda "Device or other IDs" beyan
-  edilmeli.
+- **"Reklam kimliğin kullanılmıyor" yazılmadı.** Manifest reklam kimliği
+  iznini kaldırıyor, ama AdMob SDK'sı kişiselleştirilmemiş reklamda da
+  başka cihaz tanımlayıcıları (App Set ID) okuyabiliyor; Data safety
+  formunda "Cihaz ya da diğer kimlikler" beyan ediliyor. Metin bu yüzden
+  yalnızca "kişiselleştirilmiyor" diyor.
 - **Giriş sağlayıcısı adı verilmedi** ("hesabınla giriş"): Android'de
-  Apple ile giriş ayrıca yapılandırma istiyor.
+  Apple ile giriş ayrıca bir Services ID istiyor (SETUP_KEYS.md §10.3).
 - **Ekran kilidi** Face ID yerine parmak izi / yüz tanıma / ekran kilidi.
 
 Android derlemesi çıktığında bu maddeler uygulamayla yeniden

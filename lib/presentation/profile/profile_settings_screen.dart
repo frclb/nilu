@@ -13,6 +13,7 @@ import '../../design_system/content_illustration.dart';
 import 'package:go_router/go_router.dart';
 import '../../localization/app_localizations.dart';
 import '../../core/navigation/route_names.dart';
+import '../../core/platform/app_platform.dart';
 import 'package:provider/provider.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../domain/view_models/account_view_model.dart';
@@ -239,27 +240,30 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                                 ),
                                 // Ana ekran widget'ı uygulamada var ama onu
                                 // tanıtan ekran hiçbir yerden açılmıyordu:
-                                // rota tanımlıydı, kapısı yoktu.
-                                SettingsItem(
-                                  title: context.tr('widgets_title'),
-                                  icon: Icons.widgets_outlined,
-                                  iconColor: primary,
-                                  iconBgColor: tint,
-                                  onTap: () {
-                                    context.pushNamed(
-                                      RouteNames.widgetsPreview,
-                                    );
-                                  },
-                                ),
-                                SettingsItem(
-                                  title: context.tr('health_sync_title'),
-                                  icon: Icons.monitor_heart_outlined,
-                                  iconColor: primary,
-                                  iconBgColor: tint,
-                                  onTap: () {
-                                    context.pushNamed(RouteNames.healthSync);
-                                  },
-                                ),
+                                // rota tanımlıydı, kapısı yoktu. Android'de
+                                // widget (ve Sağlık eşitlemesi) henüz yok.
+                                if (AppPlatform.homeWidget)
+                                  SettingsItem(
+                                    title: context.tr('widgets_title'),
+                                    icon: Icons.widgets_outlined,
+                                    iconColor: primary,
+                                    iconBgColor: tint,
+                                    onTap: () {
+                                      context.pushNamed(
+                                        RouteNames.widgetsPreview,
+                                      );
+                                    },
+                                  ),
+                                if (AppPlatform.healthSync)
+                                  SettingsItem(
+                                    title: context.tr('health_sync_title'),
+                                    icon: Icons.monitor_heart_outlined,
+                                    iconColor: primary,
+                                    iconBgColor: tint,
+                                    onTap: () {
+                                      context.pushNamed(RouteNames.healthSync);
+                                    },
+                                  ),
                               ],
                               SettingsItem(
                                 title: context.tr('appearance_title'),

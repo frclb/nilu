@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:period_tracker/core/platform/app_platform.dart';
 import 'package:period_tracker/data/repositories/care_repository.dart';
 import 'package:period_tracker/data/repositories/cycle_settings_repository.dart';
 import 'package:period_tracker/data/repositories/period_repository.dart';
@@ -436,6 +437,8 @@ void main() {
             // test bitmeden geri alınmalı.
             debugDisableShadows = false;
             debugDefaultTargetPlatformOverride = device.value.platform;
+            AppPlatform.debugAndroid =
+                device.value.platform == TargetPlatform.android;
             _mockBiometrics(device.value.platform);
 
             await _seed(lang, pregnant: shot.value.pregnant);
@@ -452,6 +455,7 @@ void main() {
             tester.takeException();
 
             debugDefaultTargetPlatformOverride = null;
+            AppPlatform.debugAndroid = null;
             debugDisableShadows = true;
           },
         );

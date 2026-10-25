@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/navigation/route_names.dart';
+import '../../core/platform/app_platform.dart';
 import '../../design_system/app_card.dart';
 import '../../design_system/app_decor.dart';
 import '../../design_system/brand_lotus.dart';
@@ -145,14 +147,26 @@ class _ActiveState extends StatelessWidget {
   /// Aboneliği yönetme mağazanın işi.
   ///
   /// Apple, uygulama içinde iptal düğmesi koymayı değil sistem ayarlarına
-  /// yönlendirmeyi istiyor.
-  void _openManageSubscriptions(BuildContext context) {
+  /// yönlendirmeyi istiyor; yol tarif ediliyor. Google Play'in abonelikler
+  /// sayfası ise bir bağlantı: doğrudan açılıyor, açılamazsa yol tarif
+  /// ediliyor.
+  Future<void> _openManageSubscriptions(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
+    final hint = context.tr(AppPlatform.storeKey('premium_manage_hint'));
+    if (AppPlatform.isAndroid) {
+      try {
+        final opened = await launchUrl(
+          Uri.parse(AppPlatform.playSubscriptionsUrl),
+          mode: LaunchMode.externalApplication,
+        );
+        if (opened) return;
+      } catch (e) {
+        debugPrint('Could not open Play subscriptions: $e');
+      }
+    }
     messenger
       ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(content: Text(context.tr('premium_manage_hint'))),
-      );
+      ..showSnackBar(SnackBar(content: Text(hint)));
   }
 }
 
@@ -223,7 +237,7 @@ class _OfferStateState extends State<_OfferState> {
 
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  context.tr('premium_disclaimer'),
+                  context.tr(AppPlatform.storeKey('premium_disclaimer')),
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: t.textMuted,

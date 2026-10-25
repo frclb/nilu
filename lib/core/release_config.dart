@@ -29,6 +29,21 @@ class ReleaseConfig {
   /// AdMob → Ad units → Banner: `ca-app-pub-…/…`.
   static const String admobBannerUnitIos = placeholder;
 
+  /// RevenueCat → Project settings → API keys → Google Play için **public**
+  /// SDK anahtarı (`goog_` ile başlar).
+  static const String revenueCatGoogleApiKey = placeholder;
+
+  /// AdMob → Apps → (Android uygulaması) → App ID. AdMob'da iOS ve Android
+  /// ayrı uygulamalar; kimlikler farklı.
+  ///
+  /// `android/app/src/main/AndroidManifest.xml` içindeki
+  /// `com.google.android.gms.ads.APPLICATION_ID` ile aynı olmalı
+  /// (denetleyici karşılaştırıyor).
+  static const String admobAppIdAndroid = placeholder;
+
+  /// AdMob → Ad units → (Android uygulaması) → Banner.
+  static const String admobBannerUnitAndroid = placeholder;
+
   /// Kullanıcının haklarını kullanacağı ve soru soracağı adres.
   static const String? supportEmail = null;
 

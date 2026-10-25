@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 
+import '../../core/platform/app_platform.dart';
 import '../../domain/models/home_widget_entry.dart';
 
 /// Ana ekran widget'ına veri yazar.
@@ -39,6 +40,8 @@ class WidgetDatasource {
     List<HomeWidgetEntry> entries, {
     required String staleText,
   }) async {
+    // Android'de widget henüz yok; veri yazmak boşuna olurdu.
+    if (!AppPlatform.homeWidget) return;
     try {
       await HomeWidget.setAppGroupId(appGroupId);
       await HomeWidget.saveWidgetData(

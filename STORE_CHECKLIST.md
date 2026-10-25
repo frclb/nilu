@@ -245,6 +245,32 @@ kapsayarak yapılmalı — Apple isteğe bağlı toplanan veriyi de beyan istiyo
 - Formda her kategoride "optional" ayrımı yok; açıklama alanı olmadığı için
   politika §4 isteğe bağlı olduğunu anlatıyor.
 
+### Google Play — Data safety
+Play Console → Uygulama içeriği → Veri güvenliği. Aynı tablodan; Play'de
+"isteğe bağlı" işareti **var**, kullanılmalı.
+
+- **Toplanan veri** (cihazdan çıkan), hepsi **isteğe bağlı**, amaç
+  **Uygulama işlevselliği**, hiçbiri **paylaşılmıyor** (partnere gönderilen
+  yakınlık durumu kullanıcının kendi başlattığı bir aktarım; Play bunu
+  paylaşım saymıyor):
+  - **Sağlık ve fitness → Sağlık bilgisi:** bulut eşitleme açıksa kayıtların
+    kopyası; partner paylaşımı açıksa yakınlık durumu
+  - **Kişisel bilgiler → Ad, E-posta adresi:** Apple ya da Google ile giriş
+  - **Kişisel bilgiler → Kullanıcı kimlikleri:** hesap kimliği, partner için
+    anonim kimlik
+  - **Uygulama etkinliği → Kullanıcı tarafından oluşturulan diğer içerik:**
+    eşitleme açıksa gün notları
+  - **Finansal bilgiler → Satın alma geçmişi:** abonelik (RevenueCat)
+- **Reklam SDK'sı:** Google'ın
+  [Google Mobile Ads SDK beyan rehberine](https://developers.google.com/admob/android/privacy/play-data-disclosure)
+  göre doldurulmalı (IP adresinden yaklaşık konum, uygulama etkileşimleri,
+  tanılama, cihaz kimlikleri — amaç reklam ve dolandırıcılık önleme).
+  Reklam kimliği izni manifestte kaldırıldı (SETUP_KEYS.md §10.5).
+- **Firebase:** [Firebase'in Play beyan rehberi](https://firebase.google.com/docs/android/play-data-disclosure)
+  — Authentication ve Firestore'un topladıkları yukarıdaki kalemlerle örtüşüyor.
+- **Güvenlik:** aktarımda şifreli — **Evet**. Kullanıcı silme isteyebilir —
+  **Evet** (uygulama içinden; dışarıdan: sitede `support/#delete-account`).
+
 ### Hesap silme ✅
 Apple, hesap oluşturan uygulamalarda **uygulama içinden hesap silmeyi**
 zorunlu tutar (App Store Review Guideline 5.1.1(v)).

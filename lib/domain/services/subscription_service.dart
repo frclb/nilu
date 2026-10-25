@@ -10,6 +10,14 @@ class SubscriptionService {
   /// yer tutucu anahtarla yapılandırmak her açılışta ağ hatası üretiyor ve
   /// paywall'u boş bir teklif listesiyle bekletiyordu.
   static const _appleApiKey = ReleaseConfig.revenueCatAppleApiKey;
+  static const _googleApiKey = ReleaseConfig.revenueCatGoogleApiKey;
+
+  /// Bu platformun anahtarı; desteklenmeyen platformda `null`.
+  static String? get _apiKey => switch (defaultTargetPlatform) {
+    TargetPlatform.iOS => _appleApiKey,
+    TargetPlatform.android => _googleApiKey,
+    _ => null,
+  };
 
   static final Completer<void> _readyCompleter = Completer<void>();
 
@@ -38,7 +46,8 @@ class SubscriptionService {
   static Future<void> get ready => _readyCompleter.future;
 
   static Future<void> init() async {
-    if (!ReleaseConfig.isSet(_appleApiKey)) {
+    final apiKey = _apiKey;
+    if (!ReleaseConfig.isSet(apiKey)) {
       debugPrint('RevenueCat key not set; subscriptions unavailable.');
       if (!_readyCompleter.isCompleted) _readyCompleter.complete();
       return;
@@ -48,15 +57,9 @@ class SubscriptionService {
       // ve kullanıcı kimliği ayrıntısı yazılmasın.
       await Purchases.setLogLevel(kDebugMode ? LogLevel.debug : LogLevel.warn);
 
-      late StoreConfig storeConfig;
-      if (defaultTargetPlatform == TargetPlatform.iOS) {
-        storeConfig = StoreConfig(store: Store.appStore, apiKey: _appleApiKey);
-      } else {
-        // Android için eklenebilir
-        return;
-      }
-
-      final configuration = PurchasesConfiguration(storeConfig.apiKey);
+      // Anahtarın öneki mağazayı belirliyor (appl_ / goog_); SDK hangi
+      // mağazaya bağlanacağını ondan biliyor.
+      final configuration = PurchasesConfiguration(apiKey!);
       await Purchases.configure(configuration);
       _configured = true;
     } catch (e) {
@@ -142,11 +145,4 @@ class SubscriptionService {
       return false;
     }
   }
-}
-
-class StoreConfig {
-  final Store store;
-  final String apiKey;
-
-  StoreConfig({required this.store, required this.apiKey});
 }

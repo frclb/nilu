@@ -42,6 +42,7 @@ Birbirine bağlılar, atlama:
 7. Firebase                     → partner eşleşmesi
 8. Site (GitHub Pages)          → gizlilik, şartlar, destek adresleri
 9. Son denetim                  → dart run tool/check_release.dart
+10. Google Play (Android)       → 5–7'deki hesaplara Android eklenir
 ```
 
 ---
@@ -496,7 +497,148 @@ dart run tool/check_release.dart
 Hesaplara bağlı her değeri denetler: RevenueCat anahtarı, AdMob kimlikleri
 (Google test kimlikleri reddedilir, Info.plist ile karşılaştırılır), destek
 e-postası, `GoogleService-Info.plist` (Runner hedefinde mi, doğru uygulamaya mı
-ait), `.firebaserc`, site adresi. Eksik yoksa "Yayına hazır" der.
+ait), `.firebaserc`, site adresi. `android/` olduğu için Android tarafını da
+denetler (§10). Eksik yoksa "Yayına hazır" der.
+
+---
+
+## 10. Google Play (Android)
+
+Android projesi hazır (`android/`). Kimlik iOS'la aynı, bu yüzden Firebase,
+RevenueCat ve AdMob'da **aynı projelere** Android uygulaması ekleniyor.
+
+| | |
+|---|---|
+| Paket adı | `com.furkan.rcperiodtracker` |
+| En düşük sürüm | Android 8.0 (API 26) — health eklentisi |
+| Hedef sürüm | Android 16 (API 36) — Play 31 Ağustos 2026'dan beri istiyor |
+
+Android'de henüz olmayanlar: **Apple Sağlık eşitlemesi** (Health Connect
+bağlanmadı) ve **ana ekran widget'ı**. Profil ekranında görünmüyorlar
+(`lib/core/platform/app_platform.dart`); mağaza metni de onları saymıyor.
+
+**10.1 Play Console hesabı:** [play.google.com/console](https://play.google.com/console)
+→ geliştirici hesabı (tek seferlik ücret, kimlik doğrulaması).
+
+> **Kişisel hesapta yayından önce kapalı test şart.** 13 Kasım 2023'ten sonra
+> açılan kişisel hesaplar, üretime çıkmadan önce **en az 12 test kullanıcısıyla
+> 14 gün kesintisiz** kapalı test yapmak zorunda; bitmeden "Production" kilitli.
+> Kuruluş hesabı (D-U-N-S numarasıyla) bu şarttan muaf. 14 gün takvimi
+> belirlediği için hesap ve dahili test erkenden açılmalı; test kullanıcısı
+> düşerse sayaç sıfırlanabiliyor, birkaç yedek kişi eklemek iyi olur.
+
+**10.2 Yayın imzası:**
+
+```bash
+keytool -genkey -v -keystore ~/nilu-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+```
+
+`android/key.properties.example` → `android/key.properties` olarak kopyala ve
+doldur (git dışında). Play App Signing açık kalsın: Google uygulama imzalama
+anahtarını tutuyor, sen yalnızca **yükleme anahtarıyla** imzalıyorsun; yükleme
+anahtarı kaybolursa sıfırlatılabiliyor. `.jks` dosyasını ve parolaları
+depoya **koyma**, ayrıca yedekle.
+
+İki anahtarın SHA-1 ve SHA-256 parmak izi 10.3'te gerekecek:
+
+```bash
+keytool -list -v -keystore ~/nilu-upload.jks -alias upload
+```
+
+Uygulama imzalama anahtarınınki: Play Console → Test and release → App
+integrity → App signing. Geliştirme için debug anahtarı:
+
+```bash
+keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android
+```
+
+**10.3 Firebase Android uygulaması:** Proje ayarları → Uygulama ekle →
+Android → paket adı `com.furkan.rcperiodtracker` → **SHA-1 ve SHA-256**
+parmak izlerini ekle (yükleme, uygulama imzalama ve debug anahtarları). Sonra
+`google-services.json` indir → `android/app/google-services.json`. Ya da:
+
+```bash
+flutterfire configure --platforms=android
+```
+
+Dosya yokken derleme yine çalışıyor (Gradle eklentisi yalnızca dosya varsa
+uygulanıyor), uygulama yerel modda açılıyor.
+
+- **Google ile giriş** Android'de parmak izi olmadan `DEVELOPER_ERROR`
+  veriyor. Denetleyici dosyada sertifikalı bir OAuth istemcisi arıyor.
+- **Apple ile giriş** Android'de Apple'ın web akışıyla çalışıyor ve iOS'tan
+  farklı olarak bir **Services ID** istiyor: Apple Developer → Identifiers →
+  Services IDs → yeni (ör. `com.furkan.rcperiodtracker.signin`) → Sign in
+  with Apple → Return URL `https://<proje-kimliği>.firebaseapp.com/__/auth/handler`.
+  Services ID, Firebase'deki Apple sağlayıcısına girilir. Bu yapılmazsa
+  Android'de "Apple ile Devam Et" hata verir. iPhone'da Apple hesabıyla bulut
+  eşitlemesi açıp Android'e geçen kullanıcı kayıtlarını ancak bununla geri
+  alabiliyor.
+
+**10.4 RevenueCat — Google Play:** RevenueCat → Apps → + Google Play →
+paket adı. Play Console'da bir **hizmet hesabı** (Google Cloud → Service
+accounts → JSON anahtarı; Play Console → Users and permissions'ta finans
+izinleri) oluşturup RevenueCat'e yükle — RevenueCat'in Play kurulum rehberi
+adım adım anlatıyor.
+
+Play'de abonelik ürünleri: Monetize → Subscriptions. App Store'daki ürün
+kimlikleriyle aynı adları kullanmak RevenueCat'te eşlemeyi kolaylaştırır;
+her ürüne aylık/yıllık **base plan**. Ürünleri `premium` entitlement'ına ve
+`default` offering'e bağla.
+
+> Play, abonelik ürünü oluşturmaya ancak faturalandırma izni olan bir
+> derleme yüklendikten sonra izin veriyor: önce bir AAB'yi dahili test
+> kanalına yükle (10.7).
+
+Anahtar (`goog_` ile başlar) → `lib/core/release_config.dart`:
+
+```dart
+static const String revenueCatGoogleApiKey = 'goog_…';
+```
+
+**10.5 AdMob — Android uygulaması:** AdMob'da aynı hesapta Apps → Add app →
+**Android**. iOS ile kimlikler farklı:
+
+- App ID → `release_config.dart` → `admobAppIdAndroid` **ve**
+  `android/app/src/main/AndroidManifest.xml` →
+  `com.google.android.gms.ads.APPLICATION_ID` (şu an Google'ın örnek kimliği;
+  denetleyici ikisini karşılaştırıyor)
+- Banner birimi → `admobBannerUnitAndroid`
+
+`app-ads.txt` aynı yayıncı kimliğini taşıdığı için değişmiyor.
+
+Manifest reklam kimliği iznini (`AD_ID`) **kaldırıyor**: reklamlar
+kişiselleştirilmemiş, iOS'ta da IDFA istenmiyor. Play Console'daki "Reklam
+kimliği" sorusuna bu yüzden **Hayır**.
+
+**10.6 Play Console → Uygulama içeriği (App content):** her biri
+STORE_CHECKLIST.md "Google Play" bölümünde ayrıntılı.
+
+- Gizlilik politikası: sitenin `…/tr/privacy/` adresi
+- Reklam içeriyor: **Evet**
+- Uygulama erişimi: bütün özellikler girişsiz kullanılabiliyor
+- **Sağlık uygulamaları beyanı:** her uygulama için zorunlu; "Period
+  tracking" (regl takibi) ve gebelik ile ilgili seçenekler işaretlenir.
+  Health Connect kullanılmadığı için onun izin formu yok.
+- **Veri güvenliği (Data safety):** STORE_CHECKLIST.md §4 → "Google Play —
+  Data safety"
+- **Hesap silme bağlantısı:** `…/tr/support/#delete-account` (sitede
+  hazır; uygulama dışından silme isteme yolu da orada)
+- İçerik derecelendirmesi (IARC anketi), hedef kitle (13+)
+
+**10.7 Derleme ve yükleme:**
+
+```bash
+flutter build appbundle --release
+```
+
+`build/app/outputs/bundle/release/app-release.aab` → Play Console → Test and
+release → Internal testing → yeni sürüm. Sonra kapalı test (12 kişi, 14
+gün), sonra üretim. Sürüm numarası iOS'la ortak: `pubspec.yaml` →
+`version`.
+
+Mağaza metinleri [STORE_LISTING.md](STORE_LISTING.md) "Google Play"
+bölümünde, görseller `store_assets/google_play/`.
 
 ---
 

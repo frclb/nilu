@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
+import 'package:period_tracker/core/platform/app_platform.dart';
 import 'package:period_tracker/design_system/app_flavor.dart';
 import 'package:period_tracker/design_system/app_theme.dart';
 import 'package:period_tracker/design_system/brand_lotus.dart';
@@ -148,6 +149,17 @@ void main() {
     expect(saving, findsOneWidget);
     final style = tester.widget<Text>(saving).style;
     expect(style?.fontWeight, FontWeight.w600);
+  });
+
+  testWidgets('Android: ödeme Google Play hesabından', (tester) async {
+    // Google Play de otomatik yenileme bildirimini istiyor; "Apple kimliği"
+    // yazan bir not Android'de yanlış olurdu.
+    AppPlatform.debugAndroid = true;
+    addTearDown(() => AppPlatform.debugAndroid = null);
+    await open(tester, brightness: Brightness.light);
+
+    expect(find.text(s('premium_disclaimer_android')), findsOneWidget);
+    expect(find.text(s('premium_disclaimer')), findsNothing);
   });
 
   testWidgets('karanlık temada da eksiksiz', (tester) async {

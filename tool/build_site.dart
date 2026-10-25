@@ -257,8 +257,11 @@ ${list('privacy_points')}
     final faq = (s['faq'] as List)
         .cast<Map<String, dynamic>>()
         .map(
+          // `id`: dışarıdan bağlantı verilen sorular (Google Play hesap
+          // silme sayfası olarak #delete-account'u istiyor).
           (f) =>
-              '<details><summary>${_esc(f['q'] as String)}</summary>'
+              '<details${f['id'] == null ? '' : ' id="${_esc(f['id'] as String)}"'}>'
+              '<summary>${_esc(f['q'] as String)}</summary>'
               '<p>${_render(lang, f['a'] as String)}</p></details>',
         )
         .join('\n');

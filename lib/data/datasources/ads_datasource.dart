@@ -25,13 +25,16 @@ class AdsDatasource {
 
   /// Banner reklam birimi; gösterilmeyecekse `null`.
   ///
-  /// Release derlemede gerçek birim (`ReleaseConfig.admobBannerUnitIos`).
-  /// O doldurulmamışsa reklam hiç istenmiyor: test reklamları "Test mode"
-  /// rozetiyle yayına çıkarsa inceleme uygulamayı yarım sayar.
+  /// Release derlemede platformun gerçek birimi
+  /// (`ReleaseConfig.admobBannerUnitIos` / `…Android`). O doldurulmamışsa
+  /// reklam hiç istenmiyor: test reklamları "Test mode" rozetiyle yayına
+  /// çıkarsa inceleme uygulamayı yarım sayar.
   static String? get bannerUnitId => unitFor(
     release: kReleaseMode,
     ios: Platform.isIOS,
-    configured: ReleaseConfig.admobBannerUnitIos,
+    configured: Platform.isIOS
+        ? ReleaseConfig.admobBannerUnitIos
+        : ReleaseConfig.admobBannerUnitAndroid,
   );
 
   @visibleForTesting
@@ -41,7 +44,7 @@ class AdsDatasource {
     required String configured,
   }) {
     if (!release) return ios ? _testBannerIOS : _testBannerAndroid;
-    if (!ios || !ReleaseConfig.isSet(configured)) return null;
+    if (!ReleaseConfig.isSet(configured)) return null;
     return configured;
   }
 

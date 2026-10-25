@@ -1,0 +1,12 @@
+# Yayın imzası. Bu dosyayı key.properties adıyla kopyala ve doldur;
+# key.properties git dışında (android/.gitignore). Anahtar deposu da
+# (*.jks) depoya girmez — kaybedilirse Play App Signing'deki yükleme
+# anahtarı sıfırlatılmalı.
+#
+# Oluşturmak için:
+#   keytool -genkey -v -keystore ~/nilu-upload.jks -keyalg RSA -keysize 2048 \
+#     -validity 10000 -alias upload
+storePassword=
+keyPassword=
+keyAlias=upload
+storeFile=/Users/KULLANICI/nilu-upload.jks

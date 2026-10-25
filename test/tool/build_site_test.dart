@@ -48,6 +48,18 @@ void main() {
     }
   });
 
+  test('hesap silme sorusunun sabit bir bağlantısı var', () {
+    // Google Play, hesap açılabilen uygulamalardan uygulama dışında bir
+    // silme sayfası istiyor; Play Console'a .../support/#delete-account
+    // giriliyor.
+    for (final d in diller) {
+      final html = File(
+        '${cikti.path}/$d/support/index.html',
+      ).readAsStringSync();
+      expect(html, contains('<details id="delete-account">'), reason: d);
+    }
+  });
+
   for (final d in diller) {
     test('$d: gizlilik ve şartlar uygulamadaki metnin aynısı', () {
       final s = sozluk(d);
