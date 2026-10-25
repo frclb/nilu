@@ -121,6 +121,14 @@ değişince komutlar yeniden koşuluyor.
 > dışına taşıyor; başlıklarda bir kelime pembe degradeyle vurgulu. Çizim
 > parçaları `tool/store_kit.py`'de, kurgu ve metinler
 > `tool/store_screenshots.py`'de.
+>
+> **Google Play'de** paneller arasında iki ipek şerit akıyor: her panel
+> sınırında çaprazlanıyorlar, her panelde biri cihazın arkasından yukarı
+> kıvrılıyor, öteki cihazın altından önüne geçiyor (önden arkaya geçiş
+> sınırda, görünmeyen yerde). Boncuklar şeridin üstünde. Öne çıkan görsel
+> aynı şeridi kullanıyor. Sekiz panelin ikisi Android'e özgü: ana ekran
+> widget'ı (widget önizleme ekranından kesilen kartlarla kurulan bir ana
+> ekran) ve Health Connect; asistan ve kütüphane yalnızca App Store'da.
 
 | Görsel | Boyut | Dil başına |
 |---|---|---|
@@ -135,8 +143,10 @@ değişince komutlar yeniden koşuluyor.
 | Google Play simgesi | 512×512 | tek |
 
 Hepsi alfasız RGB; başlık ve arama görselleri JPEG (gren dokusuyla PNG
-10 MB'ı geçiyordu), diğerleri PNG. Sıra mağazadaki sıra; ilk üçü (ana sayfa, takvim,
-gizlilik) arama sonuçlarında görünüyor.
+10 MB'ı geçiyordu), diğerleri PNG. Sıra mağazadaki sıra; App Store'da ilk
+üçü (ana sayfa, takvim, gizlilik) arama sonuçlarında görünüyor. Play'de
+sıra: ana sayfa, takvim, widget, gizlilik, günlük, içgörüler, gebelik,
+Health Connect.
 
 > **iPhone'da zorunlu olan "Dynamic Island, orta ekran"** (1206×2622).
 > Apple'ın sayfası büyük ekran için iki ayrı yedek kuralı veriyor ve

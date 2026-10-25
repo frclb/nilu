@@ -24,7 +24,9 @@ kuruyor:
 
 Sekiz panel tek bir geniş zeminden kesiliyor: döngü halkasının boncukları
 bir dalga hâlinde bütün panellerden akıyor, mağazada kaydırınca görseller
-birbirine bağlanıyor. Hiçbir çıktıda saydamlık yok.
+birbirine bağlanıyor. Google Play'de üstüne ışıklı bir şerit paneller
+arasında kıvrılıyor ve dizide Android'e özgü iki panel var: ana ekran
+widget'ı ve Health Connect. Hiçbir çıktıda saydamlık yok.
 
 Ölçüler ve kurallar (Ekim 2026):
   * Ekran görüntüsü boyutları — developer.apple.com/help/app-store-connect/
@@ -41,7 +43,7 @@ import math
 import os
 import sys
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageChops, ImageDraw
 
 import store_kit as K
 
@@ -67,6 +69,21 @@ SHOTS = (
     "health_library",
 )
 
+# Google Play: en fazla sekiz. Android'e özgü iki panel (ana ekran widget'ı,
+# Health Connect) asistan ve kütüphanenin yerini alıyor; ikisi de mağaza
+# metninde anlatılıyor. `widget_home` ham ekran değil, widget önizleme
+# ekranından kesilen kartlarla kurulan bir ana ekran (`android_home`).
+PLAY_SHOTS = (
+    "home",
+    "calendar",
+    "widget_home",
+    "privacy_security",
+    "log_entry",
+    "insights",
+    "pregnancy_home",
+    "health_sync",
+)
+
 CAPTIONS = {
     "tr": {
         "home": ("DÖNGÜ", "Döngünü\n*bir bakışta* gör"),
@@ -77,6 +94,8 @@ CAPTIONS = {
         "assistant": ("VERİNE SOR", "Cevaplar kendi\n*kayıtlarından*"),
         "pregnancy_home": ("GEBELİK", "Gebelikte de\n*yanında*"),
         "health_library": ("KÜTÜPHANE", "*Kaynaklı* yazılarla\nöğren"),
+        "widget_home": ("WİDGET", "Döngün\n*ana ekranında*"),
+        "health_sync": ("EŞİTLEME", "Health Connect ile\n*eşitle*"),
     },
     "en": {
         "home": ("CYCLE", "Your cycle\n*at a glance*"),
@@ -87,6 +106,8 @@ CAPTIONS = {
         "assistant": ("ASK YOUR DATA", "Answers from\n*your own entries*"),
         "pregnancy_home": ("PREGNANCY", "With you\n*through pregnancy*"),
         "health_library": ("LIBRARY", "Learn from\n*sourced articles*"),
+        "widget_home": ("WIDGET", "Your cycle\n*on your home screen*"),
+        "health_sync": ("SYNC", "Sync with\n*Health Connect*"),
     },
     "de": {
         "home": ("ZYKLUS", "Dein Zyklus\n*auf einen Blick*"),
@@ -97,6 +118,8 @@ CAPTIONS = {
         "assistant": ("FRAG DEINE DATEN", "Antworten aus\n*deinen Einträgen*"),
         "pregnancy_home": ("SCHWANGERSCHAFT", "Auch in der\n*Schwangerschaft* da"),
         "health_library": ("BIBLIOTHEK", "Lerne mit\n*belegten Artikeln*"),
+        "widget_home": ("WIDGET", "Dein Zyklus auf dem\n*Startbildschirm*"),
+        "health_sync": ("SYNCHRONISIERUNG", "Mit *Health Connect*\nsynchronisieren"),
     },
     "es": {
         "home": ("CICLO", "Tu ciclo\n*de un vistazo*"),
@@ -107,6 +130,8 @@ CAPTIONS = {
         "assistant": ("PREGUNTA A TUS DATOS", "Respuestas de\n*tus propios registros*"),
         "pregnancy_home": ("EMBARAZO", "También a tu lado\n*en el embarazo*"),
         "health_library": ("BIBLIOTECA", "Aprende con\n*artículos con fuentes*"),
+        "widget_home": ("WIDGET", "Tu ciclo en tu\n*pantalla de inicio*"),
+        "health_sync": ("SINCRONIZACIÓN", "Sincroniza con\n*Health Connect*"),
     },
     "fr": {
         "home": ("CYCLE", "Ton cycle\n*en un coup d’œil*"),
@@ -117,6 +142,8 @@ CAPTIONS = {
         "assistant": ("INTERROGE TES DONNÉES", "Des réponses tirées\n*de tes saisies*"),
         "pregnancy_home": ("GROSSESSE", "À tes côtés\n*pendant la grossesse*"),
         "health_library": ("BIBLIOTHÈQUE", "Apprends avec\n*des articles sourcés*"),
+        "widget_home": ("WIDGET", "Ton cycle\n*sur l’écran d’accueil*"),
+        "health_sync": ("SYNCHRONISATION", "Synchronise avec\n*Health Connect*"),
     },
     "pt": {
         "home": ("CICLO", "Seu ciclo\n*num relance*"),
@@ -127,6 +154,8 @@ CAPTIONS = {
         "assistant": ("PERGUNTE AOS SEUS DADOS", "Respostas dos seus\n*próprios registros*"),
         "pregnancy_home": ("GRAVIDEZ", "Com você\n*também na gravidez*"),
         "health_library": ("BIBLIOTECA", "Aprenda com\n*artigos com fontes*"),
+        "widget_home": ("WIDGET", "Seu ciclo\n*na tela inicial*"),
+        "health_sync": ("SINCRONIZAÇÃO", "Sincronize com o\n*Health Connect*"),
     },
 }
 
@@ -186,21 +215,25 @@ IPHONE_6_3 = (1206, 2622)
 # cihazın (döndürülmeden önceki) üst kenarı — bütün panellerde aynı hizada.
 # Tablette arayüz küçük görünüyor: büyütme daha güçlü; cihaz büyük olduğu
 # için eğim ve kayma azaltılıyor (`tilt`), yoksa köşeleri tuvalden taşıyor.
+# `ribbon`: zeminde paneller arasında akan şerit (Google Play).
 LAYOUTS = {
     "iphone_6_9": dict(device="iphone", canvas=(1320, 2868), screen_w=1010, top=132,
-                       chip=34, headline=150, device_top=760, zoom=1.22),
+                       chip=34, headline=150, device_top=760, zoom=1.22, shots=SHOTS),
     "ipad_13": dict(device="ipad", canvas=(2064, 2752), screen_w=1500, top=128,
-                    chip=40, headline=156, device_top=770, zoom=1.55, tilt=0.4),
+                    chip=40, headline=156, device_top=770, zoom=1.55, tilt=0.4, shots=SHOTS),
     "phone": dict(device="android", canvas=(1080, 1920), screen_w=700, top=84,
-                  chip=26, headline=104, device_top=540, zoom=1.22),
+                  chip=26, headline=104, device_top=540, zoom=1.22, shots=PLAY_SHOTS, ribbon=True),
     "tablet_10": dict(device="android_tablet", canvas=(1440, 2560), screen_w=1080, top=110,
-                      chip=30, headline=124, device_top=690, zoom=1.45, tilt=0.4),
+                      chip=30, headline=124, device_top=690, zoom=1.45, tilt=0.4, shots=PLAY_SHOTS,
+                      ribbon=True),
 }
 
 # Her panelin kurgusu. angle: cihazın eğimi; shift: cihaz merkezinin yatay
 # kayması; inset: büyütülen öğenin kenarlarından kırpılan pay (pt, eksi
 # değer genişletir); part: öğenin hangi kısmı (oransal kutu); out:
-# büyütmenin kaynağına göre kayması (tuvalin oranı); zoom: ek büyütme.
+# büyütmenin kaynağına göre kayması (tuvalin oranı); zoom: ek büyütme;
+# radius: büyütülen kartın köşesi (pt), verilmezse 20. Bir yerleşimin adıyla
+# verilen sözlük o yerleşimde üstteki değerleri değiştiriyor.
 SPECS = {
     "home": dict(angle=-6, shift=0.07, inset=0, part=(0, 0, 1, 0.555), out=(-0.13, 0.015), zoom=1.0),
     "calendar": dict(angle=0, shift=0.0, inset=12, part=(0, 0, 1, 1), out=(0.0, 0.05), zoom=1.06),
@@ -210,6 +243,9 @@ SPECS = {
     "assistant": dict(angle=0, shift=0.0, inset=0, part=(0, 0, 1, 1), out=(0.0, -0.02), zoom=1.06),
     "pregnancy_home": dict(angle=-5, shift=-0.07, inset=0, part=(0, 0, 1, 1), out=(0.13, 0.015), zoom=1.0),
     "health_library": dict(angle=5, shift=0.07, inset=12, part=(0, 0, 1, 1), out=(-0.12, 0.03), zoom=1.0),
+    "widget_home": dict(angle=-5, shift=0.06, inset=0, part=(0, 0, 1, 1), out=(-0.10, 0.02), zoom=1.0,
+                        radius=22, tablet_10=dict(out=(-0.02, -0.17))),
+    "health_sync": dict(angle=5, shift=-0.06, inset=-4, part=(0, 0, 1, 1), out=(0.10, 0.0), zoom=1.0),
 }
 
 
@@ -218,7 +254,7 @@ SPECS = {
 # ---------------------------------------------------------------------------
 
 
-def load_raw(device, lang, shot):
+def _raw(device, lang, shot):
     base = os.path.join(RAW, device, lang, shot)
     if not os.path.exists(base + ".png"):
         sys.exit(
@@ -228,9 +264,98 @@ def load_raw(device, lang, shot):
     screen = Image.open(base + ".png").convert("RGB")
     with open(base + ".json", encoding="utf-8") as f:
         meta = json.load(f)
+    return screen, meta
+
+
+def load_raw(device, lang, shot):
+    if shot == "widget_home":
+        return android_home(lang, device)
+    screen, meta = _raw(device, lang, shot)
     spec = K.DEVICES[device]
     spec["status"](screen, spec["ratio"])
     return screen, meta
+
+
+def wallpaper(size):
+    """Ana ekranın duvar kâğıdı: canlı gül–mor degrade, ışıklar, lotus.
+
+    Koyu panorama zemininde cihaz seçilsin diye açık ve doygun; beyaz
+    widget kartları üstünde öne çıkıyor.
+    """
+    w, h = size
+    img = K.vertical_gradient(size, (0xB8, 0x3A, 0x78), (0x3C, 0x12, 0x5A))
+    _glows(img, [
+        ((w * 0.85, h * 0.12), w * 0.75, K.FERTILE, 0.65),
+        ((w * 0.05, h * 0.55), w * 0.80, K.OVULATION, 0.55),
+        ((w * 0.95, h * 0.90), w * 0.70, (0xFF, 0xA8, 0x8C), 0.40),
+        ((w * 0.30, h * 1.00), w * 0.60, K.PLUM900, 0.50),
+    ])
+    K.lotus_watermark(img, (w * 0.5, h * 0.72), w * 0.9, K.WHITE, 0.07)
+    return K.grain(img, amount=4, seed=5)
+
+
+def android_home(lang, device):
+    """Ana ekranda Nilu widget'ları: Android'e özgü panelin ekranı.
+
+    Kartlar uygulamanın widget önizleme ekranından (`widgets_preview`)
+    kesiliyor, yani widget'ın kendi çizimi; yerleşim Android'in ana ekran
+    ızgarasına göre (orta 4×2, küçük 2×2). Dönen meta büyütülecek kartı
+    (orta widget) gösteriyor.
+    """
+    src, meta = _raw(device, lang, "widgets_preview")
+    r = meta["ratio"]
+    w, h = src.size
+    screen = wallpaper((w, h))
+    tablet = device == "android_tablet"
+
+    def card(rect):
+        box = tuple(int(round(v * r)) for v in rect)
+        crop = src.crop(box)
+        return crop, K.rounded_mask(crop.size, 22 * r)
+
+    def put(img, mask, x, y):
+        K.shadow(screen, mask, (x * r, y * r), strength=0.45, blur=0.05, drop=0.04)
+        screen.paste(img, (int(round(x * r)), int(round(y * r))), mask)
+
+    medium, medium_mask = card(meta["callout"])
+    small, small_mask = card(meta["widget_small"])
+    mw, mh = medium.size[0] / r, medium.size[1] / r
+    sw = small.size[0] / r
+    if tablet:
+        # Tablet (800 dp): yan yana, ekranın ortasında; büyütme üstlerinde
+        # duruyor, ana ekrandaki hâlleri görünsün.
+        x0 = (w / r - mw - 24 - sw) / 2
+        m_pos = (x0, 430)
+        s_pos = (x0 + mw + 24, 430)
+        icon_c = (s_pos[0] + sw / 2, 430 + mh + 70)
+    else:
+        # Telefon (412 dp): orta widget üstte, altında küçük widget ve simge.
+        m_pos = ((w / r - mw) / 2, 128)
+        s_pos = (m_pos[0], m_pos[1] + mh + 28)
+        icon_c = (m_pos[0] + mw - sw / 2, s_pos[1] + sw / 2 - 12)
+    put(medium, medium_mask, *m_pos)
+    put(small, small_mask, *s_pos)
+
+    # Uygulama simgesi (Android'in yuvarlak maskesi) ve adı.
+    size = int(60 * r)
+    source = os.path.join(K.ROOT, "ios", "Runner", "Assets.xcassets", "AppIcon.appiconset",
+                          "Icon-App-1024x1024@1x.png")
+    icon = Image.open(source).convert("RGB").resize((size, size), Image.LANCZOS)
+    icon_mask = K.rounded_mask((size, size), size / 2)
+    ix, iy = icon_c[0] * r - size / 2, icon_c[1] * r - size / 2
+    K.shadow(screen, icon_mask, (ix, iy), strength=0.4, blur=0.08, drop=0.05)
+    screen.paste(icon, (int(ix), int(iy)), icon_mask)
+    d = ImageDraw.Draw(screen)
+    d.text((icon_c[0] * r, (icon_c[1] + 30 + 20) * r), "Nilu", font=K.roboto(13 * r), fill=K.WHITE,
+           anchor="mm")
+
+    # Hareket çubuğu.
+    bw, bh = 108 * r, 4 * r
+    d.rounded_rectangle([(w - bw) / 2, h - 14 * r, (w + bw) / 2, h - 14 * r + bh], radius=bh / 2,
+                        fill=(255, 255, 255))
+    K.android_status(screen, r, camera=not tablet, ink=K.WHITE)
+    rect = [m_pos[0], m_pos[1], m_pos[0] + mw, m_pos[1] + mh]
+    return screen, {"ratio": r, "callout": rect}
 
 
 def callout_box(screen, meta, spec):
@@ -255,6 +380,7 @@ def callout_box(screen, meta, spec):
 # ---------------------------------------------------------------------------
 
 _PANORAMA = {}
+_FRONT = {}  # Google Play: şeridin cihazların önünden geçen kısmı
 
 
 def _glows(canvas, items):
@@ -276,12 +402,19 @@ def _glows(canvas, items):
         canvas.paste(color, (0, 0), small.resize((w, h), Image.BICUBIC))
 
 
-def thread(canvas, path, dot, alpha=1.0):
-    """Döngü ipliği: evre renkli boncuklar, ince bir çizgi ve hafif ışık."""
+def thread(canvas, path, dot, alpha=1.0, line=True, keep=None, cover=None):
+    """Döngü ipliği: evre renkli boncuklar, ince bir çizgi ve hafif ışık.
+
+    `line`: boncukları bağlayan çizgi; şeridin üstünde zaten tel var.
+    `keep(x)`: yalnızca bu boncuklar (şeridin önde ve arkada kalan kısmı
+    ayrı katmanlarda). `cover`: verilirse önde kalan katmanın saydamlık
+    maskesi; boncuklar ona da işleniyor, ışık halesi çizilmiyor.
+    """
     w, h = canvas.size
-    line = Image.new("L", (w // 2 + 1, h // 2 + 1), 0)
-    ImageDraw.Draw(line).line([(x / 2, y / 2) for x, y in path], fill=255, width=max(1, int(dot * 0.12)))
-    canvas.paste(K.WHITE, (0, 0), line.resize((w, h), Image.BICUBIC).point(lambda v: int(v * 0.16 * alpha)))
+    if line:
+        layer = Image.new("L", (w // 2 + 1, h // 2 + 1), 0)
+        ImageDraw.Draw(layer).line([(x / 2, y / 2) for x, y in path], fill=255, width=max(1, int(dot * 0.12)))
+        canvas.paste(K.WHITE, (0, 0), layer.resize((w, h), Image.BICUBIC).point(lambda v: int(v * 0.16 * alpha)))
 
     # Noktaları yay uzunluğuna göre eşit aralıkla diz.
     spacing = dot * 2.1
@@ -292,16 +425,19 @@ def thread(canvas, path, dot, alpha=1.0):
             beads.append(p)
             travelled = 0.0
         prev = p
+    # Renk sırası bütün iplikte aynı kalsın: süzmeden önce numaralandır.
+    beads = [(i, p) for i, p in enumerate(beads) if keep is None or keep(p[0])]
 
-    halo = Image.new("L", (w // 4 + 1, h // 4 + 1), 0)
-    hd = ImageDraw.Draw(halo)
-    for i, (x, y) in enumerate(beads):
-        r = dot * (1.6 if K.PHASES[i % len(K.PHASES)] == K.OVULATION else 1.0) * 1.9 / 4
-        hd.ellipse([x / 4 - r, y / 4 - r, x / 4 + r, y / 4 + r], fill=int(120 * alpha))
-    halo = halo.filter(K.ImageFilter.GaussianBlur(dot / 3))
-    canvas.paste(K.PLUM300, (0, 0), halo.resize((w, h), Image.BICUBIC))
+    if cover is None:
+        halo = Image.new("L", (w // 4 + 1, h // 4 + 1), 0)
+        hd = ImageDraw.Draw(halo)
+        for i, (x, y) in beads:
+            r = dot * (1.6 if K.PHASES[i % len(K.PHASES)] == K.OVULATION else 1.0) * 1.9 / 4
+            hd.ellipse([x / 4 - r, y / 4 - r, x / 4 + r, y / 4 + r], fill=int(120 * alpha))
+        halo = halo.filter(K.ImageFilter.GaussianBlur(dot / 3))
+        canvas.paste(K.PLUM300, (0, 0), halo.resize((w, h), Image.BICUBIC))
 
-    for i, (x, y) in enumerate(beads):
+    for i, (x, y) in beads:
         color = K.PHASES[i % len(K.PHASES)]
         size = dot * (1.6 if color == K.OVULATION else 1.0)
         box = int(size * 2) + 4
@@ -311,6 +447,8 @@ def thread(canvas, path, dot, alpha=1.0):
         ImageDraw.Draw(local).ellipse([c - rr, c - rr, c + rr, c + rr], fill=int(255 * alpha))
         local = local.resize((box, box), Image.LANCZOS)
         canvas.paste(color, (int(x - box / 2), int(y - box / 2)), local)
+        if cover is not None:
+            cover.paste(255, (int(x - box / 2), int(y - box / 2)), local)
         # Boncuğun üstünde küçük bir parıltı: düz daire değil, ışıklı taş.
         shine = Image.new("L", (box * K.SS, box * K.SS), 0)
         sr = rr * 0.38
@@ -324,12 +462,126 @@ def wave(x0, x1, y_mid, amplitude, wavelength, phase, step=6):
             for x in range(int(x0), int(x1), step)]
 
 
+# Şeridin renkleri: vurgunun gülleri, lavanta ve şeftali — panelden panele
+# yavaşça değişiyor.
+RIBBON_STOPS = ((0xFF, 0x8F, 0xB8), (0xC9, 0xA4, 0xFF), (0xFF, 0xC8, 0xA8), (0xFF, 0xAE, 0xDE),
+                (0xB4, 0x8C, 0xFF), (0xFF, 0x8F, 0xB8))
+
+
+def silk(size, xs, center, width, twist, phase, strands, strength, line_unit, k=2):
+    """Bükülen ipek şerit: yüzey ve tel maskeleri (1/k çözünürlükte) ve teller.
+
+    `center(x)`: şeridin orta çizgisi; `width`: yarı genişliği; `twist`:
+    bir tam dönüşün boyu. Şeridin bize dönük geniş yeri parlak, kıvrılıp
+    inceldiği yer soluk — düz bir bant değil, dönen bir ipek. `line_unit`:
+    tel kalınlığının ölçüsü (tuval genişliği).
+    """
+    small = (size[0] // k + 1, size[1] // k + 1)
+    lines, sheen = Image.new("L", small, 0), Image.new("L", small, 0)
+    d, ds = ImageDraw.Draw(lines), ImageDraw.Draw(sheen)
+
+    def turn(x):
+        return math.cos(2 * math.pi * x / twist + phase)
+
+    # Yüzey: dar dilimler, her biri bükülmeye göre parlak ya da soluk.
+    prev = None
+    for x in xs:
+        c, spread = center(x), width * turn(x)
+        edge = (x / k, (c - spread) / k, (c + spread) / k)
+        if prev:
+            light = 0.22 + 0.78 * abs(turn(x)) ** 0.8
+            ds.polygon([(prev[0], prev[1]), (edge[0], edge[1]), (edge[0], edge[2]), (prev[0], prev[2])],
+                       fill=int(120 * strength * light))
+        prev = edge
+
+    paths = []
+    for j in range(strands):
+        t = j / (strands - 1) * 2 - 1  # -1…1
+        paths.append([(x, center(x) + width * turn(x) * t) for x in xs])
+    for j, path in enumerate(paths):
+        edge = j in (0, strands - 1)
+        line_w = max(1, round(line_unit * (0.0040 if edge else 0.0016) * strength / k))
+        d.line([(x / k, y / k) for x, y in path], fill=int((245 if edge else 90) * strength),
+               width=line_w, joint="curve")
+    return lines, sheen, paths
+
+
+def silk_halo(canvas, colors, mask, radius, gain=2.6):
+    """Şeridin çevresine yayılan ışık."""
+    W, h = canvas.size
+    halo = mask.resize((W // 8 + 1, h // 8 + 1), Image.BILINEAR)
+    halo = halo.filter(K.ImageFilter.GaussianBlur(radius / 8)).point(lambda v: min(255, int(v * gain)))
+    canvas.paste(colors, (0, 0), halo.resize((W, h), Image.BICUBIC))
+
+
+def ribbon(canvas, w, h):
+    """Paneller arasında akan ışıklı şeritler (Google Play).
+
+    Play'de görseller yan yana, aralarında boşlukla diziliyor. İki şerit
+    zıt yönde kıvrılıyor ve her panel sınırında çaprazlanıyor: biri
+    bıraktığı yerden ötekinde devam ediyor, sınırdaki düğüm iki paneli
+    birbirine bağlıyor. Her panelde biri cihazın arkasından yukarı
+    kıvrılıyor, öteki aşağıda cihazın önünden geçiyor — şerit cihazları
+    sarıyor. Önden arkaya geçiş panel sınırında, yani görünmeyen yerde.
+    Başlık bandına çıkmıyor: yazının okunurluğu bozulmasın.
+
+    Arkada kalan kısım `canvas`a çiziliyor; önde kalan (renk, saydamlık)
+    tam genişlikte döndürülüyor, panel cihazdan sonra üstüne basıyor.
+    """
+    W = canvas.size[0]
+    n = round(W / w)
+    k = 2  # yarım çözünürlükte çiz, büyüt: hızlı ve yumuşak
+    # Aşağı inen (öndeki) kıvrım cihazın en altından, ekranın kesildiği
+    # yerden geçiyor: arayüzün yazılarını örtmesin.
+    mid, rise, dip = h * 0.66, h * 0.20, h * 0.27
+    xs = range(int(-w * 0.1), int(W + w * 0.1), 4)
+
+    def center(sign):
+        def at(x):
+            # Sınırlarda (x = i·w) orta yükseklik: iki şerit burada kesişiyor.
+            s = sign * math.sin(math.pi * x / w) * (1 + 0.12 * math.sin(2 * math.pi * x / (0.83 * w)))
+            return mid + s * (dip if s > 0 else rise)
+        return at
+
+    # A: çift panellerde aşağı iniyor (önde), tek panellerde yukarı
+    # (arkada); B tersi. Önde yüzey daha saydam: altındaki arayüz okunsun.
+    a_lines, a_sheen, a_paths = silk((W, h), xs, center(1), h * 0.065, 1.35 * w, 0.5, 7, 1.0, w, k)
+    b_lines, b_sheen, _ = silk((W, h), xs, center(-1), h * 0.038, 1.1 * w, 2.0, 5, 0.7, w, k)
+    a, b = ImageChops.lighter(a_lines, a_sheen), ImageChops.lighter(b_lines, b_sheen)
+
+    def see_through(lines, sheen):
+        return ImageChops.lighter(lines, sheen.point(lambda v: int(v * 0.6)))
+
+    a_front, b_front = see_through(a_lines, a_sheen), see_through(b_lines, b_sheen)
+    even = Image.new("L", a.size, 0)
+    de = ImageDraw.Draw(even)
+    for i in range(0, n, 2):
+        de.rectangle([i * w / k, 0, (i + 1) * w / k - 1, a.size[1]], fill=255)
+    odd = ImageChops.invert(even)
+    mul = ImageChops.multiply
+    front = ImageChops.lighter(mul(a_front, even), mul(b_front, odd)).resize((W, h), Image.BICUBIC)
+    back = ImageChops.lighter(mul(a, odd), mul(b, even)).resize((W, h), Image.BICUBIC)
+
+    colors = K.horizontal_gradient((W // 8, 1), RIBBON_STOPS).resize((W, h))
+    silk_halo(canvas, colors, ImageChops.lighter(a, b), w * 0.025)
+    canvas.paste(colors, (0, 0), back)
+
+    # A'nın orta telinde döngünün boncukları: marka imzası şeritle birlikte
+    # akıyor, şerit öndeyken boncuklar da önde.
+    path = a_paths[len(a_paths) // 2]
+    dot = w * 0.014
+    thread(canvas, path, dot, alpha=0.95, line=False, keep=lambda x: int(x // w) % 2 == 1)
+    thread(colors, path, dot, alpha=0.95, line=False, keep=lambda x: int(x // w) % 2 == 0, cover=front)
+    return colors, front
+
+
 def panorama(layout_name):
     """Sekiz panelin ortak zemini; panel başına bir dilim."""
     if layout_name in _PANORAMA:
         return _PANORAMA[layout_name]
-    w, h = LAYOUTS[layout_name]["canvas"]
-    n = len(SHOTS)
+    layout = LAYOUTS[layout_name]
+    w, h = layout["canvas"]
+    n = len(layout["shots"])
     W = w * n
     canvas = K.vertical_gradient((W, h), K.PLUM700, K.DEEP)
     items = []
@@ -338,9 +590,19 @@ def panorama(layout_name):
         items.append((((i + 0.5) * w, h * 1.0), w * 0.95, K.FERTILE, 0.22))
         items.append(((i * w, h * (0.40 + 0.12 * (i % 3))), w * 0.6, K.OVULATION, 0.30))
         items.append((((i + 0.5) * w, h * 0.42), w * 0.55, K.PLUM600, 0.45))
+        if layout.get("ribbon"):
+            # Şeridin panel sınırını geçtiği yerde ışık: kesik değil, köprü.
+            items.append(((i * w, h * 0.66), w * 0.42, K.BERRY_LIGHT, 0.40))
     _glows(canvas, items)
     for i in range(0, n, 3):
         K.lotus_watermark(canvas, ((i + 0.92) * w, h * 0.30), w * 0.75, K.PLUM300, 0.045)
+    if layout.get("ribbon"):
+        colors, front = ribbon(canvas, w, h)
+        canvas = K.grain(canvas, amount=6)
+        _PANORAMA[layout_name] = [canvas.crop((i * w, 0, (i + 1) * w, h)) for i in range(n)]
+        _FRONT[layout_name] = [(colors.crop((i * w, 0, (i + 1) * w, h)), front.crop((i * w, 0, (i + 1) * w, h)))
+                               for i in range(n)]
+        return _PANORAMA[layout_name]
     # İplik başlık ile cihazlar arasındaki boşluktan geçiyor: her panelde
     # görünüyor ve kenarlardan bir sonrakine akıyor.
     y_mid = LAYOUTS[layout_name]["device_top"] - h * 0.032
@@ -457,7 +719,7 @@ def place_callout(canvas, screen, meta, spec, mapper, framed, zoom, text_bottom)
     crop = screen.crop(tuple(int(round(v)) for v in box))
     width = (box[2] - box[0]) * framed.scale * zoom * spec["zoom"]
     width = min(width, w * 0.94)
-    radius = 20 * meta["ratio"] * framed.scale * zoom
+    radius = spec.get("radius", 20) * meta["ratio"] * framed.scale * zoom
     card, mask = K.callout_card(crop, width, radius)
     cx, cy = mapper(((box[0] + box[2]) / 2, (box[1] + box[3]) / 2))
     cx += spec["out"][0] * w
@@ -471,7 +733,7 @@ def place_callout(canvas, screen, meta, spec, mapper, framed, zoom, text_bottom)
 
 def panel(lang, layout_name, index, shot):
     layout = LAYOUTS[layout_name]
-    spec = SPECS[shot]
+    spec = dict(SPECS[shot], **SPECS[shot].get(layout_name, {}))
     canvas = panorama(layout_name)[index].copy()
     w, h = canvas.size
 
@@ -491,6 +753,12 @@ def panel(lang, layout_name, index, shot):
     tilt = layout.get("tilt", 1.0)
     center = (w / 2 + spec["shift"] * w * tilt, layout["device_top"] + fh / 2)
     mapper = K.place_device(canvas, framed, center, spec["angle"] * tilt)
+
+    if layout_name in _FRONT:
+        # Şerit cihazın önünden geçiyor; altına ince bir gölge düşüyor.
+        colors, front = _FRONT[layout_name][index]
+        K.shadow(canvas, front, (0, 0), strength=0.35, blur=0.012, drop=0.008)
+        canvas.paste(colors, (0, 0), front)
 
     place_callout(canvas, screen, meta, spec, mapper, framed, layout["zoom"], text_bottom)
 
@@ -594,12 +862,21 @@ def search_results(lang):
 def feature_graphic(lang):
     size = (1024, 500)
     w, h = size
-    path = wave(-50, w + 50, h * 0.80, h * 0.07, 700, 0.6, step=3)
-    canvas = dark_canvas(size, path, dot=10, seed_glows=[
+    canvas = dark_canvas(size, seed_glows=[
         ((w * 0.75, h * 0.3), h * 0.8, K.BERRY_LIGHT, 0.55),
         ((w * 0.1, h * 0.1), h * 0.8, K.OVULATION, 0.25),
         ((w * 0.35, h * 0.9), h * 0.6, K.PLUM600, 0.5),
     ])
+    # Ekran görüntülerindeki ipek şerit, yazının altından telefonun
+    # arkasına akıyor.
+    lines, sheen, paths = silk(size, range(-40, w + 40, 2),
+                               lambda x: h * 0.80 + h * 0.07 * math.sin(2 * math.pi * x / 760 + 0.5),
+                               h * 0.075, 560, 0.4, 7, 0.85, w * 1.4, k=1)
+    mask = ImageChops.lighter(lines, sheen).crop((0, 0, w, h))
+    colors = K.horizontal_gradient((w // 4, 1), RIBBON_STOPS[:3]).resize(size)
+    silk_halo(canvas, colors, mask, w * 0.02, gain=1.5)
+    canvas.paste(colors, (0, 0), mask)
+    thread(canvas, paths[len(paths) // 2], dot=10, line=False)
     device_with_callout(canvas, lang, "android", "home", 250, (w * 0.80, h * 0.80), -8, 1.15, (-0.10, -0.05))
 
     x = w * 0.07
@@ -665,7 +942,7 @@ def main():
             count += 2
         if args.only in (None, "google_play"):
             for layout in ("phone", "tablet_10"):
-                for i, shot in enumerate(SHOTS):
+                for i, shot in enumerate(PLAY_SHOTS):
                     save(panel(lang, layout, i, shot), "google_play", lang, layout, f"{i + 1:02d}_{shot}.png")
                     count += 1
             save(feature_graphic(lang), "google_play", lang, "feature_graphic.png")

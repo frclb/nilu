@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:period_tracker/core/platform/app_platform.dart';
+import 'package:period_tracker/data/datasources/health_datasource.dart';
 import 'package:period_tracker/data/repositories/care_repository.dart';
 import 'package:period_tracker/data/repositories/cycle_settings_repository.dart';
 import 'package:period_tracker/data/repositories/period_repository.dart';
@@ -34,6 +35,7 @@ import 'package:period_tracker/presentation/calendar/widgets/calendar_grid.dart'
 import 'package:period_tracker/presentation/calendar/calendar_screen.dart';
 import 'package:period_tracker/presentation/calendar/view_models/calendar_view_model.dart';
 import 'package:period_tracker/presentation/health_library/health_library_screen.dart';
+import 'package:period_tracker/presentation/health_sync/health_sync_screen.dart';
 import 'package:period_tracker/presentation/home/home_screen.dart';
 import 'package:period_tracker/presentation/home/widgets/custom_bottom_nav.dart';
 import 'package:period_tracker/presentation/home/widgets/side_nav_rail.dart';
@@ -41,6 +43,7 @@ import 'package:period_tracker/presentation/insights/insights_screen.dart';
 import 'package:period_tracker/presentation/log_entry/log_entry_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/pregnancy_home_screen.dart';
 import 'package:period_tracker/presentation/profile/privacy_security_screen.dart';
+import 'package:period_tracker/presentation/widgets_preview/widgets_preview_screen.dart';
 
 import '../presentation/pregnancy_fixtures.dart';
 import '../presentation/screen_harness.dart';
@@ -134,7 +137,7 @@ typedef _Shot = ({
   bool pregnant,
 });
 
-const Map<String, _Shot> _shots = {
+final Map<String, _Shot> _shots = {
   'home': (screen: HomeScreen(), tab: 0, pregnant: false),
   'calendar': (screen: CalendarScreen(), tab: 1, pregnant: false),
   'log_entry': (screen: LogEntryScreen(), tab: null, pregnant: false),
@@ -147,7 +150,31 @@ const Map<String, _Shot> _shots = {
   ),
   'assistant': (screen: AssistantScreen(), tab: null, pregnant: false),
   'health_library': (screen: HealthLibraryScreen(), tab: 3, pregnant: false),
+  // Google Play seti için: widget paneli ana ekran kartlarını buradan
+  // alıyor; Android'de Health Connect ekranı.
+  'widgets_preview': (
+    screen: WidgetsPreviewScreen(),
+    tab: null,
+    pregnant: false,
+  ),
+  'health_sync': (
+    screen: HealthSyncScreen(health: _StoreHealth()),
+    tab: null,
+    pregnant: false,
+  ),
 };
+
+/// Yalnızca Google Play setinde kullanılan ekranlar.
+const Set<String> _androidOnly = {'widgets_preview', 'health_sync'};
+
+/// Health Connect ekranı için: Sağlık bağlantısı var, eklenti çağrılmıyor.
+class _StoreHealth extends HealthDatasource {
+  @override
+  Future<bool> isAvailable() async => true;
+
+  @override
+  Future<bool> canInstall() async => false;
+}
 
 /// Görselde ekrandan dışarı büyütülecek öğe.
 ///
@@ -163,6 +190,16 @@ final Map<String, Finder Function()> _callouts = {
   'assistant': () =>
       find.byWidgetPredicate((w) => w.runtimeType.toString() == '_TurnView'),
   'health_library': () => find.byType(HealthLibraryFeaturedArticle),
+  'widgets_preview': () => find.byKey(const Key('widget_preview_medium')),
+  'health_sync': () => find.byKey(const Key('health_write_back')),
+};
+
+/// Büyütmeden başka ölçülen öğeler: widget panelinde küçük widget da
+/// ana ekrana yerleştiriliyor.
+final Map<String, Map<String, Finder Function()>> _extras = {
+  'widgets_preview': {
+    'widget_small': () => find.byKey(const Key('widget_preview_small')),
+  },
 };
 
 /// Öğenin ekrandaki dikdörtgeni (mantıksal piksel); ekranda yoksa `null`.
@@ -187,6 +224,8 @@ Future<void> _seed(String lang, {required bool pregnant}) async {
     // Gizlilik ekranında kilit açık görünsün; cihazda Face ID var (bkz.
     // `_mockBiometrics`).
     'app_lock_enabled': true,
+    // Health Connect ekranında yazma açık görünsün.
+    'health_write_back': true,
   });
   await CycleSettingsRepository().saveCycleSettings(
     cycleLength: 29,
@@ -428,6 +467,10 @@ void main() {
   for (final device in _devices.entries) {
     for (final lang in AppLocalizations.supportedLanguageCodes) {
       for (final shot in _shots.entries) {
+        if (_androidOnly.contains(shot.key) &&
+            device.value.platform != TargetPlatform.android) {
+          continue;
+        }
         testWidgets(
           'mağaza · ${device.key} · $lang · ${shot.key}',
           skip: !_enabled,
@@ -450,6 +493,13 @@ void main() {
               jsonEncode({
                 'ratio': device.value.ratio,
                 'callout': _rectOf(tester, shot.key),
+                for (final extra in (_extras[shot.key] ?? const {}).entries)
+                  extra.key: () {
+                    final finder = extra.value();
+                    if (finder.evaluate().isEmpty) return null;
+                    final r = tester.getRect(finder.first);
+                    return [r.left, r.top, r.right, r.bottom];
+                  }(),
               }),
             );
             tester.takeException();

@@ -356,8 +356,11 @@ def ios_pad_status(screen, ratio):
     d.text((24 * pt, 17.5 * pt), "9:41", font=font, fill=(0, 0, 0), anchor="ls")
 
 
-def android_status(screen, ratio, camera=True):
-    """Android durum çubuğu: solda saat, sağda Wi-Fi, sinyal, pil."""
+def android_status(screen, ratio, camera=True, ink=(0x1D, 0x1B, 0x20)):
+    """Android durum çubuğu: solda saat, sağda Wi-Fi, sinyal, pil.
+
+    `ink`: simge ve saat rengi; koyu duvar kâğıdında açık.
+    """
     w = screen.size[0]
     dp = ratio
     bar = 40 if camera else 28
@@ -379,7 +382,7 @@ def android_status(screen, ratio, camera=True):
             d.ellipse([(w / dp / 2 - 6.5) * k, (cy - 6.5) * k, (w / dp / 2 + 6.5) * k, (cy + 6.5) * k], fill=255)
 
     mask = shape_layer(screen.size, paint)
-    screen.paste((0x1D, 0x1B, 0x20), (0, 0), mask)
+    screen.paste(ink, (0, 0), mask)
     if camera:
         # Kamera deliği siyah, simgeler koyu gri.
         def hole(d, ss):
@@ -388,7 +391,7 @@ def android_status(screen, ratio, camera=True):
 
         screen.paste((0, 0, 0), (0, 0), shape_layer(screen.size, hole))
     d = ImageDraw.Draw(screen)
-    d.text((24 * dp, (cy + 5) * dp), "9:41", font=roboto(14 * dp), fill=(0x1D, 0x1B, 0x20), anchor="ls")
+    d.text((24 * dp, (cy + 5) * dp), "9:41", font=roboto(14 * dp), fill=ink, anchor="ls")
 
 
 
