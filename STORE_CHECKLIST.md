@@ -139,6 +139,7 @@ değişince komutlar yeniden koşuluyor.
 | App Store arama sonucu görseli (3:2) | 3840×2560 | 1 |
 | Google Play telefon (9:16) | 1080×1920 | 8 |
 | Google Play 10" tablet (9:16) | 1440×2560 | 8 |
+| Google Play 7" tablet | 10" tabletle aynı dosyalar | 8 |
 | Google Play öne çıkan görsel | 1024×500 | 1 |
 | Google Play simgesi | 512×512 | tek |
 
@@ -146,7 +147,10 @@ Hepsi alfasız RGB; başlık ve arama görselleri JPEG (gren dokusuyla PNG
 10 MB'ı geçiyordu), diğerleri PNG. Sıra mağazadaki sıra; App Store'da ilk
 üçü (ana sayfa, takvim, gizlilik) arama sonuçlarında görünüyor. Play'de
 sıra: ana sayfa, takvim, widget, gizlilik, günlük, içgörüler, gebelik,
-Health Connect.
+Health Connect. Play Console'da 7" ve 10" tablet alanları ayrı; ikisine de
+`tablet_10/` yükleniyor (9:16, kenarlar 1080–7680 px arasında: Play'in
+büyük ekran kuralı). Tablet için en az 4 görsel isteniyor, sekizi de
+yükleniyor.
 
 > **iPhone'da zorunlu olan "Dynamic Island, orta ekran"** (1206×2622).
 > Apple'ın sayfası büyük ekran için iki ayrı yedek kuralı veriyor ve
