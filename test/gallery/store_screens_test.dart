@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:period_tracker/core/platform/app_platform.dart';
+import 'package:period_tracker/core/platform/apple_health_icon.dart';
 import 'package:period_tracker/data/datasources/health_datasource.dart';
 import 'package:period_tracker/data/repositories/care_repository.dart';
 import 'package:period_tracker/data/repositories/cycle_settings_repository.dart';
@@ -150,8 +151,8 @@ final Map<String, _Shot> _shots = {
   ),
   'assistant': (screen: AssistantScreen(), tab: null, pregnant: false),
   'health_library': (screen: HealthLibraryScreen(), tab: 3, pregnant: false),
-  // Google Play seti için: widget paneli ana ekran kartlarını buradan
-  // alıyor; Android'de Health Connect ekranı.
+  // Widget paneli ana ekran kartlarını buradan alıyor. Sağlık ekranı
+  // Android'de Health Connect, iOS'ta Apple Sağlık.
   'widgets_preview': (
     screen: WidgetsPreviewScreen(),
     tab: null,
@@ -164,8 +165,11 @@ final Map<String, _Shot> _shots = {
   ),
 };
 
-/// Yalnızca Google Play setinde kullanılan ekranlar.
-const Set<String> _androidOnly = {'widgets_preview', 'health_sync'};
+/// Apple Sağlık simgesi iOS paketinde (Assets.xcassets); uygulama onu yerel
+/// kanaldan alıyor, testte kanal yok.
+final Uint8List _appleHealthIcon = File(
+  'ios/Runner/Assets.xcassets/AppleHealthIcon.imageset/apple_health@3x.png',
+).readAsBytesSync();
 
 /// Health Connect ekranı için: Sağlık bağlantısı var, eklenti çağrılmıyor.
 class _StoreHealth extends HealthDatasource {
@@ -467,10 +471,6 @@ void main() {
   for (final device in _devices.entries) {
     for (final lang in AppLocalizations.supportedLanguageCodes) {
       for (final shot in _shots.entries) {
-        if (_androidOnly.contains(shot.key) &&
-            device.value.platform != TargetPlatform.android) {
-          continue;
-        }
         testWidgets(
           'mağaza · ${device.key} · $lang · ${shot.key}',
           skip: !_enabled,
@@ -482,11 +482,26 @@ void main() {
             debugDefaultTargetPlatformOverride = device.value.platform;
             AppPlatform.debugAndroid =
                 device.value.platform == TargetPlatform.android;
+            AppleHealthIcon.debugBytes =
+                device.value.platform == TargetPlatform.iOS
+                ? _appleHealthIcon
+                : null;
             _mockBiometrics(device.value.platform);
 
             await _seed(lang, pregnant: shot.value.pregnant);
             await _pump(tester, shot.value, device: device.value, lang: lang);
             if (shot.key == 'assistant') await _askExamples(tester);
+            if (AppleHealthIcon.debugBytes case final icon?
+                when shot.key == 'health_sync') {
+              // Görüntü çözülmeden çekilirse simgenin yeri boş kalıyor.
+              await tester.runAsync(
+                () => precacheImage(
+                  MemoryImage(icon),
+                  tester.element(find.byType(HealthSyncScreen)),
+                ),
+              );
+              await tester.pump();
+            }
             final base = 'build/store_raw/${device.key}/$lang/${shot.key}';
             await _capture(tester, '$base.png', device.value.ratio);
             File('$base.json').writeAsStringSync(
@@ -506,6 +521,7 @@ void main() {
 
             debugDefaultTargetPlatformOverride = null;
             AppPlatform.debugAndroid = null;
+            AppleHealthIcon.debugBytes = null;
             debugDisableShadows = true;
           },
         );

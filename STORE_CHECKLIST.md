@@ -126,15 +126,17 @@ değişince komutlar yeniden koşuluyor.
 > parçaları `tool/store_kit.py`'de, kurgu ve metinler
 > `tool/store_screenshots.py`'de.
 >
-> **Google Play'de** sekiz panelin ikisi Android'e özgü: ana ekran
-> widget'ı (widget önizleme ekranından kesilen kartlarla kurulan bir ana
-> ekran) ve Health Connect; asistan ve kütüphane yalnızca App Store'da.
+> App Store'da on, Google Play'de sekiz panel (Play'in sınırı; asistan ve
+> kütüphane yalnızca App Store'da). İkisinde de ana ekran widget'ı (widget
+> önizleme ekranından kesilen kartlarla kurulan, platformun ana ekranına
+> benzeyen bir ekran) ve Sağlık eşitlemesi var: iOS'ta Apple Sağlık ekranı
+> Apple'ın resmî simgesiyle, Android'de Health Connect.
 
 | Görsel | Boyut | Dil başına |
 |---|---|---|
-| App Store iPhone 6,9" (Dynamic Island, büyük) | 1320×2868 | 8 |
-| App Store iPhone 6,3" (Dynamic Island, orta — **zorunlu**) | 1206×2622 | 8 |
-| App Store iPad 13" | 2064×2752 | 8 |
+| App Store iPhone 6,9" (Dynamic Island, büyük) | 1320×2868 | 10 |
+| App Store iPhone 6,3" (Dynamic Island, orta — **zorunlu**) | 1206×2622 | 10 |
+| App Store iPad 13" | 2064×2752 | 10 |
 | App Store ürün sayfası başlığı (21:9) | 3840×1646 | 1 |
 | App Store arama sonucu görseli (3:2) | 3840×2560 | 1 |
 | Google Play telefon (9:16) | 1080×1920 | 8 |
@@ -145,7 +147,8 @@ değişince komutlar yeniden koşuluyor.
 
 Hepsi alfasız RGB; başlık ve arama görselleri JPEG (gren dokusuyla PNG
 10 MB'ı geçiyordu), diğerleri PNG. Sıra mağazadaki sıra; App Store'da ilk
-üçü (ana sayfa, takvim, gizlilik) arama sonuçlarında görünüyor. Play'de
+üçü (ana sayfa, takvim, gizlilik) arama sonuçlarında görünüyor, sonra
+günlük, widget, içgörüler, Apple Sağlık, asistan, gebelik, kütüphane. Play'de
 sıra: ana sayfa, takvim, widget, gizlilik, günlük, içgörüler, gebelik,
 Health Connect. Play Console'da 7" ve 10" tablet alanları ayrı; ikisine de
 `tablet_10/` yükleniyor (9:16, kenarlar 1080–7680 px arasında: Play'in

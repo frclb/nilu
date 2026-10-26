@@ -309,8 +309,11 @@ def _ios_glyphs(draw, ox, oy, k, color, signal=True):
     r(88.3, 7.7, 90, 12.3, 0.8, grey)
 
 
-def ios_phone_status(screen, ratio):
-    """iPhone durum çubuğu ve Dynamic Island; ekran görüntüsüne çizilir."""
+def ios_phone_status(screen, ratio, ink=(0, 0, 0)):
+    """iPhone durum çubuğu ve Dynamic Island; ekran görüntüsüne çizilir.
+
+    `ink`: saat ve simgelerin rengi; koyu duvar kâğıdında beyaz.
+    """
     w = screen.size[0]
     pt = ratio
 
@@ -330,14 +333,14 @@ def ios_phone_status(screen, ratio):
         _ios_glyphs(d, (w / pt - 130.7) * pt * ss, 22 * pt * ss, pt * ss, 255)
 
     mask = shape_layer(screen.size, glyphs)
-    screen.paste((0, 0, 0), (0, 0), mask)
+    screen.paste(ink, (0, 0), mask)
 
     d = ImageDraw.Draw(screen)
     font = status_font(18 * pt)
-    d.text((82.8 * pt, 39 * pt), "9:41", font=font, fill=(0, 0, 0), anchor="ms")
+    d.text((82.8 * pt, 39 * pt), "9:41", font=font, fill=ink, anchor="ms")
 
 
-def ios_pad_status(screen, ratio):
+def ios_pad_status(screen, ratio, ink=(0, 0, 0)):
     """iPad durum çubuğu: solda saat, sağda Wi-Fi ve pil."""
     w = screen.size[0]
     pt = ratio
@@ -350,10 +353,10 @@ def ios_pad_status(screen, ratio):
         _ios_glyphs(d, ox, oy, k, 255, signal=False)
 
     mask = shape_layer(screen.size, glyphs)
-    screen.paste((0, 0, 0), (0, 0), mask)
+    screen.paste(ink, (0, 0), mask)
     d = ImageDraw.Draw(screen)
     font = status_font(15 * pt)
-    d.text((24 * pt, 17.5 * pt), "9:41", font=font, fill=(0, 0, 0), anchor="ls")
+    d.text((24 * pt, 17.5 * pt), "9:41", font=font, fill=ink, anchor="ls")
 
 
 def android_status(screen, ratio, camera=True, ink=(0x1D, 0x1B, 0x20)):

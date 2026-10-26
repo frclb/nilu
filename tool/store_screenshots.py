@@ -22,12 +22,13 @@ kuruyor:
     google_play/<dil>/feature_graphic.png         1024×500
     google_play/icon_512.png                      512×512
 
-Sekiz panel tek bir geniş zeminden kesiliyor: iki ipek şerit paneller
-arasında kıvrılıp cihazları sarıyor, döngü halkasının boncukları şeridin
-üstünde akıyor; mağazada kaydırınca görseller birbirine bağlanıyor. Tek
-parça görseller (başlık, arama sonucu, öne çıkan görsel) aynı şeridi
-taşıyor. Google Play dizisinde Android'e özgü iki panel var: ana ekran
-widget'ı ve Health Connect. Hiçbir çıktıda saydamlık yok.
+Paneller (App Store'da on, Play'de sekiz) tek bir geniş zeminden
+kesiliyor: iki ipek şerit paneller arasında kıvrılıp cihazları sarıyor,
+döngü halkasının boncukları şeridin üstünde akıyor; mağazada kaydırınca
+görseller birbirine bağlanıyor. Tek parça görseller (başlık, arama sonucu,
+öne çıkan görsel) aynı şeridi taşıyor. İki dizide de ana ekran widget'ı ve
+Sağlık eşitlemesi var (iOS'ta Apple Sağlık, Android'de Health Connect).
+Hiçbir çıktıda saydamlık yok.
 
 Ölçüler ve kurallar (Ekim 2026):
   * Ekran görüntüsü boyutları — developer.apple.com/help/app-store-connect/
@@ -58,22 +59,25 @@ LANGS = ("tr", "en", "de", "es", "fr", "pt")
 # cihazlar aynı hizada dursun.
 # ---------------------------------------------------------------------------
 
-# Sıra mağazadaki sıra: ilk üçü arama sonucunda görünüyor.
+# Sıra mağazadaki sıra: ilk üçü arama sonucunda görünüyor. App Store en
+# fazla on kabul ediyor.
 SHOTS = (
     "home",
     "calendar",
     "privacy_security",
     "log_entry",
+    "widget_home",
     "insights",
+    "health_sync",
     "assistant",
     "pregnancy_home",
     "health_library",
 )
 
-# Google Play: en fazla sekiz. Android'e özgü iki panel (ana ekran widget'ı,
-# Health Connect) asistan ve kütüphanenin yerini alıyor; ikisi de mağaza
-# metninde anlatılıyor. `widget_home` ham ekran değil, widget önizleme
-# ekranından kesilen kartlarla kurulan bir ana ekran (`android_home`).
+# Google Play: en fazla sekiz; asistan ve kütüphane dışarıda kalıyor.
+# `widget_home` ham ekran değil, widget önizleme ekranından kesilen kartlarla
+# kurulan bir ana ekran (`home_screen`). `health_sync` Android'de Health
+# Connect, iOS'ta Apple Sağlık ekranı.
 PLAY_SHOTS = (
     "home",
     "calendar",
@@ -160,6 +164,18 @@ CAPTIONS = {
     },
 }
 
+# iOS'ta farklı olan başlıklar: Sağlık paneli Apple Sağlık'ı anıyor. Ad
+# uygulamadakiyle aynı: Apple'ın yönergesi "Apple Health" ve Sağlık'ın
+# sistemdeki çevirisi.
+APPLE_CAPTIONS = {
+    "tr": {"health_sync": ("EŞİTLEME", "Apple Sağlık ile\n*eşitle*")},
+    "en": {"health_sync": ("SYNC", "Sync with\n*Apple Health*")},
+    "de": {"health_sync": ("SYNCHRONISIERUNG", "Mit *Apple Health*\nsynchronisieren")},
+    "es": {"health_sync": ("SINCRONIZACIÓN", "Sincroniza con\n*Apple Salud*")},
+    "fr": {"health_sync": ("SYNCHRONISATION", "Synchronise avec\n*Apple Santé*")},
+    "pt": {"health_sync": ("SINCRONIZAÇÃO", "Sincronize com o\n*Apple Saúde*")},
+}
+
 # Gizlilik panelindeki rozetler ve arama görseli. Üçü de uygulamada
 # doğrulanabilir ve iki platformda da doğru: hesap isteğe bağlı (yok değil),
 # cihazdaki veri şifreli, ekran kilidi ücretsiz.
@@ -243,7 +259,7 @@ SPECS = {
     "pregnancy_home": dict(angle=-5, shift=-0.07, inset=0, part=(0, 0, 1, 1), out=(0.13, 0.015), zoom=1.0),
     "health_library": dict(angle=5, shift=0.07, inset=12, part=(0, 0, 1, 1), out=(-0.12, 0.03), zoom=1.0),
     "widget_home": dict(angle=-5, shift=0.06, inset=0, part=(0, 0, 1, 1), out=(-0.10, 0.02), zoom=1.0,
-                        radius=22, tablet_10=dict(out=(-0.02, -0.17))),
+                        radius=22, tablet_10=dict(out=(-0.02, -0.17)), ipad_13=dict(out=(-0.02, -0.17))),
     "health_sync": dict(angle=5, shift=-0.06, inset=-4, part=(0, 0, 1, 1), out=(0.10, 0.0), zoom=1.0),
 }
 
@@ -268,7 +284,7 @@ def _raw(device, lang, shot):
 
 def load_raw(device, lang, shot):
     if shot == "widget_home":
-        return android_home(lang, device)
+        return home_screen(lang, device)
     screen, meta = _raw(device, lang, shot)
     spec = K.DEVICES[device]
     spec["status"](screen, spec["ratio"])
@@ -293,19 +309,23 @@ def wallpaper(size):
     return K.grain(img, amount=4, seed=5)
 
 
-def android_home(lang, device):
-    """Ana ekranda Nilu widget'ları: Android'e özgü panelin ekranı.
+def home_screen(lang, device):
+    """Ana ekranda Nilu widget'ları: "widget" panelinin ekranı.
 
     Kartlar uygulamanın widget önizleme ekranından (`widgets_preview`)
-    kesiliyor, yani widget'ın kendi çizimi; yerleşim Android'in ana ekran
-    ızgarasına göre (orta 4×2, küçük 2×2). Dönen meta büyütülecek kartı
-    (orta widget) gösteriyor.
+    kesiliyor, yani widget'ın kendi çizimi. Yerleşim platformun ana
+    ekranına göre: telefonda orta widget üstte, altında küçük widget ve
+    uygulama simgesi; tablette ikisi yan yana ekranın ortasında (büyütme
+    üstlerinde duruyor, ana ekrandaki hâlleri görünsün). Simge Android'de
+    yuvarlak, iOS'ta yuvarlatılmış kare. Dönen meta büyütülecek kartı (orta
+    widget) gösteriyor.
     """
     src, meta = _raw(device, lang, "widgets_preview")
     r = meta["ratio"]
     w, h = src.size
     screen = wallpaper((w, h))
-    tablet = device == "android_tablet"
+    ios = device in ("iphone", "ipad")
+    tablet = device in ("ipad", "android_tablet")
 
     def card(rect):
         box = tuple(int(round(v * r)) for v in rect)
@@ -320,39 +340,44 @@ def android_home(lang, device):
     small, small_mask = card(meta["widget_small"])
     mw, mh = medium.size[0] / r, medium.size[1] / r
     sw = small.size[0] / r
+    icon_pt = 64 if ios else 60
     if tablet:
-        # Tablet (800 dp): yan yana, ekranın ortasında; büyütme üstlerinde
-        # duruyor, ana ekrandaki hâlleri görünsün.
         x0 = (w / r - mw - 24 - sw) / 2
         m_pos = (x0, 430)
         s_pos = (x0 + mw + 24, 430)
         icon_c = (s_pos[0] + sw / 2, 430 + mh + 70)
     else:
-        # Telefon (412 dp): orta widget üstte, altında küçük widget ve simge.
-        m_pos = ((w / r - mw) / 2, 128)
+        # iOS'ta widget'lar Dynamic Island'ın altından başlıyor.
+        m_pos = ((w / r - mw) / 2, 84 if ios else 128)
         s_pos = (m_pos[0], m_pos[1] + mh + 28)
         icon_c = (m_pos[0] + mw - sw / 2, s_pos[1] + sw / 2 - 12)
     put(medium, medium_mask, *m_pos)
     put(small, small_mask, *s_pos)
 
-    # Uygulama simgesi (Android'in yuvarlak maskesi) ve adı.
-    size = int(60 * r)
+    # Uygulama simgesi ve adı.
+    size = int(icon_pt * r)
     source = os.path.join(K.ROOT, "ios", "Runner", "Assets.xcassets", "AppIcon.appiconset",
                           "Icon-App-1024x1024@1x.png")
     icon = Image.open(source).convert("RGB").resize((size, size), Image.LANCZOS)
-    icon_mask = K.rounded_mask((size, size), size / 2)
+    icon_mask = K.rounded_mask((size, size), size * (0.2237 if ios else 0.5))
     ix, iy = icon_c[0] * r - size / 2, icon_c[1] * r - size / 2
     K.shadow(screen, icon_mask, (ix, iy), strength=0.4, blur=0.08, drop=0.05)
     screen.paste(icon, (int(ix), int(iy)), icon_mask)
     d = ImageDraw.Draw(screen)
-    d.text((icon_c[0] * r, (icon_c[1] + 30 + 20) * r), "Nilu", font=K.roboto(13 * r), fill=K.WHITE,
+    label_font = K.status_font(12 * r) if ios else K.roboto(13 * r)
+    d.text((icon_c[0] * r, (icon_c[1] + icon_pt / 2 + (18 if ios else 20)) * r), "Nilu", font=label_font, fill=K.WHITE,
            anchor="mm")
 
-    # Hareket çubuğu.
-    bw, bh = 108 * r, 4 * r
-    d.rounded_rectangle([(w - bw) / 2, h - 14 * r, (w + bw) / 2, h - 14 * r + bh], radius=bh / 2,
-                        fill=(255, 255, 255))
-    K.android_status(screen, r, camera=not tablet, ink=K.WHITE)
+    # Ana ekran çubuğu (iOS) ya da hareket çubuğu (Android).
+    bw, bh, bottom = (134, 5, 8) if ios else (108, 4, 10)
+    d.rounded_rectangle([(w - bw * r) / 2, h - (bottom + bh) * r, (w + bw * r) / 2, h - bottom * r],
+                        radius=bh * r / 2, fill=(255, 255, 255))
+    if device == "iphone":
+        K.ios_phone_status(screen, r, ink=K.WHITE)
+    elif device == "ipad":
+        K.ios_pad_status(screen, r, ink=K.WHITE)
+    else:
+        K.android_status(screen, r, camera=not tablet, ink=K.WHITE)
     rect = [m_pos[0], m_pos[1], m_pos[0] + mw, m_pos[1] + mh]
     return screen, {"ratio": r, "callout": rect}
 
@@ -582,7 +607,7 @@ def backdrop_silk(canvas, center, width, twist, phase, dot, line_unit):
 
 
 def panorama(layout_name):
-    """Sekiz panelin ortak zemini; panel başına bir dilim."""
+    """Panellerin ortak zemini; panel başına bir dilim."""
     if layout_name in _PANORAMA:
         return _PANORAMA[layout_name]
     layout = LAYOUTS[layout_name]
@@ -732,7 +757,10 @@ def panel(lang, layout_name, index, shot):
     w, h = canvas.size
 
     # Yazı: ilk panelde marka imzası, diğerlerinde cam etiket.
-    overline, text = CAPTIONS[lang][shot]
+    captions = CAPTIONS[lang]
+    if layout["device"] in ("iphone", "ipad"):
+        captions = captions | APPLE_CAPTIONS[lang]
+    overline, text = captions[shot]
     if index == 0:
         y = brand(canvas, w / 2, layout["top"], layout["chip"] * 2.5)
     else:
