@@ -15,6 +15,12 @@
 //
 // Site çerez, analiz, harici yazı tipi ya da betik kullanmıyor; tek betik
 // kök sayfadaki dil yönlendirmesi.
+//
+// site/assets/badges'teki rozetler Apple'ın ve Google'ın resmî dosyaları,
+// değiştirilmeden kullanılıyor. Apple'ın iki rozetinin lisansı (App Store
+// Marketing Artwork, Works with Apple Health) App Store'da yayındaki
+// uygulamayla sınırlı: ikisi de ancak site.json'a `appStoreUrl` girilince
+// görünüyor. Kurallar ve kaynaklar: SETUP_KEYS.md §8.
 import 'dart:convert';
 import 'dart:io';
 
@@ -62,6 +68,10 @@ class SiteBuilder {
     if (m == null || m.group(1) == '3940256099942544') return null;
     return 'pub-${m.group(1)}';
   }
+
+  /// Mağaza sayfaları; uygulama o mağazada henüz yoksa `null`.
+  String? get appStoreUrl => config['appStoreUrl'] as String?;
+  String? get playStoreUrl => config['playStoreUrl'] as String?;
 
   String? get baseUrl {
     final b = config['baseUrl'] as String?;
@@ -194,12 +204,42 @@ $body
 ''';
   }
 
+  /// Resmî mağaza rozeti; [file] site/assets/badges altında.
+  String _badge(String url, String file, String alt) =>
+      '<a href="${_esc(url)}"><img src="../assets/badges/$file" '
+      'alt="${_esc(alt)}" height="48"></a>';
+
   String _home(String lang) {
     final s = site(lang);
-    final store = config['appStoreUrl'] as String?;
-    final cta = store == null
-        ? '<span>${_esc(s['coming_soon'] as String)}</span>'
-        : '<a href="${_esc(store)}">${_esc(s['download'] as String)}</a>';
+    String t(String key) => _esc(s[key] as String);
+    final apple = appStoreUrl;
+    final play = playStoreUrl;
+    // Apple: App Store rozeti sırada ilk ve diğer rozet varken siyah olanı.
+    // Google: Google Play rozeti ötekilerle aynı boyda ya da büyük.
+    final badges = [
+      if (apple != null)
+        _badge(apple, 'app-store-$lang.svg', s['badge_app_store'] as String),
+      if (play != null)
+        _badge(play, 'google-play-$lang.svg', s['badge_google_play'] as String),
+    ];
+    final cta = badges.isEmpty
+        ? '<div class="cta"><span>${t('coming_soon')}</span></div>'
+        : '<div class="badges">${badges.join()}</div>';
+    // Apple'ın kuralı: rozet ana mesajdan sonra ve ondan küçük, yanında
+    // Sağlık'ın faydası ve gizlilik cümlesi. Rozet çevrilmiyor.
+    final health = apple == null
+        ? ''
+        : '''
+<section class="card"><h2>${t('health_title')}</h2>
+<p>${t('health_body')}</p>
+<p class="note">${t('health_privacy')}</p>
+<img class="health-badge" src="../assets/badges/apple-health.svg" alt="Works with Apple Health" height="40">
+</section>''';
+    // Rozetlerdeki markaların sahip satırları (ikisinin de kuralı istiyor).
+    final credits = [
+      if (apple != null) 'trademarks_apple',
+      if (play != null) 'trademarks_google',
+    ].map((k) => '\n<p class="note legal">${t(k)}</p>').join();
     String list(String key) =>
         (s[key] as List).map((e) => '<li>${_esc(e as String)}</li>').join('\n');
     return _layout(
@@ -211,17 +251,17 @@ $body
           '''
 <section class="hero">
 <img src="../assets/icon-256.png" alt="Nilu" width="112" height="112">
-<h1>${_esc(s['hero_title'] as String)}</h1>
-<p>${_esc(s['hero_body'] as String)}</p>
-<div class="cta">$cta</div>
+<h1>${t('hero_title')}</h1>
+<p>${t('hero_body')}</p>
+$cta
 </section>
-<section class="card"><h2>${_esc(s['features_title'] as String)}</h2><ul>
+<section class="card"><h2>${t('features_title')}</h2><ul>
 ${list('features')}
-</ul></section>
-<section class="card"><h2>${_esc(s['privacy_title'] as String)}</h2><ul>
+</ul></section>$health
+<section class="card"><h2>${t('privacy_title')}</h2><ul>
 ${list('privacy_points')}
 </ul></section>
-<p class="note">${_esc(s['medical'] as String)}</p>''',
+<p class="note">${t('medical')}</p>$credits''',
     );
   }
 
@@ -426,10 +466,11 @@ $list
         ..writeAsStringSync(p.content);
     }
     final assets = Directory('${root.path}/site/assets');
-    Directory('${out.path}/assets').createSync(recursive: true);
-    for (final f in assets.listSync().whereType<File>()) {
-      final name = f.uri.pathSegments.last;
-      f.copySync('${out.path}/assets/$name');
+    for (final f in assets.listSync(recursive: true).whereType<File>()) {
+      final rel = f.path.substring(assets.path.length + 1);
+      final hedef = File('${out.path}/assets/$rel')
+        ..parent.createSync(recursive: true);
+      f.copySync(hedef.path);
     }
   }
 }

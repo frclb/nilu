@@ -110,6 +110,31 @@ void main() {
     expect(oku('assets/style.css'), isNot(contains('url(http')));
   });
 
+  test('bugün: mağaza bağlantısı yokken rozet yok, "Yakında" var', () {
+    final yazilar =
+        jsonDecode(File('site/strings.json').readAsStringSync())
+            as Map<String, dynamic>;
+    for (final d in diller) {
+      final html = oku('$d/index.html');
+      final s = yazilar[d] as Map<String, dynamic>;
+      expect(html, contains(esc(s['coming_soon'] as String)), reason: d);
+      expect(html, isNot(contains('assets/badges/')), reason: d);
+    }
+  });
+
+  test('her dilin resmî mağaza rozetleri sitede', () {
+    // Rozetler dile göre: Apple ve Google kendi çevirisini veriyor,
+    // rozet yazısı elle çevrilmiyor. Sağlık rozetinin yalnız İngilizcesi var.
+    for (final d in diller) {
+      for (final ad in ['app-store-$d.svg', 'google-play-$d.svg']) {
+        final svg = oku('assets/badges/$ad');
+        expect(svg, contains('<svg'), reason: ad);
+        expect(svg, isNot(contains('<script')), reason: ad);
+      }
+    }
+    expect(oku('assets/badges/apple-health.svg'), contains('<svg'));
+  });
+
   test('göreli bağlantıların hepsi var olan bir dosyaya gidiyor', () {
     final link = RegExp(r'''(?:src|href)="([^"#:]+)"''');
     for (final f in cikti.listSync(recursive: true).whereType<File>()) {
@@ -153,8 +178,10 @@ void main() {
           ..createSync(recursive: true)
           ..writeAsStringSync(File(yol).readAsStringSync());
       }
-      for (final f in Directory('site/assets').listSync().whereType<File>()) {
-        File('${kok.path}/site/assets/${f.uri.pathSegments.last}')
+      for (final f in Directory(
+        'site/assets',
+      ).listSync(recursive: true).whereType<File>()) {
+        File('${kok.path}/${f.path}')
           ..createSync(recursive: true)
           ..writeAsBytesSync(f.readAsBytesSync());
       }
@@ -199,6 +226,67 @@ class ReleaseConfig {
         sayfalar['robots.txt'],
         contains('Sitemap: https://ornek.github.io/nilu/sitemap.xml'),
       );
+    });
+
+    /// site.json'a mağaza bağlantılarını yazıp ana sayfaları üretir.
+    Map<String, String> magazayla({String? apple, String? play}) {
+      final yol = File('${kok.path}/site/site.json');
+      final config = jsonDecode(yol.readAsStringSync()) as Map<String, dynamic>;
+      config['appStoreUrl'] = apple;
+      config['playStoreUrl'] = play;
+      yol.writeAsStringSync(jsonEncode(config));
+      return {for (final p in SiteBuilder(kok).pages()) p.path: p.content};
+    }
+
+    const apple = 'https://apps.apple.com/app/id1234567890';
+    const play =
+        'https://play.google.com/store/apps/details?id=com.furkan.rcperiodtracker';
+
+    test(
+      'iki mağaza da varsa: resmî rozetler, Sağlık kartı, marka satırları',
+      () {
+        final sayfalar = magazayla(apple: apple, play: play);
+        final yazilar =
+            jsonDecode(File('site/strings.json').readAsStringSync())
+                as Map<String, dynamic>;
+        for (final d in diller) {
+          final html = sayfalar['$d/index.html']!;
+          final s = yazilar[d] as Map<String, dynamic>;
+          final appStore = html.indexOf(
+            '<a href="$apple"><img src="../assets/badges/app-store-$d.svg" '
+            'alt="${esc(s['badge_app_store'] as String)}"',
+          );
+          final googlePlay = html.indexOf(
+            '<a href="${esc(play)}"><img src="../assets/badges/google-play-$d.svg" '
+            'alt="${esc(s['badge_google_play'] as String)}"',
+          );
+          // Apple'ın kuralı: App Store rozeti sırada ilk.
+          expect(appStore, isNonNegative, reason: d);
+          expect(googlePlay, greaterThan(appStore), reason: d);
+          expect(html, isNot(contains(esc(s['coming_soon'] as String))));
+
+          // Rozet çevrilmiyor; ana mesajdan (başlık) sonra geliyor.
+          final rozet = html.indexOf('alt="Works with Apple Health"');
+          expect(
+            rozet,
+            greaterThan(html.indexOf(esc(s['health_title'] as String))),
+          );
+          expect(html, contains(esc(s['health_privacy'] as String)));
+          expect(html, contains(esc(s['trademarks_apple'] as String)));
+          expect(html, contains(esc(s['trademarks_google'] as String)));
+        }
+      },
+    );
+
+    test('yalnız Google Play varsa Apple rozetleri ve satırı yok', () {
+      // Apple Developer Program üyeliği gecikirse Android önce çıkabilir;
+      // Apple'ın iki rozetinin lisansı App Store'daki uygulamaya bağlı.
+      final html = magazayla(play: play)['tr/index.html']!;
+      expect(html, contains('assets/badges/google-play-tr.svg'));
+      expect(html, isNot(contains('app-store-')));
+      expect(html, isNot(contains('apple-health.svg')));
+      expect(html, isNot(contains('Apple Inc.')));
+      expect(html, contains('Google LLC'));
     });
 
     test('bugün: hesap yokken app-ads.txt ve site haritası yok', () {

@@ -460,7 +460,8 @@ sürümler kesilmesin.
 App Store **gizlilik politikası adresi** ve **destek adresi** istiyor.
 Site `site/` ve `tool/build_site.dart`'tan üretiliyor; gizlilik politikası ve
 şartlar **uygulamanın sözlüğünden** geliyor, yani uygulamadakiyle hep aynı.
-Altı dil, çerez/analiz/harici kaynak yok.
+Altı dil, çerez/analiz/harici kaynak yok; dışarıya giden tek bağlantı mağaza
+rozetleri.
 
 **8.1 Depo:** GitHub'da depo oluştur (ör. `nilu`), bu projeyi gönder.
 
@@ -468,8 +469,37 @@ Altı dil, çerez/analiz/harici kaynak yok.
 `.github/workflows/pages.yml` her gönderimde siteyi üretip yayımlıyor.
 
 **8.3 Adres:** `site/site.json` → `baseUrl`, ör.
-`https://kullanici.github.io/nilu`. Uygulama yayına çıkınca `appStoreUrl`
-de girilirse ana sayfadaki "Yakında" düğmesi indirme bağlantısına dönüşür.
+`https://kullanici.github.io/nilu`.
+
+**Mağaza rozetleri:** uygulama bir mağazada yayına çıkınca o mağazanın
+adresini gir; ana sayfadaki "Yakında" yazısının yerini resmî rozet alır.
+
+| Anahtar | Değer | Görünen |
+|---|---|---|
+| `appStoreUrl` | `https://apps.apple.com/app/id…` (App Store Connect → Uygulama Bilgileri → Apple ID) | App Store rozeti, "Works with Apple Health" kartı, Apple'ın marka satırı |
+| `playStoreUrl` | `https://play.google.com/store/apps/details?id=com.furkan.rcperiodtracker` | Google Play rozeti, Google'ın marka satırı |
+
+Rozetler `site/assets/badges/`'te, Apple'ın ve Google'ın resmî dosyaları
+(2026-10-26'da indirildi). **Hiçbirini düzenleme, döndürme, gölge ekleme.**
+Her dilin kendi rozeti var; Apple Sağlık rozeti yalnızca İngilizce ve
+çevrilmesi yasak.
+
+- **App Store rozeti:** App Store Marketing Artwork License (EA0861),
+  [developer.apple.com/app-store/marketing/guidelines](https://developer.apple.com/app-store/marketing/guidelines/).
+  Yalnızca App Store'da yayındaki uygulama için ve Developer Program üyeliği
+  sürerken. Başka mağaza rozeti varken siyah olan ve sırada ilk.
+- **Works with Apple Health:** Developer Artwork License (EA4520),
+  [developer.apple.com/licensing-trademarks/works-with-apple-health](https://developer.apple.com/licensing-trademarks/works-with-apple-health/).
+  Yalnızca onaylı uygulamayla ilgili sayfalarda, sayfada bir kez, ana
+  mesajdan küçük. **Sosyal medyada kullanılmaz.** Basına bir şey verilecekse
+  iki hafta önce Apple'a gösterilmeli.
+- **Google Play rozeti:** lisans onayı yok, kurallar
+  [Partner Marketing Hub](https://partnermarketinghub.withgoogle.com/brands/google-play/google-play/lockups-icons-badges/)'da.
+  Öteki rozetlerle aynı boyda ya da daha büyük. Google eski rozeti yasaklıyor;
+  Hub'da yenisi çıkarsa dosyaları değiştir.
+
+Apple Developer Program üyeliği biterse Apple'ın iki rozeti de kaldırılmalı
+(`appStoreUrl`'i `null` yapmak yeter).
 
 **8.4 App Store Connect'e girilecek adresler** (her dilin kendi sayfası):
 

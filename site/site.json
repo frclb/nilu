@@ -1,6 +1,7 @@
 {
   "baseUrl": "https://YER_TUTUCU.github.io/nilu",
   "appStoreUrl": null,
+  "playStoreUrl": null,
   "languages": ["tr", "en", "de", "es", "fr", "pt"],
   "defaultLanguage": "tr"
 }

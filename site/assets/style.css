@@ -74,15 +74,26 @@ nav.main a[aria-current="page"] { background: var(--brand-tint); color: var(--br
 main { padding: 32px 0 48px; }
 
 .hero { text-align: center; padding: 16px 0 8px; }
-.hero img { width: 112px; height: 112px; border-radius: 26px; box-shadow: 0 8px 28px rgba(107, 47, 85, 0.18); }
+.hero > img { width: 112px; height: 112px; border-radius: 26px; box-shadow: 0 8px 28px rgba(107, 47, 85, 0.18); }
 .hero h1 { font-size: clamp(30px, 6vw, 42px); line-height: 1.15; margin: 20px 0 12px; letter-spacing: -0.6px; }
 .hero p { color: var(--text-muted); margin: 0 auto; max-width: 560px; }
 .cta { margin-top: 24px; }
-.cta a, .cta span {
+.cta span {
   display: inline-block; padding: 12px 22px; border-radius: 14px;
-  background: var(--brand); color: var(--bg); font-weight: 600; text-decoration: none;
+  background: var(--surface-alt); color: var(--text-muted); font-weight: 600;
 }
-.cta span { background: var(--surface-alt); color: var(--text-muted); }
+
+/* Mağaza rozetleri olduğu gibi: gölge, eğim, renk yok. Aradaki boşluk
+   Apple'ın ve Google'ın istediği en az çeyrek rozet yüksekliği (12px). */
+.badges {
+  margin-top: 24px; display: flex; flex-wrap: wrap; justify-content: center; gap: 16px;
+}
+.badges a { display: block; border-radius: 8px; }
+.badges img { display: block; height: 48px; width: auto; }
+
+/* Works with Apple Health: ana mesajdan küçük, en az 30px. */
+.health-badge { display: block; height: 40px; width: auto; margin-top: 16px; }
+.note.legal { font-size: 13px; }
 
 .card {
   background: var(--surface); border: 1px solid var(--border);
