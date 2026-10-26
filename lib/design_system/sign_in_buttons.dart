@@ -13,6 +13,14 @@ import 'package:flutter/material.dart';
 ///
 /// Apple düğmesi her zaman önce ve en az Google düğmesi kadar belirgin
 /// (App Store Yönergeleri 4.8).
+///
+/// Apple logosu Apple'ın kendi dosyası (`assets/brand/apple/`, Apple Design
+/// Resources → "Sign in with Apple", sola yaslı, orta boy). Yönergeler özel
+/// düğmede başka bir Apple logosunu yasaklıyor ve ölçüleri sabitliyor: PNG
+/// dosyası yalnızca 44 pt yüksekliğindeki düğmede kullanılıyor, logo
+/// düğmenin tam yüksekliğinde (dosyanın kendi boşluğu kırpılmadan), yazı
+/// boyutu yüksekliğin %43'ü. Dosyanın lisansı yalnızca uygulamanın
+/// arayüzünde kullanmaya izin veriyor (Apple Developer Program üyeliği şart).
 class SignInButton extends StatelessWidget {
   const SignInButton.apple({
     super.key,
@@ -30,6 +38,12 @@ class SignInButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final bool _apple;
 
+  /// Apple'ın önerdiği yükseklik; iki düğme aynı boyda.
+  static const double height = 44;
+
+  /// Yüksekliğin %43'ü (Apple'ın sistem düğmesindeki oran).
+  static const double _titleSize = 19;
+
   static const Color _black = Color(0xFF000000);
   static const Color _white = Color(0xFFFFFFFF);
   static const Color _googleDark = Color(0xFF131314);
@@ -45,54 +59,81 @@ class SignInButton extends StatelessWidget {
     final Color zemin;
     final Color yazi;
     final Color? kenar;
+    final Widget isaret;
     if (_apple) {
       zemin = dark ? _white : _black;
       yazi = dark ? _black : _white;
       kenar = null;
+      // Logo dosyasının zemini düğmeyle aynı renk; beyaz düğmeye siyah
+      // logo, siyah düğmeye beyaz logo.
+      isaret = Image.asset(
+        dark
+            ? 'assets/brand/apple/siwa_logo_black.png'
+            : 'assets/brand/apple/siwa_logo_white.png',
+        height: height,
+        fit: BoxFit.fitHeight,
+        excludeFromSemantics: true,
+      );
     } else {
       zemin = dark ? _googleDark : _white;
       yazi = dark ? _googleTextDark : _googleTextLight;
       kenar = dark ? _googleBorderDark : _googleBorderLight;
+      isaret = const Padding(
+        padding: EdgeInsets.only(right: 12),
+        child: SizedBox.square(
+          dimension: 20,
+          child: CustomPaint(painter: _GoogleMark()),
+        ),
+      );
     }
 
-    return SizedBox(
-      width: double.infinity,
-      height: 52,
-      child: TextButton(
-        onPressed: onPressed,
-        style: TextButton.styleFrom(
-          backgroundColor: zemin,
-          foregroundColor: yazi,
-          disabledBackgroundColor: zemin.withValues(alpha: 0.5),
-          disabledForegroundColor: yazi.withValues(alpha: 0.6),
+    // Devre dışıyken bütün düğme soluyor: logo dosyasının zemini opak,
+    // yalnızca zemini soldurmak logonun çevresinde kutu bırakırdı.
+    return Semantics(
+      button: true,
+      enabled: onPressed != null,
+      child: Opacity(
+        opacity: onPressed == null ? 0.5 : 1,
+        child: Material(
+          color: zemin,
+          clipBehavior: Clip.antiAlias,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: kenar == null ? BorderSide.none : BorderSide(color: kenar),
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (_apple)
-              Icon(Icons.apple, size: 22, color: yazi)
-            else
-              const SizedBox.square(
-                dimension: 18,
-                child: CustomPaint(painter: _GoogleMark()),
-              ),
-            const SizedBox(width: 10),
-            Flexible(
-              child: Text(
-                label,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
-                  color: yazi,
+          child: InkWell(
+            onTap: onPressed,
+            child: SizedBox(
+              width: double.infinity,
+              height: height,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    isaret,
+                    Flexible(
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        // Sabit yükseklikli düğmede büyük yazı ayarı yazıyı
+                        // kesmesin; sistem düğmesi de büyümüyor.
+                        textScaler: MediaQuery.textScalerOf(
+                          context,
+                        ).clamp(maxScaleFactor: 1.2),
+                        style: TextStyle(
+                          fontSize: _titleSize,
+                          fontWeight: FontWeight.w600,
+                          color: yazi,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

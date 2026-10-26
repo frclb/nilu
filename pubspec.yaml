@@ -113,6 +113,9 @@ flutter:
     # Görünüm ekranındaki simge önizlemeleri (ana ekran simgesinin kendisi
     # Assets.xcassets içinde).
     - assets/icon/previews/
+    # Apple ile giriş düğmesinin logosu: Apple Design Resources'tan,
+    # Apple'ın lisansıyla yalnızca uygulama arayüzünde (bkz. SignInButton).
+    - assets/brand/apple/
 
   # Yazı tipleri pakete gömülü.
   #
