@@ -552,7 +552,7 @@
   "premium_banner_desc": "Cycle trend across your whole history, symptom–phase analysis, sharing the doctor summary as a file, and custom themes.",
   "premium_banner_cta": "See features",
   "health_sync_title": "Apple Health",
-  "health_sync_desc": "Import your period records from the Health app and, if you like, write the days you mark here to Health too. You grant permission, and you can revoke it at any time.",
+  "health_sync_desc": "Import your period records from the Health app and, if you like, write the days you mark here to Health too. You grant permission and can revoke it at any time in the Health app’s privacy settings.",
   "health_sync_point_watch": "Data from Apple Watch and other apps arrives through Health.",
   "health_sync_point_merge": "Days you marked yourself are kept; only missing periods are added.",
   "health_sync_point_local": "Health data is processed only on this device; if you turned on cloud sync, imported periods are also added to the copy in your own account.",

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/repositories/favorites_repository.dart';
 import '../../design_system/app_decor.dart';
+import '../../design_system/app_snack.dart';
 import '../../design_system/app_tokens.dart';
 import '../../localization/app_localizations.dart';
 
@@ -45,7 +46,7 @@ class _FavoriteButtonState extends State<FavoriteButton> {
   }
 
   Future<void> _toggle() async {
-    final messenger = ScaffoldMessenger.of(context);
+    final snack = AppSnack.of(context);
     final addedMessage = context.tr('recipe_favorited');
     final removedMessage = context.tr('favorite_removed');
 
@@ -53,9 +54,7 @@ class _FavoriteButtonState extends State<FavoriteButton> {
     if (!mounted) return;
 
     setState(() => _isFavorite = nowFavorite);
-    messenger.showSnackBar(
-      SnackBar(content: Text(nowFavorite ? addedMessage : removedMessage)),
-    );
+    snack.show(nowFavorite ? addedMessage : removedMessage);
   }
 
   @override

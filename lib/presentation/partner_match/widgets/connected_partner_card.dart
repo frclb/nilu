@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_decor.dart';
+import '../../../design_system/app_snack.dart';
 import '../../../design_system/app_theme.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../design_system/content_illustration.dart';
@@ -47,14 +48,14 @@ class ConnectedPartnerCard extends StatelessWidget {
 
     final user = context.read<UserViewModel>();
     final intimacy = context.read<IntimacyViewModel>();
-    final messenger = ScaffoldMessenger.of(context);
+    final snack = AppSnack.of(context);
     final done = context.tr('partner_remove_done');
     final failed = context.tr('partner_remove_failed');
 
     final ok = await user.removePartnerAccess();
     // Yeni bir partner bağlanırsa paylaşım yeniden rıza istemeli.
     if (ok) await intimacy.stopSharing();
-    messenger.showSnackBar(SnackBar(content: Text(ok ? done : failed)));
+    ok ? snack.success(done) : snack.error(failed);
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/platform/app_haptics.dart';
 import '../../design_system/app_decor.dart';
 import '../../design_system/app_scrim.dart';
 import 'widgets/partner_unavailable_notice.dart';
@@ -79,7 +80,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     } on PairingUnavailable {
       // Sunucuya ulaşılamadı: "geçersiz kod" demek yanlış olurdu.
       if (!mounted) return;
-      _showMessage(context.tr('partner_scan_unreachable'));
+      _showMessage(context.tr('partner_scan_unreachable'), ok: false);
       await _resumeScanner();
       if (!mounted) return;
       setState(() => _isProcessing = false);
@@ -156,6 +157,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     _lastErrorAt = now;
 
     if (!mounted) return;
+    AppHaptics.error();
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
@@ -168,7 +170,10 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     );
   }
 
-  void _showMessage(String text) {
+  /// Kamera ekranında bildirim kameranın üstünde yüzüyor; bu yüzden
+  /// [AppSnack] değil. Sonuç titreşimi aynı.
+  void _showMessage(String text, {required bool ok}) {
+    ok ? AppHaptics.success() : AppHaptics.error();
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
@@ -231,7 +236,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     if (!mounted) return;
     navigator.pop(); // yükleniyor
     navigator.pop(); // onay sayfası
-    _showMessage(ok ? requested : failed);
+    _showMessage(ok ? requested : failed, ok: ok);
     if (ok) {
       router.goNamed(RouteNames.home);
     } else {

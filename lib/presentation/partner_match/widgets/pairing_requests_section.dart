@@ -6,6 +6,7 @@ import '../../../data/datasources/remote/firestore_datasource.dart';
 import '../../../data/repositories/pairing_repository.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_decor.dart';
+import '../../../design_system/app_snack.dart';
 import '../../../design_system/app_theme.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../domain/services/pairing_token.dart';
@@ -58,7 +59,7 @@ class _PairingRequestsSectionState extends State<PairingRequestsSection> {
   Future<void> _approve(String requesterUid) async {
     final userViewModel = context.read<UserViewModel>();
     final intimacy = context.read<IntimacyViewModel>();
-    final messenger = ScaffoldMessenger.of(context);
+    final snack = AppSnack.of(context);
     final approved = context.tr('partner_request_approved');
     final failed = context.tr('partner_request_failed');
 
@@ -69,7 +70,7 @@ class _PairingRequestsSectionState extends State<PairingRequestsSection> {
     );
     if (!mounted) return;
     setState(() => _busy.remove(requesterUid));
-    messenger.showSnackBar(SnackBar(content: Text(ok ? approved : failed)));
+    ok ? snack.success(approved) : snack.error(failed);
     // Onay erişimi veriyor ama paylaşımı başlatmıyor: paylaşım ayrı bir
     // açık rıza istiyor.
     if (ok && !intimacy.sharingOn && await askIntimacyConsent(context)) {

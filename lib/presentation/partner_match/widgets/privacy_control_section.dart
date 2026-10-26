@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../design_system/app_card.dart';
+import '../../../design_system/app_snack.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../domain/view_models/intimacy_view_model.dart';
 import '../../../localization/app_localizations.dart';
@@ -19,14 +20,14 @@ class PrivacyControlSection extends StatelessWidget {
 
   Future<void> _toggle(BuildContext context, bool on) async {
     final vm = context.read<IntimacyViewModel>();
-    final messenger = ScaffoldMessenger.of(context);
+    final snack = AppSnack.of(context);
     final retractFailed = context.tr('partner_share_retract_failed');
     if (on) {
       if (await askIntimacyConsent(context)) await vm.startSharing();
       return;
     }
     if (!await vm.stopSharing()) {
-      messenger.showSnackBar(SnackBar(content: Text(retractFailed)));
+      snack.error(retractFailed);
     }
   }
 

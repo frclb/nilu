@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/platform/app_platform.dart';
+import '../../core/platform/apple_health_icon.dart';
 import '../../data/datasources/health_datasource.dart';
 import '../../data/repositories/health_write_back.dart';
 import '../../data/repositories/period_repository.dart';
@@ -220,12 +222,10 @@ class _HealthSyncScreenState extends State<HealthSyncScreen>
                 padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
                 child: Column(
                   children: [
-                    AppIconTile(
-                      icon: Icons.favorite_rounded,
-                      size: 68,
-                      gradient: AppGradients.mark(context),
-                      color: theme.colorScheme.onPrimary,
-                    ),
+                    if (AppPlatform.isAndroid)
+                      const _HeartTile()
+                    else
+                      _AppleHealthMark(label: context.tr('health_sync_title')),
                     const SizedBox(height: AppSpacing.lg),
                     Text(
                       context.tr(_k('health_sync_desc')),
@@ -337,6 +337,72 @@ class _HealthSyncScreenState extends State<HealthSyncScreen>
           ),
         ),
       ),
+    );
+  }
+}
+
+class _HeartTile extends StatelessWidget {
+  const _HeartTile();
+
+  @override
+  Widget build(BuildContext context) => AppIconTile(
+    icon: Icons.favorite_rounded,
+    size: 68,
+    gradient: AppGradients.mark(context),
+    color: Theme.of(context).colorScheme.onPrimary,
+  );
+}
+
+/// Apple Sağlık'ın resmî simgesi ve adı (iOS).
+///
+/// Apple'ın yönergeleri: yalnızca Apple'ın simgesi, yanında "Apple Sağlık"
+/// adı, değiştirilmeden (maske, gölge, kenar yok) ve çevresinde en az
+/// yüksekliğinin onda biri kadar boşlukla. Simge yüklenemezse (testte) uygulamanın kalp simgesi.
+class _AppleHealthMark extends StatelessWidget {
+  const _AppleHealthMark({required this.label});
+
+  final String label;
+
+  static const double _size = 64;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Uint8List?>(
+      future: AppleHealthIcon.load(),
+      builder: (context, snapshot) {
+        final bytes = snapshot.data;
+        if (bytes == null) return const _HeartTile();
+        return Column(
+          children: [
+            // Simgenin zemini beyaz; beyaz kartta kenarı kayboluyor, yalnızca
+            // kalp kalıyordu. Simgeye kenar ya da gölge eklemek yasak, bu
+            // yüzden altına düz renkli bir zemin geliyor (boşluk yönergenin
+            // istediği onda birden fazla).
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: context.tokens.brandTint,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Image.memory(
+                  bytes,
+                  width: _size,
+                  height: _size,
+                  excludeFromSemantics: true,
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              label,
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+            ),
+          ],
+        );
+      },
     );
   }
 }

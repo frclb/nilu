@@ -10,6 +10,7 @@ import '../../data/repositories/pairing_repository.dart';
 import '../../design_system/app_card.dart';
 import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
+import '../../design_system/app_snack.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/services/pairing_token.dart';
 import 'widgets/pairing_requests_section.dart';
@@ -71,7 +72,7 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
     final id = await context.read<UserViewModel>().ensureMyId();
     final token = await _pairing.rotate(id);
     if (!mounted) return;
-    final messenger = ScaffoldMessenger.of(context);
+    final snack = AppSnack.of(context);
     final failed = context.tr('partner_qr_gen_failed');
     setState(() {
       // Yenilenemezse eski kod geçerli kalıyor; ekran onu göstermeye devam
@@ -80,7 +81,7 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
       _rotating = false;
     });
     if (token == null) {
-      messenger.showSnackBar(SnackBar(content: Text(failed)));
+      snack.error(failed);
     }
     // Onay bildirimi kaldırıldı: QR ile kodun kendisi zaten gözle görülür
     // biçimde değişiyor, bildirim ise "Eşleşme Kodunu Kopyala" düğmesinin
@@ -92,10 +93,10 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
 
   Future<void> _copy() async {
     final copied = context.tr('partner_qr_gen_code_copied');
-    final messenger = ScaffoldMessenger.of(context);
+    final snack = AppSnack.of(context);
     await Clipboard.setData(ClipboardData(text: _token!));
     if (!mounted) return;
-    messenger.showSnackBar(SnackBar(content: Text(copied)));
+    snack.show(copied);
   }
 
   @override

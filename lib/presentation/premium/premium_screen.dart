@@ -7,6 +7,7 @@ import '../../core/navigation/route_names.dart';
 import '../../core/platform/app_platform.dart';
 import '../../design_system/app_card.dart';
 import '../../design_system/app_decor.dart';
+import '../../design_system/app_snack.dart';
 import '../../design_system/brand_lotus.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/services/premium_gate.dart';
@@ -151,7 +152,7 @@ class _ActiveState extends StatelessWidget {
   /// sayfası ise bir bağlantı: doğrudan açılıyor, açılamazsa yol tarif
   /// ediliyor.
   Future<void> _openManageSubscriptions(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final snack = AppSnack.of(context);
     final hint = context.tr(
       AppPlatform.isAndroid
           ? 'premium_manage_hint_android'
@@ -168,9 +169,7 @@ class _ActiveState extends StatelessWidget {
         debugPrint('Could not open Play subscriptions: $e');
       }
     }
-    messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(hint)));
+    snack.show(hint);
   }
 }
 
@@ -315,36 +314,31 @@ class _OfferStateState extends State<_OfferState> {
   }
 
   Future<void> _purchase(String planId) async {
-    final messenger = ScaffoldMessenger.of(context);
+    final snack = AppSnack.of(context);
     final success = context.tr('premium_purchase_success');
     final failed = context.tr('premium_purchase_failed');
     final unavailable = context.tr('premium_unavailable');
 
     final package = widget.viewModel.packageFor(planId);
     if (package == null) {
-      _show(messenger, unavailable);
+      snack.error(unavailable);
       return;
     }
 
     final purchased = await widget.viewModel.purchasePackage(package);
-    _show(messenger, purchased ? success : failed);
+    // Başarısızlığın çoğu kullanıcının vazgeçmesi: hata titreşimi yok.
+    purchased ? snack.success(success) : snack.show(failed);
   }
 
   Future<void> _restore() async {
-    final messenger = ScaffoldMessenger.of(context);
+    final snack = AppSnack.of(context);
     final checking = context.tr('premium_restore_checking');
     final restored = context.tr('premium_restore_success');
     final nothing = context.tr('premium_restore_none');
 
-    _show(messenger, checking);
+    snack.show(checking);
     final ok = await widget.viewModel.restorePurchases();
-    _show(messenger, ok ? restored : nothing);
-  }
-
-  void _show(ScaffoldMessengerState messenger, String text) {
-    messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(text)));
+    ok ? snack.success(restored) : snack.show(nothing);
   }
 }
 

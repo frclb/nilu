@@ -87,7 +87,7 @@ Future<void> _enableSync(BuildContext context, {required bool restore}) async {
   if (restore) {
     await _finishRestore(context, sonuc);
   } else if (vm.status == SyncStatus.failed) {
-    AppSnack.show(context, context.tr('account_sync_failed'));
+    AppSnack.error(context, context.tr('account_sync_failed'));
   }
 }
 
@@ -101,14 +101,14 @@ Future<void> _finishRestore(BuildContext context, SyncOutcome? sonuc) async {
   final failed = context.tr('account_restore_failed');
 
   if (sonuc == null || vm.status == SyncStatus.failed) {
-    AppSnack.show(context, failed);
+    AppSnack.error(context, failed);
     return;
   }
   if (await vm.hasLocalData()) {
     await user.resetPartnerState();
     await user.markOnboardingComplete();
     if (!context.mounted) return;
-    AppSnack.show(context, done);
+    AppSnack.success(context, done);
     router.goNamed(RouteNames.home);
   } else {
     if (!context.mounted) return;
@@ -185,9 +185,9 @@ class _SignedOut extends StatelessWidget {
       case SignInStatus.cancelled:
         break;
       case SignInStatus.failed:
-        AppSnack.show(context, context.tr('account_sign_in_failed'));
+        AppSnack.error(context, context.tr('account_sign_in_failed'));
       case SignInStatus.unavailable:
-        AppSnack.show(context, context.tr('account_unavailable'));
+        AppSnack.error(context, context.tr('account_unavailable'));
     }
   }
 
@@ -421,10 +421,9 @@ class _SignedIn extends StatelessWidget {
     if (!onay || !context.mounted) return;
     final ok = await context.read<AccountViewModel>().disableSync();
     if (!context.mounted) return;
-    AppSnack.show(
-      context,
-      context.tr(ok ? 'account_sync_off_done' : 'account_sync_off_failed'),
-    );
+    ok
+        ? AppSnack.success(context, context.tr('account_sync_off_done'))
+        : AppSnack.error(context, context.tr('account_sync_off_failed'));
   }
 
   Future<void> _syncNow(BuildContext context) async {
@@ -433,7 +432,7 @@ class _SignedIn extends StatelessWidget {
     if (!context.mounted) return;
     if (restore) return _finishRestore(context, sonuc);
     if (vm.status == SyncStatus.failed) {
-      AppSnack.show(context, context.tr('account_sync_failed'));
+      AppSnack.error(context, context.tr('account_sync_failed'));
     }
   }
 
@@ -461,14 +460,14 @@ class _SignedIn extends StatelessWidget {
     if (!onay || !context.mounted) return;
     final sonuc = await context.read<AccountViewModel>().deleteAccount();
     if (!context.mounted) return;
-    AppSnack.show(
-      context,
-      context.tr(switch (sonuc) {
-        AccountDeleteResult.deleted => 'account_delete_done',
-        AccountDeleteResult.cancelled => 'account_delete_cancelled',
-        AccountDeleteResult.failed => 'account_delete_failed',
-      }),
-    );
+    switch (sonuc) {
+      case AccountDeleteResult.deleted:
+        AppSnack.success(context, context.tr('account_delete_done'));
+      case AccountDeleteResult.cancelled:
+        AppSnack.show(context, context.tr('account_delete_cancelled'));
+      case AccountDeleteResult.failed:
+        AppSnack.error(context, context.tr('account_delete_failed'));
+    }
   }
 
   @override

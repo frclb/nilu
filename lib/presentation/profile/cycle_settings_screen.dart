@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../design_system/app_decor.dart';
+import '../../design_system/app_snack.dart';
 import '../../design_system/app_tokens.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -63,9 +64,7 @@ class _CycleSettingsScreenState extends State<CycleSettingsScreen> {
     // CalendarViewModel'i yenile — yeni ayarlar yalnızca ileriye dönük uygulanır
     if (mounted) {
       context.read<CalendarViewModel>().refreshData();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.tr('cycle_settings_saved'))),
-      );
+      AppSnack.success(context, context.tr('cycle_settings_saved'));
       context.pop();
     }
   }

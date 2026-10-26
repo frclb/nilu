@@ -2,7 +2,9 @@ package com.furkan.rcperiodtracker
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
+import android.view.HapticFeedbackConstants
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -46,6 +48,28 @@ class MainActivity : FlutterFragmentActivity() {
                 } catch (e: Exception) {
                     result.success(false)
                 }
+            }
+
+        // Sonuç titreşimleri: başarı, uyarı, hata. Dart tarafı:
+        // lib/core/platform/app_haptics.dart. Android 11+ "onay" ve "ret"
+        // titreşimlerini veriyor; öncesinde en yakınları. Kullanıcı
+        // dokunuş titreşimini kapattıysa sistem çalmıyor.
+        MethodChannel(messenger, "nilu/haptics")
+            .setMethodCallHandler { call, result ->
+                if (call.method != "notify") {
+                    result.notImplemented()
+                    return@setMethodCallHandler
+                }
+                val success = call.arguments == "success"
+                val effect = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    if (success) HapticFeedbackConstants.CONFIRM
+                    else HapticFeedbackConstants.REJECT
+                } else {
+                    if (success) HapticFeedbackConstants.VIRTUAL_KEY
+                    else HapticFeedbackConstants.LONG_PRESS
+                }
+                window.decorView.performHapticFeedback(effect)
+                result.success(null)
             }
 
         // Uygulamayı açan eylem: Health Connect izin ekranındaki "gizlilik

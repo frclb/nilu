@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../design_system/app_decor.dart';
+import '../../design_system/app_snack.dart';
 import '../../design_system/app_tokens.dart';
 import '../../design_system/content_illustration.dart';
 import 'package:go_router/go_router.dart';
@@ -65,7 +66,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   Future<void> _save() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    final messenger = ScaffoldMessenger.of(context);
+    final snack = AppSnack.of(context);
     final router = GoRouter.of(context);
     final savedMessage = context.tr('personal_info_saved');
 
@@ -75,7 +76,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
       birthDate: _birthDate,
     );
 
-    messenger.showSnackBar(SnackBar(content: Text(savedMessage)));
+    snack.success(savedMessage);
     router.pop();
   }
 

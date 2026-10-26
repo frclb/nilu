@@ -6,6 +6,7 @@ import '../../core/navigation/route_names.dart';
 import '../../design_system/app_card.dart';
 import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
+import '../../design_system/app_snack.dart';
 import '../../design_system/app_theme.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/services/pairing_token.dart';
@@ -884,13 +885,13 @@ Future<void> confirmLeavePartner(BuildContext context) async {
   if (confirmed != true || !context.mounted) return;
 
   final user = context.read<UserViewModel>();
-  final messenger = ScaffoldMessenger.of(context);
+  final snack = AppSnack.of(context);
   final router = GoRouter.of(context);
   final failed = context.tr('pv_disconnect_failed');
   if (await user.leavePartnerRole()) {
     // Kurulum bayrağı da sıfırlandı; yönlendirici artık geri sıçratmıyor.
     router.goNamed(RouteNames.onboarding);
   } else {
-    messenger.showSnackBar(SnackBar(content: Text(failed)));
+    snack.error(failed);
   }
 }

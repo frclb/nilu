@@ -48,7 +48,7 @@ class _PastPeriodsScreenState extends State<PastPeriodsScreen> {
       _secilen,
     );
     if (!mounted) return;
-    AppSnack.show(
+    AppSnack.success(
       context,
       context.tr('past_periods_added', params: {'n': '$eklenen'}),
     );

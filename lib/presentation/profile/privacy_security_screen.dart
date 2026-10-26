@@ -2,6 +2,7 @@ import '../../domain/view_models/pregnancy_view_model.dart';
 import 'dart:io';
 import 'dart:isolate';
 import 'package:flutter/material.dart';
+import '../../design_system/app_snack.dart';
 import '../../design_system/app_card.dart';
 import '../../design_system/app_decor.dart';
 import '../../design_system/app_theme.dart';
@@ -84,7 +85,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
   /// kaldıramasın.
   Future<void> _toggleLock(bool value) async {
     if (value && !_capability.isAvailable) {
-      _showMessage(context.tr('lock_unavailable'));
+      AppSnack.error(context, context.tr('lock_unavailable'));
       return;
     }
 
@@ -96,22 +97,17 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     if (!mounted) return;
 
     if (!ok) {
-      _showMessage(context.tr('lock_auth_failed'));
+      AppSnack.error(context, context.tr('lock_auth_failed'));
       return;
     }
 
     await _lockService.setEnabled(value);
     if (!mounted) return;
     setState(() => _lockEnabled = value);
-    _showMessage(
+    AppSnack.success(
+      context,
       value ? context.tr('lock_enabled') : context.tr('lock_disabled'),
     );
-  }
-
-  void _showMessage(String text) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(text)));
   }
 
   @override
@@ -412,7 +408,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
   Future<void> _pickAndImport() async {
     // Metinler `await`ten **önce** okunuyor: sonrasında `context` bir async
     // boşluğun ötesinde kalıyor.
-    final messenger = ScaffoldMessenger.of(context);
+    final snack = AppSnack.of(context);
     final viewModel = context.read<CalendarViewModel>();
     String message(String key, {Map<String, String>? params}) =>
         context.tr(key, params: params);
@@ -450,12 +446,10 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
             () => Isolate.run(() => BackupCrypto.decrypt(sifreli, parola)),
           );
         } on BackupPasswordException {
-          messenger.showSnackBar(SnackBar(content: Text(wrongPassword)));
+          snack.error(wrongPassword);
           return;
         } on BackupFormatException {
-          messenger.showSnackBar(
-            SnackBar(content: Text(failureText[ImportFailure.wrongFormat]!)),
-          );
+          snack.error(failureText[ImportFailure.wrongFormat]!);
           return;
         }
       }
@@ -463,11 +457,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
       final report = await _repository.importDataFromJson(metin);
 
       if (!report.succeeded) {
-        messenger.showSnackBar(
-          SnackBar(
-            content: Text(failureText[report.failure] ?? genericFailure),
-          ),
-        );
+        snack.error(failureText[report.failure] ?? genericFailure);
         return;
       }
 
@@ -475,23 +465,21 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
       // yüklediği kayıtları ancak uygulamayı kapatıp açınca görürdü.
       await viewModel.refreshData();
 
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            report.totalAdded == 0
-                ? message('privacy_import_nothing_new')
-                : message(
-                    report.totalAdded == 1
-                        ? 'privacy_import_done_one'
-                        : 'privacy_import_done',
-                    params: {'n': '${report.totalAdded}'},
-                  ),
+      if (report.totalAdded == 0) {
+        snack.show(message('privacy_import_nothing_new'));
+      } else {
+        snack.success(
+          message(
+            report.totalAdded == 1
+                ? 'privacy_import_done_one'
+                : 'privacy_import_done',
+            params: {'n': '${report.totalAdded}'},
           ),
-        ),
-      );
+        );
+      }
     } catch (e) {
       debugPrint('Import failed: $e');
-      messenger.showSnackBar(SnackBar(content: Text(genericFailure)));
+      snack.error(genericFailure);
     }
   }
 
@@ -614,7 +602,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
       isPremium: context.read<SubscriptionViewModel>().isPremium,
     );
 
-    final messenger = ScaffoldMessenger.of(context);
+    final snack = AppSnack.of(context);
     final failedMessage = context.tr('privacy_export_failed');
 
     // Çeviri fonksiyonu senkron olmalı; async boşluktan sonra context
@@ -672,7 +660,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
       );
     } catch (e) {
       debugPrint('Export failed: $e');
-      messenger.showSnackBar(SnackBar(content: Text(failedMessage)));
+      snack.error(failedMessage);
     }
   }
 
@@ -716,7 +704,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
-              final messenger = ScaffoldMessenger.of(context);
+              final snack = AppSnack.of(context);
               final router = GoRouter.of(context);
               final userViewModel = context.read<UserViewModel>();
               final hesap = context.read<AccountViewModel>();
@@ -741,15 +729,11 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               if (hesap.isSignedIn) {
                 final sonuc = await hesap.deleteAccount();
                 if (sonuc != AccountDeleteResult.deleted) {
-                  messenger.showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        sonuc == AccountDeleteResult.cancelled
-                            ? cancelledMessage
-                            : failedMessage,
-                      ),
-                    ),
-                  );
+                  if (sonuc == AccountDeleteResult.cancelled) {
+                    snack.show(cancelledMessage);
+                  } else {
+                    snack.error(failedMessage);
+                  }
                   return;
                 }
                 accountDeleted = true;
@@ -768,11 +752,11 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               // Kimlik silinemediyse (Firebase eskimiş oturumu reddeder)
               // "hesabın silindi" demek yanlış olur: veri gitti ama hesap
               // duruyor ve yeniden girişte geri geliyor.
-              messenger.showSnackBar(
-                SnackBar(
-                  content: Text(accountDeleted ? doneMessage : reauthMessage),
-                ),
-              );
+              if (accountDeleted) {
+                snack.success(doneMessage);
+              } else {
+                snack.warning(reauthMessage);
+              }
               router.goNamed(RouteNames.onboarding);
             },
             style: AppTheme.dialogAction().copyWith(

@@ -552,7 +552,7 @@
   "premium_banner_desc": "Zyklustrend über den ganzen Verlauf, Symptom-Phasen-Analyse, Arztbericht als Datei teilen und eigene Designs.",
   "premium_banner_cta": "Funktionen ansehen",
   "health_sync_title": "Apple Health",
-  "health_sync_desc": "Importiere deine Periodenaufzeichnungen aus der Health-App und schreibe auf Wunsch die hier markierten Tage auch in Health. Du erteilst die Berechtigung und kannst sie jederzeit widerrufen.",
+  "health_sync_desc": "Importiere deine Periodenaufzeichnungen aus der Health-App und schreibe auf Wunsch die hier markierten Tage auch in Health. Du erteilst die Berechtigung und kannst sie jederzeit in den Datenschutzeinstellungen der Health-App widerrufen.",
   "health_sync_point_watch": "Daten von Apple Watch und anderen Apps kommen über Health.",
   "health_sync_point_merge": "Selbst markierte Tage bleiben erhalten; nur fehlende Perioden werden ergänzt.",
   "health_sync_point_local": "Gesundheitsdaten werden nur auf diesem Gerät verarbeitet; wenn du die Cloud-Synchronisierung eingeschaltet hast, landen importierte Perioden auch in der Kopie in deinem eigenen Konto.",

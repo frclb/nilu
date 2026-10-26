@@ -552,7 +552,7 @@
   "premium_banner_desc": "Tendencia del ciclo con todo tu historial, análisis de síntomas por fase, compartir el resumen médico como archivo y temas propios.",
   "premium_banner_cta": "Ver funciones",
   "health_sync_title": "Apple Salud",
-  "health_sync_desc": "Importa tus registros de regla desde la app Salud y, si quieres, escribe también en Salud los días que marques aquí. Tú das el permiso y puedes retirarlo cuando quieras.",
+  "health_sync_desc": "Importa tus registros de regla desde la app Salud y, si quieres, escribe también en Salud los días que marques aquí. Tú das el permiso y puedes retirarlo cuando quieras en los ajustes de privacidad de la app Salud.",
   "health_sync_point_watch": "Los datos del Apple Watch y otras apps llegan a través de Salud.",
   "health_sync_point_merge": "Los días que marcaste se conservan; solo se añaden los periodos que faltan.",
   "health_sync_point_local": "Los datos de salud se procesan solo en este dispositivo; si activaste la sincronización en la nube, los periodos importados también se añaden a la copia de tu propia cuenta.",

@@ -215,7 +215,7 @@ class _LogEntryScreenState extends State<LogEntryScreen> {
       return;
     }
 
-    AppSnack.show(context, context.tr('home_log_saved'));
+    AppSnack.success(context, context.tr('home_log_saved'));
     NavigationService().pop();
   }
 

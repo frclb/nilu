@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/platform/app_haptics.dart';
 import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_snack.dart';
 import '../../../design_system/app_theme.dart';
@@ -63,6 +64,8 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
   /// onay simgeli durum satırı alıyor ve altında geri alma beliriyor. Geçici
   /// bir şerit bunu tekrarlayıp üstünü örtmekten başka bir şey yapmıyordu.
   /// Hata durumunda bildirim duruyor: orada ekranda değişen bir şey yok.
+  /// Başarıda bildirim yok ama başarı titreşimi var: uygulamanın en önemli
+  /// eylemi, ekran değişirken elde de hissediliyor.
   Future<void> _run(Future<bool> Function() action) async {
     final failed = context.tr('home_period_toggle_failed');
 
@@ -75,6 +78,7 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
       AppSnack.error(context, failed);
       return;
     }
+    AppHaptics.success();
     setState(() => _actedThisSession = true);
   }
 
