@@ -234,19 +234,20 @@ fiyatı erişilemez yapar.
 Doğrusu: Türkiye için yukarıdaki fiyatlar, diğer bölgeler için ayrı bir
 taban. App Store Connect fiyat tablosunda bölge bölge düzenlenebiliyor.
 
-### Avrupa için öneri (henüz karara bağlanmadı)
+### Avrupa ve diğer ülkeler (2026-10-27'de karar verildi)
 
-| Plan | Fiyat | Aylığa düşen | Rozet |
+| Plan | Euro bölgesi | ABD | Rozet |
 |---|---|---|---|
-| Aylık | 3,99 € | 3,99 € | — |
-| Yıllık | 23,99 € | 2,00 € | %50 daha uygun |
+| Aylık | 3,99 € | 3,99 $ | — |
+| Yıllık | 23,99 € | 23,99 $ | %50 daha uygun |
 
 Türkiye ile aynı yapı: yıllık, aylığın tam yarısı. Rozet iki pazarda da
 aynı sayıyı gösteriyor.
 
-Daha yukarısını denemek istersen 4,99 € / 29,99 € de tam %50 veriyor ve
-indirim kampanyası için yer bırakıyor. Yeni ve bilinmeyen bir uygulamada
-3,99 daha kolay dönüşür.
+App Store Connect'e girildi: aylıkta taban ABD (3,99 $ → Euro bölgesi
+kendiliğinden 3,99 €), yıllıkta taban Almanya (23,99 €; ABD'den başlanınca
+Euro 24,99'a çıkıyordu) ve ABD elle 23,99 $. Türkiye iki planda da elle
+(59,99 / 349,99 TL). Kalan ülkeleri Apple kendi kuruyla çevirdi.
 
 **Gösterilen fiyat cebe girmiyor.** 3,99 €'nun içinde KDV var (Apple
 tahsil edip kendi ödüyor) ve üstüne komisyon geliyor:
@@ -261,10 +262,15 @@ doların altındaki geliştiricilerde komisyon %30 yerine %15. Başvuru
 ücretsiz ama **kendiliğinden olmuyor**; başvurmazsan %30 ödersin. Tablodaki
 fark aynı satışta yaklaşık %20 daha fazla gelir demek.
 
+**Yapıldı (2026-10-27):** uygulama kaydı "Nilu · Regl & Adet Takvimi"
+(Apple ID 6827515554, SKU `nilu-ios-001`); grup **Premium**; ürünler
+`nilu_premium_monthly` (1 ay) ve `nilu_premium_annual` (1 yıl), fiyatlar
+yukarıdaki gibi. Kalan: ülkeler (Availability), altı dilde görünen ad ve
+açıklama, inceleme ekran görüntüsü.
+
 Her ürün için:
 
-- Product ID (ör. `rc_premium_monthly`, `rc_premium_annual`) — sonradan
-  **değiştirilemez**
+- Product ID — sonradan **değiştirilemez**
 - Fiyat (Apple'ın fiyat basamaklarından)
 - **Localization**: her ürüne görünen ad + açıklama. En az birincil dil zorunlu;
   uygulama altı dilde yayınlandığı için altısını da girmek doğru olur.
@@ -279,6 +285,14 @@ Tanıtım teklifi (ilk ay indirimli, deneme süresi) koyacaksan buradan; uygulam
 ## 5. RevenueCat
 
 [app.revenuecat.com](https://app.revenuecat.com) → yeni proje.
+
+**Yapıldı (2026-10-27):** proje **Nilu**; uygulama **Nilu (iOS)**
+(In-App Purchase anahtarı yüklendi, Key ID `2JFPG53NWR`; .p8 dosyası
+depoda değil, sende); entitlement `premium` ← iki ürün; `default`
+offering'inde `$rc_monthly` ve `$rc_annual` paketlerine iOS ürünleri
+eklendi; `appl_` anahtarı `release_config.dart`'ta. Projede şablondan kalan
+"Test Store" uygulaması ve "RCApp Pro" entitlement'ı var; yalnızca test
+anahtarıyla çalışıyorlar, yayını etkilemiyorlar.
 
 **5.1 Uygulamayı ekle:** Apps → App Store → Bundle ID `com.furkan.rcperiodtracker`.
 

@@ -17,7 +17,8 @@ class ReleaseConfig {
 
   /// RevenueCat → Project settings → API keys → App Store için **public**
   /// SDK anahtarı (`appl_` ile başlar). Gizli değil; uygulamaya gömülür.
-  static const String revenueCatAppleApiKey = placeholder;
+  static const String revenueCatAppleApiKey =
+      'appl_SfbZZfHUxphmCTRaeldtSPhhhao';
 
   /// AdMob → Apps → (iOS uygulaması) → App ID: `ca-app-pub-…~…`.
   ///
