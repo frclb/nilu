@@ -2,23 +2,39 @@
   "tr": {
     "lang_name": "Türkçe",
     "nav_home": "Ana sayfa",
+    "nav_features": "Özellikler",
     "nav_privacy": "Gizlilik",
     "nav_terms": "Şartlar",
     "nav_support": "Destek",
     "language": "Dil",
-    "hero_title": "Döngün sende kalır",
+    "hero_eyebrow": "Regl · Gebelik · Lohusalık",
+    "hero_title": "Döngün *sende* kalır",
     "hero_body": "Regl, gebelik ve lohusalık için sakin bir takip uygulaması. İşaretlediğin her şey telefonunda, şifreli duruyor — hesap zorunlu değil, izleme yok.",
+    "hero_more": "Nasıl çalıştığına bak",
+    "hero_alt": "Nilu ana ekranı: sıradaki regle kalan günler ve döngü halkası",
+    "trust": [
+      "Hesap şart değil",
+      "Cihazda şifreli",
+      "Ekran kilidi ücretsiz"
+    ],
     "badge_app_store": "App Store'dan İndirin",
     "badge_google_play": "Google Play'den İndirin",
     "coming_soon": "Yakında App Store'da ve Google Play'de",
     "features_title": "Neler yapar",
-    "features": [
-      "Takvim ve tahminler: reglini işaretle; bir sonrakini bir aralıkla ve nasıl hesaplandığıyla gör, tahmini doğurgan dönemi de.",
-      "Günlük kayıt: akış, ağrı, ruh hâli, belirtiler ve notlar.",
-      "Bütün döngü geçmişin ve muayenede gösterebileceğin hekim özeti — ücretsiz.",
-      "Gebelik ve lohusalık: hafta ve gün, Sağlık Bakanlığı rehberine göre izlemler, tehlike işaretleri.",
-      "Ana ekran widget'ı ve hatırlatıcılar; hepsi cihazında hazırlanır.",
-      "İstersen partnerinle: yalnızca seçtiğin yakınlık durumu, açık rızanla."
+    "features_lead": "Reglden gebeliğe ve lohusalığa; her dönemde sade, anlaşılır ve senin kontrolünde.",
+    "showcase": [
+      {"id": "calendar", "label": "TAKVİM", "title": "Sıradaki reglin, *aralığıyla* birlikte", "body": "Reglini takvimde işaretle. Nilu bir sonrakini tek bir tarih yerine olası bir aralık olarak gösterir; nasıl hesaplandığını ve tahmini doğurgan dönemi de.", "alt": "Takvim: işaretlenmiş regl günleri, tahminler ve doğurgan dönem"},
+      {"id": "log_entry", "label": "GÜNLÜK", "title": "Nasıl hissettiğini *kaydet*", "body": "Akış, ağrı, ruh hâli, belirtiler ve notlar birkaç dokunuşla kayıtlı; ne zaman geriye dönüp bakmak istersen orada.", "alt": "Günlük kayıt: akış yoğunluğu, belirtiler, ağrı ve ruh hâli"},
+      {"id": "insights", "label": "İÇGÖRÜLER", "title": "Bedeninin *örüntülerini* gör", "body": "Döngülerin ne kadar sürüyor, ne kadar düzenli, hangi belirtiler sık tekrarlıyor? Bütün döngü geçmişin ve muayenede gösterebileceğin hekim özeti ücretsiz.", "alt": "İçgörüler: döngü uzunluğu trendi ve belirti analizi"},
+      {"id": "assistant", "label": "VERİNE SOR", "title": "Cevaplar kendi *kayıtlarından*", "body": "“Reglime kaç gün kaldı?”, “Döngülerim düzenli mi?” diye sor. Cevaplar telefonunda, uygulamada gördüğün hesaplardan çıkar; bir yapay zekâ modeline gönderilmez ve bilmediğini uydurmaz.", "alt": "Verine sor: sıradaki regl ve döngü düzeni soruları, cevaplarıyla"},
+      {"id": "pregnancy_home", "label": "GEBELİK", "title": "Gebelikte de *yanında*", "body": "Gebelik ve lohusalıkta haftan ve günün, Sağlık Bakanlığı rehberine göre izlemlerin ve beklemeden başvurman gereken tehlike işaretleri bir arada.", "alt": "Gebelik ana ekranı: gebelik haftası, tahmini doğum ve sıradaki izlem"}
+    ],
+    "more_title": "Ve dahası",
+    "more": [
+      {"icon": "widget", "title": "Ana ekran widget'ı", "body": "Döngü günün ve sıradaki reglin bir bakışta; widget ve hatırlatıcılar cihazında hazırlanır."},
+      {"icon": "library", "title": "Sağlık kütüphanesi", "body": "Regl, beslenme, psikoloji ve ilişkiler üzerine kaynak gösterilen yazılar."},
+      {"icon": "partner", "title": "İstersen partnerinle", "body": "Yalnızca seçtiğin yakınlık durumu paylaşılır, açık rızanla."},
+      {"icon": "backup", "title": "Yedeğin sende", "body": "Telefon değiştirirken kayıtlarını parolalı bir yedekle taşı ya da istersen hesabınla buluta eşitle."}
     ],
     "privacy_title": "Gizlilik sonradan eklenmedi",
     "privacy_points": [
@@ -28,6 +44,8 @@
       "Ekran kilidi, gizli bildirim, sade ana ekran simgesi ve parolalı yedek — hepsi ücretsiz.",
       "Bütün verini uygulamanın içinden silebilirsin."
     ],
+    "privacy_alt": "Gizlilik ve Güvenlik: uygulama kilidi ve cihazda şifreli saklanan veriler",
+    "privacy_more": "Gizlilik politikasını oku",
     "medical": "Nilu tıbbi teşhis koymaz, tedavi önermez ve bir doğum kontrol yöntemi değildir. Tahminler geçmiş kayıtlarından hesaplanır ve yaklaşıktır.",
     "health_title": "Bütün sağlık verilerin tek yerde",
     "health_body": "Nilu'yu iPhone'daki Apple Sağlık uygulamasıyla birlikte kullanmak sağlığını daha iyi yönetmeni sağlar. Sağlık uygulamasındaki regl kayıtlarını Nilu'ya aktarabilir, istersen Nilu'da işaretlediğin günleri Sağlık'a da yazabilirsin; böylece Nilu'dakiler de dahil bütün sağlık verilerini tek yerde izlersin.",
@@ -35,10 +53,13 @@
     "trademarks_apple": "Apple, Apple logosu ve iPhone, Apple Inc.'in ABD'de ve diğer ülkelerde tescilli ticari markalarıdır. App Store, Apple Inc.'in ABD'de ve diğer ülkelerde tescilli hizmet markasıdır.",
     "trademarks_google": "Google Play ve Google Play logosu, Google LLC'nin ticari markalarıdır.",
     "footer_tracking": "Bu site çerez, analiz ya da takip kullanmaz.",
+    "final_title": "Kendini dinlemenin *sakin* yolu",
+    "final_body": "Hesap açmadan başla; eşitlemeyi açmadıkça kayıtların telefonundan çıkmaz.",
     "support_title": "Destek",
     "support_intro": "Bir sorun mu yaşıyorsun, bir önerin mi var? Bize yaz.",
     "support_contact": "E-posta: {email}",
     "faq_title": "Sık sorulanlar",
+    "faq_more": "Bütün sorular ve destek",
     "faq": [
       {"q": "Verilerim nerede saklanıyor?", "a": "Telefonunda, şifreli olarak. Bulut eşitlemeyi açmadıysan hiçbir sağlık kaydın cihazından çıkmaz; partner özelliği yalnızca paylaşmayı seçtiğin yakınlık durumunu gönderir. Ayrıntılar Gizlilik Politikası'nda."},
       {"q": "Telefon değiştireceğim; kayıtlarımı nasıl taşırım?", "a": "Eski telefonda {{nav_profile}} → {{profile_privacy_security}} → {{privacy_export}} ile bir yedek al. Yeni telefonda aynı ekrandan {{privacy_import}} ile geri yükle. Ya da {{nav_profile}} → {{profile_cloud_account}} ekranında bulut eşitlemeyi aç; yeni telefonda karşılama ekranındaki \"{{onboarding_restore}}\" ile aynı hesapla giriş yap."},
@@ -51,23 +72,39 @@
   "en": {
     "lang_name": "English",
     "nav_home": "Home",
+    "nav_features": "Features",
     "nav_privacy": "Privacy",
     "nav_terms": "Terms",
     "nav_support": "Support",
     "language": "Language",
-    "hero_title": "Your cycle stays with you",
+    "hero_eyebrow": "Period · Pregnancy · Postpartum",
+    "hero_title": "Your cycle *stays with you*",
     "hero_body": "A calm tracker for periods, pregnancy and the postnatal weeks. Everything you log stays on your phone, encrypted — no account required, no tracking.",
+    "hero_more": "See how it works",
+    "hero_alt": "Nilu home screen: days until your next period and the cycle ring",
+    "trust": [
+      "No account needed",
+      "Encrypted on device",
+      "Free app lock"
+    ],
     "badge_app_store": "Download on the App Store",
     "badge_google_play": "Get it on Google Play",
     "coming_soon": "Coming soon to the App Store and Google Play",
     "features_title": "What it does",
-    "features": [
-      "Calendar and predictions: mark your period and see the next one as a range, with how it was calculated, plus your estimated fertile window.",
-      "Daily log: flow, pain, mood, symptoms and notes.",
-      "Your full cycle history and a summary to show your doctor — free.",
-      "Pregnancy and postnatal weeks: weeks and days, appointments and reminders, warning signs.",
-      "Home Screen widget and reminders, all prepared on your device.",
-      "If you want, with your partner: only the closeness status you choose, with your explicit consent."
+    "features_lead": "From periods to pregnancy and the weeks after birth — simple, clear and in your hands.",
+    "showcase": [
+      {"id": "calendar", "label": "CALENDAR", "title": "Your next period, *shown as a range*", "body": "Mark your period on the calendar. Nilu shows the next one as a likely range rather than a single date — with how it was calculated, plus your estimated fertile window.", "alt": "Calendar with marked period days, predictions and the fertile window"},
+      {"id": "log_entry", "label": "DAILY LOG", "title": "Log *how you feel*", "body": "Flow, pain, mood, symptoms and notes, saved in a few taps — and there whenever you want to look back.", "alt": "Daily log: flow, symptoms, pain and mood"},
+      {"id": "insights", "label": "INSIGHTS", "title": "See your body’s *patterns*", "body": "How long do your cycles last, how regular are they, which symptoms keep coming back? Your full cycle history and a summary to show your doctor are free.", "alt": "Insights: cycle length trend and symptom analysis"},
+      {"id": "assistant", "label": "ASK YOUR DATA", "title": "Answers from *your own entries*", "body": "Ask “How many days until my period?” or “Are my cycles regular?”. Answers are worked out on your phone from the same numbers you see in the app — nothing is sent to an AI model, and nothing is made up.", "alt": "Ask your data: questions about your next period and cycle regularity, with answers"},
+      {"id": "pregnancy_home", "label": "PREGNANCY", "title": "With you *through pregnancy*", "body": "Through pregnancy and the postnatal weeks: your week and day, appointments and reminders, and the warning signs that mean you shouldn’t wait.", "alt": "Pregnancy home: week of pregnancy, due date and next appointment"}
+    ],
+    "more_title": "And more",
+    "more": [
+      {"icon": "widget", "title": "Home Screen widget", "body": "Your cycle day and next period at a glance; the widget and reminders are prepared on your device."},
+      {"icon": "library", "title": "Health library", "body": "Sourced articles on periods, nutrition, mental health and relationships."},
+      {"icon": "partner", "title": "With your partner, if you want", "body": "Only the closeness status you choose is shared, with your explicit consent."},
+      {"icon": "backup", "title": "Your backup, your call", "body": "Move to a new phone with a password-protected backup, or turn on cloud sync with your account."}
     ],
     "privacy_title": "Privacy isn't an add-on",
     "privacy_points": [
@@ -77,6 +114,8 @@
       "App lock, discreet notifications, a plain home-screen icon and password-protected backups — all free.",
       "You can delete all your data from inside the app."
     ],
+    "privacy_alt": "Privacy & Security: app lock and data encrypted on your device",
+    "privacy_more": "Read the privacy policy",
     "medical": "Nilu does not diagnose, does not prescribe treatment and is not a contraceptive method. Predictions are calculated from your past entries and are approximate.",
     "health_title": "All your health data in one place",
     "health_body": "Using Nilu with the Apple Health app on iPhone empowers you to better manage your health. Import your period records from the Health app and, if you like, write the days you mark in Nilu to Health too, so you see all your health data, including data from Nilu, in one convenient place.",
@@ -84,10 +123,13 @@
     "trademarks_apple": "Apple, the Apple logo and iPhone are trademarks of Apple Inc., registered in the U.S. and other countries. App Store is a service mark of Apple Inc., registered in the U.S. and other countries.",
     "trademarks_google": "Google Play and the Google Play logo are trademarks of Google LLC.",
     "footer_tracking": "This site uses no cookies, analytics or tracking.",
+    "final_title": "A *calm* way to listen to your body",
+    "final_body": "Start without an account; unless you turn on sync, your entries never leave your phone.",
     "support_title": "Support",
     "support_intro": "Having a problem or have a suggestion? Write to us.",
     "support_contact": "Email: {email}",
     "faq_title": "Frequently asked",
+    "faq_more": "All questions and support",
     "faq": [
       {"q": "Where is my data stored?", "a": "On your phone, encrypted. Unless you turn on cloud sync, none of your health entries leave your device; the partner feature only sends the closeness status you choose to share. Details are in the Privacy Policy."},
       {"q": "I'm changing phones; how do I move my entries?", "a": "On your old phone, create a backup with {{nav_profile}} → {{profile_privacy_security}} → {{privacy_export}}. On the new phone, restore it from the same screen with {{privacy_import}}. Or turn on cloud sync in {{nav_profile}} → {{profile_cloud_account}}, then on the new phone tap \"{{onboarding_restore}}\" on the welcome screen and sign in with the same account."},
@@ -100,23 +142,39 @@
   "de": {
     "lang_name": "Deutsch",
     "nav_home": "Start",
+    "nav_features": "Funktionen",
     "nav_privacy": "Datenschutz",
     "nav_terms": "Bedingungen",
     "nav_support": "Support",
     "language": "Sprache",
-    "hero_title": "Dein Zyklus bleibt bei dir",
+    "hero_eyebrow": "Periode · Schwangerschaft · Wochenbett",
+    "hero_title": "Dein Zyklus *bleibt bei dir*",
     "hero_body": "Ein ruhiger Tracker für Periode, Schwangerschaft und Wochenbett. Alles, was du einträgst, bleibt verschlüsselt auf deinem Handy — kein Konto nötig, kein Tracking.",
+    "hero_more": "So funktioniert’s",
+    "hero_alt": "Nilu-Startseite: Tage bis zur nächsten Periode und der Zyklusring",
+    "trust": [
+      "Kein Konto nötig",
+      "Auf dem Gerät verschlüsselt",
+      "App-Sperre gratis"
+    ],
     "badge_app_store": "Laden im App Store",
     "badge_google_play": "Jetzt bei Google Play",
     "coming_soon": "Bald im App Store und bei Google Play",
     "features_title": "Was die App kann",
-    "features": [
-      "Kalender und Vorhersagen: Periode eintragen und die nächste als Zeitraum sehen – mit der Erklärung, wie er berechnet wurde – sowie das geschätzte fruchtbare Fenster.",
-      "Tägliches Protokoll: Blutung, Schmerzen, Stimmung, Symptome und Notizen.",
-      "Dein ganzer Zyklusverlauf und eine Übersicht für den Arztbesuch — kostenlos.",
-      "Schwangerschaft und Wochenbett: Wochen und Tage, Termine und Erinnerungen, Warnzeichen.",
-      "Widget für den Home-Bildschirm und Erinnerungen, alles auf deinem Gerät erstellt.",
-      "Wenn du willst, mit deinem Partner: nur der Nähe-Status, den du wählst, mit deiner ausdrücklichen Einwilligung."
+    "features_lead": "Von der Periode über die Schwangerschaft bis ins Wochenbett – einfach, klar und in deiner Hand.",
+    "showcase": [
+      {"id": "calendar", "label": "KALENDER", "title": "Deine nächste Periode *als Zeitraum*", "body": "Trag deine Periode im Kalender ein. Nilu zeigt die nächste als wahrscheinlichen Zeitraum statt als einzelnes Datum – mit der Erklärung, wie er berechnet wurde, und dem geschätzten fruchtbaren Fenster.", "alt": "Kalender mit eingetragenen Periodentagen, Vorhersagen und fruchtbarem Fenster"},
+      {"id": "log_entry", "label": "TAGEBUCH", "title": "Halte fest, *wie es dir geht*", "body": "Blutung, Schmerzen, Stimmung, Symptome und Notizen – mit wenigen Tippern gespeichert und jederzeit nachlesbar.", "alt": "Tagebuch: Blutungsstärke, Symptome, Schmerzen und Stimmung"},
+      {"id": "insights", "label": "AUSWERTUNGEN", "title": "Erkenne die *Muster* deines Körpers", "body": "Wie lang sind deine Zyklen, wie regelmäßig, welche Symptome kehren wieder? Dein ganzer Zyklusverlauf und eine Übersicht für den Arztbesuch sind kostenlos.", "alt": "Auswertungen: Verlauf der Zykluslänge und Symptomanalyse"},
+      {"id": "assistant", "label": "FRAG DEINE DATEN", "title": "Antworten aus *deinen Einträgen*", "body": "Frag „Wie viele Tage bis zu meiner Periode?“ oder „Sind meine Zyklen regelmäßig?“. Die Antworten entstehen auf deinem Handy aus denselben Zahlen, die du in der App siehst – nichts geht an ein KI-Modell, und nichts wird erfunden.", "alt": "Frag deine Daten: Fragen zur nächsten Periode und zur Regelmäßigkeit, mit Antworten"},
+      {"id": "pregnancy_home", "label": "SCHWANGERSCHAFT", "title": "Auch in der *Schwangerschaft* da", "body": "In der Schwangerschaft und im Wochenbett: Woche und Tag, Termine und Erinnerungen und die Warnzeichen, bei denen du nicht warten solltest.", "alt": "Schwangerschaft: Schwangerschaftswoche, errechneter Termin und nächste Untersuchung"}
+    ],
+    "more_title": "Und mehr",
+    "more": [
+      {"icon": "widget", "title": "Widget für den Home-Bildschirm", "body": "Zyklustag und nächste Periode auf einen Blick; Widget und Erinnerungen entstehen auf deinem Gerät."},
+      {"icon": "library", "title": "Gesundheitsbibliothek", "body": "Belegte Artikel zu Periode, Ernährung, Psyche und Beziehungen."},
+      {"icon": "partner", "title": "Mit deinem Partner, wenn du willst", "body": "Geteilt wird nur der Nähe-Status, den du wählst – mit deiner ausdrücklichen Einwilligung."},
+      {"icon": "backup", "title": "Dein Backup, deine Wahl", "body": "Zieh mit einem passwortgeschützten Backup auf ein neues Handy um oder aktiviere die Cloud-Synchronisierung mit deinem Konto."}
     ],
     "privacy_title": "Datenschutz ist kein Zusatz",
     "privacy_points": [
@@ -126,6 +184,8 @@
       "App-Sperre, diskrete Mitteilungen, ein schlichtes Home-Bildschirm-Symbol und passwortgeschützte Backups – alles kostenlos.",
       "Du kannst alle deine Daten in der App löschen."
     ],
+    "privacy_alt": "Datenschutz & Sicherheit: App-Sperre und verschlüsselt gespeicherte Daten",
+    "privacy_more": "Datenschutzerklärung lesen",
     "medical": "Nilu stellt keine Diagnose, empfiehlt keine Behandlung und ist kein Verhütungsmittel. Vorhersagen werden aus deinen früheren Einträgen berechnet und sind ungefähr.",
     "health_title": "Alle Gesundheitsdaten an einem Ort",
     "health_body": "Mit Nilu und der Apple Health-App auf dem iPhone behältst du deine Gesundheit besser im Blick. Importiere deine Periodenaufzeichnungen aus der Health-App und schreibe auf Wunsch die in Nilu markierten Tage auch in Health – so siehst du alle deine Gesundheitsdaten, auch die aus Nilu, an einem Ort.",
@@ -133,10 +193,13 @@
     "trademarks_apple": "Apple, das Apple Logo und iPhone sind Marken der Apple Inc., die in den USA und weiteren Ländern eingetragen sind. App Store ist eine Dienstleistungsmarke der Apple Inc., die in den USA und weiteren Ländern eingetragen ist.",
     "trademarks_google": "Google Play und das Google Play-Logo sind Marken von Google LLC.",
     "footer_tracking": "Diese Website verwendet keine Cookies, keine Analyse und kein Tracking.",
+    "final_title": "Ein *ruhiger* Weg, auf deinen Körper zu hören",
+    "final_body": "Starte ohne Konto; solange du die Synchronisierung nicht einschaltest, verlassen deine Einträge dein Handy nicht.",
     "support_title": "Support",
     "support_intro": "Ein Problem oder ein Vorschlag? Schreib uns.",
     "support_contact": "E-Mail: {email}",
     "faq_title": "Häufige Fragen",
+    "faq_more": "Alle Fragen und Support",
     "faq": [
       {"q": "Wo werden meine Daten gespeichert?", "a": "Verschlüsselt auf deinem Handy. Solange du die Cloud-Synchronisierung nicht einschaltest, verlassen keine Gesundheitseinträge dein Gerät; die Partnerfunktion sendet nur den Nähe-Status, den du teilen möchtest. Details in der Datenschutzerklärung."},
       {"q": "Ich wechsle das Handy — wie nehme ich meine Einträge mit?", "a": "Erstelle auf dem alten Handy ein Backup über {{nav_profile}} → {{profile_privacy_security}} → {{privacy_export}}. Stelle es auf dem neuen Handy im selben Bildschirm mit {{privacy_import}} wieder her. Oder schalte unter {{nav_profile}} → {{profile_cloud_account}} die Cloud-Synchronisierung ein und tippe auf dem neuen Handy im Willkommensbildschirm auf „{{onboarding_restore}}“ und melde dich mit demselben Konto an."},
@@ -149,23 +212,39 @@
   "es": {
     "lang_name": "Español",
     "nav_home": "Inicio",
+    "nav_features": "Funciones",
     "nav_privacy": "Privacidad",
     "nav_terms": "Condiciones",
     "nav_support": "Soporte",
     "language": "Idioma",
-    "hero_title": "Tu ciclo se queda contigo",
+    "hero_eyebrow": "Regla · Embarazo · Posparto",
+    "hero_title": "Tu ciclo *se queda contigo*",
     "hero_body": "Un registro tranquilo para la regla, el embarazo y el posparto. Todo lo que anotas se queda cifrado en tu móvil — sin cuenta obligatoria y sin rastreo.",
+    "hero_more": "Mira cómo funciona",
+    "hero_alt": "Pantalla de inicio de Nilu: días hasta tu próxima regla y el anillo del ciclo",
+    "trust": [
+      "Sin cuenta obligatoria",
+      "Cifrado en tu móvil",
+      "Bloqueo gratis"
+    ],
     "badge_app_store": "Consíguelo en el App Store",
     "badge_google_play": "Descargar en Google Play",
     "coming_soon": "Próximamente en el App Store y Google Play",
     "features_title": "Qué hace",
-    "features": [
-      "Calendario y previsiones: marca tu regla y consulta la siguiente como un rango, con cómo se calculó, además de la ventana fértil estimada.",
-      "Registro diario: flujo, dolor, ánimo, síntomas y notas.",
-      "Todo tu historial de ciclos y un resumen para enseñar en la consulta — gratis.",
-      "Embarazo y posparto: semanas y días, citas y recordatorios, señales de alarma.",
-      "Widget de pantalla de inicio y recordatorios, todo preparado en tu dispositivo.",
-      "Si quieres, con tu pareja: solo el estado de cercanía que elijas, con tu consentimiento explícito."
+    "features_lead": "De la regla al embarazo y el posparto: sencillo, claro y en tus manos.",
+    "showcase": [
+      {"id": "calendar", "label": "CALENDARIO", "title": "Tu próxima regla, *como un rango*", "body": "Marca tu regla en el calendario. Nilu muestra la siguiente como un rango probable en lugar de una sola fecha, con cómo se calculó y tu ventana fértil estimada.", "alt": "Calendario con días de regla marcados, predicciones y ventana fértil"},
+      {"id": "log_entry", "label": "REGISTRO", "title": "Anota *cómo te sientes*", "body": "Flujo, dolor, estado de ánimo, síntomas y notas, guardados en unos toques y siempre a mano cuando quieras mirar atrás.", "alt": "Registro diario: flujo, síntomas, dolor y estado de ánimo"},
+      {"id": "insights", "label": "ANÁLISIS", "title": "Descubre los *patrones* de tu cuerpo", "body": "¿Cuánto duran tus ciclos, qué tan regulares son, qué síntomas se repiten? Tu historial completo de ciclos y un resumen para mostrar a tu médico son gratis.", "alt": "Análisis: tendencia de la duración del ciclo y análisis de síntomas"},
+      {"id": "assistant", "label": "PREGUNTA A TUS DATOS", "title": "Respuestas de *tus propios registros*", "body": "Pregunta «¿Cuántos días faltan para mi regla?» o «¿Son regulares mis ciclos?». Las respuestas se calculan en tu móvil con los mismos números que ves en la app: no se envía nada a un modelo de IA y no se inventa nada.", "alt": "Pregunta a tus datos: preguntas sobre tu próxima regla y la regularidad, con respuestas"},
+      {"id": "pregnancy_home", "label": "EMBARAZO", "title": "También a tu lado *en el embarazo*", "body": "Durante el embarazo y el posparto: tu semana y tu día, citas y recordatorios, y las señales de alarma que no deben esperar.", "alt": "Inicio del embarazo: semana de gestación, fecha probable de parto y próxima cita"}
+    ],
+    "more_title": "Y más",
+    "more": [
+      {"icon": "widget", "title": "Widget en la pantalla de inicio", "body": "Tu día del ciclo y tu próxima regla de un vistazo; el widget y los recordatorios se preparan en tu dispositivo."},
+      {"icon": "library", "title": "Biblioteca de salud", "body": "Artículos con fuentes sobre la regla, nutrición, salud mental y relaciones."},
+      {"icon": "partner", "title": "Con tu pareja, si quieres", "body": "Solo se comparte el estado de cercanía que elijas, con tu consentimiento explícito."},
+      {"icon": "backup", "title": "Tu copia, tu decisión", "body": "Pasa a un móvil nuevo con una copia de seguridad protegida con contraseña o activa la sincronización en la nube con tu cuenta."}
     ],
     "privacy_title": "La privacidad no es un añadido",
     "privacy_points": [
@@ -175,6 +254,8 @@
       "Bloqueo de la app, notificaciones discretas, un icono sencillo en la pantalla de inicio y copias protegidas con contraseña: todo gratis.",
       "Puedes borrar todos tus datos desde la propia app."
     ],
+    "privacy_alt": "Privacidad y seguridad: bloqueo de la app y datos cifrados en tu dispositivo",
+    "privacy_more": "Leer la política de privacidad",
     "medical": "Nilu no diagnostica, no recomienda tratamientos y no es un método anticonceptivo. Las previsiones se calculan a partir de tus registros anteriores y son aproximadas.",
     "health_title": "Todos tus datos de salud en un solo lugar",
     "health_body": "Usar Nilu con la app Salud de Apple en el iPhone te ayuda a gestionar mejor tu salud. Importa tus registros de regla desde la app Salud y, si quieres, escribe también en Salud los días que marques en Nilu: así verás todos tus datos de salud, incluidos los de Nilu, en un solo lugar.",
@@ -182,10 +263,13 @@
     "trademarks_apple": "Apple, el logotipo de Apple y iPhone son marcas comerciales de Apple Inc., registradas en EE. UU. y en otros países. App Store es una marca de servicio de Apple Inc., registrada en EE. UU. y en otros países.",
     "trademarks_google": "Google Play y el logotipo de Google Play son marcas comerciales de Google LLC.",
     "footer_tracking": "Este sitio no usa cookies, analítica ni rastreo.",
+    "final_title": "Una forma *tranquila* de escuchar a tu cuerpo",
+    "final_body": "Empieza sin cuenta; si no activas la sincronización, tus registros no salen de tu móvil.",
     "support_title": "Soporte",
     "support_intro": "¿Tienes un problema o una sugerencia? Escríbenos.",
     "support_contact": "Correo: {email}",
     "faq_title": "Preguntas frecuentes",
+    "faq_more": "Todas las preguntas y soporte",
     "faq": [
       {"q": "¿Dónde se guardan mis datos?", "a": "En tu móvil, cifrados. Si no activas la sincronización en la nube, ningún registro de salud sale de tu dispositivo; la función de pareja solo envía el estado de cercanía que decidas compartir. Los detalles están en la Política de Privacidad."},
       {"q": "Voy a cambiar de móvil, ¿cómo paso mis registros?", "a": "En el móvil antiguo, crea una copia con {{nav_profile}} → {{profile_privacy_security}} → {{privacy_export}}. En el nuevo, restáurala desde la misma pantalla con {{privacy_import}}. O activa la sincronización en {{nav_profile}} → {{profile_cloud_account}} y, en el móvil nuevo, toca «{{onboarding_restore}}» en la pantalla de bienvenida e inicia sesión con la misma cuenta."},
@@ -198,23 +282,39 @@
   "fr": {
     "lang_name": "Français",
     "nav_home": "Accueil",
+    "nav_features": "Fonctionnalités",
     "nav_privacy": "Confidentialité",
     "nav_terms": "Conditions",
     "nav_support": "Assistance",
     "language": "Langue",
-    "hero_title": "Ton cycle reste avec toi",
+    "hero_eyebrow": "Règles · Grossesse · Post-partum",
+    "hero_title": "Ton cycle *reste avec toi*",
     "hero_body": "Un suivi serein des règles, de la grossesse et du post-partum. Tout ce que tu notes reste chiffré sur ton téléphone — sans compte obligatoire, sans pistage.",
+    "hero_more": "Voir comment ça marche",
+    "hero_alt": "Écran d’accueil de Nilu : jours avant tes prochaines règles et anneau du cycle",
+    "trust": [
+      "Sans compte obligatoire",
+      "Chiffré sur l’appareil",
+      "Verrouillage gratuit"
+    ],
     "badge_app_store": "Télécharger dans l'App Store",
     "badge_google_play": "Disponible sur Google Play",
     "coming_soon": "Bientôt sur l'App Store et Google Play",
     "features_title": "Ce qu'elle fait",
-    "features": [
-      "Calendrier et prévisions : note tes règles et vois les prochaines sous forme de période, avec la façon dont elle est calculée, ainsi que ta période fertile estimée.",
-      "Journal quotidien : flux, douleurs, humeur, symptômes et notes.",
-      "Tout l'historique de tes cycles et un résumé à montrer en consultation — gratuit.",
-      "Grossesse et post-partum : semaines et jours, rendez-vous et rappels, signes d'alerte.",
-      "Widget d'écran d'accueil et rappels, tout est préparé sur ton appareil.",
-      "Si tu veux, avec ton partenaire : seulement l'état de proximité que tu choisis, avec ton consentement explicite."
+    "features_lead": "Des règles à la grossesse et au post-partum : simple, clair et entre tes mains.",
+    "showcase": [
+      {"id": "calendar", "label": "CALENDRIER", "title": "Tes prochaines règles, *sur une période*", "body": "Note tes règles dans le calendrier. Nilu affiche les prochaines comme une période probable plutôt qu’une date unique, avec la façon dont elle est calculée et ta fenêtre de fertilité estimée.", "alt": "Calendrier avec jours de règles notés, prévisions et fenêtre de fertilité"},
+      {"id": "log_entry", "label": "JOURNAL", "title": "Note *comment tu te sens*", "body": "Flux, douleur, humeur, symptômes et notes, enregistrés en quelques touches et toujours là quand tu veux revenir en arrière.", "alt": "Journal du jour : flux, symptômes, douleur et humeur"},
+      {"id": "insights", "label": "ANALYSES", "title": "Découvre les *rythmes* de ton corps", "body": "Combien de temps durent tes cycles, sont-ils réguliers, quels symptômes reviennent ? Tout l’historique de tes cycles et un résumé à montrer à ton médecin sont gratuits.", "alt": "Analyses : tendance de la durée du cycle et analyse des symptômes"},
+      {"id": "assistant", "label": "INTERROGE TES DONNÉES", "title": "Des réponses tirées *de tes saisies*", "body": "Demande « Dans combien de jours mes règles ? » ou « Mes cycles sont-ils réguliers ? ». Les réponses sont calculées sur ton téléphone à partir des chiffres que tu vois dans l’app : rien n’est envoyé à un modèle d’IA, et rien n’est inventé.", "alt": "Interroge tes données : questions sur tes prochaines règles et la régularité, avec réponses"},
+      {"id": "pregnancy_home", "label": "GROSSESSE", "title": "À tes côtés *pendant la grossesse*", "body": "Pendant la grossesse et le post-partum : ta semaine et ton jour, rendez-vous et rappels, et les signes d’alerte qui ne doivent pas attendre.", "alt": "Accueil grossesse : semaine de grossesse, date prévue et prochain rendez-vous"}
+    ],
+    "more_title": "Et aussi",
+    "more": [
+      {"icon": "widget", "title": "Widget sur l’écran d’accueil", "body": "Ton jour du cycle et tes prochaines règles en un coup d’œil ; le widget et les rappels sont préparés sur ton appareil."},
+      {"icon": "library", "title": "Bibliothèque santé", "body": "Des articles sourcés sur les règles, la nutrition, la santé mentale et les relations."},
+      {"icon": "partner", "title": "Avec ton partenaire, si tu veux", "body": "Seul l’état de proximité que tu choisis est partagé, avec ton consentement explicite."},
+      {"icon": "backup", "title": "Ta sauvegarde, ton choix", "body": "Passe à un nouveau téléphone avec une sauvegarde protégée par mot de passe, ou active la synchronisation cloud avec ton compte."}
     ],
     "privacy_title": "La confidentialité n'est pas une option",
     "privacy_points": [
@@ -224,6 +324,8 @@
       "Verrouillage de l'app, notifications discrètes, icône sobre sur l'écran d'accueil et sauvegardes protégées par mot de passe : tout est gratuit.",
       "Tu peux supprimer toutes tes données depuis l'app."
     ],
+    "privacy_alt": "Confidentialité et sécurité : verrouillage de l’app et données chiffrées sur ton appareil",
+    "privacy_more": "Lire la politique de confidentialité",
     "medical": "Nilu ne pose pas de diagnostic, ne prescrit aucun traitement et n'est pas un moyen de contraception. Les prévisions sont calculées à partir de tes saisies passées et restent approximatives.",
     "health_title": "Toutes tes données de santé au même endroit",
     "health_body": "Utiliser Nilu avec l'app Santé d'Apple sur iPhone t'aide à mieux gérer ta santé. Importe tes relevés de règles depuis l'app Santé et, si tu veux, écris aussi dans Santé les jours que tu notes dans Nilu : tu retrouves ainsi toutes tes données de santé, y compris celles de Nilu, au même endroit.",
@@ -231,10 +333,13 @@
     "trademarks_apple": "Apple, le logo Apple et iPhone sont des marques d'Apple Inc., déposées aux États-Unis et dans d'autres pays. App Store est une marque de service d'Apple Inc., déposée aux États-Unis et dans d'autres pays.",
     "trademarks_google": "Google Play et le logo Google Play sont des marques de Google LLC.",
     "footer_tracking": "Ce site n'utilise ni cookies, ni outils d'analyse, ni pistage.",
+    "final_title": "Une façon *douce* d’écouter ton corps",
+    "final_body": "Commence sans compte ; tant que tu n’actives pas la synchronisation, tes saisies ne quittent pas ton téléphone.",
     "support_title": "Assistance",
     "support_intro": "Un problème ou une suggestion ? Écris-nous.",
     "support_contact": "E-mail : {email}",
     "faq_title": "Questions fréquentes",
+    "faq_more": "Toutes les questions et l’assistance",
     "faq": [
       {"q": "Où sont stockées mes données ?", "a": "Sur ton téléphone, chiffrées. Tant que tu n'actives pas la synchronisation cloud, aucune de tes données de santé ne quitte ton appareil ; la fonction partenaire n'envoie que l'état de proximité que tu choisis de partager. Détails dans la Politique de confidentialité."},
       {"q": "Je change de téléphone : comment transférer mes données ?", "a": "Sur l'ancien téléphone, crée une sauvegarde avec {{nav_profile}} → {{profile_privacy_security}} → {{privacy_export}}. Sur le nouveau, restaure-la depuis le même écran avec {{privacy_import}}. Ou active la synchronisation dans {{nav_profile}} → {{profile_cloud_account}}, puis sur le nouveau téléphone touche « {{onboarding_restore}} » sur l'écran d'accueil et connecte-toi avec le même compte."},
@@ -247,23 +352,39 @@
   "pt": {
     "lang_name": "Português (Brasil)",
     "nav_home": "Início",
+    "nav_features": "Recursos",
     "nav_privacy": "Privacidade",
     "nav_terms": "Termos",
     "nav_support": "Suporte",
     "language": "Idioma",
-    "hero_title": "Seu ciclo fica com você",
+    "hero_eyebrow": "Menstruação · Gravidez · Pós-parto",
+    "hero_title": "Seu ciclo *fica com você*",
     "hero_body": "Um app tranquilo para menstruação, gravidez e pós-parto. Tudo o que você registra fica criptografado no seu celular — sem conta obrigatória e sem rastreamento.",
+    "hero_more": "Veja como funciona",
+    "hero_alt": "Tela inicial do Nilu: dias até a próxima menstruação e o anel do ciclo",
+    "trust": [
+      "Sem conta obrigatória",
+      "Criptografado no aparelho",
+      "Bloqueio grátis"
+    ],
     "badge_app_store": "Baixar na App Store",
     "badge_google_play": "Disponível no Google Play",
     "coming_soon": "Em breve na App Store e no Google Play",
     "features_title": "O que ele faz",
-    "features": [
-      "Calendário e previsões: marque a menstruação e veja a próxima como um intervalo, com a explicação do cálculo, além da janela fértil estimada.",
-      "Registro diário: fluxo, dor, humor, sintomas e anotações.",
-      "Todo o seu histórico de ciclos e um resumo para mostrar na consulta — grátis.",
-      "Gravidez e pós-parto: semanas e dias, consultas e lembretes, sinais de alerta.",
-      "Widget da Tela de Início e lembretes, tudo preparado no seu aparelho.",
-      "Se quiser, com seu parceiro: só o status de proximidade que você escolher, com seu consentimento explícito."
+    "features_lead": "Da menstruação à gravidez e ao pós-parto: simples, claro e nas suas mãos.",
+    "showcase": [
+      {"id": "calendar", "label": "CALENDÁRIO", "title": "Sua próxima menstruação *como um intervalo*", "body": "Marque sua menstruação no calendário. O Nilu mostra a próxima como um intervalo provável em vez de uma data única, com a forma como foi calculada e sua janela fértil estimada.", "alt": "Calendário com dias de menstruação marcados, previsões e janela fértil"},
+      {"id": "log_entry", "label": "REGISTRO", "title": "Anote *como você se sente*", "body": "Fluxo, dor, humor, sintomas e notas, salvos em poucos toques e sempre à mão quando você quiser olhar para trás.", "alt": "Registro diário: fluxo, sintomas, dor e humor"},
+      {"id": "insights", "label": "ANÁLISES", "title": "Veja os *padrões* do seu corpo", "body": "Quanto duram seus ciclos, quão regulares eles são, quais sintomas se repetem? Todo o seu histórico de ciclos e um resumo para mostrar ao médico são grátis.", "alt": "Análises: tendência da duração do ciclo e análise de sintomas"},
+      {"id": "assistant", "label": "PERGUNTE AOS SEUS DADOS", "title": "Respostas dos seus *próprios registros*", "body": "Pergunte “Quantos dias faltam para minha menstruação?” ou “Meus ciclos são regulares?”. As respostas são calculadas no seu celular com os mesmos números que você vê no app: nada é enviado a um modelo de IA e nada é inventado.", "alt": "Pergunte aos seus dados: perguntas sobre a próxima menstruação e a regularidade, com respostas"},
+      {"id": "pregnancy_home", "label": "GRAVIDEZ", "title": "Com você *também na gravidez*", "body": "Na gravidez e no pós-parto: sua semana e seu dia, consultas e lembretes, e os sinais de alerta que não podem esperar.", "alt": "Início da gravidez: semana gestacional, data provável do parto e próxima consulta"}
+    ],
+    "more_title": "E mais",
+    "more": [
+      {"icon": "widget", "title": "Widget na tela inicial", "body": "Seu dia do ciclo e a próxima menstruação num relance; o widget e os lembretes são preparados no seu aparelho."},
+      {"icon": "library", "title": "Biblioteca de saúde", "body": "Artigos com fontes sobre menstruação, nutrição, saúde mental e relacionamentos."},
+      {"icon": "partner", "title": "Com seu parceiro, se você quiser", "body": "Só o status de proximidade que você escolher é compartilhado, com seu consentimento explícito."},
+      {"icon": "backup", "title": "Seu backup, sua escolha", "body": "Mude para um celular novo com um backup protegido por senha ou ative a sincronização na nuvem com sua conta."}
     ],
     "privacy_title": "Privacidade não é um extra",
     "privacy_points": [
@@ -273,6 +394,8 @@
       "Bloqueio do app, notificações discretas, um ícone simples na tela inicial e backups protegidos por senha — tudo gratuito.",
       "Você pode apagar todos os seus dados dentro do próprio app."
     ],
+    "privacy_alt": "Privacidade e segurança: bloqueio do app e dados criptografados no aparelho",
+    "privacy_more": "Ler a política de privacidade",
     "medical": "O Nilu não faz diagnóstico, não indica tratamento e não é um método contraceptivo. As previsões são calculadas a partir dos seus registros anteriores e são aproximadas.",
     "health_title": "Todos os seus dados de saúde em um só lugar",
     "health_body": "Usar o Nilu com o app Saúde da Apple no iPhone ajuda você a cuidar melhor da sua saúde. Importe seus registros de período do app Saúde e, se quiser, grave também no Saúde os dias que você marcar no Nilu: assim você vê todos os seus dados de saúde, inclusive os do Nilu, em um só lugar.",
@@ -280,10 +403,13 @@
     "trademarks_apple": "Apple, o logotipo da Apple e iPhone são marcas comerciais da Apple Inc., registradas nos EUA e em outros países. App Store é uma marca de serviço da Apple Inc., registrada nos EUA e em outros países.",
     "trademarks_google": "Google Play e o logotipo do Google Play são marcas comerciais da Google LLC.",
     "footer_tracking": "Este site não usa cookies, análise nem rastreamento.",
+    "final_title": "Um jeito *tranquilo* de ouvir seu corpo",
+    "final_body": "Comece sem conta; se você não ativar a sincronização, seus registros não saem do seu celular.",
     "support_title": "Suporte",
     "support_intro": "Teve algum problema ou tem uma sugestão? Escreva para nós.",
     "support_contact": "E-mail: {email}",
     "faq_title": "Perguntas frequentes",
+    "faq_more": "Todas as perguntas e suporte",
     "faq": [
       {"q": "Onde meus dados ficam armazenados?", "a": "No seu celular, criptografados. Se você não ativar a sincronização na nuvem, nenhum registro de saúde sai do seu aparelho; o recurso de parceiro só envia o status de proximidade que você escolher compartilhar. Os detalhes estão na Política de Privacidade."},
       {"q": "Vou trocar de celular; como levo meus registros?", "a": "No celular antigo, faça um backup em {{nav_profile}} → {{profile_privacy_security}} → {{privacy_export}}. No novo, restaure pela mesma tela com {{privacy_import}}. Ou ative a sincronização em {{nav_profile}} → {{profile_cloud_account}} e, no celular novo, toque em “{{onboarding_restore}}” na tela de boas-vindas e entre com a mesma conta."},

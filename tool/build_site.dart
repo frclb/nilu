@@ -11,7 +11,12 @@
 //
 // Sitenin kendine ait metni site/strings.json'da, adresi site/site.json'da.
 // Destek e-postası ve app-ads.txt'nin yayıncı kimliği
-// lib/core/release_config.dart'tan.
+// lib/core/release_config.dart'tan. Metinlerde `*…*` arası vurgulu
+// (başlıklarda degrade), mağaza görsellerindeki gibi.
+//
+// Ana sayfa bir tanıtım sayfası: uygulamanın gerçek ekranları, mağaza
+// görselleriyle aynı çerçeve ve şerit. Ekranlar, zemin, bağlantı önizlemesi
+// ve yazı tipleri tool/site_assets.py ile site/assets'e üretiliyor.
 //
 // Site çerez, analiz, harici yazı tipi ya da betik kullanmıyor; tek betik
 // kök sayfadaki dil yönlendirmesi.
@@ -42,6 +47,61 @@ String _paras(String text) => text
     .where((p) => p.trim().isNotEmpty)
     .map((p) => '<p>$p</p>')
     .join('\n');
+
+/// "Döngün *sende* kalır" → vurgulu kısım `<em>`; kaçışlı.
+String _marked(String s) => _esc(
+  s,
+).replaceAllMapped(RegExp(r'\*([^*]+)\*'), (m) => '<em>${m.group(1)}</em>');
+
+/// Vurgu işaretsiz metin: sayfa başlığı ve açıklamalar için.
+String _plain(String s) => s.replaceAll('*', '');
+
+/// Bağlantı önizlemesinin (Open Graph) yerel adı.
+const _ogLocales = {
+  'tr': 'tr_TR',
+  'en': 'en_US',
+  'de': 'de_DE',
+  'es': 'es_ES',
+  'fr': 'fr_FR',
+  'pt': 'pt_BR',
+};
+
+/// Satır içi simgeler: 24×24, `currentColor` çizgi. Site dışarıdan simge
+/// kitaplığı yüklemiyor.
+const _icons = {
+  'account':
+      '<circle cx="12" cy="8" r="3.5"/>'
+      '<path d="M5 20c.8-3.4 3.6-5.5 7-5.5s6.2 2.1 7 5.5M4 4l16 16"/>',
+  'shield':
+      '<path d="M12 3l7 3v5c0 4.6-3 8.3-7 10-4-1.7-7-5.4-7-10V6z"/>'
+      '<path d="M9 12l2 2 4-4"/>',
+  'lock':
+      '<rect x="5" y="11" width="14" height="10" rx="2.5"/>'
+      '<path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  'widget':
+      '<rect x="4" y="4" width="7" height="7" rx="2"/>'
+      '<rect x="13" y="4" width="7" height="7" rx="2"/>'
+      '<rect x="4" y="13" width="16" height="7" rx="2"/>',
+  'library':
+      '<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/>'
+      '<path d="M5 17a3 3 0 0 1 3-3h11M9 8h6"/>',
+  'partner':
+      '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  'backup':
+      '<path d="M7 18a4 4 0 0 1-.6-8A5.5 5.5 0 0 1 17 8.5a4.5 4.5 0 0 1 .5 9.5"/>'
+      '<path d="M12 12v8M9 15l3-3 3 3"/>',
+  'check': '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  'down': '<path d="M12 5v14M6 13l6 6 6-6"/>',
+  'right': '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  'globe':
+      '<circle cx="12" cy="12" r="9"/>'
+      '<path d="M3 12h18M12 3c2.5 2.5 3.8 5.5 3.8 9s-1.3 6.5-3.8 9'
+      'c-2.5-2.5-3.8-5.5-3.8-9S9.5 5.5 12 3z"/>',
+};
+
+String _icon(String name) =>
+    '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">'
+    '${_icons[name]}</svg>';
 
 class SiteBuilder {
   SiteBuilder(this.root);
@@ -141,25 +201,32 @@ class SiteBuilder {
     final s = site(lang);
     final up = '../' * depth;
     final rel = section == 'home' ? '' : '$section/';
-    String alt(String l) {
-      final b = baseUrl;
-      return b == null ? '$up$l/$rel' : '$b/$l/$rel';
-    }
+    final b = baseUrl;
+    String alt(String l) => b == null ? '$up$l/$rel' : '$b/$l/$rel';
+    final description = _esc(s['hero_body'] as String);
 
-    final nav = [
-      ('home', s['nav_home'], ''),
-      ('privacy', s['nav_privacy'], 'privacy/'),
-      ('terms', s['nav_terms'], 'terms/'),
-      ('support', s['nav_support'], 'support/'),
-    ];
-    String navLinks() => nav
+    // Üst menüde "Özellikler" dar ekranda gizleniyor (sayfanın kendisi);
+    // gizlilik ve destek her ekranda erişilebilir.
+    String links(List<(String, String)> items) => items
         .map(
           (n) =>
-              '<a href="$up$lang/${n.$3}"'
+              '<a class="nav-${n.$1}" href="$up$lang/'
+              '${n.$1 == 'features' ? '#features' : '${n.$1}/'}"'
               '${n.$1 == section ? ' aria-current="page"' : ''}>'
-              '${_esc(n.$2 as String)}</a>',
+              '${_esc(s[n.$2] as String)}</a>',
         )
         .join();
+    final top = links([
+      ('features', 'nav_features'),
+      ('privacy', 'nav_privacy'),
+      ('support', 'nav_support'),
+    ]);
+    final bottom = links([
+      ('features', 'nav_features'),
+      ('privacy', 'nav_privacy'),
+      ('terms', 'nav_terms'),
+      ('support', 'nav_support'),
+    ]);
     final langs = languages
         .map(
           (l) =>
@@ -168,9 +235,30 @@ class SiteBuilder {
               '${_esc(site(l)['lang_name'] as String)}</a>',
         )
         .join();
-    final hreflang = languages
-        .map((l) => '<link rel="alternate" hreflang="$l" href="${alt(l)}">')
-        .join('\n');
+    final hreflang = [
+      for (final l in languages)
+        '<link rel="alternate" hreflang="$l" href="${alt(l)}">',
+      if (b != null) '<link rel="alternate" hreflang="x-default" href="$b/">',
+    ].join('\n');
+    // Bağlantı önizlemesi mutlak adres istiyor: site adresi girilince.
+    final social = b == null
+        ? ''
+        : '''
+<link rel="canonical" href="${alt(lang)}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Nilu">
+<meta property="og:locale" content="${_ogLocales[lang]}">
+<meta property="og:title" content="${_esc(title)}">
+<meta property="og:description" content="$description">
+<meta property="og:url" content="${alt(lang)}">
+<meta property="og:image" content="$b/assets/og/$lang.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="${_esc(_plain(s['hero_title'] as String))}">
+<meta name="twitter:card" content="summary_large_image">''';
+    final brand =
+        '<a class="brand" href="$up$lang/"><img src="${up}assets/icon-256.png" '
+        'alt="" width="32" height="32"><span>Nilu</span></a>';
 
     return '''<!doctype html>
 <html lang="$lang">
@@ -178,23 +266,29 @@ class SiteBuilder {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${_esc(title)}</title>
-<meta name="description" content="${_esc(s['hero_body'] as String)}">
+<meta name="description" content="$description">
+<meta name="theme-color" content="#22001a">
+<link rel="preload" href="${up}assets/fonts/Newsreader-Medium.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="${up}assets/fonts/PlusJakartaSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${up}assets/style.css">
 <link rel="icon" type="image/png" href="${up}assets/favicon.png">
 <link rel="apple-touch-icon" href="${up}assets/apple-touch-icon.png">
-$hreflang
+$hreflang$social
 </head>
-<body>
+<body class="page-${section == 'home' ? 'home' : 'doc'}">
 <a class="skip" href="#icerik">${_esc(title)}</a>
 <header class="site"><div class="wrap">
-<a class="brand" href="$up$lang/"><img src="${up}assets/icon-256.png" alt="" width="36" height="36"><span>Nilu</span></a>
-<nav class="main" aria-label="${_esc(s['nav_home'] as String)}">${navLinks()}</nav>
+$brand
+<nav class="main">$top</nav>
+<details class="lang-menu"><summary aria-label="${_esc(s['language'] as String)}">${_icon('globe')}<span>${lang.toUpperCase()}</span></summary>
+<div class="lang-list">$langs</div></details>
 </div></header>
-<main id="icerik"><div class="wrap">
+<main id="icerik">
 $body
-</div></main>
+</main>
 <footer class="site"><div class="wrap">
-<div class="links">${navLinks()}</div>
+<div class="foot-top">$brand<p class="tagline">${_esc(_plain(s['hero_title'] as String))}</p></div>
+<div class="links">$bottom</div>
 <div class="langs" aria-label="${_esc(s['language'] as String)}">$langs</div>
 <p>${_esc(s['footer_tracking'] as String)}</p>
 <p>© ${DateTime.now().year} Nilu</p>
@@ -209,13 +303,29 @@ $body
       '<a href="${_esc(url)}"><img src="../assets/badges/$file" '
       'alt="${_esc(alt)}" height="48"></a>';
 
+  /// Çerçeveli ekran (tool/site_assets.py). Boyut, yüklenirken yerleşim
+  /// kaymasın diye: 600 piksellik ekran + çerçeve.
+  String _phone(
+    String lang,
+    String shot,
+    String alt, {
+    String cls = 'phone',
+    bool lazy = true,
+  }) =>
+      '<img class="$cls" src="../assets/screens/$lang/$shot.webp" '
+      'alt="${_esc(alt)}" width="656" height="1360"'
+      '${lazy ? ' loading="lazy"' : ''} decoding="async">';
+
   String _home(String lang) {
     final s = site(lang);
     String t(String key) => _esc(s[key] as String);
+    List<Map<String, dynamic>> items(String key) =>
+        (s[key] as List).cast<Map<String, dynamic>>();
     final apple = appStoreUrl;
     final play = playStoreUrl;
     // Apple: App Store rozeti sırada ilk ve diğer rozet varken siyah olanı.
-    // Google: Google Play rozeti ötekilerle aynı boyda ya da büyük.
+    // Google: Google Play rozeti ötekilerle aynı boyda ya da büyük. Rozetler
+    // sayfada bir kez: Apple'ın kuralı sayfa başına bir rozet.
     final badges = [
       if (apple != null)
         _badge(apple, 'app-store-$lang.svg', s['badge_app_store'] as String),
@@ -223,45 +333,132 @@ $body
         _badge(play, 'google-play-$lang.svg', s['badge_google_play'] as String),
     ];
     final cta = badges.isEmpty
-        ? '<div class="cta"><span>${t('coming_soon')}</span></div>'
+        ? '<p class="soon">${t('coming_soon')}</p>'
         : '<div class="badges">${badges.join()}</div>';
+
+    const trustIcons = ['account', 'shield', 'lock'];
+    final trust = [
+      for (final (i, label) in (s['trust'] as List).cast<String>().indexed)
+        '<li>${_icon(trustIcons[i])}${_esc(label)}</li>',
+    ].join();
+
+    final rows = items('showcase')
+        .map(
+          (r) =>
+              '''
+<article class="row row-${r['id']}">
+<div class="row-copy">
+<p class="label">${_esc(r['label'] as String)}</p>
+<h3>${_marked(r['title'] as String)}</h3>
+<p>${_esc(r['body'] as String)}</p>
+</div>
+<div class="stage">${_phone(lang, r['id'] as String, r['alt'] as String)}</div>
+</article>''',
+        )
+        .join();
+
+    final tiles = items('more')
+        .map(
+          (x) =>
+              '<li><span class="tile-icon">${_icon(x['icon'] as String)}</span>'
+              '<h3>${_esc(x['title'] as String)}</h3>'
+              '<p>${_esc(x['body'] as String)}</p></li>',
+        )
+        .join('\n');
+
+    final points = (s['privacy_points'] as List)
+        .map(
+          (p) => '<li>${_icon('check')}<span>${_esc(p as String)}</span></li>',
+        )
+        .join('\n');
+
+    // Sık sorulanlardan e-posta geçmeyen ilk üçü; hepsi destek sayfasında.
+    final faq = items('faq')
+        .where((f) => !(f['a'] as String).contains('{email}'))
+        .take(3)
+        .map(
+          (f) =>
+              '<details><summary>${_esc(f['q'] as String)}</summary>'
+              '<p>${_render(lang, f['a'] as String)}</p></details>',
+        )
+        .join('\n');
+
     // Apple'ın kuralı: rozet ana mesajdan sonra ve ondan küçük, yanında
     // Sağlık'ın faydası ve gizlilik cümlesi. Rozet çevrilmiyor.
     final health = apple == null
         ? ''
         : '''
-<section class="card"><h2>${t('health_title')}</h2>
+<section class="health"><div class="wrap narrow"><div class="card">
+<h2>${t('health_title')}</h2>
 <p>${t('health_body')}</p>
 <p class="note">${t('health_privacy')}</p>
 <img class="health-badge" src="../assets/badges/apple-health.svg" alt="Works with Apple Health" height="40">
-</section>''';
+</div></div></section>''';
     // Rozetlerdeki markaların sahip satırları (ikisinin de kuralı istiyor).
     final credits = [
       if (apple != null) 'trademarks_apple',
       if (play != null) 'trademarks_google',
-    ].map((k) => '\n<p class="note legal">${t(k)}</p>').join();
-    String list(String key) =>
-        (s[key] as List).map((e) => '<li>${_esc(e as String)}</li>').join('\n');
+    ].map((k) => '\n<p class="legal">${t(k)}</p>').join();
+
     return _layout(
       lang: lang,
       section: 'home',
-      title: 'Nilu — ${s['hero_title']}',
+      title: 'Nilu — ${_plain(s['hero_title'] as String)}',
       depth: 1,
       body:
           '''
 <section class="hero">
-<img src="../assets/icon-256.png" alt="Nilu" width="112" height="112">
-<h1>${t('hero_title')}</h1>
-<p>${t('hero_body')}</p>
-$cta
+<div class="wrap hero-grid">
+<div class="hero-copy">
+<p class="eyebrow">${t('hero_eyebrow')}</p>
+<h1>${_marked(s['hero_title'] as String)}</h1>
+<p class="lead">${t('hero_body')}</p>
+<div class="cta-row">$cta<a class="more-link" href="#features">${t('hero_more')}${_icon('down')}</a></div>
+<ul class="trust">$trust</ul>
+</div>
+<div class="hero-art">
+${_phone(lang, 'calendar', '', cls: 'back', lazy: false)}
+${_phone(lang, 'home', s['hero_alt'] as String, cls: 'front', lazy: false)}
+<img class="ring" src="../assets/screens/$lang/ring.webp" alt="" width="560" height="448" decoding="async">
+</div>
+</div>
 </section>
-<section class="card"><h2>${t('features_title')}</h2><ul>
-${list('features')}
-</ul></section>$health
-<section class="card"><h2>${t('privacy_title')}</h2><ul>
-${list('privacy_points')}
-</ul></section>
-<p class="note">${t('medical')}</p>$credits''',
+<section class="features" id="features">
+<div class="wrap">
+<header class="section-head"><p class="eyebrow">${t('features_title')}</p><h2>${t('features_lead')}</h2></header>
+$rows
+</div>
+</section>
+<section class="more"><div class="wrap">
+<h2>${t('more_title')}</h2>
+<ul class="tiles">
+$tiles
+</ul>
+</div></section>$health
+<section class="privacy-band"><div class="band">
+<div class="band-copy">
+<p class="eyebrow">${t('nav_privacy')}</p>
+<h2>${t('privacy_title')}</h2>
+<ul class="checks">
+$points
+</ul>
+<a class="button" href="privacy/">${t('privacy_more')}${_icon('right')}</a>
+</div>
+<div class="band-art">${_phone(lang, 'privacy_security', s['privacy_alt'] as String)}</div>
+</div></section>
+<section class="faq-preview"><div class="wrap narrow qa">
+<h2>${t('faq_title')}</h2>
+$faq
+<a class="text-link" href="support/">${t('faq_more')}${_icon('right')}</a>
+</div></section>
+<section class="final"><div class="wrap">
+<img src="../assets/icon-256.png" alt="" width="96" height="96" loading="lazy">
+<h2>${_marked(s['final_title'] as String)}</h2>
+<p>${t('final_body')}</p>
+</div></section>
+<section class="fine"><div class="wrap narrow">
+<p>${t('medical')}</p>$credits
+</div></section>''',
     );
   }
 
@@ -274,6 +471,7 @@ ${list('privacy_points')}
   }) {
     final title = _app(lang, titleKey);
     final body = StringBuffer()
+      ..writeln('<div class="doc"><div class="wrap narrow">')
       ..writeln('<article>')
       ..writeln('<h1>${_esc(title)}</h1>')
       ..writeln('<p class="updated">${_esc(_app(lang, updatedKey))}</p>');
@@ -282,7 +480,7 @@ ${list('privacy_points')}
         ..writeln('<h2>${_esc(t)}</h2>')
         ..writeln(_paras(_render(lang, c)));
     }
-    body.writeln('</article>');
+    body.writeln('</article>\n</div></div>');
     return _layout(
       lang: lang,
       section: section,
@@ -312,14 +510,16 @@ ${list('privacy_points')}
       depth: 2,
       body:
           '''
+<div class="doc"><div class="wrap narrow qa">
 <article>
 <h1>${_esc(s['support_title'] as String)}</h1>
-<p>${_esc(s['support_intro'] as String)}</p>
-<p>${_render(lang, s['support_contact'] as String)}</p>
+<p class="intro">${_esc(s['support_intro'] as String)}</p>
+<p class="contact">${_render(lang, s['support_contact'] as String)}</p>
 <h2>${_esc(s['faq_title'] as String)}</h2>
 $faq
 <p class="note">${_esc(s['medical'] as String)}</p>
-</article>''',
+</article>
+</div></div>''',
     );
   }
 
@@ -339,6 +539,7 @@ $faq
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nilu</title>
+<meta name="theme-color" content="#22001a">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <script>
@@ -353,13 +554,14 @@ $faq
 })();
 </script>
 </head>
-<body>
-<main><div class="wrap" style="text-align:center">
-<img src="assets/icon-256.png" alt="Nilu" width="112" height="112" style="border-radius:26px;margin-top:32px">
+<body class="page-root">
+<main class="root-box">
+<img src="assets/icon-256.png" alt="" width="96" height="96">
+<h1>Nilu</h1>
 <ul class="langs-list">
 $list
 </ul>
-</div></main>
+</main>
 </body>
 </html>
 ''';
@@ -380,12 +582,17 @@ $list
     return '''<!doctype html>
 <html lang="$defaultLanguage">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#22001a">
+<link rel="stylesheet" href="${yol}assets/style.css">
 <title>Nilu — 404</title></head>
-<body style="font-family:-apple-system,sans-serif;text-align:center;padding:48px 16px">
+<body class="page-root">
+<main class="root-box">
+<img src="${yol}assets/icon-256.png" alt="" width="96" height="96">
 <h1>404</h1>
-<ul style="list-style:none;padding:0">
+<ul class="langs-list">
 $list
 </ul>
+</main>
 </body>
 </html>
 ''';

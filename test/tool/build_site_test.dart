@@ -139,6 +139,43 @@ void main() {
     expect(oku('assets/badges/apple-health.svg'), contains('<svg'));
   });
 
+  test('tanıtım sayfası: ekranlar, açıklamaları, bağlantı önizlemesi', () {
+    final yazilar =
+        jsonDecode(File('site/strings.json').readAsStringSync())
+            as Map<String, dynamic>;
+    for (final d in diller) {
+      final html = oku('$d/index.html');
+      final s = yazilar[d] as Map<String, dynamic>;
+      for (final r in (s['showcase'] as List).cast<Map<String, dynamic>>()) {
+        expect(
+          html,
+          contains(
+            'src="../assets/screens/$d/${r['id']}.webp" '
+            'alt="${esc(r['alt'] as String)}"',
+          ),
+          reason: '$d ${r['id']}',
+        );
+      }
+      // `*…*` vurguya dönüşüyor; işaret sayfaya ham düşmüyor.
+      expect(html, contains('<h1>'), reason: d);
+      expect(RegExp(r'<h1>[^<]*<em>').hasMatch(html), isTrue, reason: d);
+      expect(html, isNot(contains('<title>Nilu — *')), reason: d);
+      expect(
+        html,
+        contains(
+          '<meta property="og:image" content="${site.baseUrl}/assets/og/$d.jpg">',
+        ),
+      );
+      expect(File('${cikti.path}/assets/og/$d.jpg').existsSync(), isTrue);
+    }
+    // Apple Sağlık simgesinin lisansı uygulamanın içiyle sınırlı: o ekranın
+    // görüntüsü sitede yok.
+    final ekranlar = Directory(
+      'site/assets/screens',
+    ).listSync(recursive: true).map((f) => f.path);
+    expect(ekranlar.where((p) => p.contains('health_sync')), isEmpty);
+  });
+
   test('göreli bağlantıların hepsi var olan bir dosyaya gidiyor', () {
     final link = RegExp(r'''(?:src|href)="([^"#:]+)"''');
     for (final f in cikti.listSync(recursive: true).whereType<File>()) {

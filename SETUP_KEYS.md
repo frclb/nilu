@@ -516,6 +516,21 @@ Diğer diller: `de`, `es`, `fr`, `pt` aynı düzende.
 dart run tool/build_site.dart && python3 -m http.server 8765 --directory build/site
 ```
 
+**8.6 Ana sayfanın görselleri:** ekranlar, kahraman alanının zemini,
+bağlantı önizlemesi (`og/<dil>.jpg`) ve yazı tipleri mağaza görselleriyle
+aynı kaynaktan, `tool/site_assets.py` ile üretilip depoda tutuluyor. Uygulamanın
+görünüşü değişince:
+
+```bash
+flutter test test/gallery/store_screens_test.dart --dart-define=STORE=true
+python3 tool/site_assets.py
+```
+
+Tanıtım metinleri `site/strings.json`'da (`showcase`, `more`, `trust` …);
+her cümle uygulamada doğrulanabilir olmalı, mağaza görsellerindeki kuralla
+aynı. Apple Sağlık ekranı sitede yok: simgesinin lisansı uygulamanın içiyle
+sınırlı.
+
 ---
 
 ## 9. Son denetim
