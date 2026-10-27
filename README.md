@@ -109,22 +109,15 @@ eklerken en azından `tr.json` ve `en.json` güncellenmelidir — CI bunu denetl
 
 ## İmzalama ve yetkiler
 
-Debug ile Release **farklı yetki dosyaları** kullanıyor:
+Bütün yapılandırmalar aynı yetki dosyalarını kullanıyor:
+`ios/Runner/Runner.entitlements` (HealthKit, App Groups, Apple ile giriş) ve
+`ios/CycleWidget/CycleWidget.entitlements` (App Groups). Takım
+`V8MCMH5GJ7` (Hürkan ÇELEBİ, bireysel üyelik), otomatik imzalama.
 
-| Yapılandırma | Dosya | HealthKit + App Groups |
-|---|---|---|
-| Debug | `ios/Runner/RunnerDebug.entitlements` | yok |
-| Release / Profile | `ios/Runner/Runner.entitlements` | var |
-
-Sebebi: ücretsiz ("kişisel") Apple takımları bu iki yetkiyi vermiyor ve Xcode
-profil üretemeyip derlemeyi durduruyor. Debug'ı yetkisiz bırakmak ücretsiz
-hesapla cihaza kurmayı mümkün kılıyor; mağaza derlemesi tam yetkilerle
-çıkıyor. Bu yapılandırmada sağlık senkronizasyonu ve ana ekran widget'ı
-çalışmaz.
-
-Ücretli Apple Developer Program üyeliği alındığında Debug'ın
-`CODE_SIGN_ENTITLEMENTS` ayarı asıl dosyaya döndürülüp `*Debug.entitlements`
-dosyaları silinebilir.
+Üyelikten önce Debug yetkisiz ayrı dosyalar kullanıyordu: ücretsiz
+("kişisel") takımlar HealthKit ve App Groups vermiyor. Üyelik gelince
+(2026-10-27) o dosyalar kaldırıldı; cihazdaki geliştirme sürümünde de sağlık
+senkronizasyonu, widget ve Apple ile giriş çalışıyor.
 
 ## Ekran uyumu
 

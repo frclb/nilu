@@ -34,36 +34,20 @@ Her yüklemede build numarası artmalıdır.
 
 ## 2. İmzalama ve yetkiler
 
-**Apple Developer Program üyeliği ($99/yıl)** ⬜
-Mağazaya yükleme, HealthKit ve App Groups bunsuz çalışmaz.
-Üyelik alındıktan sonra Xcode → Runner → Signing & Capabilities → Team seçin.
-Otomatik imzalama yeterlidir. **CycleWidget hedefinde de aynı takımı seçin**
-— ayrı bir hedef, kendi takımını istiyor.
+**Apple Developer Program üyeliği ($99/yıl)** ✅
+Bireysel, Hürkan ÇELEBİ; 2026-10-27'de onaylandı. Team ID `V8MCMH5GJ7`
+(ücretsiz takımın kimliği üyelikle aynı kaldı; iki hedefte de bu takım,
+otomatik imzalama).
 
-**Yetkiler yapılandırmaya göre ayrılmıştır:**
+**Yetkiler:** her yapılandırma (Debug, Profile, Release) aynı dosyaları
+kullanıyor: `Runner/Runner.entitlements` (HealthKit, App Groups, Apple ile
+giriş) ve `CycleWidget/CycleWidget.entitlements` (App Groups). Üyelikten
+önce Debug yetkisiz ayrı dosyalarla çalışıyordu (ücretsiz takımlar HealthKit
+ve App Groups vermiyor); üyelikle birlikte kaldırıldılar.
 
-| Yapılandırma | Dosya | HealthKit | App Groups |
-|---|---|---|---|
-| Debug | `Runner/RunnerDebug.entitlements` | yok | yok |
-| Release / Profile | `Runner/Runner.entitlements` | var | var |
-
-Ücretsiz ("kişisel") Apple takımları HealthKit ve App Groups yetkisini
-vermiyor; Xcode profil üretemeyip derlemeyi durduruyordu:
-
-```
-Personal development teams … do not support the HealthKit Access
-(Verifiable Health Records) capability.
-```
-
-Debug bu yetkileri içermediği için uygulama ücretsiz hesapla telefona
-kurulabiliyor; mağaza derlemesi (Release) tam yetkilerle çıkıyor. Debug'da
-**sağlık senkronizasyonu ve ana ekran widget'ı çalışmaz** — bunları test
-etmek üyelik gerektirir. Aynısı `CycleWidget/CycleWidgetDebug.entitlements`
-için de geçerli.
-
-Ücretli üyelik alındığında bu ayrıma gerek kalmaz: Debug'ın
-`CODE_SIGN_ENTITLEMENTS` ayarı `Runner/Runner.entitlements` yapılıp
-`*Debug.entitlements` dosyaları silinebilir.
+**Business ⬜ — premium'u bloke ediyor:** App Store Connect → Business:
+Paid Applications Agreement, banka hesabı, W-8BEN. Ayrıca App Store Small
+Business Program başvurusu (komisyon %15). Ayrıntı SETUP_KEYS.md §1.
 
 ---
 

@@ -114,13 +114,11 @@ uygulamayı devretmek (App Transfer) gerekiyor ve devrin koşulları var.
 **Üyelik gelene kadar IPA dışa aktarılamıyor:** `No signing certificate "iOS
 Distribution" found`. Arşiv alınabiliyor, dışa aktarım alınamıyor.
 
-Üyelikten sonra Xcode'da takımı seç. `DEVELOPMENT_TEAM` değeri değişirse
-`ios/Runner.xcodeproj/project.pbxproj` içinde iki yerde geçiyor.
-
-Bir de: üyelik gelince `ios/Runner/RunnerDebug.entitlements` gereksizleşiyor.
-Debug'ın `CODE_SIGN_ENTITLEMENTS` ayarı `Runner/Runner.entitlements` yapılıp
-dosya silinebilir — o dosya yalnızca ücretsiz hesapla cihaza kurabilmek için
-vardı, HealthKit ve widget onunla çalışmıyor.
+Üyelik 2026-10-27'de geldi; takım kimliği ücretsiz takımınkiyle aynı kaldı
+(`V8MCMH5GJ7`, Xcode'da "Hürkan ÇELEBİ — Individual"), projede değişiklik
+gerekmedi. Debug'ın yetkisiz `*Debug.entitlements` dosyaları (yalnızca
+ücretsiz hesapla cihaza kurmak içindi) kaldırıldı; her yapılandırma tam
+yetkilerle imzalanıyor.
 
 ---
 
