@@ -104,6 +104,38 @@ No signing certificate "iOS Distribution" found
 Arşiv elde kalıyor; üyelik gelince Xcode Organizer'dan aynı arşiv dışa
 aktarılabiliyor.
 
+### İmza: bulut sertifikasıyla değil, bu Mac'teki sertifikayla
+
+**Bulutta yönetilen dağıtım sertifikasıyla imzalanan paket App Store'un
+doğrulamasından geçmiyor** (2026-10-27, Xcode 26):
+
+```
+Invalid Signature. Code failed to satisfy specified code requirement(s).
+The file at path "Runner.app/Runner" is not properly signed.
+```
+
+Sebep, takımın adındaki Türkçe harfler (Hürkan ÇELEBİ). Bulut imzalamada
+Xcode imzanın kuralına (designated requirement) sertifikanın adını
+ayrıştırılmış Unicode (NFD: `u` + birleşen iki nokta) olarak yazıyor;
+sertifikadaki ad bileşik (NFC: `ü`). Bu Mac'te `codesign --verify` geçiyor,
+Apple'ın sunucusu baytları karşılaştırıp reddediyor. Xcode Organizer'ın
+"Upload"ı da aynı yolu kullanıyor.
+
+Çözüm: Mac'te yerel bir **Apple Distribution** sertifikası (Xcode →
+Settings → Apple Accounts → takım → Manage Certificates → + → Apple
+Distribution; 2026-10-27'de oluşturuldu). Varken dışa aktarım onu seçiyor ve
+kural doğru yazılıyor. Yüklemeden önce denetle:
+
+```bash
+unzip -oq build/ios/ipa/*.ipa -d /tmp/nilu-ipa
+codesign -d -r- /tmp/nilu-ipa/Payload/Runner.app 2>&1 | grep designated
+# subject.CN] = "Apple Distribution: Hürkan ÇELEBİ (V8MCMH5GJ7)" → doğru
+# subject.CN] = 0x…75cc88… (hex, "u" + U+0308)                → bulut imzası, yükleme reddedilir
+```
+
+Sertifika Mac'in anahtar zincirinde; Mac değişirse Xcode'dan dışa aktarılıp
+(.p12) taşınmalı ya da yenisi oluşturulmalı.
+
 ---
 
 ## 4. Yükle
@@ -127,6 +159,10 @@ _(Bu makinede kurulu değil.)_
 App Store Connect → Users and Access → Integrations → App Store Connect API →
 yeni anahtar, rol **App Manager**. İnen `AuthKey_XXXXXXXX.p8` **bir kez**
 indirilebiliyor.
+
+İlk yükleme (build 1, 2026-10-27) bu yolla yapıldı; anahtar `AuthKey_8879865B4X.p8`
+("Nilu yukleme", App Manager), Issuer ID `0fd78666-cacb-4657-9056-c7e822a3a36e`.
+Anahtar dosyası taşınmadan `API_PRIVATE_KEYS_DIR=<klasör>` ile de gösterilebilir.
 
 ```bash
 mkdir -p ~/.appstoreconnect/private_keys
