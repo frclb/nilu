@@ -75,12 +75,14 @@ class ReleaseConfig {
 
   test('bugünkü proje: hesaplar bağlanmadığı için eksikler listeleniyor', () {
     final eksikler = checkRelease(Directory.current).map((i) => i.what);
-    expect(eksikler, contains(contains('GoogleService-Info.plist')));
     expect(eksikler, contains(contains('RevenueCat Google Play')));
-    // iOS hesapları bağlandı: RevenueCat, AdMob, destek e-postası.
+    // iOS hesapları bağlandı: RevenueCat, AdMob, Firebase projesi, destek
+    // e-postası. GoogleService-Info.plist depoda değil (.gitignore): yerelde
+    // var, CI'da yok; burada sınanmıyor.
     expect(eksikler, isNot(contains(contains('RevenueCat App Store'))));
     expect(eksikler, isNot(contains(contains('AdMob iOS App ID'))));
     expect(eksikler, isNot(contains(contains('GADApplicationIdentifier'))));
+    expect(eksikler, isNot(contains(contains('.firebaserc'))));
     expect(eksikler, isNot(contains(contains('Destek e-postası'))));
   });
 

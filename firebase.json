@@ -11,5 +11,25 @@
     "ui": {
       "enabled": false
     }
+  },
+  "flutter": {
+    "platforms": {
+      "ios": {
+        "default": {
+          "projectId": "nilu-3b870",
+          "appId": "1:989679229107:ios:fe7cdcd33f0c51168238c6",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "nilu-3b870",
+          "configurations": {
+            "ios": "1:989679229107:ios:fe7cdcd33f0c51168238c6"
+          }
+        }
+      }
+    }
   }
 }

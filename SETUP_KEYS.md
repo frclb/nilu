@@ -402,6 +402,16 @@ Partner eşleşmesi ve isteğe bağlı hesap / bulut eşitleme için. Uygulaman�
 geri kalanı Firebase'siz çalışıyor; yapılandırılmazsa partner ekranı
 eşleşmenin, hesap ekranı girişin kullanılamadığını söylüyor.
 
+**Yapıldı (2026-10-27, iOS):** proje **Nilu** (`nilu-3b870`, Analytics ve
+Gemini kapalı); Firestore `eur3`, kurallar ve indeksler yüklendi
+(`firebase deploy --only firestore`); giriş yöntemleri Anonim (otomatik
+temizlik **kapalı**: partner kimliği silinmesin), Google (destek e-postası
+olarak hesabın Gmail adresi, Google'ın onay ekranında görünüyor) ve Apple;
+iOS uygulaması `flutterfire configure` ile kaydedildi,
+`GoogleService-Info.plist` Runner hedefinde (depoda değil, `.gitignore`),
+`REVERSED_CLIENT_ID` Info.plist'te. `.firebaserc` depoda. Kalan: Apple
+jetonu iptali için OAuth code flow anahtarı (7.3), Android uygulaması.
+
 **7.1 Proje:** [console.firebase.google.com](https://console.firebase.google.com)
 → yeni proje (Analytics **kapalı**: uygulama analiz kullanmıyor ve gizlilik
 politikası bunu söylüyor). Konum: `eur3` (Avrupa) — KVKK ve GDPR açısından
