@@ -45,7 +45,11 @@ class ReleaseConfig {
   static const String admobBannerUnitAndroid = placeholder;
 
   /// Kullanıcının haklarını kullanacağı ve soru soracağı adres.
-  static const String? supportEmail = null;
+  ///
+  /// Tür bilerek boş olabilir: `null`'ken uygulama ve site yer tutucu
+  /// gösteriyor, denetleyici eksik sayıyor.
+  // ignore: unnecessary_nullable_for_final_variable_declarations
+  static const String? supportEmail = 'niluapp@proton.me';
 
   /// Doldurulmamış alanın değeri.
   static const String placeholder = 'YER_TUTUCU';

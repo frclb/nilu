@@ -329,9 +329,12 @@ zorunlu tutar (App Store Review Guideline 5.1.1(v)).
 - Apple jetonunun iptali için Firebase'deki Apple sağlayıcısına anahtar
   girilmeli (SETUP_KEYS.md §7.3).
 
-### Destek e-postası ⬜ — **engelleyici**
+### Destek e-postası ✅
+**niluapp@proton.me** (Proton Mail, ücretsiz; 2026-10-27'de açıldı).
 Politikanın 10. bölümü (haklar) ve Şartların 12. bölümü (iletişim) aynı
-adresi gösteriyor; adres `lib/core/app_info.dart` → `AppInfo.supportEmail`.
+adresi gösteriyor; adres `lib/core/release_config.dart` →
+`ReleaseConfig.supportEmail`. Site de oradan okuyor (destek sayfası,
+politika, şartlar). Google Play'in "iletişim e-postası" alanına da bu adres.
 Boşken ekranda dilin köşeli parantezli yer tutucusu görünüyor
 (`legal_email_placeholder`) — bilerek: gözden kaçmasın.
 

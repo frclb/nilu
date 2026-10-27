@@ -77,8 +77,9 @@ class ReleaseConfig {
     final eksikler = checkRelease(Directory.current).map((i) => i.what);
     expect(eksikler, contains(contains('RevenueCat')));
     expect(eksikler, contains(contains('AdMob iOS App ID')));
-    expect(eksikler, contains(contains('Destek e-postası')));
     expect(eksikler, contains(contains('GoogleService-Info.plist')));
+    // Destek e-postası girildi.
+    expect(eksikler, isNot(contains(contains('Destek e-postası'))));
   });
 
   test('Google test kimlikleriyle yayına çıkılmıyor', () {
