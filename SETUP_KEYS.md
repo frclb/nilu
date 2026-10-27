@@ -178,6 +178,25 @@ Doldurulacak alanlar ve uygulamanın gerçeğiyle uyumu
 - **Gizlilik politikası URL'si** — zorunlu alan, uygulama içindeki metnin aynısı
   bir web sayfasında yayında olmalı.
 
+**Mağaza sayfası (metinler ve ekran görüntüleri) fastlane ile yükleniyor.**
+Kaynak `STORE_LISTING.md` ve `store_assets/`; `tool/asc_metadata.py` ikisini
+fastlane düzenine (`build/fastlane/`) diziyor. Kimlik: App Store Connect →
+Users and Access → Integrations → **App Store Connect API** → Team Keys,
+rol App Manager (`AuthKey_….p8`, depoda değil). fastlane `metadata`
+klasörünü görsün diye `build/fastlane`'in içinden çalıştırılıyor:
+
+```bash
+python3 tool/asc_metadata.py
+cd build/fastlane && fastlane deliver --api_key_path <anahtar.json> \
+  --app_identifier com.furkan.rcperiodtracker --app_version 1.0 \
+  --metadata_path ./metadata --screenshots_path ./screenshots \
+  --overwrite_screenshots true --skip_binary_upload true --force true
+```
+
+`<anahtar.json>`: `{"key_id", "issuer_id", "key": "<.p8 içeriği>"}` —
+`key_filepath` kabul edilmiyor. İlk sürümde inceleme bilgileri yoksa deliver
+en sonda "No data" ile duruyor; metinler o noktada yüklenmiş oluyor.
+
 ---
 
 ## 4. Abonelik ürünleri

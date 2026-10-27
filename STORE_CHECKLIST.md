@@ -230,21 +230,28 @@ Aşağıdakiler **koddan çıkarılmıştır** — formu buna göre doldurun.
 Firebase açık olacağı için beyan aşağıdaki gibi, **isteğe bağlı** toplamayı da
 kapsayarak yapılmalı — Apple isteğe bağlı toplanan veriyi de beyan istiyor.
 
-### Apple — App Privacy
-- "Data Used to Track You": **Hayır** (reklamlar kişiselleştirilmiyor, ATT istenmiyor)
-- "Data Linked to You" (amaç: **App Functionality**; hiçbiri izleme ya da
-  reklam için değil):
-  - **Health & Fitness → Health**: bulut eşitleme açıksa kayıtların kopyası;
-    partner paylaşımı açıksa yakınlık durumu
-  - **Contact Info → Email Address, Name**: Apple ya da Google ile giriş
-    yapılırsa (Apple'da e-posta gizlenebiliyor)
-  - **User Content → Other User Content**: eşitleme açıksa gün notları
-  - **Identifiers → User ID**: hesap kimliği ya da partner için anonim kimlik
-  - **Purchases → Purchase History**: abonelik (RevenueCat)
-- "Data Not Linked to You": **Identifiers → Device ID** (reklam,
-  kişiselleştirilmemiş)
-- Formda her kategoride "optional" ayrımı yok; açıklama alanı olmadığı için
-  politika §4 isteğe bağlı olduğunu anlatıyor.
+### Apple — App Privacy ✅ (2026-10-27'de yayınlandı)
+Uygulamanın kendi `PrivacyInfo.xcprivacy`'si ve kütüphanelerin (AdMob, UMP,
+Firebase, RevenueCat) gizlilik dosyaları birlikte okunarak dolduruldu: Apple
+eklenen kodun topladığını da beyan istiyor.
+
+- "Data Used to Track You": **Hayır** — hiçbir tür izleme için
+  işaretlenmedi (reklamlar kişiselleştirilmiyor, ATT istenmiyor; AdMob'un
+  dosyası Device ID'yi "tracking" diye geçiyor ama bu yalnızca ATT izni
+  verilince ve kişiselleştirilmiş reklamda geçerli).
+- "Data Linked to You":
+  - App Functionality: **Name, Email Address** (Apple/Google ile giriş),
+    **Health**, **Sensitive Info** (gebelik verisi; bulut yedeği açıksa),
+    **Other User Content** (notlar), **User ID**, **Purchase History**
+  - Third-Party Advertising + Analytics (AdMob): **Coarse Location** (IP'den;
+    UMP için App Functionality da), **Device ID**, **Product Interaction**
+    (UMP için App Functionality da), **Advertising Data**
+- "Data Not Linked to You": **Crash Data** (Analytics), **Performance Data**
+  ve **Other Diagnostic Data** (Analytics, Third-Party Advertising; UMP
+  için App Functionality)
+- Gizlilik politikası §7 reklam ağının IP adresi gibi teknik bilgileri
+  aldığını söylüyor; beyanla uyumlu. Yeni bir SDK eklenirse önce
+  `ios/Pods/**/PrivacyInfo.xcprivacy` okunup beyan güncellenmeli.
 
 ### Google Play — Data safety
 Play Console → Politika → Uygulama içeriği → Veri güvenliği. Formun
