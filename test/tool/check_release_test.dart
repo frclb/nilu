@@ -75,10 +75,12 @@ class ReleaseConfig {
 
   test('bugünkü proje: hesaplar bağlanmadığı için eksikler listeleniyor', () {
     final eksikler = checkRelease(Directory.current).map((i) => i.what);
-    expect(eksikler, contains(contains('RevenueCat')));
-    expect(eksikler, contains(contains('AdMob iOS App ID')));
     expect(eksikler, contains(contains('GoogleService-Info.plist')));
-    // Destek e-postası girildi.
+    expect(eksikler, contains(contains('RevenueCat Google Play')));
+    // iOS hesapları bağlandı: RevenueCat, AdMob, destek e-postası.
+    expect(eksikler, isNot(contains(contains('RevenueCat App Store'))));
+    expect(eksikler, isNot(contains(contains('AdMob iOS App ID'))));
+    expect(eksikler, isNot(contains(contains('GADApplicationIdentifier'))));
     expect(eksikler, isNot(contains(contains('Destek e-postası'))));
   });
 

@@ -330,9 +330,12 @@ class ReleaseConfig {
       expect(html, contains('Google LLC'));
     });
 
-    test('bugün: AdMob hesabı yokken app-ads.txt yok, site haritası var', () {
-      expect(site.publisherId, isNull);
-      expect(File('${cikti.path}/app-ads.txt').existsSync(), isFalse);
+    test('bugün: AdMob bağlı, app-ads.txt ve site haritası var', () {
+      expect(site.publisherId, 'pub-1004252412866238');
+      expect(
+        oku('app-ads.txt'),
+        'google.com, pub-1004252412866238, DIRECT, f08c47fec0942fa0\n',
+      );
       expect(site.baseUrl, 'https://frclb.github.io/nilu');
       expect(
         oku('sitemap.xml'),

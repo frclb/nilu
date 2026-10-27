@@ -25,10 +25,11 @@ class ReleaseConfig {
   /// `ios/Runner/Info.plist` içindeki `GADApplicationIdentifier` ile aynı
   /// olmalı (denetleyici karşılaştırıyor). app-ads.txt'deki yayıncı
   /// kimliği de bundan türetiliyor.
-  static const String admobAppIdIos = placeholder;
+  static const String admobAppIdIos = 'ca-app-pub-1004252412866238~9274619048';
 
   /// AdMob → Ad units → Banner: `ca-app-pub-…/…`.
-  static const String admobBannerUnitIos = placeholder;
+  static const String admobBannerUnitIos =
+      'ca-app-pub-1004252412866238/6648455703';
 
   /// RevenueCat → Project settings → API keys → Google Play için **public**
   /// SDK anahtarı (`goog_` ile başlar).
