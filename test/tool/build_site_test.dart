@@ -98,13 +98,17 @@ void main() {
   });
 
   test('dış kaynak yok: yazı tipi, betik, analiz', () {
-    final dis = RegExp(r'''(src|href)="(https?:)?//''');
+    final dis = RegExp(r'''(src|href)="((?:https?:)?//[^"]*)"''');
     for (final f in cikti.listSync(recursive: true).whereType<File>()) {
       if (!f.path.endsWith('.html')) continue;
       final html = f.readAsStringSync();
-      // hreflang bağlantıları baseUrl ile mutlak olabilir; site henüz
-      // adressiz, o yüzden hiçbiri dışarıyı göstermemeli.
-      expect(dis.hasMatch(html), isFalse, reason: f.path);
+      // hreflang ve canonical bağlantıları baseUrl ile mutlak; onlar sitenin
+      // kendisi. Mağaza rozetleri bugün yok (bkz. "bugün" testi).
+      final disarisi = dis
+          .allMatches(html)
+          .map((m) => m[2]!)
+          .where((u) => !u.startsWith('${site.baseUrl}/'));
+      expect(disarisi, isEmpty, reason: f.path);
     }
     expect(oku('assets/style.css'), isNot(contains('@import')));
     expect(oku('assets/style.css'), isNot(contains('url(http')));
@@ -289,10 +293,14 @@ class ReleaseConfig {
       expect(html, contains('Google LLC'));
     });
 
-    test('bugün: hesap yokken app-ads.txt ve site haritası yok', () {
+    test('bugün: AdMob hesabı yokken app-ads.txt yok, site haritası var', () {
       expect(site.publisherId, isNull);
       expect(File('${cikti.path}/app-ads.txt').existsSync(), isFalse);
-      expect(File('${cikti.path}/sitemap.xml').existsSync(), isFalse);
+      expect(site.baseUrl, 'https://frclb.github.io/nilu');
+      expect(
+        oku('sitemap.xml'),
+        contains('<loc>https://frclb.github.io/nilu/tr/privacy/</loc>'),
+      );
     });
   });
 }
