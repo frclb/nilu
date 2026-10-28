@@ -145,12 +145,13 @@ class _ActiveState extends StatelessWidget {
     );
   }
 
-  /// Aboneliği yönetme mağazanın işi.
+  /// Aboneliği yönetme mağazanın işi: mağazanın abonelikler sayfası
+  /// doğrudan açılıyor, açılamazsa yol tarif ediliyor.
   ///
-  /// Apple, uygulama içinde iptal düğmesi koymayı değil sistem ayarlarına
-  /// yönlendirmeyi istiyor; yol tarif ediliyor. Google Play'in abonelikler
-  /// sayfası ise bir bağlantı: doğrudan açılıyor, açılamazsa yol tarif
-  /// ediliyor.
+  /// iOS'ta önceden yalnızca yol tarif ediliyordu ("Ayarlar → Apple
+  /// Kimliği → Abonelikler"); TestFlight'ta "direkt ayarlara gönderebilir
+  /// miyiz" diye soruldu. App Store'un abonelikler bağlantısı hesabın
+  /// Abonelikler ekranını açıyor.
   Future<void> _openManageSubscriptions(BuildContext context) async {
     final snack = AppSnack.of(context);
     final hint = context.tr(
@@ -158,16 +159,14 @@ class _ActiveState extends StatelessWidget {
           ? 'premium_manage_hint_android'
           : 'premium_manage_hint',
     );
-    if (AppPlatform.isAndroid) {
-      try {
-        final opened = await launchUrl(
-          Uri.parse(AppPlatform.playSubscriptionsUrl),
-          mode: LaunchMode.externalApplication,
-        );
-        if (opened) return;
-      } catch (e) {
-        debugPrint('Could not open Play subscriptions: $e');
-      }
+    try {
+      final opened = await launchUrl(
+        Uri.parse(AppPlatform.subscriptionsUrl),
+        mode: LaunchMode.externalApplication,
+      );
+      if (opened) return;
+    } catch (e) {
+      debugPrint('Could not open store subscriptions: $e');
     }
     snack.show(hint);
   }

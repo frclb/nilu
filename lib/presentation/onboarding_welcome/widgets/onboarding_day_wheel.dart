@@ -103,28 +103,44 @@ class OnboardingDayWheel extends StatelessWidget {
                     childCount: max - min + 1,
                     builder: (context, index) {
                       final days = index + min;
-                      final isSelected = days == selected;
-                      return Center(
-                        child: AnimatedDefaultTextStyle(
-                          duration: const Duration(milliseconds: 200),
-                          style:
-                              (theme.textTheme.titleLarge ?? const TextStyle())
-                                  .copyWith(
-                                    fontSize: isSelected ? 26 : 20,
-                                    fontWeight: isSelected
-                                        ? FontWeight.w800
-                                        : FontWeight.w500,
-                                    color: isSelected
-                                        ? scheme.onPrimary
-                                        : t.textMuted.withAlpha(150),
-                                  ),
-                          child: Text(
-                            context.tr(
-                              'onb_days_count',
-                              params: {'n': '$days'},
+                      // Hapın altındaki satır çarkın **anlık konumundan**,
+                      // ekranın tuttuğu `selected`'tan değil. Önceden
+                      // `selected` esas alınıyordu; TestFlight'ta (iPhone,
+                      // iOS 27) ortada 28 dururken hap koyu ve rakam soluk
+                      // çizildi: iki değer ayrışınca seçili gün hapın
+                      // içinde görünmüyordu. `selected` yalnızca çark
+                      // yerleşmeden önceki ilk kare için.
+                      return ListenableBuilder(
+                        listenable: controller,
+                        builder: (context, _) {
+                          final center = controller.hasClients
+                              ? controller.selectedItem
+                              : selected - min;
+                          final isSelected = index == center;
+                          return Center(
+                            child: AnimatedDefaultTextStyle(
+                              duration: const Duration(milliseconds: 200),
+                              style:
+                                  (theme.textTheme.titleLarge ??
+                                          const TextStyle())
+                                      .copyWith(
+                                        fontSize: isSelected ? 26 : 20,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w800
+                                            : FontWeight.w500,
+                                        color: isSelected
+                                            ? scheme.onPrimary
+                                            : t.textMuted.withAlpha(150),
+                                      ),
+                              child: Text(
+                                context.tr(
+                                  'onb_days_count',
+                                  params: {'n': '$days'},
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       );
                     },
                   ),

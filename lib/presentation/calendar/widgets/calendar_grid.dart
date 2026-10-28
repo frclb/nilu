@@ -578,15 +578,19 @@ class _DayTile extends StatelessWidget {
     final t = context.tokens;
     Color textColor;
     var textWeight = FontWeight.w500;
-    if (isFaded) {
-      textColor = t.textFaint.withAlpha(160);
-    } else if (isPeriod) {
+    // Dolgulu günler (regl, seçili) ay dışında olsa da dolgunun kontrast
+    // rengini alıyor. Önceden ay dışı her gün soluk griydi: önceki aydan
+    // taşan regl günleri kırmızı bandın, seçili gün koyu dairenin üstünde
+    // okunmuyordu (TestFlight bulgusu: "kırmızı kısım renkler ayrışmıyor").
+    if (isPeriod) {
       // Akış rengi koyu temada açık pembe; beyaz metin orada okunmuyor.
       textColor = AppContrast.on(t.flow);
       textWeight = FontWeight.w700;
     } else if (isSelected) {
       textColor = theme.colorScheme.onPrimary;
       textWeight = FontWeight.w700;
+    } else if (isFaded) {
+      textColor = t.textFaint.withAlpha(160);
     } else if (isToday) {
       textColor = theme.colorScheme.primary;
       textWeight = FontWeight.w700;

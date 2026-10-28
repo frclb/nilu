@@ -22,4 +22,13 @@ abstract final class AppPlatform {
   static const String playSubscriptionsUrl =
       'https://play.google.com/store/account/subscriptions'
       '?package=com.furkan.rcperiodtracker';
+
+  /// App Store'un abonelikler sayfası. iOS bu bağlantıyı App Store
+  /// uygulamasında, hesabın "Abonelikler" ekranında açıyor.
+  static const String appStoreSubscriptionsUrl =
+      'https://apps.apple.com/account/subscriptions';
+
+  /// Bu platformun abonelik yönetimi sayfası.
+  static String get subscriptionsUrl =>
+      isAndroid ? playSubscriptionsUrl : appStoreSubscriptionsUrl;
 }

@@ -89,6 +89,11 @@ class SignInButton extends StatelessWidget {
 
     // Devre dışıyken bütün düğme soluyor: logo dosyasının zemini opak,
     // yalnızca zemini soldurmak logonun çevresinde kutu bırakırdı.
+    //
+    // Basma efekti de aynı sebeple içeriğin **üstünde**. Önceden InkWell
+    // efekti düğmenin zeminine çiziyordu, logo onun üstünde kalıyordu:
+    // basınca zemin açılıyor, logonun opak siyahı açılmıyordu ve elmanın
+    // çevresinde ayrı bir siyah kutu beliriyordu (TestFlight bulgusu).
     return Semantics(
       button: true,
       enabled: onPressed != null,
@@ -101,38 +106,45 @@ class SignInButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             side: kenar == null ? BorderSide.none : BorderSide(color: kenar),
           ),
-          child: InkWell(
-            onTap: onPressed,
-            child: SizedBox(
-              width: double.infinity,
-              height: height,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    isaret,
-                    Flexible(
-                      child: Text(
-                        label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        // Sabit yükseklikli düğmede büyük yazı ayarı yazıyı
-                        // kesmesin; sistem düğmesi de büyümüyor.
-                        textScaler: MediaQuery.textScalerOf(
-                          context,
-                        ).clamp(maxScaleFactor: 1.2),
-                        style: TextStyle(
-                          fontSize: _titleSize,
-                          fontWeight: FontWeight.w600,
-                          color: yazi,
+          child: Stack(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: height,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      isaret,
+                      Flexible(
+                        child: Text(
+                          label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          // Sabit yükseklikli düğmede büyük yazı ayarı
+                          // yazıyı kesmesin; sistem düğmesi de büyümüyor.
+                          textScaler: MediaQuery.textScalerOf(
+                            context,
+                          ).clamp(maxScaleFactor: 1.2),
+                          style: TextStyle(
+                            fontSize: _titleSize,
+                            fontWeight: FontWeight.w600,
+                            color: yazi,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
+              Positioned.fill(
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: InkWell(onTap: onPressed),
+                ),
+              ),
+            ],
           ),
         ),
       ),
