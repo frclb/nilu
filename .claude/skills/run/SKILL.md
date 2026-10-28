@@ -16,8 +16,8 @@ Web'de açılan şey uygulamanın kendisi değil.
 ## Sıra
 
 ```bash
-D=AFD1D088-3A6A-4228-9B23-C2F6D2F1CCD6   # iPhone 17 Pro Max
-# iPad için: C1B3155C-6E26-4C32-B658-F936A5A06BC0 (iPad Pro 13")
+D=1A6311E5-671B-4158-905D-14698AD15330   # iPhone 17 Pro Max (iOS 26.2)
+# iPad için: 23AD5675-0674-4425-B5AC-EEC2ED19C2B5 (iPad Pro 13", iOS 26.2)
 
 xcrun simctl boot $D
 sleep 20                                  # boot bitmeden install başarısız olur
