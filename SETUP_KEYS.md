@@ -370,7 +370,7 @@ eklendi; App ID `ca-app-pub-1004252412866238~9274619048`, banner birimi
 ("Nilu - AB rizasi": İzin ver, İzin verme ve Seçenekleri yönet; tüm AEA
 ülkelerinde "İzin verme" açık; İngilizce + 26 dil; gizlilik politikası
 `…/en/privacy/`). Kalan: yayından sonra App Store'a bağlamak (6.1),
-`app-ads.txt` kökte (6.5), ödeme profili.
+ödeme profili. `app-ads.txt` kökte yayında (6.5).
 
 **6.1 Uygulamayı ekle:** Apps → Add app → iOS. "Mağazada listeli mi?"
 sorusuna uygulama henüz yayında değilse **hayır**; yayına çıktıktan sonra
@@ -417,6 +417,13 @@ GitHub'ın proje sitesi (`kullanici.github.io/nilu/`) kök değil. İki yol:
   dosya kendiliğinden doğru yerde olur.
 
 Programatik talebin büyük kısmı bu dosyayı arıyor; yoksa eCPM düşer.
+
+**Yapıldı (2026-10-28):** kullanıcı sitesi `frclb/frclb.github.io`;
+`https://frclb.github.io/app-ads.txt` yayında, kök Nilu'nun sitesine
+yönlendiriyor. `github.io` genel sonek listesinde olduğu için AdMob
+`frclb.github.io`'yu kök sayıyor; mağazadaki pazarlama adresi
+(`frclb.github.io/nilu/…`) olduğu gibi kalabilir. Yayıncı kimliği değişirse
+iki depodaki dosya da güncellenmeli.
 
 **6.6 Test cihazı:** Settings → Test devices → cihazını ekle. **Kendi reklamına
 tıklama** — geçersiz trafik hesabı kapattırıyor ve geri dönüşü zor.
