@@ -6,8 +6,8 @@ import '../../../core/firebase/firebase_config.dart';
 /// Giriş sağlayıcısı.
 enum AccountProvider { apple, google }
 
-/// Apple ya da Google ile giriş yapmış kullanıcı. Anonim (yalnızca partner
-/// eşleşmesi için açılmış) kimlik bir hesap sayılmıyor.
+/// Apple ya da Google ile giriş yapmış kullanıcı. Eski sürümlerden kalmış
+/// anonim bir kimlik hesap sayılmıyor.
 @immutable
 class AccountUser {
   final String uid;
@@ -29,11 +29,7 @@ class SignInResult {
   final SignInStatus status;
   final AccountUser? user;
 
-  /// Anonim kimlik hesaba bağlanamadı, var olan bir hesaba geçildi: kimlik
-  /// değişti. Bu cihazdaki partner bağlantısı eski kimliğe bağlıydı.
-  final bool switchedIdentity;
-
-  const SignInResult(this.status, {this.user, this.switchedIdentity = false});
+  const SignInResult(this.status, {this.user});
 }
 
 /// Hesap girişi. Testte sahtesiyle değiştiriliyor.
@@ -57,10 +53,8 @@ abstract class AccountAuth {
 /// (`signInWithProvider`): ayrı bir giriş paketi yok. Apple'da iOS'un yerel
 /// "Apple ile giriş" sayfası, Google'da sistemin güvenli web sayfası.
 ///
-/// Partner eşleşmesi için zaten anonim bir kimlik varsa hesap **ona
-/// bağlanıyor** (`linkWithProvider`): kimlik değişmiyor, eşleşme kopmuyor.
-/// Hesap başka bir cihazda daha önce kullanılmışsa bağlanamaz; o zaman o
-/// hesaba geçiliyor.
+/// Partner eşleşmesi de hesap istiyor; anonim kimlik yok. Eskiden eşleşme
+/// için açılan anonim kimliğe hesap bağlanıyordu (`linkWithProvider`).
 class FirebaseAccountAuth implements AccountAuth {
   FirebaseAuth get _auth => FirebaseAuth.instance;
 
@@ -110,30 +104,7 @@ class FirebaseAccountAuth implements AccountAuth {
   Future<SignInResult> signIn(AccountProvider provider) async {
     if (!isAvailable) return const SignInResult(SignInStatus.unavailable);
     final saglayici = _provider(provider);
-    final simdiki = _auth.currentUser;
     try {
-      if (simdiki != null && simdiki.isAnonymous) {
-        try {
-          final c = await simdiki.linkWithProvider(saglayici);
-          return SignInResult(SignInStatus.signedIn, user: fromUser(c.user));
-        } on FirebaseAuthException catch (e) {
-          const zatenVar = {
-            'credential-already-in-use',
-            'email-already-in-use',
-            'account-exists-with-different-credential',
-          };
-          if (!zatenVar.contains(e.code)) rethrow;
-          final kimlik = e.credential;
-          final c = kimlik != null
-              ? await _auth.signInWithCredential(kimlik)
-              : await _auth.signInWithProvider(saglayici);
-          return SignInResult(
-            SignInStatus.signedIn,
-            user: fromUser(c.user),
-            switchedIdentity: true,
-          );
-        }
-      }
       final c = await _auth.signInWithProvider(saglayici);
       return SignInResult(SignInStatus.signedIn, user: fromUser(c.user));
     } on FirebaseAuthException catch (e) {

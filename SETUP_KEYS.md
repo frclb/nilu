@@ -284,8 +284,14 @@ fark aynı satışta yaklaşık %20 daha fazla gelir demek.
 **Yapıldı (2026-10-27):** uygulama kaydı "Nilu · Regl & Adet Takvimi"
 (Apple ID 6827515554, SKU `nilu-ios-001`); grup **Premium**; ürünler
 `nilu_premium_monthly` (1 ay) ve `nilu_premium_annual` (1 yıl), fiyatlar
-yukarıdaki gibi. Kalan: ülkeler (Availability), altı dilde görünen ad ve
-açıklama, inceleme ekran görüntüsü.
+yukarıdaki gibi. Ülkeler, altı dilde görünen ad ve açıklama tamam. İnceleme
+görüntüsü 2026-10-28'de yüklendi; iki ürün de **Ready to Submit**.
+
+İnceleme görüntüsü cihazdan değil, paywall'ın kendi widget'ından çizildi:
+sözleşme aktif olmadan StoreKit fiyat döndürmüyor ve ekran "kullanılamıyor"
+gösteriyor. `test/presentation/premium_paywall_test.dart`'taki sahte
+modelle aynı yol; İngilizce, ABD fiyatları ($3.99 / $23.99), planlar
+görünecek kadar kaydırılmış.
 
 Her ürün için:
 
@@ -425,13 +431,15 @@ eşleşmenin, hesap ekranı girişin kullanılamadığını söylüyor.
 
 **Yapıldı (2026-10-27, iOS):** proje **Nilu** (`nilu-3b870`, Analytics ve
 Gemini kapalı); Firestore `eur3`, kurallar ve indeksler yüklendi
-(`firebase deploy --only firestore`); giriş yöntemleri Anonim (otomatik
-temizlik **kapalı**: partner kimliği silinmesin), Google (destek e-postası
-olarak hesabın Gmail adresi, Google'ın onay ekranında görünüyor) ve Apple;
+(`firebase deploy --only firestore`); giriş yöntemleri Google (destek
+e-postası olarak hesabın Gmail adresi, Google'ın onay ekranında görünüyor) ve
+Apple. Anonim giriş 2026-10-28'de kapatıldı: partner eşleşmesi artık hesap
+istiyor;
 iOS uygulaması `flutterfire configure` ile kaydedildi,
 `GoogleService-Info.plist` Runner hedefinde (depoda değil, `.gitignore`),
-`REVERSED_CLIENT_ID` Info.plist'te. `.firebaserc` depoda. Kalan: Apple
-jetonu iptali için OAuth code flow anahtarı (7.3), Android uygulaması.
+`REVERSED_CLIENT_ID` Info.plist'te. `.firebaserc` depoda. Apple jetonu
+iptali için OAuth code flow anahtarı 2026-10-28'de girildi (7.3). Kalan:
+Android uygulaması.
 
 **7.1 Proje:** [console.firebase.google.com](https://console.firebase.google.com)
 → yeni proje (Analytics **kapalı**: uygulama analiz kullanmıyor ve gizlilik
@@ -458,17 +466,23 @@ Ardından `ios/Runner/Info.plist` → `CFBundleURLSchemes` içindeki
 
 **7.3 Giriş yöntemleri:** Authentication → Sign-in method:
 
-- **Anonymous** → aç. Partner eşleşmesi anonim bir kimlikle çalışıyor (e-posta,
-  ad yok); kimlik yalnızca eşleşme başlatılınca açılıyor.
+- **Anonymous** → **kapalı** kalsın. Partner eşleşmesi Apple ya da Google
+  hesabı istiyor; giriş yoksa kod ve okutma ekranı önce girişi soruyor.
+  Kurallar da anonim oturumu reddediyor (`isSignedIn`).
 - **Google** → aç, destek e-postasını seç.
 - **Apple** → aç. iOS'ta yerel "Apple ile giriş" kullanılıyor, Services ID
   gerekmiyor. Ama hesap silinirken Apple jetonunun iptali (App Store kuralı
   5.1.1(v)) için **OAuth code flow** alanları doldurulmalı: Apple Developer →
   Keys → yeni anahtar, "Sign in with Apple" işaretli → `.p8` dosyası, Key ID
   ve Team ID Firebase'deki Apple sağlayıcısına girilir.
+
+  Yapıldı: anahtar "Nilu Sign in with Apple", Key ID `2M3Z4CRJ96`, Team ID
+  `V8MCMH5GJ7`. `.p8` bir kez indirilebiliyor; yedeği depo dışında
+  saklanmalı. Firebase, code flow doluyken **Services ID**'yi boş kabul
+  etmiyor; yerel iOS girişinde jeton paket adına verildiği için oraya
+  `com.furkan.rcperiodtracker` yazıldı.
 - Settings → **User account linking** → "Link accounts that use the same
-  email" (varsayılan). Partner için açılmış anonim kimliğe hesap
-  bağlanıyor (`linkWithProvider`), uid değişmiyor.
+  email" (varsayılan).
 
 Hesap isteğe bağlı: giriş tek başına hiçbir sağlık verisi göndermiyor; bulut
 eşitleme ayrı bir açık rızayla açılıyor (`sync_consent_sheet.dart`).
@@ -492,11 +506,11 @@ ya her şeyi kapatır ya her şeyi açar.
 cd firebase_tests && npm install && npm test
 ```
 
-Emülatörde gerçek kural motoruyla 28 senaryo: partnerin kendini listeye
+Emülatörde gerçek kural motoruyla 31 senaryo: partnerin kendini listeye
 ekleyemediği, yalnızca kendini çıkarabildiği, onaysız okuyamadığı, davet
-kodunun yalnızca sahibince iptal edildiği; bulut kopyasını yalnızca Apple ya
-da Google ile girmiş sahibin okuyup yazabildiği, anonim kimliğin ve onaylı
-partnerin bile göremediği… CI'da da koşuyor.
+kodunun yalnızca sahibince iptal edildiği; bulut kopyasını yalnızca sahibin
+okuyup yazabildiği, onaylı partnerin bile göremediği; anonim bir oturumun
+hiçbir şeye erişemediği… CI'da da koşuyor.
 
 **7.6 İsteğe bağlı sertleştirme — App Check:** Firestore'a yalnızca gerçek
 uygulamanın erişmesini sağlar (App Attest). Yeni bir paket ve App Attest

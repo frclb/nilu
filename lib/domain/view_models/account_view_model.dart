@@ -16,8 +16,9 @@ enum AccountDeleteResult { deleted, cancelled, failed }
 
 /// İsteğe bağlı hesap ve bulut eşitleme.
 ///
-/// Uygulama hesapsız da eksiksiz çalışıyor. Hesap yalnızca verinin bir
-/// kopyasını buluta koymak ve başka cihazda geri almak için.
+/// Takip, kayıt ve analizler hesapsız çalışıyor. Hesap verinin bir
+/// kopyasını buluta koymak, başka cihazda geri almak ve partner eşleşmesi
+/// için.
 ///
 /// **Rıza.** Giriş yapmak tek başına hiçbir sağlık verisini göndermiyor.
 /// Eşitleme ancak kullanıcı açık rıza verince başlıyor (KVKK m.6: sağlık

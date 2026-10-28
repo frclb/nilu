@@ -46,8 +46,21 @@ beforeEach(async () => {
   await env.clearFirestore();
 });
 
+// Oturumlar Apple ya da Google hesabı: kurallar anonim oturumu kabul etmiyor.
 const db = (uid) =>
-  uid ? env.authenticatedContext(uid).firestore() : env.unauthenticatedContext().firestore();
+  uid
+    ? env
+        .authenticatedContext(uid, {
+          firebase: { sign_in_provider: 'apple.com', identities: { 'apple.com': ['1'] } },
+        })
+        .firestore()
+    : env.unauthenticatedContext().firestore();
+
+// Eski sürümlerin partner eşleşmesi için açtığı anonim oturum.
+const anonim = (uid) =>
+  env
+    .authenticatedContext(uid, { firebase: { sign_in_provider: 'anonymous', identities: {} } })
+    .firestore();
 
 /** Kuralları atlayarak başlangıç verisi yazar. */
 async function seed(fn) {
@@ -227,11 +240,6 @@ describe('syncData/{uid}: bulut kopyası', () => {
         firebase: { sign_in_provider: saglayici, identities: { [saglayici]: ['1'] } },
       })
       .firestore();
-  const anonim = (uid) =>
-    env
-      .authenticatedContext(uid, { firebase: { sign_in_provider: 'anonymous', identities: {} } })
-      .firestore();
-
   const meta = { version: 'v1', hash: 'abc', chunkCount: 1, schema: 1, disabled: false, updatedAt: serverTimestamp() };
   const parca = { index: 0, data: '{"format":"nilu-sync"}' };
 
@@ -251,7 +259,7 @@ describe('syncData/{uid}: bulut kopyası', () => {
     await assertSucceeds(getDoc(doc(fs, 'syncData/ada')));
   });
 
-  test('anonim kimliğe sonradan bağlanan hesap (aynı uid) erişir', async () => {
+  test('oturumun sağlayıcısı değil bağlı kimlikler sayılıyor', async () => {
     const fs = env
       .authenticatedContext('ada', {
         firebase: { sign_in_provider: 'anonymous', identities: { 'apple.com': ['1'] } },
@@ -310,5 +318,33 @@ describe('tanımsız yollar', () => {
   test('her şey kapalı', async () => {
     await assertFails(setDoc(doc(db('sahip'), 'baska/x'), { a: 1 }));
     await assertFails(getDoc(doc(db('sahip'), 'baska/x')));
+  });
+});
+
+describe('anonim oturum', () => {
+  // Partner eşleşmesi artık hesap istiyor. Eski bir sürümden kalmış anonim
+  // oturum ne kod açabilir ne istek bırakabilir ne de paylaşılan durumu
+  // okuyabilir.
+  test('eşleşme kodu açamaz, okuyamaz, istek bırakamaz', async () => {
+    await seed(async (fs) => setDoc(doc(fs, 'pairingTokens/KOD1'), { ownerUid: 'ada' }));
+    const fs = anonim('partner');
+    await assertFails(setDoc(doc(fs, 'pairingTokens/KOD2'), { ownerUid: 'partner' }));
+    await assertFails(getDoc(doc(fs, 'pairingTokens/KOD1')));
+    await assertFails(setDoc(doc(fs, 'pairingTokens/KOD1/requests/partner'), { at: 1 }));
+  });
+
+  test('kendi dokümanına bile yazamaz', async () => {
+    const fs = anonim('ada');
+    await assertFails(setDoc(doc(fs, 'users/ada'), { partners: [] }));
+    await assertFails(setDoc(doc(fs, 'intimacy/ada'), durum));
+  });
+
+  test('onaylı partner listesinde olsa da durumu okuyamaz', async () => {
+    await seed(async (fs) => {
+      await setDoc(doc(fs, 'users/ada'), { partners: ['partner'] });
+      await setDoc(doc(fs, 'intimacy/ada'), durum);
+    });
+    await assertFails(getDoc(doc(anonim('partner'), 'intimacy/ada')));
+    await assertSucceeds(getDoc(doc(db('partner'), 'intimacy/ada')));
   });
 });

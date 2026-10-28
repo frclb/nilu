@@ -20,10 +20,10 @@ import 'sync_consent_sheet.dart';
 
 /// Hesap ve bulut yedeği.
 ///
-/// Hesap isteğe bağlı: uygulamanın her özelliği girişsiz çalışıyor. Giriş
-/// yalnızca kayıtları buluta koyup başka bir cihazda geri almak için ve
-/// giriş tek başına hiçbir sağlık verisi göndermiyor — eşitleme ayrı bir
-/// açık rızayla açılıyor (bkz. [showSyncConsentSheet]).
+/// Hesap isteğe bağlı: takip, kayıt ve analizler girişsiz çalışıyor. Giriş
+/// kayıtları buluta koyup başka bir cihazda geri almak ve partnerle
+/// eşleşmek için; giriş tek başına hiçbir sağlık verisi göndermiyor —
+/// eşitleme ayrı bir açık rızayla açılıyor (bkz. [showSyncConsentSheet]).
 ///
 /// [restore]: karşılama ekranından, kurulumdan önce açıldı. Giriş ve rızadan
 /// sonra bulutta kayıt varsa kurulum atlanıp ana ekrana geçiliyor; yoksa
@@ -153,27 +153,11 @@ class _SignedOut extends StatelessWidget {
 
   Future<void> _signIn(BuildContext context, AccountProvider provider) async {
     final vm = context.read<AccountViewModel>();
-    final hadPartner = context.read<UserViewModel>().hasPartner;
     final sonuc = await vm.signIn(provider);
     if (!context.mounted) return;
 
     switch (sonuc.status) {
       case SignInStatus.signedIn:
-        if (sonuc.switchedIdentity && hadPartner) {
-          await showDialog<void>(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              content: Text(context.tr('account_switched_partner')),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  child: Text(context.tr('ok')),
-                ),
-              ],
-            ),
-          );
-          if (!context.mounted) return;
-        }
         if (!restore) return;
         // Geri yüklemede bir sonraki adım zaten belli: rıza ve indirme.
         if (vm.syncEnabled) {

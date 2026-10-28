@@ -58,11 +58,11 @@ class UserViewModel extends ChangeNotifier {
     _myId = prefs.getString('myId');
     _hasPartner = prefs.getBool('hasPartner') ?? (_partnerId != null);
 
-    // Eğer auth açıksa ve daha önce giriş yapılmışsa myId'yi oradan al
-    final user = _authDS.currentUser;
-    if (user != null) {
-      _myId = user.uid;
-      await prefs.setString('myId', user.uid);
+    // Hesapla giriş yapılmışsa kimlik onun uid'si.
+    final uid = _accountUid;
+    if (uid != null) {
+      _myId = uid;
+      await prefs.setString('myId', uid);
     }
 
     _isLoaded = true;
@@ -88,16 +88,26 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Kullanıcı kimliğini **tek bir yerden** üretir ve kalıcılaştırır.
+  String? get _accountUid => _authDS.accountUid;
+
+  /// Eşleşme sunucusu var ama hesap yok: eşleşmeden önce giriş gerekiyor.
+  bool get needsAccountForPairing =>
+      _firestoreDS.isAvailable && _accountUid == null;
+
+  /// Eşleşmede kullanılan kimlik; **tek bir yerden**.
   ///
-  /// Öncelik sırası:
-  /// 1. Zaten kayıtlı bir `myId` varsa o kullanılır.
-  /// 2. Firebase erişilebiliyorsa anonim giriş yapılıp UID kullanılır.
-  /// 3. Aksi halde yerel bir UUID üretilir (yerel-only mod).
+  /// 1. Sunucu varken kimlik hesabın uid'si. Hesap yoksa `null`: partner
+  ///    eşleşmesi Apple ya da Google ile giriş istiyor.
+  /// 2. Sunucu yoksa (yerel mod, testler) yerel bir UUID; eşleşme zaten
+  ///    kapalı.
   ///
-  /// QR eşleştirme ve onboarding aynı kimliği görsün diye her iki akış da
-  /// bu metodu çağırır — kimliği başka hiçbir yerde üretme.
-  Future<String> ensureMyId() async {
+  /// Eskiden hesap yoksa anonim bir Firebase kimliği açılıyordu. Kaldırıldı:
+  /// eşleşme ve paylaşılan durum artık hesaba bağlı, "Hesabı sil" hepsini
+  /// birlikte kaldırıyor.
+  ///
+  /// QR eşleştirme ve onay aynı kimliği görsün diye hepsi bu metodu
+  /// çağırır — kimliği başka hiçbir yerde üretme.
+  Future<String?> ensureMyId() async {
     final prefs = await SharedPreferences.getInstance();
 
     Future<String> sakla(String id) async {
@@ -110,10 +120,8 @@ class UserViewModel extends ChangeNotifier {
     }
 
     // Sunucu varken kimlik **oturumun** kimliği olmalı: kurallar yazanın
-    // kimliğine bakıyor. Önceden giriş bir kez başarısız olunca yerel bir
-    // UUID kalıcı olarak saklanıyor ve bir daha giriş denenmiyordu; o
-    // cihazdan eşleşme hiçbir zaman kurulamıyordu.
-    final oturum = _authDS.currentUser?.uid;
+    // kimliğine bakıyor.
+    final oturum = _accountUid;
     if (oturum != null) return sakla(oturum);
 
     if (!_firestoreDS.isAvailable) {
@@ -123,12 +131,7 @@ class UserViewModel extends ChangeNotifier {
           : sakla(const Uuid().v4());
     }
 
-    final uid = (await _authDS.signInAnonymously())?.user?.uid;
-    if (uid != null) return sakla(uid);
-    // Giriş başarısız: geçici kimlik, saklanmıyor — sonraki deneme gerçek
-    // kimliği alabilsin. Bu kimlikle yapılan yazımları kurallar reddeder
-    // ve ekran "bağlantı kurulamadı" der.
-    return _myId ?? const Uuid().v4();
+    return null;
   }
 
   /// Onboarding'i tamamlar.
@@ -136,8 +139,8 @@ class UserViewModel extends ChangeNotifier {
   /// Önceden burada her kullanıcı için anonim Firebase girişi yapılıyor,
   /// sunucuda bir profil dokümanı açılıyor ve bildirim jetonu yazılıyordu —
   /// partner modunu hiç kullanmayacak kullanıcı için bile. Kimlik artık
-  /// yalnızca eşleşme başlatılınca üretiliyor ([ensureMyId]); onboarding
-  /// sunucuya hiçbir şey yazmıyor.
+  /// hesaptan geliyor ([ensureMyId]); onboarding sunucuya hiçbir şey
+  /// yazmıyor.
   Future<void> completeOnboarding() => markOnboardingComplete();
 
   Future<void> setPartnerState({
@@ -192,6 +195,7 @@ class UserViewModel extends ChangeNotifier {
     required String token,
   }) async {
     final myId = await ensureMyId();
+    if (myId == null) return false;
     final previous = _partnerId;
     if (!await _firestoreDS.approvePartner(myId, requesterUid)) return false;
     if (previous != null && previous != requesterUid) {
@@ -227,6 +231,7 @@ class UserViewModel extends ChangeNotifier {
     required String ownerUid,
   }) async {
     final myId = await ensureMyId();
+    if (myId == null) return false;
     if (!await _firestoreDS.requestPairing(token, myId)) return false;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_requestTokenKey, token);

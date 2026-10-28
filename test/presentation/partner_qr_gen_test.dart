@@ -4,7 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:period_tracker/data/datasources/remote/firebase_auth_datasource.dart';
 import 'package:period_tracker/domain/services/pairing_token.dart';
+import 'package:period_tracker/domain/view_models/user_view_model.dart';
 import 'package:period_tracker/localization/app_localizations.dart';
 import 'package:period_tracker/presentation/partner_match/partner_qr_gen_screen.dart';
 
@@ -131,4 +133,31 @@ void main() {
     await tester.pump();
     expect(find.byType(QrImageView), findsOneWidget);
   });
+
+  testWidgets('hesap yoksa kod yerine giriş isteniyor', (tester) async {
+    // Partner eşleşmesi hesap istiyor. Önceden hesap yoksa anonim bir
+    // kimlik açılıyordu.
+    FlutterSecureStorage.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'onboarding_complete': true});
+
+    final remote = FakePartnerRemote();
+    final screen = PartnerQrGenScreen(remote: remote);
+    await pumpScreen(
+      tester,
+      screen,
+      size: const Size(390, 844),
+      userViewModel: UserViewModel(auth: _HesapYok(), firestore: remote),
+    );
+
+    expect(find.byType(QrImageView), findsNothing);
+    expect(find.byKey(const Key('partner_sign_in_required')), findsOneWidget);
+    expect(find.byKey(const Key('partner_sign_in_apple')), findsOneWidget);
+    expect(find.byKey(const Key('partner_sign_in_google')), findsOneWidget);
+    expect(remote.tokens, isEmpty, reason: 'girişsiz kod yayımlanmamalı');
+  });
+}
+
+class _HesapYok extends FirebaseAuthDataSource {
+  @override
+  String? get accountUid => null;
 }

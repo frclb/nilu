@@ -221,7 +221,7 @@ Aşağıdakiler **koddan çıkarılmıştır** — formu buna göre doldurun.
 | Hassas kişisel | Yakınlık/cinsel istek seçimleri | Cihazda **şifreli** | Yalnızca kullanıcı açıkça eşleşirse partnerine |
 | Kişisel bilgi | Profildeki ad, e-posta, doğum tarihi | Cihazda **şifreli**; bulut eşitleme açıksa Firestore'da | Hayır |
 | İletişim bilgisi | Hesabın e-postası ve adı — **yalnızca Apple ya da Google ile giriş yapılırsa** | Firebase Authentication | Hayır |
-| Tanımlayıcı | Anonim kullanıcı kimliği, partner kimliği — **yalnızca partner eşleşmesi başlatılırsa**; hesap kimliği — **yalnızca giriş yapılırsa** | Cihaz + Firebase | Hayır |
+| Tanımlayıcı | Hesap kimliği ve partner kimliği — **yalnızca Apple ya da Google ile giriş yapılırsa** (partner eşleşmesi de girişi istiyor) | Cihaz + Firebase | Hayır |
 | Cihaz kimliği | Reklam SDK'sı (kişiselleştirilmemiş reklam) | Google AdMob | Hayır |
 | Satın alma | Abonelik durumu | RevenueCat açıksa | Hayır |
 
@@ -279,7 +279,7 @@ kendi başlattığı aktarım; Play bunu paylaşım saymıyor.
 | Konum → Yaklaşık konum | AdMob (IP adresi) | Evet | Evet | Zorunlu | Reklam veya pazarlama, Analiz, Dolandırıcılık önleme/güvenlik/uyumluluk |
 | Kişisel bilgiler → Ad | Apple/Google ile giriş | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği, Hesap yönetimi |
 | Kişisel bilgiler → E-posta adresi | Apple/Google ile giriş | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği, Hesap yönetimi |
-| Kişisel bilgiler → Kullanıcı kimlikleri | Hesap kimliği; partner için anonim kimlik | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği, Hesap yönetimi |
+| Kişisel bilgiler → Kullanıcı kimlikleri | Hesap kimliği (partner eşleşmesi de onu kullanıyor) | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği, Hesap yönetimi |
 | Finansal bilgiler → Satın alma geçmişi | RevenueCat | Evet | Hayır | Zorunlu (RevenueCat'in rehberi) | Uygulama işlevselliği, Analiz |
 | Sağlık ve fitness → Sağlık bilgisi | Bulut eşitleme açıksa kayıtların kopyası (Health Connect'ten alınanlar dahil); partner paylaşımı açıksa yakınlık durumu | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği |
 | Uygulama etkinliği → Uygulama etkileşimleri | AdMob | Evet | Evet | Zorunlu | Reklam veya pazarlama, Analiz, Dolandırıcılık önleme/güvenlik/uyumluluk |
@@ -346,7 +346,7 @@ hangisinin geçerli olduğu belirsizleşir.
 
 ### Gizlilik etiketleri ⬜
 Politikanın 5. ve 6. bölümleri uygulamanın gerçekte kullandığı hizmetleri
-sayıyor: Firebase (anonim kimlik, partner eşleme), RevenueCat, Google AdMob. App Store
+sayıyor: Firebase (hesap, partner eşleme), RevenueCat, Google AdMob. App Store
 gizlilik etiketleri bunlarla tutarlı olmalı — özellikle reklam kimliği ve
 kullanım verisi kalemleri. Partner paylaşımını "yakınlık durumu" olarak
 beyan edin; döngü verisi cihazdan çıkmıyor.
@@ -429,7 +429,7 @@ Beyan edilenler koddan çıkarıldı:
 | Veri | Nereye gidiyor |
 |---|---|
 | Yakınlık durumu (sağlık) | `intimacy/{uid}` — yalnızca partner paylaşımı açıkken |
-| Kullanıcı kimliği | Firebase anonim UID |
+| Kullanıcı kimliği | Firebase hesap UID'si (Apple ya da Google ile giriş) |
 | Cihaz kimliği | Reklam (AdMob; bağlantısız, üçüncü taraf reklam amacı) |
 | Satın alma geçmişi | RevenueCat |
 

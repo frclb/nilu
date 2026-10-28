@@ -88,7 +88,6 @@ class FakeAccountAuth implements AccountAuth {
   bool available;
   AccountUser? _current;
   SignInStatus nextStatus = SignInStatus.signedIn;
-  bool switchIdentity = false;
   bool reauthOk = true;
   int reauthCalls = 0;
   String nextUid = 'hesap-1';
@@ -112,11 +111,7 @@ class FakeAccountAuth implements AccountAuth {
       provider: provider,
       email: 'ada@ornek.com',
     );
-    return SignInResult(
-      SignInStatus.signedIn,
-      user: _current,
-      switchedIdentity: switchIdentity,
-    );
+    return SignInResult(SignInStatus.signedIn, user: _current);
   }
 
   @override

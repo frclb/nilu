@@ -10,9 +10,11 @@ rules_version = '2';
 //   syncData/{uid}               -> bulut kopyasının üst bilgisi (HASSAS)
 //   syncData/{uid}/chunks/{i}    -> bulut kopyasının parçaları (HASSAS)
 //
-// Kimlik anonim ve yalnızca partner eşleşmesi başlatılınca açılıyor. Apple
-// ya da Google hesabı isteğe bağlı; yalnızca bulut eşitleme için (kullanıcı
-// açık rıza verdikten sonra, bkz. `firestore_sync_remote.dart`).
+// Kimlik her zaman bir Apple ya da Google hesabı. Hesap isteğe bağlı ama
+// sunucuya yazan iki özellik de onu istiyor: partner eşleşmesi ve bulut
+// eşitleme (kullanıcı açık rıza verdikten sonra, bkz.
+// `firestore_sync_remote.dart`). Anonim kimlik yok; eskiden partner
+// eşleşmesi onunla kuruluyordu.
 //
 // Temel ilke: kullanıcı yalnızca kendi verisine yazar. Erişim verme yetkisi
 // yalnızca verinin sahibinde.
@@ -49,8 +51,15 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Apple ya da Google hesabıyla oturum. Anonim oturum (Firebase'de
+    // kapalı, eski sürümlerden kalmış olabilir) hiçbir şeye erişemez.
+    //
+    // `sign_in_provider` değil `identities`: Firebase hesabın hangi
+    // sağlayıcılarla doğrulandığını orada tutuyor.
     function isSignedIn() {
-      return request.auth != null;
+      return request.auth != null
+        && request.auth.token.firebase.get('identities', {})
+             .keys().hasAny(['apple.com', 'google.com']);
     }
 
     function isOwner(uid) {
@@ -97,27 +106,11 @@ service cloud.firestore {
       }
     }
 
-    // Apple ya da Google hesabı bağlı mı? Anonim kimlik (yalnızca partner
-    // eşleşmesi için açılan) bulut kopyasına erişemez.
-    //
-    // `sign_in_provider` değil `identities`: anonim kimliğe hesap
-    // bağlandığında (`linkWithProvider`) uid aynı kalıyor ve oturumun
-    // sağlayıcısı değişmeyebiliyor; bağlı hesaplar ise `identities`'te.
-    function hasAccount() {
-      let kimlikler = request.auth.token.firebase.get('identities', {});
-      return isSignedIn()
-        && ('apple.com' in kimlikler || 'google.com' in kimlikler);
-    }
-
-    function isAccountOwner(uid) {
-      return isOwner(uid) && hasAccount();
-    }
-
     // Bulut eşitleme: yalnızca hesabın sahibi okur ve yazar. Partner dahil
     // başka hiç kimse — onaylı partner yalnızca `intimacy`'yi görüyor.
     match /syncData/{uid} {
-      allow read, delete: if isAccountOwner(uid);
-      allow create, update: if isAccountOwner(uid)
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
         && request.resource.data.keys().hasOnly(
              ['version', 'hash', 'chunkCount', 'schema', 'disabled', 'updatedAt'])
         && request.resource.data.chunkCount is int
@@ -125,8 +118,8 @@ service cloud.firestore {
         && request.resource.data.chunkCount <= 200;
 
       match /chunks/{index} {
-        allow read, delete: if isAccountOwner(uid);
-        allow create, update: if isAccountOwner(uid)
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
           && request.resource.data.keys().hasOnly(['index', 'data'])
           && request.resource.data.data is string;
       }

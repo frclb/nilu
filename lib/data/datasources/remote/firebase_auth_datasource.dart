@@ -18,21 +18,18 @@ class FirebaseAuthDataSource {
   User? get currentUser =>
       FirebaseConfig.isAvailable ? _auth.currentUser : null;
 
-  /// Anonim giriş yapar. Firebase yoksa null döner.
-  Future<UserCredential?> signInAnonymously() async {
-    if (!FirebaseConfig.isAvailable) return null;
-    try {
-      return await _auth.signInAnonymously();
-    } catch (e) {
-      debugPrint("Anonymous sign in error: $e");
-      return null;
-    }
+  /// Apple ya da Google hesabının uid'si; giriş yoksa `null`.
+  ///
+  /// Eski sürümlerden kalmış anonim bir oturum hesap sayılmıyor.
+  String? get accountUid {
+    final user = currentUser;
+    return user == null || user.isAnonymous ? null : user.uid;
   }
 
   /// Kimlik hesabını **kalıcı olarak** siler.
   ///
-  /// "Tüm verilerimi sil" yalnızca Firestore verisini siliyordu; partner
-  /// eşleşmesi için açılan anonim kimlik Firebase'de kalıyordu.
+  /// "Tüm verilerimi sil" yalnızca Firestore verisini siliyordu; kimlik
+  /// Firebase'de kalıyordu.
   ///
   /// Silinemezse (ör. bağlantı yok) `false` döner ki akış sessizce
   /// başarılı görünmesin.

@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:period_tracker/data/datasources/remote/firebase_auth_datasource.dart';
 import 'package:period_tracker/data/repositories/intimacy_repository.dart';
 import 'package:period_tracker/data/repositories/pairing_repository.dart';
 import 'package:period_tracker/data/repositories/share_settings_repository.dart';
@@ -34,9 +35,12 @@ void main() {
     SharedPreferences.resetStatic();
   });
 
+  /// Kayıtlı `myId` aynı zamanda giriş yapılmış hesabın uid'si: eşleşme
+  /// hesap istiyor.
   Future<UserViewModel> kullanici(Map<String, Object> prefs) async {
     SharedPreferences.setMockInitialValues(prefs);
     final vm = UserViewModel(
+      auth: _Hesap(prefs['myId'] as String?),
       firestore: remote,
       pairing: PairingRepository(remote: remote),
     );
@@ -52,6 +56,28 @@ void main() {
       await vm.completeOnboarding();
       expect(vm.onboardingComplete, isTrue);
       expect(remote.calls, isEmpty);
+    });
+  });
+
+  group('hesap', () {
+    test('hesap yoksa eşleşme kurulmuyor, sunucuya gidilmiyor', () async {
+      final vm = await kullanici({});
+      expect(vm.needsAccountForPairing, isTrue);
+      expect(await vm.ensureMyId(), isNull);
+      expect(
+        await vm.requestPartnerAccess(token: 'TOK', ownerUid: 'sahip'),
+        isFalse,
+      );
+      expect(await vm.approvePartnerRequest('yeni', token: 'TOK'), isFalse);
+      expect(remote.calls, isEmpty);
+      expect(vm.isPartner, isFalse);
+      expect(vm.hasPartner, isFalse);
+    });
+
+    test('hesapla giriş yapılmışsa kimlik hesabın uid\'si', () async {
+      final vm = await kullanici({'myId': 'sahip'});
+      expect(vm.needsAccountForPairing, isFalse);
+      expect(await vm.ensureMyId(), 'sahip');
     });
   });
 
@@ -312,4 +338,14 @@ void main() {
       vm.dispose();
     });
   });
+}
+
+/// Apple ya da Google ile giriş yapılmış (ya da yapılmamış) oturum.
+class _Hesap extends FirebaseAuthDataSource {
+  _Hesap(this.uid);
+
+  final String? uid;
+
+  @override
+  String? get accountUid => uid;
 }

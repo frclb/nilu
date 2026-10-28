@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/platform/app_haptics.dart';
 import '../../design_system/app_decor.dart';
 import '../../design_system/app_scrim.dart';
+import 'widgets/partner_sign_in_required.dart';
 import 'widgets/partner_unavailable_notice.dart';
 import 'widgets/scan_unavailable.dart';
 import '../../design_system/app_tokens.dart';
@@ -248,6 +249,20 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    // Eşleşme hesap istiyor: kamera giriş yapılınca açılıyor. Okutup sonra
+    // "istek gönderilemedi" demek yerine baştan söyleniyor.
+    if (_remote.isAvailable &&
+        context.watch<UserViewModel>().needsAccountForPairing) {
+      return Scaffold(
+        backgroundColor: context.tokens.background,
+        appBar: AppBar(title: Text(context.tr('partner_scan_title'))),
+        body: AppContentWidth(
+          child: PartnerSignInRequired(onSignedIn: () => setState(() {})),
+        ),
+      );
+    }
+
     // Kamera her temada koyu; geri dönülebiliyorsa buzlu bir daire içinde
     // geri düğmesi.
     final canPop = Navigator.of(context).canPop();

@@ -15,6 +15,7 @@ import '../../design_system/app_tokens.dart';
 import '../../domain/services/pairing_token.dart';
 import 'widgets/pairing_requests_section.dart';
 import 'widgets/partner_match_app_bar.dart';
+import 'widgets/partner_sign_in_required.dart';
 
 class PartnerQrGenScreen extends StatefulWidget {
   const PartnerQrGenScreen({super.key, this.remote});
@@ -44,6 +45,9 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
   /// bu durumda da QR gösteriliyordu; okutan kişi "geçersiz kod" görüyordu.
   bool _failed = false;
 
+  /// Hesap yok: eşleşme kodu Apple ya da Google ile girişten sonra.
+  bool _needsAccount = false;
+
   @override
   void initState() {
     super.initState();
@@ -51,13 +55,21 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
   }
 
   Future<void> _load() async {
-    setState(() => _failed = false);
+    setState(() {
+      _failed = false;
+      _needsAccount = false;
+    });
     if (!_remote.isAvailable) {
       setState(() => _failed = true);
       return;
     }
     // Kimlik üretimi tek bir yerde: UserViewModel.ensureMyId().
     final id = await context.read<UserViewModel>().ensureMyId();
+    if (!mounted) return;
+    if (id == null) {
+      setState(() => _needsAccount = true);
+      return;
+    }
     final token = await _pairing.currentToken(id);
     if (!mounted) return;
     setState(() {
@@ -70,7 +82,7 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
   Future<void> _rotate() async {
     setState(() => _rotating = true);
     final id = await context.read<UserViewModel>().ensureMyId();
-    final token = await _pairing.rotate(id);
+    final token = id == null ? null : await _pairing.rotate(id);
     if (!mounted) return;
     final snack = AppSnack.of(context);
     final failed = context.tr('partner_qr_gen_failed');
@@ -112,7 +124,9 @@ class _PartnerQrGenScreenState extends State<PartnerQrGenScreen> {
         showSettings: false,
       ),
       body: AppContentWidth(
-        child: _failed
+        child: _needsAccount
+            ? PartnerSignInRequired(onSignedIn: _load)
+            : _failed
             ? _Failed(unavailable: !_remote.isAvailable, onRetry: _load)
             : _token == null
             ? Center(child: CircularProgressIndicator(color: primary))
