@@ -319,6 +319,11 @@ eklendi; `appl_` anahtarı `release_config.dart`'ta. Projede şablondan kalan
 "Test Store" uygulaması ve "RCApp Pro" entitlement'ı var; yalnızca test
 anahtarıyla çalışıyorlar, yayını etkilemiyorlar.
 
+2026-10-28: App Store Connect API anahtarı da yüklendi (Key ID `8879865B4X`,
+Issuer `0fd78666-…`, Vendor # `94918390`); ürün durumları "Could not check"
+yerine App Store Connect'teki durumu gösteriyor. Fiyatlar uygulamaya bu
+anahtardan değil StoreKit'ten geliyor; anahtar panel ve rapor için.
+
 **5.1 Uygulamayı ekle:** Apps → App Store → Bundle ID `com.furkan.rcperiodtracker`.
 
 **5.2 App Store Connect bağlantısı:** RevenueCat'in satın almaları doğrulaması
