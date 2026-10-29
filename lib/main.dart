@@ -19,6 +19,7 @@ import 'data/datasources/ads_datasource.dart';
 import 'presentation/account/cloud_sync_trigger.dart';
 import 'presentation/lock/app_lock_gate.dart';
 import 'presentation/reminders/reminder_sync.dart';
+import 'presentation/splash/launch_intro.dart';
 import 'presentation/widgets_preview/home_widget_sync.dart';
 import 'presentation/calendar/view_models/calendar_view_model.dart';
 import 'domain/view_models/account_view_model.dart';
@@ -398,14 +399,19 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-                // Widget kilidin dışında: uygulama kilitliyken de ana
-                // ekran widget'ının günü doğru kalsın. Bulut eşitleme de:
-                // öne gelince kilit açılmadan önce başlayabilir.
-                child: HomeWidgetSync(
-                  child: CloudSyncTrigger(
-                    child: AppLockGate(
-                      child: ReminderSync(
-                        child: child ?? const SizedBox.shrink(),
+                // Açılış perdesi en üstte: kilit ekranı da altında açılıyor.
+                child: LaunchIntro(
+                  ready: widget.userViewModel,
+                  isReady: () => widget.userViewModel.isLoaded,
+                  // Widget kilidin dışında: uygulama kilitliyken de ana
+                  // ekran widget'ının günü doğru kalsın. Bulut eşitleme de:
+                  // öne gelince kilit açılmadan önce başlayabilir.
+                  child: HomeWidgetSync(
+                    child: CloudSyncTrigger(
+                      child: AppLockGate(
+                        child: ReminderSync(
+                          child: child ?? const SizedBox.shrink(),
+                        ),
                       ),
                     ),
                   ),

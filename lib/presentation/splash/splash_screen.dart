@@ -12,8 +12,9 @@ import '../../design_system/app_tokens.dart';
 /// dönen kullanıcının bir an onboarding görüp sonra ana ekrana sıçramasını
 /// engeller.
 ///
-/// Çoğu açılışta bir an görünüyor: dönen bir çark yerine sakin bir marka
-/// anı — sistemin açılış ekranındaki lotusun devamı.
+/// Soğuk açılışta üstünü açılış perdesi (`LaunchIntro`) örtüyor ve perde
+/// durum okunmadan kalkmıyor; yani bu ekran pratikte görünmüyor. Perde
+/// kaldırılırsa geri dönülecek yer burası.
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
