@@ -48,9 +48,32 @@
 				<string>com.googleusercontent.apps.989679229107-8de52th506192i01h27v6d8dh8qe39oq</string>
 			</array>
 		</dict>
+		<!--
+		  Partner davet sayfasının "Nilu'da aç" düğmesi: nilu://p#KOD.
+		  Bağlantının kendisi (https://frclb.github.io/nilu/p/#KOD) uygulamayı
+		  Universal Link olarak açıyor (Runner.entitlements); aynı alan
+		  adındaki sayfadan dokununca açmadığı için bu şema da var.
+		-->
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>com.furkan.rcperiodtracker.invite</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>nilu</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<!--
+	  Bağlantıları `app_links` karşılıyor (main.dart). Flutter'ın kendi derin
+	  bağlantı yönlendirmesi açık kalsaydı davet adresini (/nilu/p/) rota
+	  olarak açmaya çalışırdı.
+	-->
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-1004252412866238~9274619048</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

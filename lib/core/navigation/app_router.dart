@@ -482,7 +482,9 @@ GoRouter createAppRouter(
       GoRoute(
         path: '/partner_scan',
         name: RouteNames.partnerScan,
-        builder: (context, state) => const PartnerScanScreen(),
+        // `k`: davet bağlantısından gelen kod (bkz. `main.dart`).
+        builder: (context, state) =>
+            PartnerScanScreen(initialCode: state.uri.queryParameters['k']),
       ),
 
       GoRoute(

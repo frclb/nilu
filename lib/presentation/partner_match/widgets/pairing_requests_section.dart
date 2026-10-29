@@ -39,7 +39,12 @@ class _PairingRequestsSectionState extends State<PairingRequestsSection> {
   late final PairingRepository _pairing =
       widget.pairing ?? PairingRepository(remote: _remote);
 
-  String? _token;
+  /// İsteklerin dinlendiği kodlar: QR kodu ve açık davet bağlantısı.
+  /// Akışlar bir kez kuruluyor; her çizimde yenisi yeniden abone olurdu.
+  Map<String, Stream<QuerySnapshot<Map<String, dynamic>>>> _streams = {};
+
+  /// Açık davet bağlantısının kodu; onay ya da retten sonra kapanıyor.
+  String? _invite;
   final Set<String> _busy = {};
 
   @override
@@ -48,12 +53,24 @@ class _PairingRequestsSectionState extends State<PairingRequestsSection> {
     _loadToken();
   }
 
-  /// Yalnızca daha önce paylaşılmış bir kod varsa: sekmeyi açmak tek
-  /// başına kimlik ve kod üretip sunucuya yazmamalı.
+  /// Yalnızca daha önce paylaşılmış kodlar: sekmeyi açmak tek başına
+  /// kimlik ve kod üretip sunucuya yazmamalı.
   Future<void> _loadToken() async {
     final token = await _pairing.existingToken();
+    final invite = await _pairing.existingInvite();
     if (!mounted) return;
-    setState(() => _token = token);
+    setState(() {
+      _invite = invite;
+      _streams = {
+        for (final t in [?token, ?invite]) t: _remote.watchPairingRequests(t),
+      };
+    });
+  }
+
+  /// Davet bağlantısının işi bitti: tek kullanımlık, bir daha açılmasın.
+  Future<void> _closeInviteIfUsed(String token) async {
+    if (token != _invite) return;
+    await _pairing.closeInvite(token);
   }
 
   /// Önce sahip partnerin neyi göreceğini görüyor ve seçiyor; sonra
@@ -61,7 +78,7 @@ class _PairingRequestsSectionState extends State<PairingRequestsSection> {
   ///
   /// Önceden onay erişimi veriyor ama hiçbir şey göndermiyordu; partner
   /// sahip ayrıca paylaşana kadar boş bir ekran gördü.
-  Future<void> _approve(String requesterUid) async {
+  Future<void> _approve(String requesterUid, String token) async {
     final userViewModel = context.read<UserViewModel>();
     final intimacy = context.read<IntimacyViewModel>();
     final snack = AppSnack.of(context);
@@ -83,7 +100,7 @@ class _PairingRequestsSectionState extends State<PairingRequestsSection> {
     setState(() => _busy.add(requesterUid));
     final ok = await userViewModel.approvePartnerRequest(
       requesterUid,
-      token: _token!,
+      token: token,
     );
     // Onaydan sonra bu bölüm ağaçtan kalkabilir (ekran "bağlı" hâline
     // geçiyor); paylaşım ona bağlı değil.
@@ -92,6 +109,7 @@ class _PairingRequestsSectionState extends State<PairingRequestsSection> {
       snack.error(failed);
       return;
     }
+    await _closeInviteIfUsed(token);
 
     if (!karar.share) {
       // Daha önce verilmiş bir rıza açık kalmasın: "paylaşmadan" dendi.
@@ -116,22 +134,41 @@ class _PairingRequestsSectionState extends State<PairingRequestsSection> {
     }
   }
 
-  Future<void> _reject(String requesterUid) async {
+  Future<void> _reject(String requesterUid, String token) async {
     setState(() => _busy.add(requesterUid));
-    await _remote.clearPairingRequest(_token!, requesterUid);
+    await _remote.clearPairingRequest(token, requesterUid);
+    await _closeInviteIfUsed(token);
     if (!mounted) return;
     setState(() => _busy.remove(requesterUid));
   }
 
   @override
-  Widget build(BuildContext context) {
-    final token = _token;
-    if (token == null) return const SizedBox.shrink();
+  Widget build(BuildContext context) =>
+      _watch(_streams.entries.toList(), const []);
 
+  /// Her kodun akışını iç içe dinler, istekleri (kod, istekte bulunan)
+  /// olarak toplar.
+  Widget _watch(
+    List<MapEntry<String, Stream<QuerySnapshot<Map<String, dynamic>>>>> kalan,
+    List<(String, String)> istekler,
+  ) {
+    if (kalan.isEmpty) return _list(istekler);
+    final MapEntry(key: token, value: stream) = kalan.first;
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: _remote.watchPairingRequests(token),
+      stream: stream,
       builder: (context, snapshot) {
         final docs = snapshot.data?.docs ?? const [];
+        return _watch(kalan.sublist(1), [
+          ...istekler,
+          for (final d in docs) (token, d.id),
+        ]);
+      },
+    );
+  }
+
+  Widget _list(List<(String, String)> docs) {
+    return Builder(
+      builder: (context) {
         if (docs.isEmpty) return const SizedBox.shrink();
 
         final t = context.tokens;
@@ -156,12 +193,12 @@ class _PairingRequestsSectionState extends State<PairingRequestsSection> {
                 style: theme.textTheme.bodyMedium?.copyWith(color: t.textMuted),
               ),
               const SizedBox(height: 14),
-              for (final doc in docs)
+              for (final (token, uid) in docs)
                 _RequestTile(
-                  requesterUid: doc.id,
-                  busy: _busy.contains(doc.id),
-                  onApprove: () => _approve(doc.id),
-                  onReject: () => _reject(doc.id),
+                  requesterUid: uid,
+                  busy: _busy.contains(uid),
+                  onApprove: () => _approve(uid, token),
+                  onReject: () => _reject(uid, token),
                 ),
             ],
           ),

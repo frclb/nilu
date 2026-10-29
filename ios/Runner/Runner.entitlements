@@ -21,6 +21,17 @@
 	<key>com.apple.developer.healthkit</key>
 	<true/>
 	<!--
+	  Partner davet bağlantısı (https://frclb.github.io/nilu/p/#KOD)
+	  uygulamayı doğrudan açsın: Universal Link. Alan adının kökünde Apple'ın
+	  doğrulama dosyası var (/.well-known/apple-app-site-association,
+	  frclb/frclb.github.io deposu). Apple Developer'da App ID'de
+	  "Associated Domains" açık olmalı.
+	-->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:frclb.github.io</string>
+	</array>
+	<!--
 	  Apple ile giriş (isteğe bağlı hesap ve bulut eşitleme). Apple
 	  Developer'da App ID'de "Sign in with Apple" capability açık olmalı.
 	-->

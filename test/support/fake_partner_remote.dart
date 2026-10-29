@@ -26,6 +26,9 @@ class FakePartnerRemote extends FirestoreDataSource {
   /// Bırakılan istekler: kod → istekte bulunanlar.
   final Map<String, Set<String>> requests = {};
 
+  /// Davet bağlantıları: kod → (oluşturulma, kullanan).
+  final Map<String, ({DateTime createdAt, String? usedBy})> invites = {};
+
   /// Yapılan çağrıların adları, sırayla.
   final List<String> calls = [];
 
@@ -74,20 +77,54 @@ class FakePartnerRemote extends FirestoreDataSource {
 
   @override
   Future<bool> revokePairingToken(String token) =>
-      _write('revokePairingToken', () => tokens.remove(token));
+      _write('revokePairingToken', () {
+        tokens.remove(token);
+        invites.remove(token);
+      });
 
   @override
-  Future<String?> resolvePairingToken(String token) async {
+  Future<bool> publishInvite(
+    String uid,
+    String token, {
+    String? previousToken,
+  }) => _write('publishInvite', () {
+    if (previousToken != null) {
+      tokens.remove(previousToken);
+      invites.remove(previousToken);
+    }
+    tokens[token] = uid;
+    invites[token] = (createdAt: DateTime.now(), usedBy: null);
+  });
+
+  @override
+  Future<PairingTokenInfo?> resolvePairingTokenInfo(String token) async {
     calls.add('resolvePairingToken');
     if (!available) throw const PairingUnavailable();
-    return tokens[token];
+    final owner = tokens[token];
+    if (owner == null) return null;
+    final davet = invites[token];
+    return PairingTokenInfo(
+      ownerUid: owner,
+      oneTime: davet != null,
+      usedBy: davet?.usedBy,
+      createdAt: davet?.createdAt,
+    );
   }
 
   @override
-  Future<bool> requestPairing(String token, String requesterUid) => _write(
-    'requestPairing',
-    () => requests.putIfAbsent(token, () => {}).add(requesterUid),
-  );
+  Future<bool> requestPairing(
+    String token,
+    String requesterUid, {
+    bool claim = false,
+  }) => _write(claim ? 'requestPairing+claim' : 'requestPairing', () {
+    if (claim) {
+      invites[token] = (
+        createdAt: invites[token]!.createdAt,
+        usedBy: requesterUid,
+      );
+    }
+    requests.putIfAbsent(token, () => {}).add(requesterUid);
+  });
 
   /// `watchOwnPairingRequest` için verilecek akış; verilmezse kapanmayan,
   /// sessiz bir akış.

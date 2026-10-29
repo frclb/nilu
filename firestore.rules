@@ -45,6 +45,9 @@ rules_version = '2';
 //      altına bir istek yazar.
 //   3. Sahip isteği görür ve onaylarsa kendi `partners` listesine ekler.
 //
+// Davet bağlantısı aynı akış; yalnızca kod tek kullanımlık ve bir saatlik
+// (aşağıda `pairingTokens`).
+//
 // Üçüncü adım sahibin onayını gerektiriyor — bedeli bu. Karşılığında erişim
 // gerçekten geri alınabiliyor.
 
@@ -132,21 +135,51 @@ service cloud.firestore {
     }
 
     match /pairingTokens/{token} {
+      // İki tür kod var:
+      //
+      //   - QR kodu: `{ownerUid}`. Sahip yenileyene kadar geçerli.
+      //   - Davet bağlantısı: `{ownerUid, oneTime: true, createdAt}`. Bir
+      //     saat geçerli ve **tek kullanımlık**: ilk açan kişi kendini
+      //     `usedBy` alanına yazıyor; bundan sonra başka hiç kimse (aynı kişi
+      //     ikinci kez de) o bağlantıyla istek bırakamıyor.
+      //
       // Kodun kendisi sırdır: kodu bilen sahibin UID'sini çözebilir.
       // Kodu bilmeyen bu dokümanın adını da bilemez, listeleme kapalı.
       allow get: if isSignedIn();
       allow list: if false;
 
       // Kodu yalnızca sahibi oluşturur ve siler. Silmek kodu iptal eder.
+      // Davetin saati sunucunun saati: istemci süreyi uzatamaz.
       allow create: if isSignedIn()
-                    && request.resource.data.ownerUid == request.auth.uid;
+                    && request.resource.data.ownerUid == request.auth.uid
+                    && (request.resource.data.keys().hasOnly(['ownerUid'])
+                        || (request.resource.data.keys()
+                              .hasOnly(['ownerUid', 'oneTime', 'createdAt'])
+                            && request.resource.data.oneTime == true
+                            && request.resource.data.createdAt == request.time));
       allow delete: if isSignedIn()
                     && resource.data.ownerUid == request.auth.uid;
-      allow update: if false;
 
-      // Eşleştirme isteği. Karşı taraf yalnızca kendi adına istek yazabilir.
+      // Davet bağlantısını kullanmak: bir kez, süresi dolmadan, sahibi
+      // dışında biri, yalnızca kendi adına.
+      allow update: if isSignedIn()
+                    && resource.data.get('oneTime', false) == true
+                    && !('usedBy' in resource.data)
+                    && resource.data.ownerUid != request.auth.uid
+                    && request.time < resource.data.createdAt + duration.value(1, 'h')
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['usedBy'])
+                    && request.resource.data.usedBy == request.auth.uid;
+
+      // Eşleştirme isteği. Karşı taraf yalnızca kendi adına istek yazabilir;
+      // davet bağlantısında ancak bağlantıyı kendisi kullandıysa (aynı
+      // yazımda ya da önce).
       match /requests/{requesterUid} {
-        allow create: if isOwner(requesterUid);
+        allow create: if isOwner(requesterUid)
+          && (getAfter(/databases/$(database)/documents/pairingTokens/$(token))
+                .data.get('oneTime', false) == false
+              || getAfter(/databases/$(database)/documents/pairingTokens/$(token))
+                   .data.get('usedBy', '') == requesterUid);
 
         // Sahip istekleri okur ve işi bitince siler; istekte bulunan da
         // kendi isteğini geri çekebilir.

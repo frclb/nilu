@@ -176,6 +176,21 @@ void main() {
     expect(ekranlar.where((p) => p.contains('health_sync')), isEmpty);
   });
 
+  // Partner davet bağlantısı (…/p/#KOD) uygulama yüklü değilken bu
+  // sayfayı açıyor. Kod `#`'ten sonra: sayfa onu yalnızca betikte okuyor.
+  test('davet sayfası: altı dil, uygulamayı açan düğme, dizine girmiyor', () {
+    final html = oku('p/index.html');
+    expect(html, contains("'nilu://p#' + kod"));
+    expect(html, contains('<meta name="robots" content="noindex">'));
+    expect(html, contains('<meta name="referrer" content="no-referrer">'));
+    for (final d in diller) {
+      expect(html, contains('"$d": {'), reason: d);
+    }
+    // Menü yolu uygulamanın etiketlerinden; ham anahtar kalmıyor.
+    expect(html, contains('Partner Olarak Giriş Yap'));
+    expect(html, isNot(contains('{{')));
+  });
+
   test('göreli bağlantıların hepsi var olan bir dosyaya gidiyor', () {
     final link = RegExp(r'''(?:src|href)="([^"#:]+)"''');
     for (final f in cikti.listSync(recursive: true).whereType<File>()) {

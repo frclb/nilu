@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../../../core/firebase/firebase_config.dart';
+import '../../../domain/services/pairing_token.dart';
 
 /// Cloud Firestore sarmalayıcısı — yalnızca partner eşleşmesi için.
 ///
@@ -85,6 +86,31 @@ class FirestoreDataSource {
     });
   });
 
+  /// Tek kullanımlık davet bağlantısının kodunu yayımlar. Saati sunucu
+  /// koyuyor; kural bir saat sonra kullanılmasına izin vermiyor. Önceki
+  /// davet siliniyor (kullanılıp silinmişse silinemez; önemi yok).
+  Future<bool> publishInvite(
+    String uid,
+    String token, {
+    String? previousToken,
+  }) => _write('invite publish', () async {
+    if (previousToken != null && previousToken != token) {
+      try {
+        await _firestore
+            .collection('pairingTokens')
+            .doc(previousToken)
+            .delete();
+      } catch (e) {
+        debugPrint('Previous invite delete skipped: $e');
+      }
+    }
+    await _firestore.collection('pairingTokens').doc(token).set({
+      'ownerUid': uid,
+      'oneTime': true,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  });
+
   /// Kodu iptal eder. Bundan sonra o QR hiçbir işe yaramaz.
   Future<bool> revokePairingToken(String token) => _write(
     'pairing token revoke',
@@ -92,15 +118,27 @@ class FirestoreDataSource {
   );
 
   /// Kodun sahibinin UID'sini çözer. Kod geçersizse `null`.
+  Future<String?> resolvePairingToken(String token) async =>
+      (await resolvePairingTokenInfo(token))?.ownerUid;
+
+  /// Kodun sahibi ve — davet bağlantısıysa — kullanılıp kullanılmadığı.
+  /// Kod geçersizse `null`.
   ///
   /// Uzak taraf kullanılamıyorsa [PairingUnavailable] fırlatır: "geçersiz
   /// kod" demek yanlış olurdu.
-  Future<String?> resolvePairingToken(String token) async {
+  Future<PairingTokenInfo?> resolvePairingTokenInfo(String token) async {
     if (!isAvailable) throw const PairingUnavailable();
     try {
       final doc = await _firestore.collection('pairingTokens').doc(token).get();
-      if (!doc.exists) return null;
-      return doc.data()?['ownerUid'] as String?;
+      final data = doc.data();
+      final owner = data?['ownerUid'] as String?;
+      if (!doc.exists || owner == null) return null;
+      return PairingTokenInfo(
+        ownerUid: owner,
+        oneTime: data?['oneTime'] == true,
+        usedBy: data?['usedBy'] as String?,
+        createdAt: (data?['createdAt'] as Timestamp?)?.toDate(),
+      );
     } catch (e) {
       debugPrint('Error resolving pairing token: $e');
       throw const PairingUnavailable();
@@ -109,15 +147,23 @@ class FirestoreDataSource {
 
   /// Kodu okuyan taraf eşleştirme isteği bırakır. İstek tek başına erişim
   /// vermiyor; sahip onaylayana kadar hiçbir şey okunamaz.
-  Future<bool> requestPairing(String token, String requesterUid) => _write(
-    'pairing request',
-    () => _firestore
-        .collection('pairingTokens')
-        .doc(token)
-        .collection('requests')
-        .doc(requesterUid)
-        .set({'requestedAt': FieldValue.serverTimestamp()}),
-  );
+  ///
+  /// [claim]: kod bir davet bağlantısı. Bağlantı aynı yazımda bu kişiye
+  /// bağlanıyor (`usedBy`); kural ikinci bir kullanıma izin vermiyor.
+  Future<bool> requestPairing(
+    String token,
+    String requesterUid, {
+    bool claim = false,
+  }) => _write('pairing request', () {
+    final kod = _firestore.collection('pairingTokens').doc(token);
+    final istek = kod.collection('requests').doc(requesterUid);
+    final veri = {'requestedAt': FieldValue.serverTimestamp()};
+    if (!claim) return istek.set(veri);
+    return (_firestore.batch()
+          ..update(kod, {'usedBy': requesterUid})
+          ..set(istek, veri))
+        .commit();
+  });
 
   /// Partnerin kendi isteğini dinlemesi. Sahip onaylayınca (ya da
   /// reddedince) istek siliniyor: partner onayı bundan anında öğreniyor.
@@ -223,6 +269,36 @@ class FirestoreDataSource {
     await _firestore.collection('intimacy').doc(uid).delete();
     await _firestore.collection('users').doc(uid).delete();
   });
+}
+
+/// Çözülmüş eşleştirme kodu.
+@immutable
+class PairingTokenInfo {
+  const PairingTokenInfo({
+    required this.ownerUid,
+    this.oneTime = false,
+    this.usedBy,
+    this.createdAt,
+  });
+
+  final String ownerUid;
+
+  /// Tek kullanımlık davet bağlantısı (QR kodu değil).
+  final bool oneTime;
+
+  /// Bağlantıyı kullanan kişi; kullanılmadıysa `null`.
+  final String? usedBy;
+  final DateTime? createdAt;
+
+  /// Davet bağlantısı bir kez kullanıldı.
+  bool get used => oneTime && usedBy != null;
+
+  /// Davet bağlantısının süresi doldu. Sunucunun saati esas; buradaki
+  /// kontrol yalnızca doğru mesajı göstermek için.
+  bool expired(DateTime now) =>
+      oneTime &&
+      (createdAt == null ||
+          !now.isBefore(createdAt!.add(PairingToken.inviteLifetime)));
 }
 
 /// Eşleştirme sunucusuna ulaşılamıyor (Firebase yapılandırılmamış ya da

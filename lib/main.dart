@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:app_links/app_links.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -24,6 +27,7 @@ import 'domain/view_models/partner_view_model.dart';
 import 'domain/view_models/pregnancy_view_model.dart';
 import 'domain/view_models/user_view_model.dart';
 import 'domain/view_models/subscription_view_model.dart';
+import 'domain/services/pairing_token.dart';
 import 'domain/services/subscription_service.dart';
 import 'core/app_info.dart';
 import 'core/firebase/firebase_config.dart';
@@ -131,10 +135,15 @@ class PeriodTrackerApp extends StatefulWidget {
   /// Verilmezse uygulama kendisi kuruyor (testler).
   final AccountViewModel? accountViewModel;
 
+  /// Uygulamayı açan bağlantılar. Verilmezse telefonda `app_links`; testte
+  /// (masaüstü) hiçbiri.
+  final Stream<Uri>? links;
+
   const PeriodTrackerApp({
     super.key,
     required this.userViewModel,
     this.accountViewModel,
+    this.links,
   });
 
   @override
@@ -154,10 +163,64 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
   late final AccountViewModel _account =
       widget.accountViewModel ?? AccountViewModel();
 
+  StreamSubscription<Uri>? _links;
+
   @override
   void initState() {
     super.initState();
     LaunchActions.attach(_onLaunchAction);
+    final links =
+        widget.links ??
+        (!kIsWeb && (Platform.isIOS || Platform.isAndroid)
+            ? AppLinks().uriLinkStream
+            : null);
+    _links = links?.listen(
+      _onLink,
+      onError: (Object e) => debugPrint('App link failed: $e'),
+    );
+  }
+
+  @override
+  void dispose() {
+    _links?.cancel();
+    super.dispose();
+  }
+
+  /// Partner davet bağlantısı uygulamayı açtı: kod okutulmuş gibi
+  /// işleniyor. Hesap yoksa okutma ekranı önce girişi soruyor.
+  void _onLink(Uri uri) {
+    final kod = PairingToken.fromInviteLink(uri);
+    if (kod == null) return;
+    _whenSettled(
+      () => _router.pushNamed(
+        RouteNames.partnerScan,
+        queryParameters: {'k': kod},
+      ),
+    );
+  }
+
+  /// Açılış yönlendirmesi bitince [open]'ı çalıştırır.
+  ///
+  /// Durum yüklenirken açılan sayfayı açılış yönlendirmesi eziyordu.
+  void _whenSettled(VoidCallback open) {
+    final delegate = _router.routerDelegate;
+    bool settled() {
+      if (!widget.userViewModel.isLoaded) return false;
+      final path = delegate.currentConfiguration.uri.path;
+      return path.isNotEmpty && path != '/' && path != splashPath;
+    }
+
+    if (settled()) {
+      open();
+      return;
+    }
+    late final VoidCallback listener;
+    listener = () {
+      if (!settled()) return;
+      delegate.removeListener(listener);
+      WidgetsBinding.instance.addPostFrameCallback((_) => open());
+    };
+    delegate.addListener(listener);
   }
 
   /// Health Connect'in "gizlilik politikası" bağlantısı uygulamayı açtı.
@@ -170,11 +233,6 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
   void _onLaunchAction(String action) {
     if (action != LaunchActions.privacyPolicy) return;
     final delegate = _router.routerDelegate;
-    bool settled() {
-      if (!widget.userViewModel.isLoaded) return false;
-      final path = delegate.currentConfiguration.uri.path;
-      return path.isNotEmpty && path != '/' && path != splashPath;
-    }
 
     // Kapanışı yönlendiricinin konumundan izle: sistem geri tuşuyla
     // kapanan sayfada `pushNamed`'in döndürdüğü bekleme tamamlanmıyor.
@@ -197,17 +255,7 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
       _router.pushNamed(RouteNames.privacyPolicy);
     }
 
-    if (settled()) {
-      open();
-      return;
-    }
-    late final VoidCallback listener;
-    listener = () {
-      if (!settled()) return;
-      delegate.removeListener(listener);
-      WidgetsBinding.instance.addPostFrameCallback((_) => open());
-    };
-    delegate.addListener(listener);
+    _whenSettled(open);
   }
 
   @override

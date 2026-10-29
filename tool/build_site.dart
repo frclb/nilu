@@ -598,12 +598,106 @@ $list
 ''';
   }
 
+  /// Partner davet bağlantısının sayfası: `…/p/#KOD`.
+  ///
+  /// Uygulama yüklüyse bağlantı bu sayfayı hiç açmıyor (Universal Link;
+  /// kök alan adındaki doğrulama dosyası, SETUP_KEYS.md §8.7). Burası
+  /// uygulama yüklü değilken ya da bağlantı tarayıcıda açıldığında
+  /// görünüyor: "Nilu'da aç" (`nilu://p#KOD`; aynı alan adındaki sayfadan
+  /// Universal Link açılmıyor), indirme yolu ve elle yazmak için kodun
+  /// kendisi. Kod `#`'ten sonra: sunucuya gitmiyor, betik okuyor.
+  String _invite() {
+    String duz(String lang, String key) =>
+        (site(lang)[key] as String).replaceAllMapped(
+          RegExp(r'\{\{([a-z0-9_]+)\}\}'),
+          (m) => _app(lang, m.group(1)!),
+        );
+    const anahtarlar = [
+      'invite_title',
+      'invite_body',
+      'invite_open',
+      'invite_install',
+      'invite_code',
+      'invite_note',
+      'invite_missing',
+    ];
+    // Girintili: tek satırda `}}` çevrilmemiş bir anahtara benziyordu.
+    final metinler = const JsonEncoder.withIndent(' ').convert({
+      for (final l in languages) l: {for (final k in anahtarlar) k: duz(l, k)},
+    });
+    // `nilu://` uygulamanın şeması: AppInfo.linkScheme ve Info.plist.
+    final store = appStoreUrl;
+    final storeHtml = store == null
+        ? ''
+        : '<p><a class="button" href="${_esc(store)}">App Store</a></p>';
+    return '''<!doctype html>
+<html lang="$defaultLanguage">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#22001a">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<title>Nilu</title>
+</head>
+<body class="page-root page-invite">
+<main class="root-box invite-box">
+<img src="../assets/icon-256.png" alt="" width="96" height="96">
+<h1 id="t">Nilu</h1>
+<p id="b"></p>
+<div id="kodlu">
+<p><a id="ac" class="button" href="#"></a></p>
+<p id="i" class="muted"></p>
+$storeHtml
+<p id="c" class="muted"></p>
+<p><span id="k" class="invite-code"></span></p>
+<p id="n" class="muted"></p>
+</div>
+</main>
+<script>
+(function () {
+  var t = $metinler;
+  var prefs = navigator.languages || [navigator.language || ''];
+  var lang = '$defaultLanguage';
+  for (var i = 0; i < prefs.length; i++) {
+    var c = (prefs[i] || '').slice(0, 2).toLowerCase();
+    if (t[c]) { lang = c; break; }
+  }
+  var s = t[lang];
+  document.documentElement.lang = lang;
+  document.title = s.invite_title;
+  function yaz(id, metin) { document.getElementById(id).textContent = metin; }
+  yaz('t', s.invite_title);
+  var kod = (location.hash || '').slice(1).replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+  if (!/^[A-HJKMNP-Z2-9]{20}\$/.test(kod)) {
+    yaz('b', s.invite_missing);
+    document.getElementById('kodlu').hidden = true;
+    return;
+  }
+  yaz('b', s.invite_body);
+  var ac = document.getElementById('ac');
+  ac.textContent = s.invite_open;
+  ac.href = 'nilu://p#' + kod;
+  yaz('i', s.invite_install);
+  yaz('c', s.invite_code);
+  yaz('k', kod.replace(/(.{4})(?!\$)/g, '\$1 '));
+  yaz('n', s.invite_note);
+})();
+</script>
+</body>
+</html>
+''';
+  }
+
   /// Bütün sayfalar.
   List<SitePage> pages() {
     final out = <SitePage>[
       (path: 'index.html', content: _root()),
       (path: '404.html', content: _notFound()),
       (path: '.nojekyll', content: ''),
+      (path: 'p/index.html', content: _invite()),
     ];
     for (final lang in languages) {
       out

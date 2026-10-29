@@ -18,7 +18,13 @@ enum PartnerCodeStatus {
 
   /// Biçim doğru ama kod bir kullanıcıya karşılık gelmiyor: yenilenmiş,
   /// iptal edilmiş ya da hesabı silinmiş.
-  unknownCode;
+  unknownCode,
+
+  /// Davet bağlantısı daha önce kullanıldı (tek kullanımlık).
+  used,
+
+  /// Davet bağlantısının süresi doldu.
+  expired;
 
   bool get isValid => this == PartnerCodeStatus.valid;
 
@@ -30,6 +36,8 @@ enum PartnerCodeStatus {
     PartnerCodeStatus.alreadyConnected => 'partner_scan_error_already',
     PartnerCodeStatus.malformed => 'partner_scan_error_malformed',
     PartnerCodeStatus.unknownCode => 'partner_scan_error_unknown',
+    PartnerCodeStatus.used => 'partner_scan_error_used',
+    PartnerCodeStatus.expired => 'partner_scan_error_expired',
   };
 }
 
@@ -90,6 +98,20 @@ class PartnerCode {
       return PartnerCodeStatus.alreadyConnected;
     }
 
+    return PartnerCodeStatus.valid;
+  }
+
+  /// Davet bağlantısının durumu: sahibi doğrulandıktan sonra.
+  ///
+  /// Bağlantı tek kullanımlık; kullanılmışsa açan kişi kim olursa olsun
+  /// (kullanan kişinin kendisi de) geçmiyor. Sunucu da aynısını uyguluyor;
+  /// buradaki kontrol doğru mesajı göstermek için.
+  static PartnerCodeStatus validateInvite({
+    required bool used,
+    required bool expired,
+  }) {
+    if (used) return PartnerCodeStatus.used;
+    if (expired) return PartnerCodeStatus.expired;
     return PartnerCodeStatus.valid;
   }
 }

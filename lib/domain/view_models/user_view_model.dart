@@ -235,13 +235,19 @@ class UserViewModel extends ChangeNotifier {
 
   /// Partner kodu okuttuktan sonra: istek bırakılır ve bu cihaz partner
   /// moduna geçer. Veri ancak sahip onaylayınca okunabiliyor.
+  ///
+  /// [invite]: kod tek kullanımlık bir davet bağlantısı; istekle aynı
+  /// yazımda bu kişiye bağlanıyor.
   Future<bool> requestPartnerAccess({
     required String token,
     required String ownerUid,
+    bool invite = false,
   }) async {
     final myId = await ensureMyId();
     if (myId == null) return false;
-    if (!await _firestoreDS.requestPairing(token, myId)) return false;
+    if (!await _firestoreDS.requestPairing(token, myId, claim: invite)) {
+      return false;
+    }
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_requestTokenKey, token);
     _requestToken = token;

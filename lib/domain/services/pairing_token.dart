@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import '../../core/app_info.dart';
+
 /// Paylaşılabilir, **döndürülebilir** eşleştirme kodu.
 ///
 /// Önceden QR kodunun içinde kullanıcının UID'si vardı ve bu pratikte kalıcı
@@ -59,6 +61,28 @@ class PairingToken {
       buffer.write(token.substring(i, min(i + 4, token.length)));
     }
     return buffer.toString();
+  }
+
+  /// Davet bağlantısının geçerlilik süresi. Sunucu da aynısını uyguluyor
+  /// (`firestore.rules`, `pairingTokens` güncelleme kuralı).
+  static const Duration inviteLifetime = Duration(hours: 1);
+
+  /// Kodun davet bağlantısı.
+  static String inviteLink(String token) => '${AppInfo.inviteLinkBase}#$token';
+
+  /// Davet bağlantısındaki kod; bağlantı Nilu'nun değilse ya da kod bozuksa
+  /// `null`. Hem `https://…/nilu/p/#KOD` hem sitedeki düğmenin
+  /// `nilu://p#KOD` biçimi.
+  static String? fromInviteLink(Uri uri) {
+    final base = Uri.parse(AppInfo.inviteLinkBase);
+    final bizim =
+        (uri.scheme == 'https' &&
+            uri.host == base.host &&
+            uri.path.startsWith(base.path.replaceAll(RegExp(r'/$'), ''))) ||
+        (uri.scheme == AppInfo.linkScheme && uri.host == 'p');
+    if (!bizim) return null;
+    final kod = normalize(uri.fragment);
+    return isWellFormed(kod) ? kod : null;
   }
 
   /// Yazılan kodu büyük harfe çevirir. Dile bağlı değil: kodun alfabesi

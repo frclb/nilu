@@ -19,10 +19,14 @@ import '../../../core/navigation/route_names.dart';
 import '../../design_system/app_layout.dart';
 
 class PartnerScanScreen extends StatefulWidget {
-  const PartnerScanScreen({super.key, this.remote});
+  const PartnerScanScreen({super.key, this.remote, this.initialCode});
 
   /// Testte sahte eşleşme sunucusu.
   final FirestoreDataSource? remote;
+
+  /// Davet bağlantısından gelen kod. Ekran açılınca (giriş gerekiyorsa
+  /// girişten sonra) okutulmuş gibi işleniyor.
+  final String? initialCode;
 
   @override
   State<PartnerScanScreen> createState() => _PartnerScanScreenState();
@@ -36,6 +40,38 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
 
   /// Okunan eşleştirme kodu. İstek bu koda bırakılıyor.
   String? _scannedToken;
+
+  /// Okunan kod tek kullanımlık bir davet bağlantısı.
+  bool _scannedInvite = false;
+
+  /// Bağlantıdan gelen kod bir kez işlensin.
+  bool _initialHandled = false;
+
+  /// Bağlantıdan gelindi: kamera açılmıyor, davetin durumu gösteriliyor.
+  /// Davet geçmezse kullanıcı kamerayı kendisi açabiliyor.
+  late bool _linkMode = widget.initialCode != null;
+
+  /// Bağlantı geçmedi: gösterilecek metnin anahtarı.
+  String? _linkError;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _handleInitialCode());
+  }
+
+  /// Bağlantıdan gelen kodu işler; hesap yoksa girişten sonra.
+  void _handleInitialCode() {
+    final code = widget.initialCode;
+    if (code == null || _initialHandled || !mounted) return;
+    if (_remote.isAvailable &&
+        context.read<UserViewModel>().needsAccountForPairing) {
+      return;
+    }
+    _initialHandled = true;
+    _handleCode(code, typed: true);
+  }
+
   bool _isProcessing = false;
 
   @override
@@ -102,12 +138,16 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     await _pauseScanner();
 
     final token = PairingToken.normalize(raw!);
-    final String? ownerUid;
+    final PairingTokenInfo? info;
     try {
-      ownerUid = await _remote.resolvePairingToken(token);
+      info = await _remote.resolvePairingTokenInfo(token);
     } on PairingUnavailable {
       // Sunucuya ulaşılamadı: "geçersiz kod" demek yanlış olurdu.
       if (!mounted) return;
+      if (_linkMode) {
+        _showLinkError('partner_scan_unreachable');
+        return;
+      }
       _showMessage(context.tr('partner_scan_unreachable'), ok: false);
       await _resumeScanner();
       if (!mounted) return;
@@ -116,13 +156,25 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     }
     if (!mounted) return;
 
-    final status = PartnerCode.validateOwner(
+    final ownerUid = info?.ownerUid;
+    var status = PartnerCode.validateOwner(
       ownerUid,
       myId: userViewModel.myId,
       currentPartnerId: userViewModel.partnerId,
     );
+    // Davet bağlantısı tek kullanımlık ve bir saatlik.
+    if (status.isValid && info!.oneTime) {
+      status = PartnerCode.validateInvite(
+        used: info.used,
+        expired: info.expired(DateTime.now()),
+      );
+    }
 
     if (!status.isValid) {
+      if (_linkMode) {
+        _showLinkError(status.messageKey!);
+        return;
+      }
       // Mesaj kamerayı yeniden başlatmadan **önce** gösteriliyor. Ters
       // sırada, başlatma hata verdiğinde mesaja hiç sıra gelmiyordu:
       // kullanıcı neyin yanlış olduğunu öğrenemeden kamera aynı kodu
@@ -135,6 +187,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     }
 
     _scannedToken = token;
+    _scannedInvite = info!.oneTime;
     // `_isProcessing` açık kalıyor: onay sayfası kapanana kadar yeni
     // okuma işlenmemeli.
     _showConfirmationDialog(ownerUid!);
@@ -152,6 +205,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
   /// da sıfırlandığı için bir sonraki kare aynı yoldan geçiyordu — kamera
   /// aynı geçersiz kodu durmadan okumaya çalışıyordu.
   Future<void> _pauseScanner() async {
+    if (_linkMode) return;
     try {
       await _scannerController.stop();
     } on MobileScannerException catch (e) {
@@ -163,11 +217,27 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
   /// Kamerayı yeniden başlatır; başlatılamazsa ekran yine de kullanılabilir
   /// kalır (kullanıcı geri dönüp tekrar girebilir).
   Future<void> _resumeScanner() async {
+    // Bağlantıdan gelindiyse kamera hiç açılmadı: şimdi ilk kez çiziliyor
+    // ve kendisi başlıyor.
+    if (_linkMode) {
+      if (mounted) setState(() => _linkMode = false);
+      return;
+    }
     try {
       await _scannerController.start();
     } on MobileScannerException catch (e) {
       debugPrint('Scanner start failed: ${e.errorCode}');
     }
+  }
+
+  /// Bağlantının kodu geçmedi: neden ekranda yazıyor; kamera ya da elle
+  /// giriş kullanıcının seçimi.
+  void _showLinkError(String key) {
+    AppHaptics.error();
+    setState(() {
+      _linkError = key;
+      _isProcessing = false;
+    });
   }
 
   /// Geçersiz kodu bildirir ve taramaya devam eder.
@@ -231,7 +301,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
           setState(() {
             _isProcessing = false;
           });
-          _scannerController.start(); // resume scanning
+          _resumeScanner();
         },
       ),
     );
@@ -263,6 +333,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     final ok = await userViewModel.requestPartnerAccess(
       token: _scannedToken!,
       ownerUid: ownerUid,
+      invite: _scannedInvite,
     );
     if (!mounted) return;
     navigator.pop(); // yükleniyor
@@ -288,7 +359,14 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
         backgroundColor: context.tokens.background,
         appBar: AppBar(title: Text(context.tr('partner_scan_title'))),
         body: AppContentWidth(
-          child: PartnerSignInRequired(onSignedIn: () => setState(() {})),
+          child: PartnerSignInRequired(
+            onSignedIn: () {
+              setState(() {});
+              WidgetsBinding.instance.addPostFrameCallback(
+                (_) => _handleInitialCode(),
+              );
+            },
+          ),
         ),
       );
     }
@@ -335,7 +413,15 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
               )
             : Stack(
                 children: [
-                  Positioned.fill(child: _scanner(theme)),
+                  Positioned.fill(
+                    child: _linkMode
+                        ? _LinkStatus(
+                            errorKey: _linkError,
+                            onUseCamera: () =>
+                                setState(() => _linkMode = false),
+                          )
+                        : _scanner(theme),
+                  ),
                   // Elle giriş kamera açılamasa da (izin yok, kamera yok)
                   // görünüyor: o durumda tek yol bu.
                   Positioned(
@@ -443,6 +529,68 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
       );
     },
   );
+}
+
+/// Bağlantıdan gelindiğinde kameranın yerinde: davet açılıyor ya da neden
+/// açılmadığı.
+class _LinkStatus extends StatelessWidget {
+  const _LinkStatus({required this.errorKey, required this.onUseCamera});
+
+  final String? errorKey;
+  final VoidCallback onUseCamera;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final hata = errorKey;
+    return ColoredBox(
+      color: AppScrim.cameraBackground,
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(32, 24, 32, _manualButtonSpace),
+          child: Column(
+            key: const Key('partner_scan_link_status'),
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (hata == null) ...[
+                CircularProgressIndicator(color: _reticle),
+                const SizedBox(height: 20),
+                Text(
+                  context.tr('partner_link_opening'),
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: AppScrim.ink,
+                  ),
+                ),
+              ] else ...[
+                Icon(Icons.link_off_rounded, size: 48, color: _reticle),
+                const SizedBox(height: 18),
+                Text(
+                  context.tr(hata),
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: AppScrim.ink,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextButton.icon(
+                  key: const Key('partner_scan_use_camera'),
+                  onPressed: onUseCamera,
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppScrim.ink,
+                    minimumSize: const Size(0, 48),
+                  ),
+                  icon: const Icon(Icons.qr_code_scanner_rounded, size: 20),
+                  label: Text(context.tr('partner_link_use_camera')),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Elle giriş düğmesinin ekranın altında kapladığı yer; ipucu bunun üstünde

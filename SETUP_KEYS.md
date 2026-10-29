@@ -136,7 +136,7 @@ Sonra iki App ID:
 
 | App ID | Capability |
 |---|---|
-| `com.furkan.rcperiodtracker` | HealthKit, App Groups, Sign in with Apple |
+| `com.furkan.rcperiodtracker` | HealthKit, App Groups, Sign in with Apple, Associated Domains |
 | `com.furkan.rcperiodtracker.CycleWidget` | App Groups |
 
 Bunlar `ios/Runner/Runner.entitlements` ile **eşleşmek zorunda**. Sign in with
@@ -616,6 +616,30 @@ Tanıtım metinleri `site/strings.json`'da (`showcase`, `more`, `trust` …);
 her cümle uygulamada doğrulanabilir olmalı, mağaza görsellerindeki kuralla
 aynı. Apple Sağlık ekranı sitede yok: simgesinin lisansı uygulamanın içiyle
 sınırlı.
+
+**8.7 Partner davet bağlantısı (Universal Link):** sahip Partner sekmesinde
+"Bağlantıyla Davet Et"e basınca `https://frclb.github.io/nilu/p/#KOD`
+paylaşılıyor. Kod tek kullanımlık ve bir saatlik; ilk açan kişiye bağlanıyor
+(`firestore.rules` → `pairingTokens`, emülatör testleri "davet bağlantısı").
+Kod `#`'ten sonra durduğu için sunucuya gitmiyor.
+
+Bağlantının uygulamayı doğrudan açması için üç parça birlikte (2026-10-29'da
+kuruldu):
+
+- App ID'de **Associated Domains** (§2; App Store Connect API ile açıldı).
+- `ios/Runner/Runner.entitlements` → `applinks:frclb.github.io`.
+- Alan adının **kökünde** doğrulama dosyası:
+  `https://frclb.github.io/.well-known/apple-app-site-association`
+  (`frclb/frclb.github.io` deposu; `.nojekyll` olmadan noktalı klasör
+  yayımlanmıyor). `appIDs`: `V8MCMH5GJ7.com.furkan.rcperiodtracker`, yol
+  `/nilu/p/*`. Apple dosyayı kendi önbelleğinden okuyor; durumunu
+  `https://app-site-association.cdn-apple.com/a/v1/frclb.github.io` gösteriyor.
+
+Uygulama yüklü değilse aynı adres sitedeki `p/index.html`'i açıyor
+(`tool/build_site.dart` → `_invite`): "Nilu'da aç" (`nilu://p#KOD`, Info.plist'te
+şema), indirme yolu ve kodu elle yazmak için kodun kendisi. Uygulamada
+bağlantıyı `app_links` karşılıyor (`main.dart`); Flutter'ın kendi derin
+bağlantı yönlendirmesi kapalı (`FlutterDeepLinkingEnabled`).
 
 ---
 

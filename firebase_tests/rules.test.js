@@ -26,7 +26,9 @@ import {
   collection,
   serverTimestamp,
   setDoc,
+  Timestamp,
   updateDoc,
+  writeBatch,
 } from 'firebase/firestore';
 
 let env;
@@ -241,6 +243,105 @@ describe('pairingTokens: davet kodu ve istekler', () => {
     });
     await assertFails(getDoc(doc(db('yabanci'), 'pairingTokens/KOD/requests/partner')));
     await assertFails(deleteDoc(doc(db('yabanci'), 'pairingTokens/KOD/requests/partner')));
+  });
+});
+
+// Davet bağlantısı: tek kullanımlık, bir saatlik, ilk açana bağlı.
+describe('pairingTokens: davet bağlantısı', () => {
+  const davet = (dakikaOnce = 0) => ({
+    ownerUid: 'sahip',
+    oneTime: true,
+    createdAt: Timestamp.fromMillis(Date.now() - dakikaOnce * 60 * 1000),
+  });
+  const istekVeKullan = (uid) => {
+    const fs = db(uid);
+    return writeBatch(fs)
+      .update(doc(fs, 'pairingTokens/DAVET'), { usedBy: uid })
+      .set(doc(fs, 'pairingTokens/DAVET/requests/' + uid), { requestedAt: serverTimestamp() })
+      .commit();
+  };
+
+  test('sahip davet açar; saat sunucunun, fazladan alan yok', async () => {
+    await assertSucceeds(
+      setDoc(doc(db('sahip'), 'pairingTokens/DAVET'), {
+        ownerUid: 'sahip',
+        oneTime: true,
+        createdAt: serverTimestamp(),
+      }),
+    );
+    // İstemci saati yazılamaz: süre uzatılabilirdi.
+    await assertFails(
+      setDoc(doc(db('sahip'), 'pairingTokens/D2'), {
+        ownerUid: 'sahip',
+        oneTime: true,
+        createdAt: Timestamp.fromMillis(Date.now() + 24 * 3600 * 1000),
+      }),
+    );
+    await assertFails(
+      setDoc(doc(db('sahip'), 'pairingTokens/D3'), { ownerUid: 'sahip', usedBy: 'sahip' }),
+    );
+  });
+
+  test('ilk açan kullanır ve istek bırakır; ikinci kişi kullanamaz', async () => {
+    await seed(async (fs) => setDoc(doc(fs, 'pairingTokens/DAVET'), davet()));
+    await assertSucceeds(istekVeKullan('partner'));
+    await assertFails(istekVeKullan('baskasi'));
+    await assertFails(
+      setDoc(doc(db('baskasi'), 'pairingTokens/DAVET/requests/baskasi'), {
+        requestedAt: serverTimestamp(),
+      }),
+    );
+  });
+
+  test('aynı kişi de bağlantıyı ikinci kez kullanamaz', async () => {
+    await seed(async (fs) => setDoc(doc(fs, 'pairingTokens/DAVET'), davet()));
+    await assertSucceeds(istekVeKullan('partner'));
+    await assertSucceeds(deleteDoc(doc(db('sahip'), 'pairingTokens/DAVET/requests/partner')));
+    await assertFails(istekVeKullan('partner'));
+  });
+
+  test('kullanmadan istek bırakılamaz', async () => {
+    await seed(async (fs) => setDoc(doc(fs, 'pairingTokens/DAVET'), davet()));
+    await assertFails(
+      setDoc(doc(db('partner'), 'pairingTokens/DAVET/requests/partner'), {
+        requestedAt: serverTimestamp(),
+      }),
+    );
+  });
+
+  test('bir saat geçince kullanılamaz', async () => {
+    await seed(async (fs) => setDoc(doc(fs, 'pairingTokens/DAVET'), davet(61)));
+    await assertFails(istekVeKullan('partner'));
+  });
+
+  test('yalnızca kendi adına, başka alana dokunmadan; sahip kendini ekleyemez', async () => {
+    await seed(async (fs) => setDoc(doc(fs, 'pairingTokens/DAVET'), davet()));
+    await assertFails(updateDoc(doc(db('partner'), 'pairingTokens/DAVET'), { usedBy: 'baskasi' }));
+    await assertFails(
+      updateDoc(doc(db('partner'), 'pairingTokens/DAVET'), {
+        usedBy: 'partner',
+        ownerUid: 'partner',
+      }),
+    );
+    await assertFails(updateDoc(doc(db('sahip'), 'pairingTokens/DAVET'), { usedBy: 'sahip' }));
+  });
+
+  test('QR kodu kullanılmış sayılamaz; isteği eskisi gibi', async () => {
+    await seed(async (fs) => setDoc(doc(fs, 'pairingTokens/KOD'), { ownerUid: 'sahip' }));
+    await assertFails(updateDoc(doc(db('partner'), 'pairingTokens/KOD'), { usedBy: 'partner' }));
+    await assertSucceeds(
+      setDoc(doc(db('partner'), 'pairingTokens/KOD/requests/partner'), {
+        requestedAt: serverTimestamp(),
+      }),
+    );
+  });
+
+  test('olmayan koda istek bırakılamaz', async () => {
+    await assertFails(
+      setDoc(doc(db('partner'), 'pairingTokens/YOK/requests/partner'), {
+        requestedAt: serverTimestamp(),
+      }),
+    );
   });
 });
 

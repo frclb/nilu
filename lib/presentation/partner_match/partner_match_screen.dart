@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/navigation/route_names.dart';
 import '../../../domain/view_models/user_view_model.dart';
 import '../../../localization/app_localizations.dart';
 import '../../data/datasources/remote/firestore_datasource.dart';
+import '../../data/repositories/pairing_repository.dart';
+import '../../design_system/app_snack.dart';
+import '../../domain/services/pairing_token.dart';
 import '../../design_system/app_card.dart';
 import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
@@ -40,9 +44,53 @@ class _PartnerMatchScreenState extends State<PartnerMatchScreen> {
   /// QR ekranından dönünce istek bölümü kodu yeniden okusun diye.
   int _generation = 0;
 
+  /// Davet bağlantısı hazırlanıyor.
+  bool _linking = false;
+
   Future<void> _invite() async {
     await context.pushNamed(RouteNames.partnerQrGen);
     if (mounted) setState(() => _generation++);
+  }
+
+  /// Tek kullanımlık, bir saatlik davet bağlantısı üretip paylaşır.
+  ///
+  /// Kodu okutmak ya da yazmak yerine: partner bağlantıya dokununca Nilu
+  /// açılıyor ve istek kendiliğinden bırakılıyor. Bağlantıyı ilk açan
+  /// kişiye bağlanıyor; ikinci bir kullanım sunucuda reddediliyor
+  /// (`firestore.rules`). Sahip yine onaylıyor.
+  Future<void> _inviteLink(Rect origin) async {
+    final user = context.read<UserViewModel>();
+    if (user.needsAccountForPairing) {
+      // Davet ekranı önce girişi soruyor.
+      return _invite();
+    }
+    final snack = AppSnack.of(context);
+    final failed = context.tr('partner_link_failed');
+    final sharedHint = context.tr('partner_link_shared_hint');
+    final metin = context.tr('partner_link_share_text');
+
+    setState(() => _linking = true);
+    final id = await user.ensureMyId();
+    final token = id == null
+        ? null
+        : await PairingRepository(remote: _remote).createInvite(id);
+    if (!mounted) return;
+    setState(() {
+      _linking = false;
+      // İstek bölümü yeni bağlantının isteklerini de dinlesin.
+      _generation++;
+    });
+    if (token == null) {
+      snack.error(failed);
+      return;
+    }
+    await SharePlus.instance.share(
+      ShareParams(
+        text: '$metin\n${PairingToken.inviteLink(token)}',
+        sharePositionOrigin: origin,
+      ),
+    );
+    snack.show(sharedHint);
   }
 
   @override
@@ -92,7 +140,12 @@ class _PartnerMatchScreenState extends State<PartnerMatchScreen> {
               ),
             ),
             if (!connected && available)
-              _InviteActions(onInvite: _invite, onHowItWorks: _howItWorks),
+              _InviteActions(
+                onInvite: _invite,
+                onInviteLink: _inviteLink,
+                linking: _linking,
+                onHowItWorks: _howItWorks,
+              ),
           ],
         ),
       ),
@@ -140,9 +193,18 @@ class _PartnerMatchScreenState extends State<PartnerMatchScreen> {
 }
 
 class _InviteActions extends StatelessWidget {
-  const _InviteActions({required this.onInvite, required this.onHowItWorks});
+  const _InviteActions({
+    required this.onInvite,
+    required this.onInviteLink,
+    required this.linking,
+    required this.onHowItWorks,
+  });
 
   final VoidCallback onInvite;
+
+  /// Paylaşım sayfasının iPad'de açılacağı yer: düğmenin kendisi.
+  final ValueChanged<Rect> onInviteLink;
+  final bool linking;
   final VoidCallback onHowItWorks;
 
   @override
@@ -161,25 +223,70 @@ class _InviteActions extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          AppGradientButton(
-            key: const Key('partner_invite'),
-            label: context.tr('partner_match_invite_button'),
-            icon: Icons.qr_code_2_rounded,
-            onPressed: onInvite,
-            height: 56,
-            radius: AppRadius.pill,
+          // Uzaktaki partner için en kolay yol: bağlantı. QR ve okutma
+          // yan yana, ikincil.
+          Builder(
+            builder: (buttonContext) => AppGradientButton(
+              key: const Key('partner_invite_link'),
+              label: context.tr('partner_match_link_button'),
+              icon: Icons.link_rounded,
+              busy: linking,
+              onPressed: linking
+                  ? null
+                  : () {
+                      final box =
+                          buttonContext.findRenderObject() as RenderBox?;
+                      onInviteLink(
+                        box == null
+                            ? Rect.zero
+                            : box.localToGlobal(Offset.zero) & box.size,
+                      );
+                    },
+              height: 56,
+              radius: AppRadius.pill,
+            ),
           ),
           const SizedBox(height: 12),
-          OutlinedButton.icon(
-            key: const Key('partner_scan'),
-            onPressed: () => context.pushNamed(RouteNames.partnerScan),
-            style: OutlinedButton.styleFrom(
-              backgroundColor: t.surface,
-              side: BorderSide(color: AppCard.borderColor(t)),
-              minimumSize: const Size.fromHeight(56),
-            ),
-            icon: const Icon(Icons.qr_code_scanner_rounded, size: 20),
-            label: Text(context.tr('partner_match_scan_button')),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  key: const Key('partner_invite'),
+                  onPressed: onInvite,
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: t.surface,
+                    side: BorderSide(color: AppCard.borderColor(t)),
+                    minimumSize: const Size.fromHeight(52),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                  ),
+                  icon: const Icon(Icons.qr_code_2_rounded, size: 20),
+                  label: Text(
+                    context.tr('partner_match_qr_short'),
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton.icon(
+                  key: const Key('partner_scan'),
+                  onPressed: () => context.pushNamed(RouteNames.partnerScan),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: t.surface,
+                    side: BorderSide(color: AppCard.borderColor(t)),
+                    minimumSize: const Size.fromHeight(52),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                  ),
+                  icon: const Icon(Icons.qr_code_scanner_rounded, size: 20),
+                  label: Text(
+                    context.tr('partner_match_scan_short'),
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 4),
           Center(
