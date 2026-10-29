@@ -337,7 +337,7 @@ adresten kullanacak; adres olmadan bu haklar fiilen kullanılamaz.
 Daireleri. Politika: veri sorumlusu Hürkan Çelebi, Bağcılar/İstanbul.
 Yayından önce bir avukatın okuması önerilir.
 
-### Türk hukuku uyum denetimi (2026-10-29) — kod tarafı ✅, hukuki adımlar ⬜
+### Türk hukuku uyum denetimi (2026-10-29) — kod tarafı ✅
 Altı başlıkta (6502, 6563, 5846, 5651, KVKK m.10, KVKK m.9/12) salt okuma
 denetimi yapıldı. Koddaki eksikler kapatıldı:
 
@@ -352,28 +352,15 @@ denetimi yapıldı. Koddaki eksikler kapatıldı:
   (1), hukuki sebepler (2), sunucu konumları (6: Firestore `eur3`, Firebase
   Auth / AdMob küresel, RevenueCat ABD, site GitHub Pages), KVKK m.11'in
   tamamı, 30 gün ve Kurul'a şikâyet (10). Politika yurt dışı aktarımın
-  dayanağını **yazmıyor**: aşağıdaki sözleşmeler yapılmadan yazılmamalı.
+  dayanağını **yazmıyor**: standart sözleşmeler yapılmadan yazılmamalı.
 
 Ticari e-posta (6563), kullanıcı yüklemesi (5846) ve herkese açık içerik
 (5651) yok; bunlar eklenirse yeniden bakılmalı (İYS kaydı, kaldırma
 süreci, yer sağlayıcı yükümlülükleri).
 
-**Hesap sahibinin yapması gerekenler (kodla yapılamaz):**
-
-1. **Yurt dışı aktarım (KVKK m.9, 2024 değişikliği):** açık rıza artık
-   yalnızca arızi aktarımlar için dayanak. Her kullanıcıda süren aktarımlar
-   (Firebase Authentication ve Firestore, AdMob, RevenueCat) için Kurul'un
-   ilan ettiği **standart sözleşme** her hizmet sağlayıcıyla imzalanmalı ve
-   imzadan sonra **5 iş günü içinde Kurum'a bildirilmeli**. Google ve
-   RevenueCat'in bu sözleşmeyi sunup sunmadığı doğrulanmadı. Yapılınca
-   politika 6. bölüme dayanak cümlesi eklenecek.
-2. **VERBİS:** ana faaliyet özel nitelikli (sağlık) veri işlemek olduğu
-   için küçük işletme muafiyeti geçerli olmayabilir; kayıt yükümlülüğü bir
-   hukukçuya teyit ettirilmeli.
-3. **Veri sorumlusunun adresi:** politikada yalnızca "Bağcılar/İstanbul"
-   var; yazılı başvuru için tam posta adresi (ya da KEP adresi) eklenmeli.
-4. **Cayma hakkı ifadesi:** m.15/1-ğ istisnasının App Store aboneliğine
-   uygulanması ve satıcı sıfatının (Apple / geliştirici) hukuken teyidi.
+**Hesap sahibinin yapacakları** (sözleşme, Kurum'a bildirim, VERBİS
+değerlendirmesi, hukukçuya sorular) yerel `legal_private/` klasöründe;
+depo herkese açık olduğu için Git'e gönderilmiyor.
 
 ### Gizlilik politikası URL'si ⬜
 App Store **herkese açık bir URL** ister. Uygulama içindeki gizlilik metni
