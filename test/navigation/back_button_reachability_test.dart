@@ -23,6 +23,10 @@ void main() {
         'bir şey yok; kurulumun geri düğmesi o zaman karşılamaya gidiyor '
         '(`onboardingBack`). Karşılamanın üstüne itildiyse `push` ile.',
     'profile': 'Alt menü sekmesi; kendi geri düğmesi yok.',
+    'signIn':
+        'Şifre yenileme bağlantısı oturum yokken açıldı; işi bitince ya da '
+        'bağlantı geçersizse giriş ekranına dönülüyor, şifre ekranına geri '
+        'gelinmemeli.',
   };
 
   test('yalnızca yığını temizlemesi gereken hedeflere `go` ile gidiliyor', () {

@@ -26,6 +26,17 @@ class FirebaseAuthDataSource {
     return user == null || user.isAnonymous ? null : user.uid;
   }
 
+  /// E-postayla açılmış hesabın adresi henüz doğrulanmadı mı?
+  ///
+  /// `emailVerified` yalnızca `reload` sonrasında güncelleniyor; doğrulama
+  /// ekranı ve bağlantı işleyicisi onu çağırıyor.
+  bool get needsEmailVerification {
+    final user = currentUser;
+    if (user == null || user.isAnonymous || user.emailVerified) return false;
+    return user.providerData.isNotEmpty &&
+        user.providerData.every((p) => p.providerId == 'password');
+  }
+
   /// Kimlik hesabını **kalıcı olarak** siler.
   ///
   /// "Tüm verilerimi sil" yalnızca Firestore verisini siliyordu; kimlik

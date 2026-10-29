@@ -17,12 +17,22 @@ class AccountUser {
   final String? email;
   final String? displayName;
 
+  /// E-posta hesabında adres doğrulandı mı? Apple ve Google hesapları
+  /// sağlayıcıda doğrulanmış sayılıyor.
+  final bool emailVerified;
+
   const AccountUser({
     required this.uid,
     required this.provider,
     this.email,
     this.displayName,
+    this.emailVerified = true,
   });
+
+  /// E-postayla açılmış ama adresi henüz doğrulanmamış hesap: uygulama
+  /// doğrulanana kadar kullanılmıyor (bkz. `resolveRedirect`).
+  bool get needsEmailVerification =>
+      provider == AccountProvider.email && !emailVerified;
 }
 
 enum SignInStatus { signedIn, cancelled, failed, unavailable }
@@ -39,6 +49,9 @@ enum EmailAuthError {
   tooManyRequests,
   network,
 }
+
+/// Şifre yenileme bağlantısıyla yeni şifre belirlemenin sonucu.
+enum PasswordResetResult { done, invalidLink, weakPassword, failed }
 
 class SignInResult {
   final SignInStatus status;
@@ -72,6 +85,26 @@ abstract class AccountAuth {
   /// `true`: hangi adreslerin kayıtlı olduğu böylece öğrenilemiyor.
   Future<bool> sendPasswordReset(String email, {String? languageCode});
 
+  /// Doğrulama bağlantısını yeniden gönderir.
+  Future<bool> sendEmailVerification({String? languageCode});
+
+  /// Hesabı sunucudan yeniden okur; e-posta doğrulandıysa kimlik jetonunu
+  /// da yeniler (sunucu kuralları doğrulamaya bakıyor). Güncel hesabı
+  /// döndürür.
+  Future<AccountUser?> reloadAccount();
+
+  /// E-postadaki doğrulama bağlantısının kodunu uygular.
+  Future<bool> applyEmailVerification(String code);
+
+  /// Şifre yenileme kodu geçerliyse hangi adrese ait olduğu; değilse `null`.
+  Future<String?> checkPasswordResetCode(String code);
+
+  /// Şifre yenileme kodu ile yeni şifreyi belirler.
+  Future<PasswordResetResult> confirmPasswordReset(
+    String code,
+    String newPassword,
+  );
+
   Future<void> signOut();
 
   /// Hesap silmeden önce: kimliği yeniden doğrular ve Apple ile girildiyse
@@ -95,9 +128,13 @@ abstract class AccountAuth {
 /// Info.plist'teki REVERSED_CLIENT_ID şemasından. Android'de şimdilik
 /// Firebase'in akışı: yerel kitaplık orada google-services.json istiyor.
 ///
-/// E-posta ve şifre Firebase'in kendi sağlayıcısı (`password`). Sıfırlama
-/// ve doğrulama e-postalarını Firebase gönderiyor; bağlantılar Firebase'in
-/// barındırdığı sayfaya (`nilu-3b870.firebaseapp.com/__/auth/action`) gidiyor.
+/// E-posta ve şifre Firebase'in kendi sağlayıcısı (`password`). Doğrulama
+/// zorunlu: adres doğrulanmadan uygulama kullanılmıyor, sunucu kuralları da
+/// doğrulanmamış e-posta hesabını reddediyor. Doğrulama ve şifre yenileme
+/// e-postalarını Firebase gönderiyor; bağlantılar Nilu'nun kendi sayfasına
+/// (`AppInfo.authLinkBase`, Firebase'deki "action URL") gidiyor. Telefonda
+/// Universal Link olarak uygulamayı açıyor ve işlem uygulamada bitiyor
+/// (`AuthActionLink`); başka cihazda sayfanın kendisi bitiriyor.
 ///
 /// Partner eşleşmesi de hesap istiyor; anonim kimlik yok. Eskiden eşleşme
 /// için açılan anonim kimliğe hesap bağlanıyordu (`linkWithProvider`).
@@ -135,6 +172,7 @@ class FirebaseAccountAuth implements AccountAuth {
         provider: provider,
         email: u.email ?? info.email,
         displayName: u.displayName ?? info.displayName,
+        emailVerified: provider != AccountProvider.email || u.emailVerified,
       );
     }
     return null;
@@ -277,6 +315,88 @@ class FirebaseAccountAuth implements AccountAuth {
     } catch (e) {
       debugPrint('Password reset failed: $e');
       return false;
+    }
+  }
+
+  @override
+  Future<bool> sendEmailVerification({String? languageCode}) async {
+    final user = isAvailable ? _auth.currentUser : null;
+    if (user == null) return false;
+    await _setLanguage(languageCode);
+    try {
+      await user.sendEmailVerification();
+      return true;
+    } catch (e) {
+      debugPrint('Verification email failed: $e');
+      return false;
+    }
+  }
+
+  @override
+  Future<AccountUser?> reloadAccount() async {
+    final user = isAvailable ? _auth.currentUser : null;
+    if (user == null) return null;
+    try {
+      await user.reload();
+      final guncel = _auth.currentUser;
+      if (guncel != null && guncel.emailVerified) {
+        // Jetondaki `email_verified` ancak yenilenince değişiyor.
+        await guncel.getIdToken(true);
+      }
+    } catch (e) {
+      debugPrint('Account reload failed: $e');
+    }
+    return fromUser(_auth.currentUser);
+  }
+
+  @override
+  Future<bool> applyEmailVerification(String code) async {
+    if (!isAvailable) return false;
+    try {
+      await _auth.applyActionCode(code);
+      return true;
+    } catch (e) {
+      // Kod kullanılmış olabilir (ör. sayfada uygulandı); çağıran yine de
+      // hesabı yeniden okuyor.
+      debugPrint('Email verification failed: $e');
+      return false;
+    }
+  }
+
+  @override
+  Future<String?> checkPasswordResetCode(String code) async {
+    if (!isAvailable) return null;
+    try {
+      return await _auth.verifyPasswordResetCode(code);
+    } catch (e) {
+      debugPrint('Password reset code invalid: $e');
+      return null;
+    }
+  }
+
+  @override
+  Future<PasswordResetResult> confirmPasswordReset(
+    String code,
+    String newPassword,
+  ) async {
+    if (!isAvailable) return PasswordResetResult.failed;
+    try {
+      await _auth.confirmPasswordReset(code: code, newPassword: newPassword);
+      return PasswordResetResult.done;
+    } on FirebaseAuthException catch (e) {
+      debugPrint('Password reset failed: ${e.code}');
+      return switch (e.code) {
+        'expired-action-code' ||
+        'invalid-action-code' ||
+        'user-disabled' ||
+        'user-not-found' => PasswordResetResult.invalidLink,
+        'weak-password' || 'password-does-not-meet-requirements' =>
+          PasswordResetResult.weakPassword,
+        _ => PasswordResetResult.failed,
+      };
+    } catch (e) {
+      debugPrint('Password reset failed: $e');
+      return PasswordResetResult.failed;
     }
   }
 

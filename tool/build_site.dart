@@ -691,6 +691,158 @@ $storeHtml
 ''';
   }
 
+  /// E-posta doğrulama ve şifre yenileme bağlantılarının sayfası:
+  /// `…/auth/?mode=…&oobCode=…&apiKey=…&lang=…` (Firebase'deki "action
+  /// URL", `AppInfo.authLinkBase`).
+  ///
+  /// Uygulama yüklü telefonda bağlantı bu sayfayı açmıyor: Universal Link
+  /// uygulamayı açıyor ve işlem orada bitiyor. Burası bağlantı başka bir
+  /// cihazda ya da e-posta uygulamasının kendi tarayıcısında açıldığında
+  /// görünüyor ve işlemi Firebase'in REST arayüzüyle kendisi bitiriyor:
+  /// doğrulamada `accounts:update`, şifrede `accounts:resetPassword`.
+  /// Önceden bu iş Firebase'in kendi sayfasındaydı (`…firebaseapp.com`).
+  ///
+  /// Kod tek kullanımlık ve adreste duruyor: sayfa dışarıdan hiçbir şey
+  /// yüklemiyor, yönlendiren bilgisi gönderilmiyor, dizine girmiyor.
+  String _authAction() {
+    const anahtarlar = [
+      'auth_verify_title',
+      'auth_verify_working',
+      'auth_verify_done',
+      'auth_verify_failed',
+      'auth_back_to_app',
+      'auth_reset_title',
+      'auth_reset_for',
+      'auth_reset_label',
+      'auth_reset_hint',
+      'auth_reset_button',
+      'auth_reset_in_app',
+      'auth_reset_short',
+      'auth_reset_done',
+      'auth_reset_failed',
+      'auth_error',
+      'auth_unknown',
+    ];
+    final metinler = const JsonEncoder.withIndent(' ').convert({
+      for (final l in languages)
+        l: {for (final k in anahtarlar) k: site(l)[k] as String},
+    });
+    return '''<!doctype html>
+<html lang="$defaultLanguage">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#22001a">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<title>Nilu</title>
+</head>
+<body class="page-root page-invite">
+<main class="root-box invite-box">
+<img src="../assets/icon-256.png" alt="" width="96" height="96">
+<h1 id="t">Nilu</h1>
+<p id="b" role="status"></p>
+<form id="f" class="auth-form" hidden>
+<p><label id="sl" for="s"></label>
+<input id="s" type="password" autocomplete="new-password" minlength="8" required></p>
+<p id="sh" class="muted"></p>
+<p id="se" class="auth-error" role="alert" hidden></p>
+<p><button id="sb" class="button" type="submit"></button></p>
+</form>
+<p><a id="ac" class="button" href="#" hidden></a></p>
+<p><a id="ap" class="auth-link" href="#" hidden></a></p>
+</main>
+<script>
+(function () {
+  var t = $metinler;
+  var q = new URLSearchParams(location.search);
+  var mode = q.get('mode'), kod = q.get('oobCode'), key = q.get('apiKey');
+  var lang = (q.get('lang') || '').slice(0, 2).toLowerCase();
+  if (!t[lang]) {
+    lang = '$defaultLanguage';
+    var prefs = navigator.languages || [navigator.language || ''];
+    for (var i = 0; i < prefs.length; i++) {
+      var c = (prefs[i] || '').slice(0, 2).toLowerCase();
+      if (t[c]) { lang = c; break; }
+    }
+  }
+  var s = t[lang];
+  document.documentElement.lang = lang;
+  function el(id) { return document.getElementById(id); }
+  function yaz(id, metin) { el(id).textContent = metin; }
+  function dugme(id, metin, adres) { var a = el(id); a.textContent = metin; a.href = adres; a.hidden = false; }
+  function istek(yol, govde) {
+    return fetch('https://identitytoolkit.googleapis.com/v1/accounts:' + yol + '?key=' + encodeURIComponent(key), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(govde)
+    }).then(function (r) {
+      return r.json().then(function (j) { if (!r.ok) throw j; return j; });
+    });
+  }
+  function kodHatasi(e) {
+    var m = (e && e.error && e.error.message) || '';
+    return /OOB_CODE|EXPIRED|USER_NOT_FOUND|USER_DISABLED/.test(m);
+  }
+  var uygulama = 'nilu://auth?mode=verified';
+  if (!kod || !key) { yaz('b', s.auth_unknown); return; }
+
+  if (mode === 'verifyEmail') {
+    document.title = s.auth_verify_title;
+    yaz('t', s.auth_verify_title);
+    yaz('b', s.auth_verify_working);
+    istek('update', { oobCode: kod }).then(function () {
+      yaz('b', s.auth_verify_done);
+      dugme('ac', s.auth_back_to_app, uygulama);
+    }, function (e) {
+      yaz('b', kodHatasi(e) ? s.auth_verify_failed : s.auth_error);
+      dugme('ac', s.auth_back_to_app, uygulama);
+    });
+    return;
+  }
+
+  if (mode === 'resetPassword') {
+    document.title = s.auth_reset_title;
+    yaz('t', s.auth_reset_title);
+    istek('resetPassword', { oobCode: kod }).then(function (j) {
+      yaz('b', s.auth_reset_for.replace('%EMAIL%', j.email || ''));
+      yaz('sl', s.auth_reset_label);
+      yaz('sh', s.auth_reset_hint);
+      yaz('sb', s.auth_reset_button);
+      el('f').hidden = false;
+      dugme('ap', s.auth_reset_in_app, 'nilu://auth?mode=resetPassword&oobCode=' + encodeURIComponent(kod));
+    }, function (e) {
+      yaz('b', kodHatasi(e) ? s.auth_reset_failed : s.auth_error);
+    });
+    el('f').addEventListener('submit', function (olay) {
+      olay.preventDefault();
+      var sifre = el('s').value;
+      var hata = el('se');
+      if (sifre.length < 8) { hata.textContent = s.auth_reset_short; hata.hidden = false; return; }
+      hata.hidden = true;
+      el('sb').disabled = true;
+      istek('resetPassword', { oobCode: kod, newPassword: sifre }).then(function () {
+        el('f').hidden = true;
+        el('ap').hidden = true;
+        yaz('b', s.auth_reset_done);
+        dugme('ac', s.auth_back_to_app, uygulama);
+      }, function (e) {
+        el('sb').disabled = false;
+        hata.textContent = kodHatasi(e) ? s.auth_reset_failed : s.auth_error;
+        hata.hidden = false;
+      });
+    });
+    return;
+  }
+
+  yaz('b', s.auth_unknown);
+})();
+</script>
+</body>
+</html>
+''';
+  }
+
   /// Bütün sayfalar.
   List<SitePage> pages() {
     final out = <SitePage>[
@@ -698,6 +850,7 @@ $storeHtml
       (path: '404.html', content: _notFound()),
       (path: '.nojekyll', content: ''),
       (path: 'p/index.html', content: _invite()),
+      (path: 'auth/index.html', content: _authAction()),
     ];
     for (final lang in languages) {
       out

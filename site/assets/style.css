@@ -419,3 +419,17 @@ footer.site p { margin: 6px 0 0; font-size: 13.5px; color: var(--faint); }
   display: inline-block; padding: 10px 14px; border-radius: 12px; letter-spacing: 2px;
   font: 600 18px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; background: rgba(255, 255, 255, 0.1);
 }
+
+/* ---------- E-posta doğrulama ve şifre yenileme (/auth/) ---------- */
+
+.auth-form { margin: 0 0 8px; }
+.auth-form label { display: block; margin-bottom: 8px; color: #f6e3ee; font-weight: 600; }
+.auth-form input {
+  width: min(320px, 100%); padding: 12px 14px; border-radius: 12px; font: inherit; font-size: 17px;
+  border: 1px solid rgba(255, 255, 255, 0.25); background: rgba(255, 255, 255, 0.08); color: #fff;
+}
+.auth-form input:focus { outline: 2px solid #f6e3ee; outline-offset: 1px; }
+.auth-form button { cursor: pointer; font: inherit; }
+.auth-form button[disabled] { opacity: 0.6; cursor: default; }
+.invite-box .auth-error { color: #ffb4c4; font-weight: 600; }
+.invite-box .auth-link { color: #f6e3ee; }

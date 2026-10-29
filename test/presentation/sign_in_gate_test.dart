@@ -12,7 +12,9 @@ import 'package:period_tracker/data/datasources/remote/firebase_auth_datasource.
 import 'package:period_tracker/domain/view_models/account_view_model.dart';
 import 'package:period_tracker/domain/view_models/user_view_model.dart';
 import 'package:period_tracker/localization/app_localizations.dart';
+import 'package:period_tracker/presentation/account/reset_password_screen.dart';
 import 'package:period_tracker/presentation/account/sign_in_screen.dart';
+import 'package:period_tracker/presentation/account/verify_email_screen.dart';
 
 import '../support/fake_partner_remote.dart';
 import '../support/fake_sync.dart';
@@ -54,6 +56,7 @@ void main() {
       onboardingComplete: user.onboardingComplete,
       location: state.matchedLocation,
       needsSignIn: user.needsSignIn,
+      needsEmailVerification: user.needsEmailVerification,
     ),
     routes: [
       GoRoute(
@@ -70,6 +73,17 @@ void main() {
         path: '/sign_in',
         name: RouteNames.signIn,
         builder: (_, _) => const SignInScreen(),
+      ),
+      GoRoute(
+        path: verifyEmailPath,
+        name: RouteNames.verifyEmail,
+        builder: (_, _) => const VerifyEmailScreen(),
+      ),
+      GoRoute(
+        path: resetPasswordPath,
+        name: RouteNames.resetPassword,
+        builder: (_, state) =>
+            ResetPasswordScreen(code: state.uri.queryParameters['code']),
       ),
       GoRoute(
         path: '/onboarding_goal',
@@ -243,8 +257,11 @@ void main() {
       expect(y('sign_in_google'), lessThan(y('sign_in_email')));
     });
 
-    testWidgets('girişten sonra kurulum başlıyor', (tester) async {
+    testWidgets('doğrulanmış hesapla girişten sonra kurulum başlıyor', (
+      tester,
+    ) async {
       await ac(tester);
+      auth.emailVerified = true;
       await doldur(tester, 'ada@ornek.com', 'gizli-sifre');
       await bas(tester, const Key('email_submit'));
 
@@ -271,7 +288,132 @@ void main() {
       await bas(tester, const Key('email_submit'));
 
       expect(auth.emailSignIns.single.create, isTrue);
-      expect(find.text('kurulum'), findsOneWidget);
+      // Adres doğrulanmadan uygulama açılmıyor.
+      expect(find.byKey(const Key('verify_email')), findsOneWidget);
+      expect(find.textContaining('ada@ornek.com'), findsOneWidget);
+      expect(find.text('kurulum'), findsNothing);
+    });
+
+    group('doğrulama zorunlu', () {
+      Future<BuildContext> dogrulamada(WidgetTester tester) async {
+        final ctx = await ac(tester);
+        await tester.tap(find.text(ctx.tr('email_mode_create')));
+        await tester.pumpAndSettle();
+        await doldur(tester, 'ada@ornek.com', 'gizli-sifre');
+        await bas(tester, const Key('email_submit'));
+        expect(find.byKey(const Key('verify_email')), findsOneWidget);
+        return tester.element(find.byKey(const Key('verify_email')));
+      }
+
+      testWidgets('doğrulanmadan "Doğruladım" ekranda bırakıyor', (
+        tester,
+      ) async {
+        await dogrulamada(tester);
+        await bas(tester, const Key('verify_email_check'));
+        expect(find.byKey(const Key('verify_email_not_yet')), findsOneWidget);
+        expect(find.text('kurulum'), findsNothing);
+      });
+
+      testWidgets('başka cihazda doğrulandı: "Doğruladım" devam ettiriyor', (
+        tester,
+      ) async {
+        await dogrulamada(tester);
+        auth.emailVerified = true;
+        await bas(tester, const Key('verify_email_check'));
+        expect(find.text('kurulum'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+
+      testWidgets('bağlantı uygulamayı açınca kendiliğinden devam ediyor', (
+        tester,
+      ) async {
+        await dogrulamada(tester);
+        await tester.runAsync(
+          () => hesap.applyEmailVerification('dogrulama-kodu'),
+        );
+        await settleAsync(tester);
+        expect(find.text('kurulum'), findsOneWidget);
+      });
+
+      testWidgets('yanlış kodlu bağlantı doğrulamıyor', (tester) async {
+        await dogrulamada(tester);
+        await tester.runAsync(() => hesap.applyEmailVerification('baska'));
+        await settleAsync(tester);
+        expect(find.byKey(const Key('verify_email')), findsOneWidget);
+      });
+
+      testWidgets('tekrar gönder bir dakika kapanıyor', (tester) async {
+        await dogrulamada(tester);
+        await bas(tester, const Key('verify_email_resend'));
+        expect(auth.verificationSends, 1);
+        final dugme = tester.widget<TextButton>(
+          find.byKey(const Key('verify_email_resend')),
+        );
+        expect(dugme.onPressed, isNull);
+      });
+
+      testWidgets('farklı hesapla giriş: oturum kapanıp girişe dönülüyor', (
+        tester,
+      ) async {
+        await dogrulamada(tester);
+        await bas(tester, const Key('verify_email_other_account'));
+        expect(find.byKey(const Key('sign_in')), findsOneWidget);
+        expect(hesap.isSignedIn, isFalse);
+      });
+    });
+
+    group('şifre yenileme bağlantısı', () {
+      Future<BuildContext> yenile(
+        WidgetTester tester,
+        String kod, {
+        Map<String, String> kodlar = const {},
+      }) async {
+        await tester.runAsync(() => kur(onboarded: false));
+        auth.resetCodes.addAll(kodlar);
+        await pumpRouter(
+          tester,
+          routes: const [],
+          router: yonlendirici('$resetPasswordPath?code=$kod'),
+          userViewModel: user,
+          accountViewModel: hesap,
+        );
+        await settleAsync(tester);
+        return tester.element(find.byKey(const Key('reset_password')));
+      }
+
+      testWidgets('yeni şifre uygulamada belirleniyor ve giriş yapılıyor', (
+        tester,
+      ) async {
+        final ctx = await yenile(tester, 'k1', kodlar: {'k1': 'ada@ornek.com'});
+        expect(find.textContaining('ada@ornek.com'), findsOneWidget);
+
+        await tester.enterText(
+          find.byKey(const Key('reset_password_field')),
+          'kisa',
+        );
+        await bas(tester, const Key('reset_password_submit'));
+        expect(find.text(ctx.tr('email_error_password_short')), findsOneWidget);
+        expect(auth.newPasswords, isEmpty);
+
+        auth.emailVerified = true;
+        await tester.enterText(
+          find.byKey(const Key('reset_password_field')),
+          'yeni-gizli-sifre',
+        );
+        await bas(tester, const Key('reset_password_submit'));
+        expect(auth.newPasswords, {'ada@ornek.com': 'yeni-gizli-sifre'});
+        expect(auth.emailSignIns.last.password, 'yeni-gizli-sifre');
+        expect(find.text('kurulum'), findsOneWidget);
+      });
+
+      testWidgets('geçersiz bağlantı yeni bağlantı istemeyi söylüyor', (
+        tester,
+      ) async {
+        await yenile(tester, 'yok');
+        expect(find.byKey(const Key('reset_password_invalid')), findsOneWidget);
+        await bas(tester, const Key('reset_password_back'));
+        expect(find.byKey(const Key('sign_in')), findsOneWidget);
+      });
     });
 
     testWidgets('biçim hatasında Firebase\'e gidilmiyor', (tester) async {
@@ -372,4 +514,8 @@ class _Oturum extends FirebaseAuthDataSource {
 
   @override
   String? get accountUid => auth.currentAccount?.uid;
+
+  @override
+  bool get needsEmailVerification =>
+      auth.currentAccount?.needsEmailVerification ?? false;
 }

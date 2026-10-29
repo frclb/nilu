@@ -17,6 +17,24 @@ import '../../localization/app_localizations.dart';
 import 'email_sign_in_sheet.dart';
 import 'sign_in_notice.dart';
 
+/// Giriş bitti: kaldığı yerden devam — kurulum ya da ana ekran.
+///
+/// Giriş, e-posta doğrulama ve şifre yenileme ekranları birlikte
+/// kullanıyor. E-posta hesabı doğrulanmadıysa yönlendirme oradan doğrulama
+/// ekranına geçiriyor.
+void continueAfterSignIn(BuildContext context) {
+  // Kimlik girişte tazelendi; yönlendirme artık geçiyor.
+  final router = GoRouter.of(context);
+  if (context.read<UserViewModel>().onboardingComplete) {
+    router.goNamed(RouteNames.home);
+  } else if (router.canPop()) {
+    // Karşılama altta kalsın: kurulumun geri düğmesi oraya dönüyor.
+    router.pushReplacementNamed(RouteNames.onboardingGoal);
+  } else {
+    router.goNamed(RouteNames.onboardingGoal);
+  }
+}
+
 /// Apple, Google ya da e-postayla giriş: uygulama hesapla kullanılıyor.
 ///
 /// Karşılama sayfalarından sonra, kurulumdan önce geliyor; çıkış yapan ya
@@ -50,19 +68,7 @@ class SignInScreen extends StatelessWidget {
     }
   }
 
-  /// Giriş bitti: kaldığı yerden devam.
-  void _continue(BuildContext context) {
-    // Kimlik girişte tazelendi; yönlendirme artık geçiyor.
-    final router = GoRouter.of(context);
-    if (context.read<UserViewModel>().onboardingComplete) {
-      router.goNamed(RouteNames.home);
-    } else if (router.canPop()) {
-      // Karşılama altta kalsın: kurulumun geri düğmesi oraya dönüyor.
-      router.pushReplacementNamed(RouteNames.onboardingGoal);
-    } else {
-      router.goNamed(RouteNames.onboardingGoal);
-    }
-  }
+  void _continue(BuildContext context) => continueAfterSignIn(context);
 
   @override
   Widget build(BuildContext context) {

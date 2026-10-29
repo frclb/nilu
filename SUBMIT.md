@@ -270,10 +270,11 @@ ama satın alma çalışmaz; ürünler "Missing Metadata"da bekler.
 - Demo hesabı: **gerekmiyor**. Uygulama karşılama sayfalarından sonra
   Apple, Google ya da e-postayla giriş istiyor (2026-10-29'dan beri
   zorunlu); inceleyen kendi Apple kimliğiyle "Apple ile Devam Et"i
-  kullanabilir, e-postasını gizleyebilir ya da "E-posta ile Devam Et" →
-  "Hesap oluştur" ile herhangi bir adresle hesap açabilir (doğrulama
-  beklenmiyor). İstenirse hazır bir demo hesabı verilebilir; onu hesap
-  sahibi uygulamadan açıp şifresini yalnızca bu alana yazar.
+  kullanabilir, e-postasını gizleyebilir. E-postayla da hesap açılabilir
+  ama adres doğrulaması zorunlu (gelen bağlantıya dokunmak gerekiyor);
+  notta Apple ile girmeleri öneriliyor. İstenirse hazır, doğrulanmış bir
+  demo hesabı verilebilir; onu hesap sahibi uygulamadan açıp şifresini
+  yalnızca bu alana yazar.
 - Notes alanına yaz:
   - Girişin zorunlu olduğunu ve neden: kayıtları yeni telefona taşımak
     (bulut yedeği), partner eşleşmesi; hesap silme uygulama içinde

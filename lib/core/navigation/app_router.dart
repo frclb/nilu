@@ -43,7 +43,9 @@ import '../../presentation/calendar/past_periods_screen.dart';
 import '../../presentation/insights/prediction_info_screen.dart';
 import '../../presentation/profile/privacy_security_screen.dart';
 import '../../presentation/account/account_screen.dart';
+import '../../presentation/account/reset_password_screen.dart';
 import '../../presentation/account/sign_in_screen.dart';
+import '../../presentation/account/verify_email_screen.dart';
 import '../../presentation/health_library/health_library_screen.dart';
 import '../../presentation/profile/profile_settings_screen.dart';
 import '../../presentation/partner_match/partner_match_screen.dart';
@@ -79,6 +81,8 @@ const Set<String> preOnboardingPaths = {
   '/partner_scan',
   '/account_restore',
   '/sign_in',
+  '/verify_email',
+  '/reset_password',
   '/privacy_policy',
   '/terms_of_service',
 };
@@ -87,19 +91,31 @@ const String splashPath = '/splash';
 const String onboardingPath = '/onboarding';
 const String homePath = '/home';
 const String signInPath = '/sign_in';
+const String verifyEmailPath = '/verify_email';
+const String resetPasswordPath = '/reset_password';
 
 /// Oturum açmadan da erişilebilen yollar.
 ///
-/// Uygulama Apple ya da Google hesabıyla kullanılıyor. Karşılama ekranı,
-/// giriş ekranı ve yasal metinler girişten önce okunabilmeli. Partner
-/// okutma ekranı ve buluttan geri yükleme kendi giriş düğmelerini
-/// gösteriyor: oradan girişe yönlendirmek akışı ikiye bölerdi.
+/// Uygulama Apple, Google ya da e-posta hesabıyla kullanılıyor. Karşılama
+/// ekranı, giriş ekranı ve yasal metinler girişten önce okunabilmeli.
+/// Partner okutma ekranı ve buluttan geri yükleme kendi giriş düğmelerini
+/// gösteriyor: oradan girişe yönlendirmek akışı ikiye bölerdi. Şifre
+/// yenileme bağlantısı da oturum yokken açılıyor.
 const Set<String> signedOutPaths = {
   '/splash',
   '/onboarding',
   signInPath,
+  resetPasswordPath,
   '/partner_scan',
   '/account_restore',
+  '/privacy_policy',
+  '/terms_of_service',
+};
+
+/// E-posta doğrulanmadan açılabilen yollar.
+const Set<String> emailVerificationPaths = {
+  verifyEmailPath,
+  resetPasswordPath,
   '/privacy_policy',
   '/terms_of_service',
 };
@@ -115,6 +131,7 @@ String? resolveRedirect({
   required bool onboardingComplete,
   required String location,
   bool needsSignIn = false,
+  bool needsEmailVerification = false,
 }) {
   // Durum depodan okunana kadar splash'te bekle. Erken karar verirsek dönen
   // kullanıcıyı yanlışlıkla onboarding'e düşürürüz.
@@ -164,6 +181,13 @@ String? resolveRedirect({
     return signInPath;
   }
 
+  // E-postayla açılan hesap, adres doğrulanana kadar kullanılmıyor; sunucu
+  // kuralları da doğrulanmamış e-posta hesabını reddediyor. Doğrulanınca
+  // ekranın kendisi devam ettiriyor — giriş ekranındaki sebeple.
+  if (needsEmailVerification && !emailVerificationPaths.contains(location)) {
+    return verifyEmailPath;
+  }
+
   return null;
 }
 
@@ -195,6 +219,7 @@ GoRouter createAppRouter(
       onboardingComplete: userViewModel.onboardingComplete,
       location: state.matchedLocation,
       needsSignIn: userViewModel.needsSignIn,
+      needsEmailVerification: userViewModel.needsEmailVerification,
     ),
     // Rota loglarını yalnızca debug derlemede yaz — release'te gürültü ve
     // gereksiz bilgi sızıntısı olmasın.
@@ -547,6 +572,19 @@ GoRouter createAppRouter(
         path: '/sign_in',
         name: RouteNames.signIn,
         builder: (context, state) => const SignInScreen(),
+      ),
+      // E-posta hesabı: adres doğrulanana kadar burada; şifre yenileme
+      // bağlantısı da uygulamada bitiyor (bkz. `AuthActionLink`).
+      GoRoute(
+        path: verifyEmailPath,
+        name: RouteNames.verifyEmail,
+        builder: (context, state) => const VerifyEmailScreen(),
+      ),
+      GoRoute(
+        path: resetPasswordPath,
+        name: RouteNames.resetPassword,
+        builder: (context, state) =>
+            ResetPasswordScreen(code: state.uri.queryParameters['code']),
       ),
 
       GoRoute(

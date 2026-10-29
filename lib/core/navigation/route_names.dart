@@ -30,6 +30,8 @@ class RouteNames {
   static const String account = 'account';
   static const String accountRestore = 'account_restore';
   static const String signIn = 'sign_in';
+  static const String verifyEmail = 'verify_email';
+  static const String resetPassword = 'reset_password';
   static const String partnerQrGen = 'partner_qr_gen';
   static const String partnerScan = 'partner_scan';
   static const String partnerSupport = 'partner_support';

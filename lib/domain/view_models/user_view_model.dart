@@ -100,6 +100,11 @@ class UserViewModel extends ChangeNotifier {
   /// (testler, yerel mod) giriş istenmiyor.
   bool get needsSignIn => _firestoreDS.isAvailable && _accountUid == null;
 
+  /// E-postayla giriş yapılmış ama adres doğrulanmamış: uygulama
+  /// doğrulanana kadar kullanılmıyor (bkz. `resolveRedirect`).
+  bool get needsEmailVerification =>
+      _firestoreDS.isAvailable && _authDS.needsEmailVerification;
+
   /// Eşleşme sunucusu var ama hesap yok: eşleşmeden önce giriş gerekiyor.
   bool get needsAccountForPairing => needsSignIn;
 

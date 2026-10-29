@@ -191,6 +191,34 @@ void main() {
     expect(html, isNot(contains('{{')));
   });
 
+  // E-posta doğrulama ve şifre yenileme bağlantıları (Firebase'in "action
+  // URL"i) uygulama yüklü değilken ya da başka cihazda bu sayfayı açıyor.
+  test(
+    'doğrulama sayfası: altı dil, işlemi kendisi bitiriyor, dizine girmiyor',
+    () {
+      final html = oku('auth/index.html');
+      expect(html, contains('<meta name="robots" content="noindex">'));
+      expect(html, contains('<meta name="referrer" content="no-referrer">'));
+      // Yalnızca Firebase'in kimlik arayüzüne istek; başka adres yok.
+      expect(
+        html,
+        contains("'https://identitytoolkit.googleapis.com/v1/accounts:'"),
+      );
+      expect(html, contains("istek('update', { oobCode: kod })"));
+      expect(html, contains("newPassword: sifre"));
+      expect(html, contains("'nilu://auth?mode=verified'"));
+      expect(html, contains("'nilu://auth?mode=resetPassword&oobCode='"));
+      // Şifre en az 8 karakter: uygulamadaki sınırla aynı.
+      expect(html, contains('sifre.length < 8'));
+      for (final d in diller) {
+        expect(html, contains('"$d": {'), reason: d);
+      }
+      expect(html, isNot(contains('{{')));
+      // E-posta yalnızca metin olarak yazılıyor.
+      expect(html, isNot(contains('innerHTML')));
+    },
+  );
+
   test('göreli bağlantıların hepsi var olan bir dosyaya gidiyor', () {
     final link = RegExp(r'''(?:src|href)="([^"#:]+)"''');
     for (final f in cikti.listSync(recursive: true).whereType<File>()) {

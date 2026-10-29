@@ -17,6 +17,9 @@ void main() {
   const reachedOtherwise = <String, String>{
     'splash': 'Yönlendirme ara ekranı; durum yüklenirken redirect düşürüyor.',
     'signIn': 'Oturum yokken redirect düşürüyor (bkz. `resolveRedirect`).',
+    'verifyEmail':
+        'E-posta hesabı doğrulanmamışken redirect düşürüyor '
+        '(bkz. `resolveRedirect`).',
     'insights': 'Alt menü dalı; sekmeye `branchIndex` ile geçiliyor.',
     'partnerSupport':
         'Partner modunda başka bir sekmenin içine gömülü çiziliyor.',

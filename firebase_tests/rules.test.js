@@ -381,6 +381,30 @@ describe('syncData/{uid}: bulut kopyası', () => {
     await assertSucceeds(setDoc(doc(fs, 'syncData/ada'), meta));
   });
 
+  // E-posta ve şifreyle açılan hesap: adres doğrulanmadan hiçbir şey.
+  const eposta = (uid, dogrulandi) =>
+    env
+      .authenticatedContext(uid, {
+        email: `${uid}@ornek.com`,
+        email_verified: dogrulandi,
+        firebase: { sign_in_provider: 'password', identities: { email: [`${uid}@ornek.com`] } },
+      })
+      .firestore();
+
+  test('adresi doğrulanmış e-posta hesabı sahip olarak yazar, okur', async () => {
+    const fs = eposta('ada', true);
+    await assertSucceeds(setDoc(doc(fs, 'syncData/ada'), meta));
+    await assertSucceeds(getDoc(doc(fs, 'syncData/ada')));
+  });
+
+  test('adresi doğrulanmamış e-posta hesabı kendi kopyasına bile erişemez', async () => {
+    await seed(async (fs) => setDoc(doc(fs, 'syncData/ada'), meta));
+    const fs = eposta('ada', false);
+    await assertFails(getDoc(doc(fs, 'syncData/ada')));
+    await assertFails(setDoc(doc(fs, 'syncData/ada'), meta));
+    await assertFails(setDoc(doc(fs, 'users/ada'), { partners: [] }));
+  });
+
   test('anonim kimlik kendi uid\'sinde bile okuyamaz, yazamaz', async () => {
     await seed(async (fs) => setDoc(doc(fs, 'syncData/ada'), meta));
     const fs = anonim('ada');

@@ -27,6 +27,7 @@ import 'domain/view_models/partner_view_model.dart';
 import 'domain/view_models/pregnancy_view_model.dart';
 import 'domain/view_models/user_view_model.dart';
 import 'domain/view_models/subscription_view_model.dart';
+import 'domain/services/auth_action_link.dart';
 import 'domain/services/pairing_token.dart';
 import 'domain/services/subscription_service.dart';
 import 'core/app_info.dart';
@@ -188,7 +189,14 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
 
   /// Partner davet bağlantısı uygulamayı açtı: kod okutulmuş gibi
   /// işleniyor. Hesap yoksa okutma ekranı önce girişi soruyor.
+  ///
+  /// E-postadaki doğrulama ve şifre yenileme bağlantıları da buradan
+  /// geliyor ([_onAuthLink]).
   void _onLink(Uri uri) {
+    if (AuthActionLink.fromUri(uri) case final auth?) {
+      _onAuthLink(auth);
+      return;
+    }
     final kod = PairingToken.fromInviteLink(uri);
     if (kod == null) return;
     _whenSettled(
@@ -197,6 +205,25 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
         queryParameters: {'k': kod},
       ),
     );
+  }
+
+  /// Doğrulama bağlantısında kod uygulanıyor; adres doğrulanınca doğrulama
+  /// ekranı kendisi devam ettiriyor. Şifre yenileme bağlantısı yeni şifre
+  /// ekranını açıyor.
+  void _onAuthLink(AuthActionLink link) {
+    switch (link.action) {
+      case AuthAction.verifyEmail:
+        unawaited(_account.applyEmailVerification(link.code!));
+      case AuthAction.verified:
+        unawaited(_account.checkEmailVerified());
+      case AuthAction.resetPassword:
+        _whenSettled(
+          () => _router.pushNamed(
+            RouteNames.resetPassword,
+            queryParameters: {'code': link.code!},
+          ),
+        );
+    }
   }
 
   /// Açılış yönlendirmesi bitince [open]'ı çalıştırır.

@@ -37,6 +37,15 @@ class AppInfo {
   /// doğrulama dosyası ve `site/site.json`.
   static const String inviteLinkBase = 'https://frclb.github.io/nilu/p/';
 
+  /// E-posta doğrulama ve şifre yenileme bağlantılarının açıldığı sayfa:
+  /// Firebase'in "action URL"i (Authentication → Templates). Firebase
+  /// sonuna `?mode=…&oobCode=…&apiKey=…&lang=…` ekliyor. Telefonda uygulamayı
+  /// açıyor (`AuthActionLink`), başka cihazda sayfa işlemi kendisi bitiriyor.
+  ///
+  /// Değişirse birlikte: Firebase'deki action URL, doğrulama dosyasındaki
+  /// `/nilu/auth/*` yolu ve `tool/build_site.dart`.
+  static const String authLinkBase = 'https://frclb.github.io/nilu/auth/';
+
   /// Sitedeki sayfanın "Nilu'da aç" düğmesinin şeması (`nilu://p#KOD`).
   /// Aynı alan adındaki sayfadan bağlantıya dokunmak uygulamayı açmıyor.
   static const String linkScheme = 'nilu';

@@ -54,15 +54,22 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Apple ya da Google hesabıyla oturum. Anonim oturum (Firebase'de
-    // kapalı, eski sürümlerden kalmış olabilir) hiçbir şeye erişemez.
+    // Apple, Google ya da adresi doğrulanmış e-posta hesabıyla oturum.
+    // Anonim oturum (Firebase'de kapalı, eski sürümlerden kalmış olabilir)
+    // hiçbir şeye erişemez; adresi doğrulanmamış e-posta hesabı da —
+    // uygulama onu doğrulama ekranında tutuyor, kural da aynısını istiyor.
     //
     // `sign_in_provider` değil `identities`: Firebase hesabın hangi
-    // sağlayıcılarla doğrulandığını orada tutuyor.
+    // sağlayıcılarla doğrulandığını orada tutuyor. `email_verified` jetonda;
+    // uygulama doğrulamadan sonra jetonu yeniliyor.
     function isSignedIn() {
+      let kimlikler = request.auth == null
+        ? {}
+        : request.auth.token.firebase.get('identities', {});
       return request.auth != null
-        && request.auth.token.firebase.get('identities', {})
-             .keys().hasAny(['apple.com', 'google.com']);
+        && (kimlikler.keys().hasAny(['apple.com', 'google.com'])
+            || (kimlikler.keys().hasAny(['email'])
+                && request.auth.token.get('email_verified', false) == true));
     }
 
     function isOwner(uid) {

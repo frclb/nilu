@@ -361,6 +361,66 @@ void main() {
     });
   });
 
+  // E-postayla açılan hesap adres doğrulanana kadar kullanılmıyor.
+  group('e-posta doğrulanmamışken', () {
+    String son(String location, {required bool onboardingComplete}) {
+      var konum = location;
+      for (var i = 0; i < 5; i++) {
+        final sonraki = resolveRedirect(
+          isLoaded: true,
+          onboardingComplete: onboardingComplete,
+          location: konum,
+          needsEmailVerification: true,
+        );
+        if (sonraki == null) return konum;
+        konum = sonraki;
+      }
+      fail('$location: yönlendirme döngüye girdi');
+    }
+
+    test('kurulum ve uygulama doğrulama ekranına çıkıyor; döngü yok', () {
+      for (final (yol, kuruldu) in [
+        ('/onboarding_goal', false),
+        ('/onboarding_last_period', false),
+        (onboardingPath, false),
+        (homePath, true),
+        ('/calendar', true),
+        ('/account', true),
+        ('/partner_scan', true),
+        (signInPath, true),
+      ]) {
+        expect(
+          son(yol, onboardingComplete: kuruldu),
+          verifyEmailPath,
+          reason: yol,
+        );
+      }
+      expect(son(verifyEmailPath, onboardingComplete: false), verifyEmailPath);
+    });
+
+    test('şifre yenileme ve yasal metinler açık', () {
+      for (final yol in [
+        resetPasswordPath,
+        '/privacy_policy',
+        '/terms_of_service',
+      ]) {
+        expect(son(yol, onboardingComplete: false), yol, reason: yol);
+      }
+    });
+
+    test('şifre yenileme oturum yokken de açılıyor', () {
+      expect(
+        resolveRedirect(
+          isLoaded: true,
+          onboardingComplete: true,
+          location: resetPasswordPath,
+          needsSignIn: true,
+        ),
+        isNull,
+      );
+    });
+  });
+
   test(
     'izin verilen yollar listesi splash ve onboarding adımlarını içerir',
     () {

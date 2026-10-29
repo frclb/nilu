@@ -98,6 +98,17 @@ class FakeAccountAuth implements AccountAuth {
   final List<({String email, String password, bool create, String? lang})>
   emailSignIns = [];
   final List<String> resetEmails = [];
+
+  /// E-posta hesabının adresi doğrulandı mı (sunucudaki durum).
+  bool emailVerified = false;
+
+  /// Bağlantıdaki doğrulama kodu bu ise uygulanıyor.
+  String validVerificationCode = 'dogrulama-kodu';
+  int verificationSends = 0;
+
+  /// Şifre yenileme kodları → hesabın adresi.
+  final Map<String, String> resetCodes = {};
+  final Map<String, String> newPasswords = {};
   final _changes = StreamController<AccountUser?>.broadcast();
 
   @override
@@ -142,8 +153,50 @@ class FakeAccountAuth implements AccountAuth {
       uid: nextUid,
       provider: AccountProvider.email,
       email: email.trim(),
+      emailVerified: emailVerified,
     );
     return SignInResult(SignInStatus.signedIn, user: _current);
+  }
+
+  @override
+  Future<bool> sendEmailVerification({String? languageCode}) async {
+    verificationSends++;
+    return available && _current != null;
+  }
+
+  @override
+  Future<AccountUser?> reloadAccount() async {
+    final c = _current;
+    if (c == null) return null;
+    _current = AccountUser(
+      uid: c.uid,
+      provider: c.provider,
+      email: c.email,
+      displayName: c.displayName,
+      emailVerified: c.provider != AccountProvider.email || emailVerified,
+    );
+    return _current;
+  }
+
+  @override
+  Future<bool> applyEmailVerification(String code) async {
+    if (code != validVerificationCode) return false;
+    emailVerified = true;
+    return true;
+  }
+
+  @override
+  Future<String?> checkPasswordResetCode(String code) async => resetCodes[code];
+
+  @override
+  Future<PasswordResetResult> confirmPasswordReset(
+    String code,
+    String newPassword,
+  ) async {
+    final email = resetCodes.remove(code);
+    if (email == null) return PasswordResetResult.invalidLink;
+    newPasswords[email] = newPassword;
+    return PasswordResetResult.done;
   }
 
   @override

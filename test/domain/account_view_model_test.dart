@@ -270,6 +270,63 @@ void main() {
       expect(v.isSignedIn, isFalse);
     });
 
+    test(
+      'doğrulanmamış hesap kapıda; doğrulanınca kimlik tazeleniyor',
+      () async {
+        final v = await vm();
+        var tazelendi = 0;
+        v.onIdentityChanged = () async => tazelendi++;
+        await v.signInWithEmail('ada@ornek.com', 'gizli-sifre', create: true);
+        expect(v.needsEmailVerification, isTrue);
+        tazelendi = 0;
+
+        expect(await v.checkEmailVerified(), isFalse);
+        expect(tazelendi, 0);
+
+        auth.emailVerified = true;
+        expect(await v.checkEmailVerified(), isTrue);
+        expect(v.needsEmailVerification, isFalse);
+        expect(tazelendi, 1, reason: 'yönlendirme doğrulama ekranından çıksın');
+      },
+    );
+
+    test(
+      'Firebase hazır olmadan gelen doğrulama kodu sonra uygulanıyor',
+      () async {
+        final v = await vm();
+        await v.signInWithEmail('ada@ornek.com', 'gizli-sifre', create: true);
+        // Bağlantı uygulamayı soğuk başlattı: Firebase henüz hazır değil.
+        auth.available = false;
+        expect(await v.applyEmailVerification('dogrulama-kodu'), isFalse);
+        expect(auth.emailVerified, isFalse);
+
+        auth.available = true;
+        await v.refresh();
+        expect(auth.emailVerified, isTrue);
+        expect(v.needsEmailVerification, isFalse);
+      },
+    );
+
+    test('şifre yenileme: geçersiz kod, sonra yeni şifreyle giriş', () async {
+      final v = await vm();
+      expect(
+        await v.resetPassword('yok', email: 'ada@ornek.com', newPassword: 'x'),
+        PasswordResetResult.invalidLink,
+      );
+      auth.resetCodes['k1'] = 'ada@ornek.com';
+      expect(await v.checkPasswordResetCode('k1'), 'ada@ornek.com');
+      expect(
+        await v.resetPassword(
+          'k1',
+          email: 'ada@ornek.com',
+          newPassword: 'yeni-gizli-sifre',
+        ),
+        PasswordResetResult.done,
+      );
+      expect(v.isSignedIn, isTrue);
+      expect(auth.emailSignIns.last.password, 'yeni-gizli-sifre');
+    });
+
     test('hesap silme şifreyi doğrulamaya veriyor', () async {
       final v = await vm();
       await v.signInWithEmail('ada@ornek.com', 'gizli-sifre', create: false);

@@ -123,6 +123,10 @@ class AccountViewModel extends ChangeNotifier {
     _sub = null;
     await _load();
     if (_syncEnabled) scheduleSync(immediately: true);
+    if (_pendingVerification case final kod? when isAvailable) {
+      _pendingVerification = null;
+      await applyEmailVerification(kod);
+    }
   }
 
   Future<void> _readConsent() async {
@@ -169,6 +173,60 @@ class AccountViewModel extends ChangeNotifier {
       _withBusy(
         () => _auth.sendPasswordReset(email, languageCode: languageCode),
       );
+
+  /// E-posta hesabı doğrulanmadı: uygulama doğrulanana kadar kapalı.
+  bool get needsEmailVerification => _account?.needsEmailVerification ?? false;
+
+  Future<bool> resendEmailVerification({String? languageCode}) =>
+      _auth.sendEmailVerification(languageCode: languageCode);
+
+  /// Hesabı sunucudan yeniden okur. Adres doğrulandıysa kimliği tazeler
+  /// (yönlendirme doğrulama ekranından çıkıyor). Doğrulandıysa `true`.
+  Future<bool> checkEmailVerified() async {
+    final onceden = needsEmailVerification;
+    final guncel = await _auth.reloadAccount();
+    if (guncel != null) _account = guncel;
+    if (onceden && !needsEmailVerification) {
+      await onIdentityChanged?.call();
+    }
+    notifyListeners();
+    return !needsEmailVerification;
+  }
+
+  /// Firebase başlamadan gelen doğrulama kodu; başlayınca uygulanıyor.
+  String? _pendingVerification;
+
+  /// E-postadaki doğrulama bağlantısı uygulamayı açtı.
+  ///
+  /// Bağlantı uygulamayı soğuk başlattıysa Firebase henüz hazır olmayabilir
+  /// (açılış onu beklemiyor): kod saklanıyor ve [refresh]'te uygulanıyor.
+  Future<bool> applyEmailVerification(String code) async {
+    if (!isAvailable) {
+      _pendingVerification = code;
+      return false;
+    }
+    await _auth.applyEmailVerification(code);
+    return checkEmailVerified();
+  }
+
+  /// Şifre yenileme kodu geçerliyse hesabın adresi.
+  Future<String?> checkPasswordResetCode(String code) =>
+      _auth.checkPasswordResetCode(code);
+
+  /// Yeni şifreyi belirler; oturum yoksa o şifreyle giriş de yapar.
+  Future<PasswordResetResult> resetPassword(
+    String code, {
+    required String email,
+    required String newPassword,
+  }) => _withBusy(() async {
+    final sonuc = await _auth.confirmPasswordReset(code, newPassword);
+    if (sonuc == PasswordResetResult.done && _account == null) {
+      await _signedIn(
+        await _auth.signInWithEmail(email, newPassword, create: false),
+      );
+    }
+    return sonuc;
+  });
 
   Future<SignInResult> _signedIn(SignInResult sonuc) async {
     if (sonuc.status == SignInStatus.signedIn) {

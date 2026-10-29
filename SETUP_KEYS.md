@@ -493,10 +493,15 @@ kabul ettiği için Podfile.lock'ta 3.5.0. Yerel ayarı UTF-8 olmayan kabukta
 - **Google** → aç, destek e-postasını seç.
 - **Email/Password** → aç; "Email link (passwordless)" **kapalı** kalsın.
   Yapıldı (2026-10-29, Firebase CLI oturumuyla, yalnızca `signIn.email`).
-  Sıfırlama ve doğrulama e-postalarını Firebase gönderiyor; bağlantılar
-  Firebase'in barındırdığı sayfaya (`nilu-3b870.firebaseapp.com/__/auth/action`)
-  gidiyor, ek kurulum yok. E-postadaki uygulama adı Project settings →
-  General → **Public-facing name**: "Nilu" olmalı, proje kimliği değil.
+  **Adres doğrulaması zorunlu:** doğrulanmamış hesap uygulamada "E-postanı
+  doğrula" ekranında kalıyor, `firestore.rules` → `isSignedIn` de
+  `email_verified` istiyor. Doğrulama ve şifre yenileme e-postalarını
+  Firebase gönderiyor (ücretsiz; kod değil bağlantı). Bağlantılar Nilu'nun
+  kendi sayfasına gidiyor: Authentication → Templates → **Customize action
+  URL** = `https://frclb.github.io/nilu/auth/` (API'de
+  `notification.sendEmail.callbackUri`; §8.7). E-postadaki uygulama adı
+  Project settings → General → **Public-facing name**: "Nilu" (kontrol
+  edildi).
   E-posta numaralandırma koruması açık (`emailPrivacyConfig`): yanlış şifre
   ile kayıtlı olmayan adres aynı hatayı veriyor.
 - **Apple** → aç. iOS'ta yerel "Apple ile giriş" kullanılıyor, Services ID
@@ -643,7 +648,14 @@ kuruldu):
   `/nilu/p/*`. Apple dosyayı kendi önbelleğinden okuyor; durumunu
   `https://app-site-association.cdn-apple.com/a/v1/frclb.github.io` gösteriyor.
 
-Uygulama yüklü değilse aynı adres sitedeki `p/index.html`'i açıyor
+**E-posta doğrulama ve şifre yenileme bağlantısı** aynı düzende:
+`https://frclb.github.io/nilu/auth/?mode=…&oobCode=…` (doğrulama dosyasında
+yol `/nilu/auth/*`). Telefonda uygulamayı açıyor; `AuthActionLink` kodu
+uyguluyor ya da yeni şifre ekranını açıyor. Başka cihazda ya da e-posta
+uygulamasının tarayıcısında sitedeki `auth/index.html` işlemi Firebase'in
+REST arayüzüyle kendisi bitiriyor (`tool/build_site.dart` → `_authAction`).
+
+Uygulama yüklü değilse davet adresi sitedeki `p/index.html`'i açıyor
 (`tool/build_site.dart` → `_invite`): "Nilu'da aç" (`nilu://p#KOD`, Info.plist'te
 şema), indirme yolu ve kodu elle yazmak için kodun kendisi. Uygulamada
 bağlantıyı `app_links` karşılıyor (`main.dart`); Flutter'ın kendi derin
