@@ -267,7 +267,11 @@ class _PeriodTrackerAppState extends State<PeriodTrackerApp> {
             final vm = partnerVM ?? PartnerViewModel();
             // Yalnızca partner rolünde: sahibin cihazı partnerinin
             // dokümanını dinlemiyor (partner bir şey paylaşmıyor).
-            vm.init(userVM.isPartner ? userVM.partnerId : null);
+            vm.init(
+              userVM.isPartner ? userVM.partnerId : null,
+              requestToken: userVM.pendingRequestToken,
+              myUid: userVM.myId,
+            );
             return vm;
           },
         ),

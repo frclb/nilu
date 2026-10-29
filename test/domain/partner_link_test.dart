@@ -337,6 +337,79 @@ void main() {
       expect(vm.currentStatus?.sexualDesire, 'feel_closer');
       vm.dispose();
     });
+
+    // TestFlight: sahip onayladıktan sonra partnerin ekranı yarım dakika
+    // "Onay bekleniyor" dedi. Onay, isteğin silinmesinden anında
+    // öğreniliyor.
+    test('sahip onaylayınca yeniden denemeyi beklemeden açılıyor', () async {
+      var deneme = 0;
+      final denied = FirebaseException(
+        plugin: 'cloud_firestore',
+        code: 'permission-denied',
+      );
+      remote.statusStream = (_) {
+        deneme++;
+        return deneme == 1
+            ? Stream<DocumentSnapshot<Map<String, dynamic>>>.error(denied)
+            : Stream.value(
+                FakeSnapshot({
+                  'sexualDesire': 'feel_closer',
+                  'affectionNeeds': ['hug'],
+                  'timestamp': Timestamp.now(),
+                  'isShared': true,
+                }),
+              );
+      };
+      final istek = StreamController<DocumentSnapshot<Map<String, dynamic>>>();
+      String? dinlenenKod;
+      String? dinlenenKimlik;
+      remote.requestStream = (token, uid) {
+        dinlenenKod = token;
+        dinlenenKimlik = uid;
+        return istek.stream;
+      };
+      final vm = PartnerViewModel(
+        firestore: remote,
+        retryInterval: const Duration(hours: 1),
+      );
+      vm.init('sahip', requestToken: 'KOD', myUid: 'ben');
+      await pumpEventQueue();
+      expect(vm.state, PartnerLinkState.awaitingApproval);
+      expect((dinlenenKod, dinlenenKimlik), ('KOD', 'ben'));
+
+      istek.add(FakeSnapshot({'requestedAt': Timestamp.now()}));
+      await pumpEventQueue();
+      expect(deneme, 1, reason: 'İstek duruyorken okuma denenmemeli');
+
+      // Sahip onayladı: istek silindi.
+      istek.add(FakeSnapshot(null));
+      await pumpEventQueue();
+      expect(deneme, 2);
+      expect(vm.state, PartnerLinkState.connected);
+      expect(vm.currentStatus?.sexualDesire, 'feel_closer');
+      vm.dispose();
+      await istek.close();
+    });
+
+    test('reddedilen istek dinleyiciyi döngüye sokmuyor', () async {
+      final denied = FirebaseException(
+        plugin: 'cloud_firestore',
+        code: 'permission-denied',
+      );
+      remote.statusStream = (_) =>
+          Stream<DocumentSnapshot<Map<String, dynamic>>>.error(denied);
+      remote.requestStream = (_, _) => Stream.value(FakeSnapshot(null));
+      final vm = PartnerViewModel(
+        firestore: remote,
+        retryInterval: const Duration(hours: 1),
+      );
+      vm.init('sahip', requestToken: 'KOD', myUid: 'ben');
+      await pumpEventQueue();
+      expect(vm.state, PartnerLinkState.awaitingApproval);
+      expect(remote.subscriptions, 2);
+      expect(remote.requestWatches, 1);
+      vm.dispose();
+    });
   });
 }
 

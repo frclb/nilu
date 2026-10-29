@@ -43,6 +43,7 @@ import '../../presentation/calendar/past_periods_screen.dart';
 import '../../presentation/insights/prediction_info_screen.dart';
 import '../../presentation/profile/privacy_security_screen.dart';
 import '../../presentation/account/account_screen.dart';
+import '../../presentation/account/sign_in_screen.dart';
 import '../../presentation/health_library/health_library_screen.dart';
 import '../../presentation/profile/profile_settings_screen.dart';
 import '../../presentation/partner_match/partner_match_screen.dart';
@@ -77,6 +78,7 @@ const Set<String> preOnboardingPaths = {
   '/onboarding_success',
   '/partner_scan',
   '/account_restore',
+  '/sign_in',
   '/privacy_policy',
   '/terms_of_service',
 };
@@ -84,6 +86,23 @@ const Set<String> preOnboardingPaths = {
 const String splashPath = '/splash';
 const String onboardingPath = '/onboarding';
 const String homePath = '/home';
+const String signInPath = '/sign_in';
+
+/// Oturum açmadan da erişilebilen yollar.
+///
+/// Uygulama Apple ya da Google hesabıyla kullanılıyor. Karşılama ekranı,
+/// giriş ekranı ve yasal metinler girişten önce okunabilmeli. Partner
+/// okutma ekranı ve buluttan geri yükleme kendi giriş düğmelerini
+/// gösteriyor: oradan girişe yönlendirmek akışı ikiye bölerdi.
+const Set<String> signedOutPaths = {
+  '/splash',
+  '/onboarding',
+  signInPath,
+  '/partner_scan',
+  '/account_restore',
+  '/privacy_policy',
+  '/terms_of_service',
+};
 
 /// Yönlendirme kararı — saf fonksiyon.
 ///
@@ -95,6 +114,7 @@ String? resolveRedirect({
   required bool isLoaded,
   required bool onboardingComplete,
   required String location,
+  bool needsSignIn = false,
 }) {
   // Durum depodan okunana kadar splash'te bekle. Erken karar verirsek dönen
   // kullanıcıyı yanlışlıkla onboarding'e düşürürüz.
@@ -129,6 +149,21 @@ String? resolveRedirect({
     return onboardingPath;
   }
 
+  // Oturum yoksa giriş ekranı. Kurulumdan önce de sonra da: çıkış yapan
+  // ya da hesabını silen kullanıcı da buraya düşüyor.
+  //
+  // [needsSignIn] yalnızca hesap hizmeti hazırken doğru: Firebase
+  // başlamadan karar verilmiyor, başlayınca `refreshListenable` yönlendirmeyi
+  // yeniden çalıştırıyor.
+  //
+  // Girişten sonra nereye gidileceğine giriş ekranı karar veriyor, burası
+  // değil: ekran karşılamanın üstüne itildiğinde `refreshListenable`
+  // yönlendirmeyi alttaki karşılama konumu için çalıştırıyor ve kullanıcı
+  // giriş ekranında kalıyordu.
+  if (needsSignIn && !signedOutPaths.contains(location)) {
+    return signInPath;
+  }
+
   return null;
 }
 
@@ -159,6 +194,7 @@ GoRouter createAppRouter(
       isLoaded: userViewModel.isLoaded,
       onboardingComplete: userViewModel.onboardingComplete,
       location: state.matchedLocation,
+      needsSignIn: userViewModel.needsSignIn,
     ),
     // Rota loglarını yalnızca debug derlemede yaz — release'te gürültü ve
     // gereksiz bilgi sızıntısı olmasın.
@@ -501,6 +537,14 @@ GoRouter createAppRouter(
         path: '/account_restore',
         name: RouteNames.accountRestore,
         builder: (context, state) => const AccountScreen(restore: true),
+      ),
+
+      // Giriş: uygulama Apple ya da Google hesabıyla kullanılıyor. Oraya
+      // yönlendirme `resolveRedirect`'te; giriş bitince de oradan çıkılıyor.
+      GoRoute(
+        path: '/sign_in',
+        name: RouteNames.signIn,
+        builder: (context, state) => const SignInScreen(),
       ),
 
       GoRoute(

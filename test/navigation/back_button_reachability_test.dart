@@ -18,6 +18,10 @@ void main() {
     'home': 'Kurulum bitti; geri tuşuyla soru ekranlarına dönülmemeli.',
     'onboarding': 'Akışın başı; yönlendirme buraya düşürüyor.',
     'onboardingSuccess': 'Kurulumun son adımı; öncesine dönülmemeli.',
+    'onboardingGoal':
+        'Giriş ekranı yönlendirmeyle tek başına açıldıysa altında dönülecek '
+        'bir şey yok; kurulumun geri düğmesi o zaman karşılamaya gidiyor '
+        '(`onboardingBack`). Karşılamanın üstüne itildiyse `push` ile.',
     'profile': 'Alt menü sekmesi; kendi geri düğmesi yok.',
   };
 

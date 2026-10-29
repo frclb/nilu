@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../core/platform/app_haptics.dart';
 import '../../design_system/app_decor.dart';
 import '../../design_system/app_scrim.dart';
@@ -43,13 +44,39 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     super.dispose();
   }
 
-  void _onDetect(BarcodeCapture capture) async {
+  void _onDetect(BarcodeCapture capture) {
     if (_isProcessing) return;
 
     final List<Barcode> barcodes = capture.barcodes;
     if (barcodes.isEmpty) return;
 
-    final raw = barcodes.first.rawValue;
+    _handleCode(barcodes.first.rawValue);
+  }
+
+  /// Kodu elle yazdırır: kamera yoksa, izin verilmediyse ya da kod
+  /// mesajla geldiyse.
+  ///
+  /// Davet ekranı kodun tamamını "elle yazılabilsin" diye gösteriyordu ama
+  /// yazılacak bir yer yoktu; TestFlight'ta "manuel ekleme yapılmıyor"
+  /// bulgusu buydu.
+  Future<void> _enterCode() async {
+    if (_isProcessing) return;
+    // Sayfa açıkken kameranın okuduğu bir kod onay sayfasını üstüne açmasın.
+    setState(() => _isProcessing = true);
+    final code = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const _ManualCodeSheet(),
+    );
+    if (!mounted) return;
+    setState(() => _isProcessing = false);
+    if (code != null) await _handleCode(code, typed: true);
+  }
+
+  /// Okunan ya da elle yazılan kodu işler.
+  Future<void> _handleCode(String? raw, {bool typed = false}) async {
+    if (_isProcessing) return;
 
     // Eskiden okunan **her** QR doğrudan partnerId olarak kaydediliyordu:
     // afişteki bir bağlantı ya da kişinin kendi kodu da dahil.
@@ -60,7 +87,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
     final format = PartnerCode.validateFormat(raw);
     if (!format.isValid) {
       // Kamera açık kalsın: kullanıcı doğru kodu okutmayı sürdürebilsin.
-      _showScanError(format);
+      _showScanError(format, typed: typed);
       return;
     }
 
@@ -100,7 +127,7 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
       // sırada, başlatma hata verdiğinde mesaja hiç sıra gelmiyordu:
       // kullanıcı neyin yanlış olduğunu öğrenemeden kamera aynı kodu
       // okumaya devam ediyordu.
-      _showScanError(status);
+      _showScanError(status, typed: typed);
       await _resumeScanner();
       if (!mounted) return;
       setState(() => _isProcessing = false);
@@ -146,13 +173,16 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
   /// Geçersiz kodu bildirir ve taramaya devam eder.
   ///
   /// Aynı geçersiz QR kare kare tekrar okunduğu için mesaj sürekli
-  /// yenilenmesin diye kısa bir bekleme konuyor.
+  /// yenilenmesin diye kısa bir bekleme konuyor. Elle yazılan kodda
+  /// bekleme yok: her deneme bir yanıt almalı.
   DateTime? _lastErrorAt;
 
-  void _showScanError(PartnerCodeStatus status) {
+  void _showScanError(PartnerCodeStatus status, {bool typed = false}) {
     final now = DateTime.now();
     final last = _lastErrorAt;
-    if (last != null && now.difference(last) < const Duration(seconds: 3)) {
+    if (!typed &&
+        last != null &&
+        now.difference(last) < const Duration(seconds: 3)) {
       return;
     }
     _lastErrorAt = now;
@@ -303,107 +333,330 @@ class _PartnerScanScreenState extends State<PartnerScanScreen> {
                   child: PartnerUnavailableNotice(),
                 ),
               )
-            : MobileScanner(
-                controller: _scannerController,
-                onDetect: _onDetect,
-                // Paketin kendi hata ekranı İngilizce sabit metin gösteriyor
-                // ("Scanning is not supported on this device"). Kullanıcı kamera
-                // iznini reddettiğinde de bu ekran çıkıyor, yani gerçek cihazda
-                // ulaşılabilir bir durum.
-                errorBuilder: (context, error) => ScanUnavailable(error: error),
-                // Çerçeve ve alt ipucu `overlayBuilder`'a veriliyor; paket bunları
-                // **yalnızca önizleme görünürken** çiziyor.
-                //
-                // Önceden ikisi de `Stack`'te `MobileScanner`'ın kardeşiydi ve
-                // kamera açılamadığında da çiziliyordu: karartma katmanı hata
-                // metnini kenarlardan soluklaştırıyor, köşe parantezleri "Ayarları
-                // aç" düğmesinin üstüne biniyor, altta da "Karekod otomatik olarak
-                // taranacaktır" yazıyordu — hiçbir şeyin taranamayacağı bir ekranda.
-                overlayBuilder: (context, constraints) {
-                  // Kesim alanı **gelen genişlikten** hesaplanıyor, ekranınkinden
-                  // değil: geniş ekranda önizleme okunur genişlikte ortalanıyor ve
-                  // ekran genişliğinin %70'i kutunun kendisinden büyük çıkıyordu.
-                  final size = constraints.biggest;
-                  final cutOut = size.shortestSide * 0.70;
-                  final bottomInset = MediaQuery.of(context).padding.bottom;
-                  // İpucu kesimin hemen altında; kısa ekranda alta yaslanıyor.
-                  final hintTop = ((size.height + cutOut) / 2 + 24).clamp(
-                    0.0,
-                    size.height - bottomInset - 72,
-                  );
-                  return Stack(
-                    children: [
-                      Positioned.fill(
-                        child: Container(
-                          decoration: ShapeDecoration(
-                            shape: _ScannerOverlayShape(
-                              borderColor: _reticle,
-                              borderRadius: 20,
-                              borderLength: 34,
-                              borderWidth: 4,
-                              cutOutSize: cutOut,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // İpucu hapı
-                      Positioned(
-                        top: hintTop,
-                        left: 20,
-                        right: 20,
-                        child: Center(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 9,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppScrim.frost(30),
-                              borderRadius: BorderRadius.circular(
-                                AppRadius.pill,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    color: _reticle,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Flexible(
-                                  child: Text(
-                                    context.tr('partner_scan_helper'),
-                                    textAlign: TextAlign.center,
-                                    style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: AppScrim.ink,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
+            : Stack(
+                children: [
+                  Positioned.fill(child: _scanner(theme)),
+                  // Elle giriş kamera açılamasa da (izin yok, kamera yok)
+                  // görünüyor: o durumda tek yol bu.
+                  Positioned(
+                    left: 20,
+                    right: 20,
+                    bottom: MediaQuery.paddingOf(context).bottom + 20,
+                    child: Center(
+                      child: _ManualCodeButton(onPressed: _enterCode),
+                    ),
+                  ),
+                ],
               ),
       ),
     );
   }
+
+  /// Kamera görüntüsü, nişangâh ve ipucu.
+  Widget _scanner(ThemeData theme) => MobileScanner(
+    controller: _scannerController,
+    onDetect: _onDetect,
+    // Paketin kendi hata ekranı İngilizce sabit metin gösteriyor
+    // ("Scanning is not supported on this device"). Kullanıcı kamera
+    // iznini reddettiğinde de bu ekran çıkıyor, yani gerçek cihazda
+    // ulaşılabilir bir durum.
+    errorBuilder: (context, error) => ScanUnavailable(error: error),
+    // Çerçeve ve alt ipucu `overlayBuilder`'a veriliyor; paket bunları
+    // **yalnızca önizleme görünürken** çiziyor.
+    //
+    // Önceden ikisi de `Stack`'te `MobileScanner`'ın kardeşiydi ve
+    // kamera açılamadığında da çiziliyordu: karartma katmanı hata
+    // metnini kenarlardan soluklaştırıyor, köşe parantezleri "Ayarları
+    // aç" düğmesinin üstüne biniyor, altta da "Karekod otomatik olarak
+    // taranacaktır" yazıyordu — hiçbir şeyin taranamayacağı bir ekranda.
+    overlayBuilder: (context, constraints) {
+      // Kesim alanı **gelen genişlikten** hesaplanıyor, ekranınkinden
+      // değil: geniş ekranda önizleme okunur genişlikte ortalanıyor ve
+      // ekran genişliğinin %70'i kutunun kendisinden büyük çıkıyordu.
+      final size = constraints.biggest;
+      final cutOut = size.shortestSide * 0.70;
+      final bottomInset = MediaQuery.of(context).padding.bottom;
+      // İpucu kesimin hemen altında; kısa ekranda alta yaslanıyor.
+      final hintTop = ((size.height + cutOut) / 2 + 24).clamp(
+        0.0,
+        size.height - bottomInset - _manualButtonSpace - 56,
+      );
+      return Stack(
+        children: [
+          Positioned.fill(
+            child: Container(
+              decoration: ShapeDecoration(
+                shape: _ScannerOverlayShape(
+                  borderColor: _reticle,
+                  borderRadius: 20,
+                  borderLength: 34,
+                  borderWidth: 4,
+                  cutOutSize: cutOut,
+                ),
+              ),
+            ),
+          ),
+
+          // İpucu hapı
+          Positioned(
+            top: hintTop,
+            left: 20,
+            right: 20,
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 9,
+                ),
+                decoration: BoxDecoration(
+                  color: AppScrim.frost(30),
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: _reticle,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Text(
+                        context.tr('partner_scan_helper'),
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: AppScrim.ink,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }
+
+/// Elle giriş düğmesinin ekranın altında kapladığı yer; ipucu bunun üstünde
+/// kalıyor.
+const double _manualButtonSpace = 72;
 
 /// Nişangâhın ve ipucu noktasının rengi: koyu kamera görüntüsü üstünde
 /// parlayan gül. Kamera temayla değişmediği için koyu temanın ikincil rengi
 /// her iki temada da kullanılıyor (bkz. `AppScrim`).
 final Color _reticle = AppTokens.dark.secondary;
+
+/// Kameranın altında "Kodu elle gir": koyu görüntünün üstünde buzlu hap.
+class _ManualCodeButton extends StatelessWidget {
+  const _ManualCodeButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      key: const Key('partner_scan_manual'),
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        foregroundColor: AppScrim.ink,
+        backgroundColor: AppScrim.frost(30),
+        minimumSize: const Size(0, 52),
+        padding: const EdgeInsets.symmetric(horizontal: 22),
+        shape: const StadiumBorder(),
+      ),
+      icon: const Icon(Icons.keyboard_alt_outlined, size: 20),
+      label: Text(
+        context.tr('partner_scan_manual'),
+        style: const TextStyle(fontWeight: FontWeight.w700),
+      ),
+    );
+  }
+}
+
+/// Eşleşme kodunu elle yazma sayfası. Biçim burada denetleniyor; geçerli
+/// kod normalize edilmiş hâliyle döndürülüyor.
+///
+/// Onay sayfası gibi koyu: kameranın üstünde açılıyor.
+class _ManualCodeSheet extends StatefulWidget {
+  const _ManualCodeSheet();
+
+  @override
+  State<_ManualCodeSheet> createState() => _ManualCodeSheetState();
+}
+
+class _ManualCodeSheetState extends State<_ManualCodeSheet> {
+  final _controller = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final code = PairingToken.normalize(_controller.text);
+    if (!PartnerCode.validateFormat(code).isValid) {
+      AppHaptics.error();
+      setState(() => _error = context.tr('partner_scan_manual_invalid'));
+      return;
+    }
+    Navigator.pop(context, code);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    const surface = AppTokens.dark;
+
+    return Padding(
+      // Klavye açılınca sayfa onun üstünde kalsın.
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
+        decoration: BoxDecoration(
+          color: surface.surface,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(AppRadius.xl),
+          ),
+          boxShadow: AppScrim.lift(
+            blurRadius: 24,
+            offset: const Offset(0, -6),
+            alpha: 70,
+          ),
+        ),
+        child: SafeArea(
+          top: false,
+          child: AppContentWidth(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppScrim.frost(60),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 22),
+                Text(
+                  context.tr('partner_scan_manual_title'),
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: AppScrim.ink,
+                    fontSize: 23,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  context.tr('partner_scan_manual_desc'),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppScrim.inkMuted,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                TextField(
+                  key: const Key('partner_scan_manual_field'),
+                  controller: _controller,
+                  autofocus: true,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  keyboardAppearance: Brightness.dark,
+                  textCapitalization: TextCapitalization.characters,
+                  textInputAction: TextInputAction.done,
+                  inputFormatters: [_UpperCaseFormatter()],
+                  onChanged: (_) {
+                    if (_error != null) setState(() => _error = null);
+                  },
+                  onSubmitted: (_) => _submit(),
+                  cursorColor: _reticle,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: AppScrim.ink,
+                    letterSpacing: 2,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: PairingToken.forDisplay(
+                      'A' * PairingToken.length,
+                    ).replaceAll('A', '•'),
+                    hintStyle: theme.textTheme.titleMedium?.copyWith(
+                      color: AppScrim.frost(70),
+                      letterSpacing: 2,
+                    ),
+                    errorText: _error,
+                    errorMaxLines: 3,
+                    errorStyle: TextStyle(color: surface.danger),
+                    filled: true,
+                    fillColor: AppScrim.frost(18),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      borderSide: BorderSide(color: _reticle, width: 1.5),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      borderSide: BorderSide(color: surface.danger),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      borderSide: BorderSide(color: surface.danger, width: 1.5),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                AppGradientButton(
+                  key: const Key('partner_scan_manual_submit'),
+                  label: context.tr('partner_scan_manual_submit'),
+                  icon: Icons.arrow_forward_rounded,
+                  onPressed: _submit,
+                  radius: AppRadius.pill,
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppScrim.inkMuted,
+                    minimumSize: const Size(double.infinity, 48),
+                  ),
+                  child: Text(context.tr('partner_scan_cancel')),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Yazılanı büyük harfe çevirir: kodun alfabesi yalnızca büyük harf.
+class _UpperCaseFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) => newValue.copyWith(text: PairingToken.toCodeCase(newValue.text));
+}
 
 /// Karekod okunduktan sonraki onay sayfası.
 ///

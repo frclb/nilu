@@ -220,8 +220,8 @@ Aşağıdakiler **koddan çıkarılmıştır** — formu buna göre doldurun.
 | Sağlık ve fitness | Regl tarihleri, semptomlar, ruh hâli, akış yoğunluğu, cinsel aktivite, gebelik testi, gebelik/lohusalık kayıtları, ölçümler, notlar, döngü ayarları | Cihazda **şifreli** (`SecureStore`); **bulut eşitleme açıksa** (açık rızayla) hesaba bağlı olarak Firestore'da (`syncData/{uid}`) | Hayır |
 | Hassas kişisel | Yakınlık/cinsel istek seçimleri | Cihazda **şifreli** | Yalnızca kullanıcı açıkça eşleşirse partnerine |
 | Kişisel bilgi | Profildeki ad, e-posta, doğum tarihi | Cihazda **şifreli**; bulut eşitleme açıksa Firestore'da | Hayır |
-| İletişim bilgisi | Hesabın e-postası ve adı — **yalnızca Apple ya da Google ile giriş yapılırsa** | Firebase Authentication | Hayır |
-| Tanımlayıcı | Hesap kimliği ve partner kimliği — **yalnızca Apple ya da Google ile giriş yapılırsa** (partner eşleşmesi de girişi istiyor) | Cihaz + Firebase | Hayır |
+| İletişim bilgisi | Hesabın e-postası ve adı — Apple ya da Google ile giriş **zorunlu** (2026-10-29'dan beri); Apple'da e-posta gizlenebilir, ad paylaşılmayabilir | Firebase Authentication | Hayır |
+| Tanımlayıcı | Hesap kimliği ve partner kimliği | Cihaz + Firebase | Hayır |
 | Cihaz kimliği | Reklam SDK'sı (kişiselleştirilmemiş reklam) | Google AdMob | Hayır |
 | Satın alma | Abonelik durumu | RevenueCat açıksa | Hayır |
 
@@ -265,7 +265,7 @@ Crashlytics, Messaging) uygulamada yok.
 |---|---|
 | Gerekli kullanıcı verisi türlerinden birini topluyor ya da paylaşıyor mu? | **Evet** |
 | Toplanan bütün veri aktarımda şifreli mi? | **Evet** (Firebase HTTPS, AdMob ve RevenueCat TLS) |
-| Kullanıcılar hesap oluşturabiliyor mu? | **Evet — OAuth** (Apple ya da Google ile giriş; isteğe bağlı) |
+| Kullanıcılar hesap oluşturabiliyor mu? | **Evet — OAuth** (Apple ya da Google ile giriş; zorunlu) |
 | Hesap silme bağlantısı | `…/tr/support/#delete-account` |
 | Hesabı silmeden veri silme isteme yolu var mı? | **Evet** — eşitlemeyi kapatınca buluttaki kopya, partner paylaşımını kapatınca sunucudaki durum siliniyor; sitede aynı sayfa |
 
@@ -277,9 +277,9 @@ kendi başlattığı aktarım; Play bunu paylaşım saymıyor.
 | Play'deki tür | Kaynak | Toplanıyor | Paylaşılıyor | Zorunlu mu | Amaç |
 |---|---|---|---|---|---|
 | Konum → Yaklaşık konum | AdMob (IP adresi) | Evet | Evet | Zorunlu | Reklam veya pazarlama, Analiz, Dolandırıcılık önleme/güvenlik/uyumluluk |
-| Kişisel bilgiler → Ad | Apple/Google ile giriş | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği, Hesap yönetimi |
-| Kişisel bilgiler → E-posta adresi | Apple/Google ile giriş | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği, Hesap yönetimi |
-| Kişisel bilgiler → Kullanıcı kimlikleri | Hesap kimliği (partner eşleşmesi de onu kullanıyor) | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği, Hesap yönetimi |
+| Kişisel bilgiler → Ad | Apple/Google ile giriş (Apple'da paylaşılmayabilir) | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği, Hesap yönetimi |
+| Kişisel bilgiler → E-posta adresi | Apple/Google ile giriş (zorunlu) | Evet | Hayır | Zorunlu | Uygulama işlevselliği, Hesap yönetimi |
+| Kişisel bilgiler → Kullanıcı kimlikleri | Hesap kimliği (partner eşleşmesi de onu kullanıyor) | Evet | Hayır | Zorunlu | Uygulama işlevselliği, Hesap yönetimi |
 | Finansal bilgiler → Satın alma geçmişi | RevenueCat | Evet | Hayır | Zorunlu (RevenueCat'in rehberi) | Uygulama işlevselliği, Analiz |
 | Sağlık ve fitness → Sağlık bilgisi | Bulut eşitleme açıksa kayıtların kopyası (Health Connect'ten alınanlar dahil); partner paylaşımı açıksa yakınlık durumu | Evet | Hayır | İsteğe bağlı | Uygulama işlevselliği |
 | Uygulama etkinliği → Uygulama etkileşimleri | AdMob | Evet | Evet | Zorunlu | Reklam veya pazarlama, Analiz, Dolandırıcılık önleme/güvenlik/uyumluluk |

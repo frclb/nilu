@@ -267,6 +267,100 @@ void main() {
     });
   });
 
+  // Uygulama Apple ya da Google hesabıyla kullanılıyor (TestFlight: "normal
+  // kullanıcı giriş yapmadan girebiliyor").
+  group('oturum yokken', () {
+    /// GoRouter gibi: yönlendirme bitene kadar uygular, son konumu döndürür.
+    String son(
+      String location, {
+      required bool onboardingComplete,
+      required bool needsSignIn,
+    }) {
+      var konum = location;
+      for (var i = 0; i < 5; i++) {
+        final sonraki = resolveRedirect(
+          isLoaded: true,
+          onboardingComplete: onboardingComplete,
+          location: konum,
+          needsSignIn: needsSignIn,
+        );
+        if (sonraki == null) return konum;
+        konum = sonraki;
+      }
+      fail('$location: yönlendirme döngüye girdi');
+    }
+
+    test('kurulum girişten sonra başlıyor', () {
+      for (final adim in [
+        '/onboarding_goal',
+        '/onboarding_last_period',
+        '/onboarding_success',
+      ]) {
+        expect(
+          son(adim, onboardingComplete: false, needsSignIn: true),
+          signInPath,
+          reason: adim,
+        );
+      }
+    });
+
+    test('kurulumu bitmemiş kullanıcı önce karşılamayı görüyor', () {
+      expect(
+        son(homePath, onboardingComplete: false, needsSignIn: true),
+        onboardingPath,
+      );
+    });
+
+    test('karşılama ekranı ve giriş ekranı açık; döngü yok', () {
+      expect(
+        son(onboardingPath, onboardingComplete: false, needsSignIn: true),
+        onboardingPath,
+      );
+      // Giriş ekranı kurulum yollarında da olmalı: yoksa kurulumu bitmemiş
+      // kullanıcı karşılamaya geri atılır ve girişe hiç ulaşamaz.
+      expect(
+        son(signInPath, onboardingComplete: false, needsSignIn: true),
+        signInPath,
+      );
+    });
+
+    test('kurulmuş uygulamada her ekran giriş istiyor', () {
+      for (final yol in [splashPath, '/', homePath, '/calendar', '/account']) {
+        expect(
+          son(yol, onboardingComplete: true, needsSignIn: true),
+          signInPath,
+          reason: yol,
+        );
+      }
+    });
+
+    test('kendi girişini gösteren ekranlar ve yasal metinler açık', () {
+      for (final yol in [
+        '/partner_scan',
+        '/account_restore',
+        '/privacy_policy',
+        '/terms_of_service',
+      ]) {
+        expect(
+          son(yol, onboardingComplete: false, needsSignIn: true),
+          yol,
+          reason: yol,
+        );
+      }
+    });
+
+    test('hesap hizmeti yokken (yerel mod) giriş istenmiyor', () {
+      expect(
+        son('/onboarding_goal', onboardingComplete: false, needsSignIn: false),
+        '/onboarding_goal',
+      );
+      expect(
+        son(homePath, onboardingComplete: true, needsSignIn: false),
+        homePath,
+      );
+    });
+  });
+
   test(
     'izin verilen yollar listesi splash ve onboarding adımlarını içerir',
     () {

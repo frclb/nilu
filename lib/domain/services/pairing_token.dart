@@ -61,9 +61,14 @@ class PairingToken {
     return buffer.toString();
   }
 
-  /// Kullanıcının elle yazdığı kodu kanonik hâle getirir.
+  /// Yazılan kodu büyük harfe çevirir. Dile bağlı değil: kodun alfabesi
+  /// Latin büyük harfler, Türkçenin "i" → "İ" kuralı burada yanlış olurdu.
+  static String toCodeCase(String input) => input.toUpperCase();
+
+  /// Kullanıcının elle yazdığı kodu kanonik hâle getirir: boşluklar ve
+  /// tireler atılır (kod mesajla "ABCD-EFGH…" diye gelebilir).
   static String normalize(String input) =>
-      input.replaceAll(RegExp(r'\s+'), '').toUpperCase();
+      input.replaceAll(RegExp(r'[\s-]+'), '').toUpperCase();
 
   /// İsteği gönderen cihazın dört haneli doğrulama kodu.
   ///

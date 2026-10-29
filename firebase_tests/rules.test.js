@@ -222,6 +222,18 @@ describe('pairingTokens: davet kodu ve istekler', () => {
     await assertSucceeds(deleteDoc(doc(db('partner'), 'pairingTokens/KOD/requests/partner')));
   });
 
+  // Partner onayı kendi isteğinin silinmesinden öğreniyor: istek dururken
+  // de silindikten sonra da okuyabilmeli.
+  test('istekte bulunan kendi isteğini okur, silindikten sonra da', async () => {
+    await seed(async (fs) => {
+      await setDoc(doc(fs, 'pairingTokens/KOD'), { ownerUid: 'sahip' });
+      await setDoc(doc(fs, 'pairingTokens/KOD/requests/partner'), { requestedAt: 1 });
+    });
+    await assertSucceeds(getDoc(doc(db('partner'), 'pairingTokens/KOD/requests/partner')));
+    await assertSucceeds(deleteDoc(doc(db('sahip'), 'pairingTokens/KOD/requests/partner')));
+    await assertSucceeds(getDoc(doc(db('partner'), 'pairingTokens/KOD/requests/partner')));
+  });
+
   test('başkasının isteğini göremez, silemez', async () => {
     await seed(async (fs) => {
       await setDoc(doc(fs, 'pairingTokens/KOD'), { ownerUid: 'sahip' });

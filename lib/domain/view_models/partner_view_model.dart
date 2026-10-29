@@ -62,6 +62,18 @@ class PartnerViewModel extends ChangeNotifier {
   _statusSubscription;
   Timer? _retryTimer;
 
+  /// Partnerin bıraktığı istek: kod ve kendi kimliği. Onay beklerken bu
+  /// istek dinleniyor.
+  String? _requestToken;
+  String? _myUid;
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
+  _requestSubscription;
+
+  /// İstek bir kez kapandı (onay ya da ret). Bundan sonra dinlenmiyor:
+  /// reddedilen istekte okuma yine reddedilir ve dinleyici aynı silinmiş
+  /// isteği görüp durmadan yeniden denerdi.
+  bool _requestClosed = false;
+
   // ─── Getters ───
   PartnerLinkState get state => _state;
   IntimacyStatus? get currentStatus => _currentStatus;
@@ -91,11 +103,16 @@ class PartnerViewModel extends ChangeNotifier {
 
   /// Sahibin kimliğiyle başlatılır; partner rolünde değilse `null`.
   ///
+  /// [requestToken] ve [myUid] partnerin bıraktığı istek: onay beklerken
+  /// dinleniyor ki sahip onaylar onaylamaz ekran açılsın.
+  ///
   /// Durum değişmediyse hiçbir şey yapılmıyor: `update` her çizimde
   /// çağırıyor ve her yeni dinleyici Firestore'da okuma olarak
   /// faturalandırılıyor.
-  void init(String? ownerUid) {
+  void init(String? ownerUid, {String? requestToken, String? myUid}) {
     final id = (ownerUid != null && ownerUid.isNotEmpty) ? ownerUid : null;
+    _requestToken = requestToken;
+    _myUid = myUid;
     if (_initialized && id == _listeningTo) return;
     _initialized = true;
     _listeningTo = id;
@@ -129,6 +146,9 @@ class PartnerViewModel extends ChangeNotifier {
     _statusSubscription = null;
     _retryTimer?.cancel();
     _retryTimer = null;
+    _requestSubscription?.cancel();
+    _requestSubscription = null;
+    _requestClosed = false;
     _currentStatus = null;
     _lastUpdatedAt = null;
     _historyList = [];
@@ -153,6 +173,7 @@ class PartnerViewModel extends ChangeNotifier {
             _currentStatus = null;
             _isLoaded = true;
             notifyListeners();
+            if (denied) _watchRequest(ownerUid);
             _retryTimer?.cancel();
             _retryTimer = Timer(retryInterval, () => _subscribe(ownerUid));
           },
@@ -163,7 +184,39 @@ class PartnerViewModel extends ChangeNotifier {
         );
   }
 
+  /// Onay beklerken partnerin kendi isteğini dinler.
+  ///
+  /// Önceden onay yalnızca yeniden denemeyle fark ediliyordu: sahip
+  /// onayladıktan sonra partnerin ekranı yarım dakikaya kadar "Onay
+  /// bekleniyor" diyordu ve TestFlight'ta bu hata gibi göründü. Sahip
+  /// onaylayınca isteği siliyor; silindiği an okuma yeniden deneniyor.
+  void _watchRequest(String ownerUid) {
+    final token = _requestToken;
+    final uid = _myUid;
+    if (_requestSubscription != null || _requestClosed) return;
+    if (token == null || uid == null) return;
+    _requestSubscription = _firestoreDS
+        .watchOwnPairingRequest(token, uid)
+        .listen(
+          (snapshot) {
+            if (snapshot.exists) return;
+            _requestClosed = true;
+            _requestSubscription?.cancel();
+            _requestSubscription = null;
+            _subscribe(ownerUid);
+          },
+          onError: (Object error) {
+            // Dinlenemiyorsa yeniden deneme zaten sürüyor.
+            debugPrint('Pairing request watch error: $error');
+            _requestSubscription?.cancel();
+            _requestSubscription = null;
+          },
+        );
+  }
+
   void _onSnapshot(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    _requestSubscription?.cancel();
+    _requestSubscription = null;
     _state = PartnerLinkState.connected;
     final data = snapshot.exists ? snapshot.data() : null;
     final desire = data?['sexualDesire'] as String?;
@@ -222,6 +275,7 @@ class PartnerViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _statusSubscription?.cancel();
+    _requestSubscription?.cancel();
     _retryTimer?.cancel();
     super.dispose();
   }

@@ -119,6 +119,23 @@ class FirestoreDataSource {
         .set({'requestedAt': FieldValue.serverTimestamp()}),
   );
 
+  /// Partnerin kendi isteğini dinlemesi. Sahip onaylayınca (ya da
+  /// reddedince) istek siliniyor: partner onayı bundan anında öğreniyor.
+  Stream<DocumentSnapshot<Map<String, dynamic>>> watchOwnPairingRequest(
+    String token,
+    String requesterUid,
+  ) {
+    if (!isAvailable) {
+      return const Stream<DocumentSnapshot<Map<String, dynamic>>>.empty();
+    }
+    return _firestore
+        .collection('pairingTokens')
+        .doc(token)
+        .collection('requests')
+        .doc(requesterUid)
+        .snapshots();
+  }
+
   /// Sahibin kendi eşleştirme isteklerini dinlemesi.
   Stream<QuerySnapshot<Map<String, dynamic>>> watchPairingRequests(
     String token,

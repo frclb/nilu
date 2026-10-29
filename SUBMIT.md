@@ -267,15 +267,19 @@ ama satın alma çalışmaz; ürünler "Missing Metadata"da bekler.
 **App Review Information**
 
 - İletişim bilgisi
-- Demo hesabı: uygulamada zorunlu hesap yok, **gerekmiyor**. Apple ile
-  giriş isteğe bağlı; inceleyen kendi Apple kimliğiyle deneyebilir.
+- Demo hesabı: **gerekmiyor**. Uygulama karşılama sayfalarından sonra
+  Apple ya da Google ile giriş istiyor (2026-10-29'dan beri zorunlu);
+  inceleyen kendi Apple kimliğiyle "Apple ile Devam Et"i kullanabilir,
+  e-postasını gizleyebilir. Uygulamanın kendi parolalı hesabı yok,
+  verilecek bir demo kimliği de yok.
 - Notes alanına yaz:
-  - Verinin cihazda kaldığını; partner eşlemesinin isteğe bağlı olduğunu,
-    Apple ya da Google ile giriş istediğini ve sunucuya yalnızca
-    paylaşılmayı seçilen yakınlık durumunun gittiğini
-  - Hesabın isteğe bağlı olduğunu (Apple ya da Google ile giriş, Profil →
-    Hesap ve bulut yedeği); girişin tek başına sağlık verisi göndermediğini,
-    bulut eşitlemenin ayrı bir açık rıza ekranından sonra açıldığını
+  - Girişin zorunlu olduğunu ve neden: kayıtları yeni telefona taşımak
+    (bulut yedeği), partner eşleşmesi; hesap silme uygulama içinde
+  - Verinin cihazda kaldığını; partner eşlemesinin isteğe bağlı olduğunu
+    ve sunucuya yalnızca paylaşılmayı seçilen yakınlık durumunun gittiğini
+  - Girişin tek başına sağlık verisi göndermediğini, bulut eşitlemenin
+    ayrı bir açık rıza ekranından sonra açıldığını (Profil → Hesap ve
+    bulut yedeği)
   - Hesap silme yeri: Profil → Hesap ve bulut yedeği → Hesabı sil (kimlik
     yeniden doğrulanıyor, Apple jetonu iptal ediliyor)
   - Premium'u denemeleri için Sandbox hesabı ya da promosyon kodu

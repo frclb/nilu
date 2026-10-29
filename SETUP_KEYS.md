@@ -140,7 +140,7 @@ Sonra iki App ID:
 | `com.furkan.rcperiodtracker.CycleWidget` | App Groups |
 
 Bunlar `ios/Runner/Runner.entitlements` ile **eşleşmek zorunda**. Sign in with
-Apple isteğe bağlı hesap ve bulut eşitleme için (bkz. §7.3); "Enable as a
+Apple uygulamanın hesabı için (bkz. §7.3); "Enable as a
 primary App ID" seçili kalsın. Portalda kapalı bir yeteneği yetki dosyası
 isterse imzalama şu hatayla duruyor:
 
@@ -437,9 +437,9 @@ tıklama** — geçersiz trafik hesabı kapattırıyor ve geri dönüşü zor.
 
 ## 7. Firebase
 
-Partner eşleşmesi ve isteğe bağlı hesap / bulut eşitleme için. Uygulamanın
-geri kalanı Firebase'siz çalışıyor; yapılandırılmazsa partner ekranı
-eşleşmenin, hesap ekranı girişin kullanılamadığını söylüyor.
+Hesap (zorunlu giriş), partner eşleşmesi ve bulut eşitleme için.
+Yapılandırılmazsa uygulama yerel modda çalışıyor: giriş istenmiyor, partner
+ekranı eşleşmenin, hesap ekranı girişin kullanılamadığını söylüyor.
 
 **Yapıldı (2026-10-27, iOS):** proje **Nilu** (`nilu-3b870`, Analytics ve
 Gemini kapalı); Firestore `eur3`, kurallar ve indeksler yüklendi
@@ -496,8 +496,9 @@ Ardından `ios/Runner/Info.plist` → `CFBundleURLSchemes` içindeki
 - Settings → **User account linking** → "Link accounts that use the same
   email" (varsayılan).
 
-Hesap isteğe bağlı: giriş tek başına hiçbir sağlık verisi göndermiyor; bulut
-eşitleme ayrı bir açık rızayla açılıyor (`sync_consent_sheet.dart`).
+Giriş zorunlu (2026-10-29'dan beri; `resolveRedirect`, `sign_in_screen.dart`)
+ama tek başına hiçbir sağlık verisi göndermiyor; bulut eşitleme ayrı bir açık
+rızayla açılıyor (`sync_consent_sheet.dart`).
 
 **7.4 Firestore ve kurallar:**
 

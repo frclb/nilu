@@ -30,6 +30,10 @@ class UserViewModel extends ChangeNotifier {
 
   bool get isPartner => _isPartner;
   String? get partnerId => _partnerId;
+
+  /// Partner olarak bırakılan ve henüz kapanmamış isteğin kodu.
+  String? _requestToken;
+  String? get pendingRequestToken => _requestToken;
   String? get myId => _myId;
   bool get hasPartner => _hasPartner;
 
@@ -57,6 +61,7 @@ class UserViewModel extends ChangeNotifier {
     _partnerId = prefs.getString('partnerId');
     _myId = prefs.getString('myId');
     _hasPartner = prefs.getBool('hasPartner') ?? (_partnerId != null);
+    _requestToken = prefs.getString(_requestTokenKey);
 
     // Hesapla giriş yapılmışsa kimlik onun uid'si.
     final uid = _accountUid;
@@ -90,9 +95,13 @@ class UserViewModel extends ChangeNotifier {
 
   String? get _accountUid => _authDS.accountUid;
 
+  /// Hesap hizmeti hazır ama oturum yok: uygulama girişten sonra
+  /// kullanılıyor (bkz. `resolveRedirect`). Firebase yapılandırılmamışsa
+  /// (testler, yerel mod) giriş istenmiyor.
+  bool get needsSignIn => _firestoreDS.isAvailable && _accountUid == null;
+
   /// Eşleşme sunucusu var ama hesap yok: eşleşmeden önce giriş gerekiyor.
-  bool get needsAccountForPairing =>
-      _firestoreDS.isAvailable && _accountUid == null;
+  bool get needsAccountForPairing => needsSignIn;
 
   /// Eşleşmede kullanılan kimlik; **tek bir yerden**.
   ///
@@ -235,6 +244,7 @@ class UserViewModel extends ChangeNotifier {
     if (!await _firestoreDS.requestPairing(token, myId)) return false;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_requestTokenKey, token);
+    _requestToken = token;
     await setPartnerState(isPartner: true, partnerId: ownerUid);
     await completeOnboarding();
     return true;
@@ -259,6 +269,7 @@ class UserViewModel extends ChangeNotifier {
       if (token != null) await _firestoreDS.clearPairingRequest(token, myId);
     }
     await prefs.remove(_requestTokenKey);
+    _requestToken = null;
     await setPartnerState(isPartner: false, partnerId: null);
     await prefs.setBool('onboarding_complete', false);
     _onboardingComplete = false;
@@ -329,6 +340,7 @@ class UserViewModel extends ChangeNotifier {
     await prefs.remove('myId');
     await prefs.remove(_requestTokenKey);
     _myId = null;
+    _requestToken = null;
     await setPartnerState(isPartner: false, partnerId: null);
   }
 
@@ -340,6 +352,7 @@ class UserViewModel extends ChangeNotifier {
     _partnerId = null;
     _myId = null;
     _hasPartner = false;
+    _requestToken = null;
     _isLoaded = false;
     notifyListeners();
     await _loadState();

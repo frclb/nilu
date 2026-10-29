@@ -89,6 +89,25 @@ class FakePartnerRemote extends FirestoreDataSource {
     () => requests.putIfAbsent(token, () => {}).add(requesterUid),
   );
 
+  /// `watchOwnPairingRequest` için verilecek akış; verilmezse kapanmayan,
+  /// sessiz bir akış.
+  Stream<DocumentSnapshot<Map<String, dynamic>>> Function(
+    String token,
+    String uid,
+  )?
+  requestStream;
+  int requestWatches = 0;
+
+  @override
+  Stream<DocumentSnapshot<Map<String, dynamic>>> watchOwnPairingRequest(
+    String token,
+    String requesterUid,
+  ) {
+    requestWatches++;
+    return requestStream?.call(token, requesterUid) ??
+        StreamController<DocumentSnapshot<Map<String, dynamic>>>().stream;
+  }
+
   @override
   Stream<QuerySnapshot<Map<String, dynamic>>> watchPairingRequests(
     String token,

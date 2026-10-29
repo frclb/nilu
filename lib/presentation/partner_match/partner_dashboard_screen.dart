@@ -31,7 +31,7 @@ class PartnerDashboardScreen extends StatefulWidget {
 }
 
 class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
@@ -42,6 +42,7 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -61,8 +62,22 @@ class _PartnerDashboardScreenState extends State<PartnerDashboardScreen>
     );
   }
 
+  /// Uygulama öne gelince bekleyen bağlantı hemen yeniden deneniyor:
+  /// partner onayı diğer telefonda verip buna döndüğünde yarım dakikalık
+  /// yeniden deneme aralığını beklememeli.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    final vm = context.read<PartnerViewModel>();
+    if (vm.state == PartnerLinkState.awaitingApproval ||
+        vm.state == PartnerLinkState.unreachable) {
+      vm.retry();
+    }
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _fadeController.dispose();
     _pulseController.dispose();
     super.dispose();

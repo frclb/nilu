@@ -16,6 +16,7 @@ void main() {
   /// Rota adıyla gidilmeyen, ama başka bir yolla açılan ekranlar.
   const reachedOtherwise = <String, String>{
     'splash': 'Yönlendirme ara ekranı; durum yüklenirken redirect düşürüyor.',
+    'signIn': 'Oturum yokken redirect düşürüyor (bkz. `resolveRedirect`).',
     'insights': 'Alt menü dalı; sekmeye `branchIndex` ile geçiliyor.',
     'partnerSupport':
         'Partner modunda başka bir sekmenin içine gömülü çiziliyor.',
