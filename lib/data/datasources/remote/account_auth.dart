@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../../../core/app_info.dart';
 import '../../../core/firebase/firebase_config.dart';
 import '../../../core/platform/app_platform.dart';
 
@@ -131,10 +132,11 @@ abstract class AccountAuth {
 /// E-posta ve şifre Firebase'in kendi sağlayıcısı (`password`). Doğrulama
 /// zorunlu: adres doğrulanmadan uygulama kullanılmıyor, sunucu kuralları da
 /// doğrulanmamış e-posta hesabını reddediyor. Doğrulama ve şifre yenileme
-/// e-postalarını Firebase gönderiyor; bağlantılar Nilu'nun kendi sayfasına
-/// (`AppInfo.authLinkBase`, Firebase'deki "action URL") gidiyor. Telefonda
-/// Universal Link olarak uygulamayı açıyor ve işlem uygulamada bitiyor
-/// (`AuthActionLink`); başka cihazda sayfanın kendisi bitiriyor.
+/// e-postalarını Firebase gönderiyor. Bağlantı Firebase'in sayfasını açıyor
+/// (action URL bu projede değiştirilemiyor), iş orada bitiyor ve "Devam"
+/// Nilu'ya geri getiriyor ([_donus]). Action URL bir gün Nilu'nun sayfasına
+/// (`AppInfo.authLinkBase`) çevrilebilirse uygulama ve site bağlantının
+/// kendisini de karşılamaya hazır (`AuthActionLink`, `ResetPasswordScreen`).
 ///
 /// Partner eşleşmesi de hesap istiyor; anonim kimlik yok. Eskiden eşleşme
 /// için açılan anonim kimliğe hesap bağlanıyordu (`linkWithProvider`).
@@ -254,6 +256,17 @@ class FirebaseAccountAuth implements AccountAuth {
         _ => null,
       };
 
+  /// E-postadaki bağlantının işi bitince "Devam" düğmesinin götürdüğü
+  /// adres: Nilu'nun sayfası, telefonda Universal Link olarak uygulamayı
+  /// açıyor ve uygulama hesabı yeniden okuyor (`AuthActionLink`).
+  ///
+  /// Firebase bu projede action URL'nin değiştirilmesine izin vermiyor
+  /// (`EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED`, konsolda da): bağlantı önce
+  /// Firebase'in sayfasını açıyor, iş orada bitiyor, oradan Nilu'ya
+  /// dönülüyor. Adresin alan adı Firebase'in yetkili alan adlarında.
+  static ActionCodeSettings _donus(String mode) =>
+      ActionCodeSettings(url: '${AppInfo.authLinkBase}?mode=$mode');
+
   Future<void> _setLanguage(String? languageCode) async {
     if (languageCode == null) return;
     try {
@@ -281,7 +294,7 @@ class FirebaseAccountAuth implements AccountAuth {
         );
         await _setLanguage(languageCode);
         try {
-          await c.user?.sendEmailVerification();
+          await c.user?.sendEmailVerification(_donus('verified'));
         } catch (e) {
           debugPrint('Verification email failed: $e');
         }
@@ -306,7 +319,10 @@ class FirebaseAccountAuth implements AccountAuth {
     if (!isAvailable) return false;
     await _setLanguage(languageCode);
     try {
-      await _auth.sendPasswordResetEmail(email: email.trim());
+      await _auth.sendPasswordResetEmail(
+        email: email.trim(),
+        actionCodeSettings: _donus('resetDone'),
+      );
       return true;
     } on FirebaseAuthException catch (e) {
       debugPrint('Password reset failed: ${e.code}');
@@ -324,7 +340,7 @@ class FirebaseAccountAuth implements AccountAuth {
     if (user == null) return false;
     await _setLanguage(languageCode);
     try {
-      await user.sendEmailVerification();
+      await user.sendEmailVerification(_donus('verified'));
       return true;
     } catch (e) {
       debugPrint('Verification email failed: $e');

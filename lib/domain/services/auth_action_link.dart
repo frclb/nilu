@@ -8,8 +8,8 @@ enum AuthAction {
   /// Yeni şifre belirle.
   resetPassword,
 
-  /// Sayfa doğrulamayı kendisi bitirdi; uygulama hesabı yeniden okusun
-  /// (sayfadaki "Nilu'ya dön" düğmesi).
+  /// İş başka yerde bitti (Firebase'in sayfası ya da Nilu'nun sitesi);
+  /// uygulama hesabı yeniden okusun.
   verified,
 }
 
@@ -45,7 +45,8 @@ class AuthActionLink {
         AuthAction.resetPassword,
         kod,
       ),
-      'verified' => const AuthActionLink(AuthAction.verified),
+      // Firebase'in sayfasında iş bitti, "Devam" buraya getirdi.
+      'verified' || 'resetDone' => const AuthActionLink(AuthAction.verified),
       _ => null,
     };
   }

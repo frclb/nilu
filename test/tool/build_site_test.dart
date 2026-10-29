@@ -207,6 +207,8 @@ void main() {
       expect(html, contains("istek('update', { oobCode: kod })"));
       expect(html, contains("newPassword: sifre"));
       expect(html, contains("'nilu://auth?mode=verified'"));
+      // Firebase'in sayfasındaki "Devam"ın döndüğü durumlar.
+      expect(html, contains("mode === 'verified' || mode === 'resetDone'"));
       expect(html, contains("'nilu://auth?mode=resetPassword&oobCode='"));
       // Şifre en az 8 karakter: uygulamadaki sınırla aynı.
       expect(html, contains('sifre.length < 8'));

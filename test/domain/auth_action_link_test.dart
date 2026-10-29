@@ -27,6 +27,14 @@ void main() {
       AuthAction.resetPassword,
     );
     expect(oku('nilu://auth?mode=verified')?.action, AuthAction.verified);
+    // Firebase'in sayfasındaki "Devam" düğmesi.
+    for (final mode in ['verified', 'resetDone']) {
+      expect(
+        oku('https://frclb.github.io/nilu/auth/?mode=$mode')?.action,
+        AuthAction.verified,
+        reason: mode,
+      );
+    }
   });
 
   test('başka adres, kodsuz işlem ve bilinmeyen işlem kabul edilmiyor', () {

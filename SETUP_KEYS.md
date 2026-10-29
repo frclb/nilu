@@ -496,16 +496,18 @@ kabul ettiği için Podfile.lock'ta 3.5.0. Yerel ayarı UTF-8 olmayan kabukta
   **Adres doğrulaması zorunlu:** doğrulanmamış hesap uygulamada "E-postanı
   doğrula" ekranında kalıyor, `firestore.rules` → `isSignedIn` de
   `email_verified` istiyor. Doğrulama ve şifre yenileme e-postalarını
-  Firebase gönderiyor (ücretsiz; kod değil bağlantı). Bağlantıların Nilu'nun
-  kendi sayfasına gitmesi için iki ayar ⬜ (henüz yapılmadı; yapılana kadar
-  bağlantılar Firebase'in sayfasını açıyor, uygulama dönüşte doğrulamayı
-  yine görüyor):
-  1. Authentication → Settings → Authorized domains → `frclb.github.io`
-     ekle (action URL'nin alan adı burada olmalı).
-  2. Authentication → Templates → herhangi bir şablon → **Customize action
-     URL** = `https://frclb.github.io/nilu/auth/` → Save (tüm şablonlara
-     uygulanıyor; şablonun kendisini kaydetmeye gerek yok). API bu ayarı
-     reddediyor (`EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED`); konsoldan yapılmalı.
+  Firebase gönderiyor (ücretsiz; kod değil bağlantı).
+  - Authentication → Settings → Authorized domains: `frclb.github.io`
+    eklendi (2026-10-29).
+  - **Action URL değiştirilemiyor:** Templates → "Customize action URL"
+    hem konsolda hem API'de `EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED` veriyor
+    (sebebi belgelerde yok). Bu yüzden bağlantı Firebase'in sayfasını
+    açıyor, doğrulama ya da yeni şifre orada bitiyor; uygulama e-postayı
+    "devam adresiyle" gönderiyor (`ActionCodeSettings.url` =
+    `https://frclb.github.io/nilu/auth/?mode=verified|resetDone`), sayfadaki
+    "Devam" Universal Link olarak Nilu'yu açıyor ve uygulama hesabı yeniden
+    okuyor. Action URL bir gün açılırsa `https://frclb.github.io/nilu/auth/`
+    yapılmalı: uygulama ve site kodlu akışa hazır (§8.7).
   E-postadaki uygulama adı
   Project settings → General → **Public-facing name**: "Nilu" (kontrol
   edildi).

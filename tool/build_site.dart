@@ -695,6 +695,11 @@ $storeHtml
   /// `…/auth/?mode=…&oobCode=…&apiKey=…&lang=…` (Firebase'deki "action
   /// URL", `AppInfo.authLinkBase`).
   ///
+  /// Firebase bu projede action URL'nin değiştirilmesine izin vermediği
+  /// için bugün e-postadaki bağlantı Firebase'in sayfasını açıyor; burası
+  /// oradaki "Devam"ın götürdüğü yer (`?mode=verified` / `?mode=resetDone`).
+  /// Aşağıdaki kodlu akış action URL değiştirilebilirse hazır.
+  ///
   /// Uygulama yüklü telefonda bağlantı bu sayfayı açmıyor: Universal Link
   /// uygulamayı açıyor ve işlem orada bitiyor. Burası bağlantı başka bir
   /// cihazda ya da e-posta uygulamasının kendi tarayıcısında açıldığında
@@ -785,6 +790,18 @@ $storeHtml
     return /OOB_CODE|EXPIRED|USER_NOT_FOUND|USER_DISABLED/.test(m);
   }
   var uygulama = 'nilu://auth?mode=verified';
+
+  // Firebase'in sayfasında iş bitti, "Devam" buraya getirdi (uygulama
+  // yüklüyse bu adres sayfayı değil uygulamayı açıyor).
+  if (mode === 'verified' || mode === 'resetDone') {
+    var bitti = mode === 'verified' ? s.auth_verify_title : s.auth_reset_title;
+    document.title = bitti;
+    yaz('t', bitti);
+    yaz('b', mode === 'verified' ? s.auth_verify_done : s.auth_reset_done);
+    dugme('ac', s.auth_back_to_app, uygulama);
+    return;
+  }
+
   if (!kod || !key) { yaz('b', s.auth_unknown); return; }
 
   if (mode === 'verifyEmail') {
