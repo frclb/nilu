@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../core/platform/app_platform.dart';
 
 class AppLocalizations {
   final Locale locale;
@@ -74,6 +75,9 @@ class AppLocalizations {
     }
   }
 
+  /// Sözlükte bu anahtar var mı?
+  bool has(String key) => _localizedStrings.containsKey(key);
+
   String translate(String key, {Map<String, String>? params}) {
     final template = _localizedStrings[key];
 
@@ -123,6 +127,22 @@ class _AppLocalizationsDelegate
 extension AppLocalizationsExtension on BuildContext {
   String tr(String key, {Map<String, String>? params}) {
     return AppLocalizations.of(this)?.translate(key, params: params) ?? key;
+  }
+
+  /// Platforma göre metin: iOS'ta `<anahtar>_ios` varsa o.
+  ///
+  /// Yasal metinler sitede iki uygulama için tek politika olarak
+  /// yayımlanıyor ve iki mağazayı birlikte anıyor. iOS uygulamasının içinde
+  /// başka bir platformun adı (Google Play, Health Connect) geçmemeli: App
+  /// Store Kural 2.3.10 bu yüzden reddediyor. iOS sürümü aynı metnin o
+  /// adlar çıkarılmış hâli.
+  String trPlatform(String key, {Map<String, String>? params}) {
+    final ios = '${key}_ios';
+    final l = AppLocalizations.of(this);
+    final secilen = !AppPlatform.isAndroid && (l?.has(ios) ?? false)
+        ? ios
+        : key;
+    return tr(secilen, params: params);
   }
 
   /// Etkin dile göre büyük harf. Ekranda görünen her büyük harfli metin

@@ -363,6 +363,31 @@ Uygulama adı **Nilu**; cihazda görünen ad (`CFBundleDisplayName`) ve widget
 adı güncellendi. Kalan tek iş: adın müsait olduğunu App Store Connect'te
 uygulama kaydını açarken doğrulamak.
 
+### iOS'ta başka platform adı yok ✅ (2026-10-29)
+
+App Store Kural 2.3.10: uygulamada ve mağaza metinlerinde/görsellerinde
+başka mobil platformların adı geçmemeli (başka bir projede iOS sürümü
+uygulama içinde "Google Play" kaldığı için reddedildi). Denetlenenler:
+
+- **Uygulama metinleri:** sözlük iki platforma ortak. Android'e özel olanlar
+  `_android` sonekiyle ya da `health_connect_` önekiyle ayrılıyor ve kodda
+  `AppPlatform.isAndroid` ile seçiliyor. İki mağazayı birlikte anan yasal
+  metinlerin (gizlilik 6 ve 8, şartlar 5 ve 9) iOS'ta `_ios` sürümü
+  gösteriliyor (`context.trPlatform`). Sitedeki politika ikisini birlikte
+  anıyor: iki uygulama için tek politika.
+  `test/localization/other_platform_names_test.dart` yeni bir metin bu
+  adlarla eklenirse ve iOS karşılığı yoksa başarısız oluyor.
+- **Mağaza metinleri:** App Store açıklaması, tanıtım metni ve anahtar
+  kelimelerde "Google Play", "Android", "Health Connect" yok ("Google ile
+  giriş" bir hizmet, platform değil).
+- **Görseller:** App Store dizisi iOS çerçevesiyle ve Apple Sağlık ekranıyla
+  üretiliyor; Google Play dizisi ayrı klasörde (`store_assets/google_play`).
+
+Aynı gün gizlilik görselindeki "Hesap şart değil" rozeti de "İzleme yok"
+oldu (giriş zorunlu); App Store Connect'te 12 görsel değiştirildi. Not:
+sürüm inceleme taslağındayken görsel silinemiyor; sürüm öğesi taslaktan
+çıkarılıp görseller işlendikten sonra geri eklendi.
+
 ---
 
 ## 5. Kategori ve içerik

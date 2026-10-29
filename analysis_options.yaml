@@ -9,6 +9,13 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+# `lib/localization/` varlık olarak paketleniyor (JSON'lar) ve derleme
+# çıktısına içindeki .dart dosyalarıyla birlikte kopyalanıyor. O kopyalar
+# göreli içe aktarmaları çözemiyor; analiz yalnızca kaynağa baksın.
+analyzer:
+  exclude:
+    - build/**
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`

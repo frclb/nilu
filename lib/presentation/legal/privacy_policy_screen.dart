@@ -43,7 +43,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
     final t = context.tokens;
     final titles = [
       for (var i = 1; i <= PrivacyPolicyScreen._sectionCount; i++)
-        context.tr('privacy_policy_section${i}_title'),
+        context.trPlatform('privacy_policy_section${i}_title'),
     ];
 
     return Scaffold(
@@ -80,7 +80,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                   child: _buildSection(
                     context,
                     title: titles[i],
-                    content: context.tr(
+                    content: context.trPlatform(
                       'privacy_policy_section${i + 1}_content',
                       params: {'email': _email(context)},
                     ),

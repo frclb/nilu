@@ -134,9 +134,11 @@ void main() {
     }
   }
 
+  // `trPlatform` iOS'ta `<anahtar>_ios`'u okuyor (bkz. app_localizations).
   bool isUsed(String key) =>
       mentionedKeys.contains(key) ||
-      dynamicKeyPatterns.any((p) => p.hasMatch(key));
+      dynamicKeyPatterns.any((p) => p.hasMatch(key)) ||
+      (key.endsWith('_ios') && isUsed(key.substring(0, key.length - 4)));
 
   // Bir anahtar en azından referans veya fallback dilde tanımlı olmalı.
   final defined = {...reference, ...fallback};

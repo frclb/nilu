@@ -177,17 +177,18 @@ APPLE_CAPTIONS = {
 }
 
 # Gizlilik panelindeki rozetler ve arama görseli. Üçü de uygulamada
-# doğrulanabilir ve iki platformda da doğru: hesap isteğe bağlı (yok değil),
-# cihazdaki veri şifreli, ekran kilidi ücretsiz.
+# doğrulanabilir ve iki platformda da doğru: izleme yok (kişiselleştirilmemiş
+# reklam, izleme izni istenmiyor), cihazdaki veri şifreli, ekran kilidi
+# ücretsiz. İlki "Hesap şart değil"di; giriş 2026-10-29'da zorunlu oldu.
 BADGES = {
-    "tr": ("Hesap şart değil", "Cihazda şifreli", "Ekran kilidi ücretsiz"),
-    "en": ("No account needed", "Encrypted on device", "Free app lock"),
-    "de": ("Kein Konto nötig", "Auf dem Gerät verschlüsselt", "App-Sperre gratis"),
-    "es": ("Sin cuenta obligatoria", "Cifrado en tu móvil", "Bloqueo gratis"),
-    "fr": ("Sans compte obligatoire", "Chiffré sur l’appareil", "Verrouillage gratuit"),
-    "pt": ("Sem conta obrigatória", "Criptografado no aparelho", "Bloqueio grátis"),
+    "tr": ("İzleme yok", "Cihazda şifreli", "Ekran kilidi ücretsiz"),
+    "en": ("No tracking", "Encrypted on device", "Free app lock"),
+    "de": ("Kein Tracking", "Auf dem Gerät verschlüsselt", "App-Sperre gratis"),
+    "es": ("Sin rastreo", "Cifrado en tu móvil", "Bloqueo gratis"),
+    "fr": ("Sans pistage", "Chiffré sur l’appareil", "Verrouillage gratuit"),
+    "pt": ("Sem rastreamento", "Criptografado no aparelho", "Bloqueio grátis"),
 }
-BADGE_ICONS = (K.ICON_NO_ACCOUNTS, K.ICON_SHIELD, K.ICON_LOCK)
+BADGE_ICONS = (K.ICON_NO_TRACKING, K.ICON_SHIELD, K.ICON_LOCK)
 
 # Ürün sayfası başlığı: tek bir fikir (Apple'ın önerisi) — alt başlığın
 # kısaltılmışı.

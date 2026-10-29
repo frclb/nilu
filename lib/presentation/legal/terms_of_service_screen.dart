@@ -41,7 +41,7 @@ class _TermsOfServiceScreenState extends State<TermsOfServiceScreen> {
     final t = context.tokens;
     final titles = [
       for (var i = 1; i <= TermsOfServiceScreen._sectionCount; i++)
-        context.tr('terms_section${i}_title'),
+        context.trPlatform('terms_section${i}_title'),
     ];
 
     return Scaffold(
@@ -77,7 +77,7 @@ class _TermsOfServiceScreenState extends State<TermsOfServiceScreen> {
                   child: _buildSection(
                     context,
                     title: titles[i],
-                    content: context.tr(
+                    content: context.trPlatform(
                       'terms_section${i + 1}_content',
                       params: {'email': _email(context)},
                     ),

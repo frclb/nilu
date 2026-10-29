@@ -424,7 +424,7 @@ def roboto(size):
 
 
 # Material simgeleri — kod noktaları Flutter'ın `Icons` sınıfından.
-ICON_NO_ACCOUNTS = "\ue431"
+ICON_NO_TRACKING = "\ue6be"  # Icons.visibility_off
 ICON_SHIELD = "\uf379"
 ICON_LOCK = "\ue3ae"
 
