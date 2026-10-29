@@ -15,6 +15,7 @@ import '../../domain/view_models/account_view_model.dart';
 import '../../domain/view_models/user_view_model.dart';
 import '../../localization/app_localizations.dart';
 import 'email_sign_in_sheet.dart';
+import 'sign_in_notice.dart';
 
 /// Apple, Google ya da e-postayla giriş: uygulama hesapla kullanılıyor.
 ///
@@ -170,6 +171,8 @@ class SignInScreen extends StatelessWidget {
                   const Center(child: CircularProgressIndicator()),
                 ],
                 const SizedBox(height: AppSpacing.lg),
+                const SignInNotice(),
+                const SizedBox(height: AppSpacing.sm),
                 Wrap(
                   alignment: WrapAlignment.center,
                   children: [

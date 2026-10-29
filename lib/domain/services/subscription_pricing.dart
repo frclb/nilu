@@ -3,16 +3,47 @@
 /// `purchases_flutter`'ın `PackageType`'ından bağımsız tutuldu: hesap saf
 /// kalsın ve mağaza SDK'sı olmadan test edilebilsin.
 enum PlanPeriod {
-  weekly(labelKey: 'premium_period_weekly', months: 1 / 4.345),
-  monthly(labelKey: 'premium_period_monthly', months: 1),
-  twoMonth(labelKey: 'premium_period_two_month', months: 2),
-  threeMonth(labelKey: 'premium_period_three_month', months: 3),
-  sixMonth(labelKey: 'premium_period_six_month', months: 6),
-  annual(labelKey: 'premium_period_annual', months: 12);
+  weekly(
+    labelKey: 'premium_period_weekly',
+    renewKey: 'premium_every_weekly',
+    months: 1 / 4.345,
+  ),
+  monthly(
+    labelKey: 'premium_period_monthly',
+    renewKey: 'premium_every_monthly',
+    months: 1,
+  ),
+  twoMonth(
+    labelKey: 'premium_period_two_month',
+    renewKey: 'premium_every_two_month',
+    months: 2,
+  ),
+  threeMonth(
+    labelKey: 'premium_period_three_month',
+    renewKey: 'premium_every_three_month',
+    months: 3,
+  ),
+  sixMonth(
+    labelKey: 'premium_period_six_month',
+    renewKey: 'premium_every_six_month',
+    months: 6,
+  ),
+  annual(
+    labelKey: 'premium_period_annual',
+    renewKey: 'premium_every_annual',
+    months: 12,
+  );
 
-  const PlanPeriod({required this.labelKey, required this.months});
+  const PlanPeriod({
+    required this.labelKey,
+    required this.renewKey,
+    required this.months,
+  });
 
   final String labelKey;
+
+  /// Yenileme sıklığı cümle içinde: "her ay", "üç ayda bir".
+  final String renewKey;
 
   /// Kaç aya karşılık geldiği. Haftalık için 4.345 (yılın ortalama ay
   /// uzunluğu); 4 kullanmak yıllık karşılaştırmayı %8 saptırırdı.

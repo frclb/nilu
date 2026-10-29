@@ -9,6 +9,7 @@ import '../../../design_system/sign_in_buttons.dart';
 import '../../../domain/view_models/account_view_model.dart';
 import '../../../localization/app_localizations.dart';
 import '../../account/email_sign_in_sheet.dart';
+import '../../account/sign_in_notice.dart';
 
 /// Partner eşleşmesi hesap istiyor: Apple, Google ya da e-postayla giriş.
 ///
@@ -108,6 +109,8 @@ class PartnerSignInRequired extends StatelessWidget {
               const SizedBox(height: 20),
               const Center(child: CircularProgressIndicator()),
             ],
+            const SizedBox(height: 20),
+            const SignInNotice(),
           ],
         ),
       ),

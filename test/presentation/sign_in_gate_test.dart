@@ -199,6 +199,36 @@ void main() {
       await settleAsync(tester);
     }
 
+    testWidgets('girişte ne saklandığı düğmelerin altında yazıyor', (
+      tester,
+    ) async {
+      await tester.runAsync(() => kur(onboarded: false));
+      await pumpRouter(
+        tester,
+        routes: const [],
+        router: yonlendirici('/sign_in'),
+        userViewModel: user,
+        accountViewModel: hesap,
+      );
+      final not = find.byKey(const Key('sign_in_notice'));
+      await tester.scrollUntilVisible(
+        not,
+        200,
+        scrollable: find.descendant(
+          of: find.byKey(const Key('sign_in')),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      final ctx = tester.element(find.byKey(const Key('sign_in')));
+      expect(find.text(ctx.tr('sign_in_notice')), findsOneWidget);
+      expect(
+        tester.getTopLeft(not).dy,
+        greaterThan(
+          tester.getTopLeft(find.byKey(const Key('sign_in_email'))).dy,
+        ),
+      );
+    });
+
     testWidgets('Apple önce, e-posta en sonda', (tester) async {
       await tester.runAsync(() => kur(onboarded: false));
       await pumpRouter(

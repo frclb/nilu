@@ -290,6 +290,11 @@ class _OfferStateState extends State<_OfferState> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (plans.where((p) => p.id == selectedId).firstOrNull
+                    case final plan?) ...[
+                  _RenewalSummary(plan: plan),
+                  const SizedBox(height: AppSpacing.sm),
+                ],
                 AppGradientButton(
                   label: context.tr('premium_subscribe_button'),
                   icon: Icons.spa,
@@ -459,6 +464,49 @@ class _PlanCard extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Seçili planın fiyatı, yenileme sıklığı, kimden çekileceği ve nasıl
+/// iptal edileceği — abone ol düğmesinin hemen üstünde.
+///
+/// Uyum denetimi (6502, Mesafeli Sözleşmeler Yönetmeliği): bu bilgiler
+/// yalnızca listenin altındaki küçük ve soluk notta duruyordu; düğme ekranın
+/// altına sabit olduğu için kullanıcı notu görmeden satın alabiliyordu.
+/// Başlangıç teklifi varsa ilk dönemden sonra ne çekileceği de yazıyor.
+class _RenewalSummary extends StatelessWidget {
+  const _RenewalSummary({required this.plan});
+
+  final SubscriptionPlan plan;
+
+  @override
+  Widget build(BuildContext context) {
+    final android = AppPlatform.isAndroid;
+    final intro = plan.introOffer;
+    final key = intro != null
+        ? (android
+              ? 'premium_renewal_summary_intro_android'
+              : 'premium_renewal_summary_intro')
+        : (android
+              ? 'premium_renewal_summary_android'
+              : 'premium_renewal_summary');
+    return Text(
+      context.tr(
+        key,
+        params: {
+          'price': plan.priceString,
+          'every': context.tr(plan.period.renewKey),
+          'intro': ?intro,
+        },
+      ),
+      key: const Key('premium_renewal_summary'),
+      textAlign: TextAlign.center,
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+        fontSize: 13,
+        height: 1.4,
+        color: context.tokens.text,
       ),
     );
   }

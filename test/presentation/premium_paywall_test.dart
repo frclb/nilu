@@ -47,6 +47,20 @@ class _FakeVM extends SubscriptionViewModel {
   ];
 }
 
+/// Aylık planda başlangıç teklifi (ör. ücretsiz deneme) var.
+class _IntroVM extends _FakeVM {
+  @override
+  List<SubscriptionPlan> get plans => const [
+    SubscriptionPlan(
+      id: 'monthly',
+      period: PlanPeriod.monthly,
+      priceString: '₺149,99',
+      price: 149.99,
+      introOffer: '₺0,00',
+    ),
+  ];
+}
+
 void main() {
   final dictionary =
       jsonDecode(File('lib/localization/tr.json').readAsStringSync())
@@ -57,6 +71,7 @@ void main() {
   Future<void> open(
     WidgetTester tester, {
     required Brightness brightness,
+    SubscriptionViewModel? vm,
   }) async {
     tester.view.physicalSize = const Size(1320, 2868);
     tester.view.devicePixelRatio = 3;
@@ -80,7 +95,7 @@ void main() {
           locale: const Locale('tr'),
           supportedLocales: const [Locale('tr')],
           home: ChangeNotifierProvider<SubscriptionViewModel>.value(
-            value: _FakeVM(),
+            value: vm ?? _FakeVM(),
             child: const PremiumScreen(),
           ),
         ),
@@ -124,6 +139,81 @@ void main() {
     );
     expect(find.text(s('premium_privacy')), findsOneWidget);
     expect(find.text(s('premium_terms')), findsOneWidget);
+  });
+
+  group('yenileme ve iptal düğmenin hemen üstünde', () {
+    // Uyum denetimi (6502, Mesafeli Sözleşmeler Yönetmeliği): fiyat,
+    // yenileme sıklığı, kimden çekileceği ve iptal yolu satın alma
+    // düğmesine basmadan görülmeli. Önceden yalnızca listenin dibindeki
+    // küçük notta duruyordu; düğme ise ekranın altına sabit.
+    String ozet(WidgetTester tester) => tester
+        .widget<Text>(find.byKey(const Key('premium_renewal_summary')))
+        .data!;
+
+    testWidgets('seçili plana göre ve kaydırmadan görünüyor', (tester) async {
+      await open(tester, brightness: Brightness.light);
+
+      final metin = find.byKey(const Key('premium_renewal_summary'));
+      final dugme = find.text(s('premium_subscribe_button'));
+      expect(
+        tester.getBottomLeft(metin).dy,
+        lessThan(tester.getTopLeft(dugme).dy),
+      );
+      expect(
+        tester.getBottomLeft(metin).dy,
+        lessThan(tester.view.physicalSize.height / 3),
+        reason: 'kaydırmadan ekranda',
+      );
+
+      // Varsayılan seçim yıllık plan.
+      expect(
+        ozet(tester),
+        s('premium_renewal_summary')
+            .replaceAll('{price}', '₺899,99')
+            .replaceAll('{every}', s('premium_every_annual')),
+      );
+      expect(ozet(tester), contains('Abonelikler'));
+
+      await tester.tap(find.text(s('premium_period_monthly')));
+      await tester.pump();
+      expect(ozet(tester), contains('₺149,99'));
+      expect(ozet(tester), contains(s('premium_every_monthly')));
+    });
+
+    testWidgets('başlangıç teklifinde sonra ne çekileceği yazıyor', (
+      tester,
+    ) async {
+      await open(tester, brightness: Brightness.light, vm: _IntroVM());
+      expect(
+        ozet(tester),
+        s('premium_renewal_summary_intro')
+            .replaceAll('{intro}', '₺0,00')
+            .replaceAll('{price}', '₺149,99')
+            .replaceAll('{every}', s('premium_every_monthly')),
+      );
+    });
+
+    testWidgets('Android: Google Play hesabı ve Google Play\'den iptal', (
+      tester,
+    ) async {
+      AppPlatform.debugAndroid = true;
+      addTearDown(() => AppPlatform.debugAndroid = null);
+      await open(tester, brightness: Brightness.light);
+      expect(ozet(tester), contains('Google Play'));
+      expect(ozet(tester), isNot(contains('Apple')));
+    });
+
+    test('cayma ve iade bilgisi ödeme notunda ve şartlarda', () {
+      for (final key in [
+        'premium_disclaimer',
+        'premium_disclaimer_android',
+        'terms_section5_content',
+        'terms_section5_content_ios',
+      ]) {
+        expect(s(key), contains('cayma hakkı'), reason: key);
+        expect(s(key), contains(RegExp('[İi]ade')), reason: key);
+      }
+    });
   });
 
   testWidgets('marka başlığı çiziliyor', (tester) async {

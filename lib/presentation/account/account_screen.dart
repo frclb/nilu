@@ -17,6 +17,7 @@ import '../../domain/view_models/user_view_model.dart';
 import '../../localization/app_localizations.dart';
 import '../../localization/relative_time.dart';
 import 'email_sign_in_sheet.dart';
+import 'sign_in_notice.dart';
 import 'sync_consent_sheet.dart';
 
 /// Hesap ve bulut yedeği.
@@ -297,6 +298,8 @@ class _SignedOut extends StatelessWidget {
             const SizedBox(height: AppSpacing.lg),
             const Center(child: CircularProgressIndicator()),
           ],
+          const SizedBox(height: AppSpacing.lg),
+          const SignInNotice(),
         ],
       ],
     );
