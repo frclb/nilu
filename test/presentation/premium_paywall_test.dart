@@ -203,14 +203,14 @@ void main() {
       expect(ozet(tester), isNot(contains('Apple')));
     });
 
-    test('cayma ve iade bilgisi ödeme notunda ve şartlarda', () {
+    test('cayma ve iade yolu ödeme notunda ve şartlarda', () {
       for (final key in [
         'premium_disclaimer',
         'premium_disclaimer_android',
         'terms_section5_content',
         'terms_section5_content_ios',
       ]) {
-        expect(s(key), contains('cayma hakkı'), reason: key);
+        expect(s(key), contains('cayma'), reason: key);
         expect(s(key), contains(RegExp('[İi]ade')), reason: key);
       }
     });

@@ -343,9 +343,13 @@ denetimi yapıldı. Koddaki eksikler kapatıldı:
 
 - Ödeme ekranı: seçili planın fiyatı, yenileme sıklığı, kimden çekileceği
   ve iptal yolu abone ol düğmesinin hemen üstünde (`_RenewalSummary`);
-  başlangıç teklifinde ilk dönemden sonra ne çekileceği. Ödeme notu ve
-  şartlar 5. bölüm cayma hakkı (Mesafeli Sözleşmeler Yönetmeliği m.15/1-ğ)
-  ve iade yolunu söylüyor.
+  başlangıç teklifinde ilk dönemden sonra ne çekileceği. Planlar özellik
+  listesinden önce: her telefonda kaydırmadan görünüyor. Ödeme notu ve
+  şartlar 5. bölüm, Premium'un anında açılan dijital hizmet olduğunu ve
+  cayma ile iade taleplerinin mağazanın (Apple) koşullarına göre yapıldığını
+  söylüyor; cayma hakkının olmadığını kesin dille iddia etmiyor (yanlışsa
+  yanıltıcı beyan olurdu). Şartlar "mevzuattan doğan haklarınız saklıdır"
+  diyor.
 - Giriş ekranları: girişte ne saklandığını ve nerede saklandığını söyleyen
   kısa aydınlatma (`SignInNotice`).
 - Gizlilik politikası: toplanan verilerin tam listesi ve toplama yöntemi
@@ -426,7 +430,7 @@ sürüm inceleme taslağındayken görsel silinemiyor; sürüm öğesi taslaktan
 
 ---
 
-## 6. Yayın öncesi bağlanması gerekenler ✅ iOS (AdMob GDPR mesajı doğrulanmadı)
+## 6. Yayın öncesi bağlanması gerekenler ✅ iOS (AdMob GDPR mesajı etkin, 2026-10-29)
 
 | Ne | Neden gerekli | Nasıl |
 |---|---|---|

@@ -212,9 +212,11 @@ class _OfferStateState extends State<_OfferState> {
               children: [
                 const _Hero(),
                 const SizedBox(height: AppSpacing.lg),
-                const _FeatureList(),
-                const SizedBox(height: AppSpacing.xl),
 
+                // Planlar özelliklerden önce: her telefonda kaydırmadan
+                // görünsünler. Önce özellik listesi geliyordu; sabit satın
+                // alma çubuğu büyük iPhone'da bile planları örtüyordu ve
+                // önceden seçili yıllık plan görülmeden abone olunabiliyordu.
                 if (widget.viewModel.isLoading)
                   const Center(child: CircularProgressIndicator())
                 else if (plans.isEmpty)
@@ -237,7 +239,9 @@ class _OfferStateState extends State<_OfferState> {
                   ],
                 ],
 
-                const SizedBox(height: AppSpacing.sm),
+                const SizedBox(height: AppSpacing.lg),
+                const _FeatureList(),
+                const SizedBox(height: AppSpacing.lg),
                 Text(
                   context.tr(
                     AppPlatform.isAndroid
