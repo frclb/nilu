@@ -45,7 +45,7 @@ giriş) ve `CycleWidget/CycleWidget.entitlements` (App Groups). Üyelikten
 önce Debug yetkisiz ayrı dosyalarla çalışıyordu (ücretsiz takımlar HealthKit
 ve App Groups vermiyor); üyelikle birlikte kaldırıldılar.
 
-**Business ⬜ — premium'u bloke ediyor:** App Store Connect → Business:
+**Business ✅** (Paid Apps Agreement, banka ve vergi formları aktif) — App Store Connect → Business:
 Paid Applications Agreement, banka hesabı, W-8BEN. Ayrıca App Store Small
 Business Program başvurusu (komisyon %15). Ayrıntı SETUP_KEYS.md §1.
 
@@ -362,14 +362,14 @@ süreci, yer sağlayıcı yükümlülükleri).
 değerlendirmesi, hukukçuya sorular) yerel `legal_private/` klasöründe;
 depo herkese açık olduğu için Git'e gönderilmiyor.
 
-### Gizlilik politikası URL'si ⬜
+### Gizlilik politikası URL'si ✅
 App Store **herkese açık bir URL** ister. Uygulama içindeki gizlilik metni
 ([privacy_policy_screen.dart](lib/presentation/legal/privacy_policy_screen.dart))
 yeterli değildir. Metni bir web sayfasına koyup URL'i mağaza formuna girin.
 Yayınlanan sürüm uygulama içindeki metinle **aynı** olmalı; ikisi ayrışırsa
 hangisinin geçerli olduğu belirsizleşir.
 
-### Gizlilik etiketleri ⬜
+### Gizlilik etiketleri ✅ (bkz. "Apple — App Privacy")
 Politikanın 5. ve 6. bölümleri uygulamanın gerçekte kullandığı hizmetleri
 sayıyor: Firebase (hesap, partner eşleme), RevenueCat, Google AdMob. App Store
 gizlilik etiketleri bunlarla tutarlı olmalı — özellikle reklam kimliği ve
@@ -426,7 +426,7 @@ sürüm inceleme taslağındayken görsel silinemiyor; sürüm öğesi taslaktan
 
 ---
 
-## 6. Yayın öncesi bağlanması gerekenler ⬜
+## 6. Yayın öncesi bağlanması gerekenler ✅ iOS (AdMob GDPR mesajı doğrulanmadı)
 
 | Ne | Neden gerekli | Nasıl |
 |---|---|---|

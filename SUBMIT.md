@@ -19,13 +19,13 @@ Yükleme bunlardan birini atlarsa ya derleme durur ya inceleme reddeder.
 
 | | Durum | Nerede |
 |---|---|---|
-| Apple Developer Program üyeliği | ⬜ **engelleyici** | [SETUP_KEYS.md §1](SETUP_KEYS.md) |
-| Destek e-postası | ⬜ **engelleyici** | `lib/core/release_config.dart` |
-| RevenueCat anahtarı + `premium` entitlement | ⬜ | [SETUP_KEYS.md §5](SETUP_KEYS.md) |
-| Gerçek AdMob kimlikleri (+ Info.plist) | ⬜ | [SETUP_KEYS.md §6](SETUP_KEYS.md) |
-| Firebase: `GoogleService-Info.plist`, Apple + Google giriş (anonim kapalı), Google dönüş adresi, kurallar | ⬜ | [SETUP_KEYS.md §7](SETUP_KEYS.md) |
-| App ID'de "Sign in with Apple" | ⬜ | [SETUP_KEYS.md §2](SETUP_KEYS.md) |
-| Site yayında (gizlilik ve destek adresleri) | ⬜ | [SETUP_KEYS.md §8](SETUP_KEYS.md) |
+| Apple Developer Program üyeliği | ✅ | [SETUP_KEYS.md §1](SETUP_KEYS.md) |
+| Destek e-postası | ✅ | `lib/core/release_config.dart` |
+| RevenueCat anahtarı + `premium` entitlement | ✅ | [SETUP_KEYS.md §5](SETUP_KEYS.md) |
+| Gerçek AdMob kimlikleri (+ Info.plist) | ✅ iOS | [SETUP_KEYS.md §6](SETUP_KEYS.md) |
+| Firebase: `GoogleService-Info.plist`, Apple + Google + e-posta giriş (anonim kapalı), Google dönüş adresi, kurallar | ✅ | [SETUP_KEYS.md §7](SETUP_KEYS.md) |
+| App ID'de "Sign in with Apple" | ✅ | [SETUP_KEYS.md §2](SETUP_KEYS.md) |
+| Site yayında (gizlilik ve destek adresleri) | ✅ | [SETUP_KEYS.md §8](SETUP_KEYS.md) |
 | Şartlar ve politikanın hukuki gözden geçirilmesi | ⬜ | [STORE_CHECKLIST.md](STORE_CHECKLIST.md) |
 
 Hesaplara bağlı olanların hepsini tek komut denetliyor:
