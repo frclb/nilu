@@ -35,7 +35,6 @@ class IntimacyViewModel extends ChangeNotifier {
   List<String> _selectedAffectionNeeds = [];
   bool _isAutoShareEnabled = false;
   DateTime? _lastSharedAt;
-  int _dailyShareCount = 0;
   bool _isSharing = false;
   String? _shareError;
   bool _isLoaded = false;
@@ -47,11 +46,16 @@ class IntimacyViewModel extends ChangeNotifier {
   late final Future<void> _ready;
 
   // ─── Debounce ───
+  //
+  // Arka arkaya birkaç seçim tek gönderimde gitsin diye kısa bir bekleme.
+  // 10 saniyeydi; partnerin ekranına "anlık" gelmesi beklendiği için
+  // kısaldı (TestFlight bulgusu).
+  //
+  // Günlük 10 paylaşım sınırı da kaldırıldı: yalnızca bu cihazda sayılan,
+  // sunucuyu korumayan bir sayaçtı ve otomatik paylaşımda her seçim bir
+  // hak yiyordu ("Bugün 9 paylaşım hakkın kaldı").
   Timer? _debounceTimer;
-  static const Duration _debounceDuration = Duration(seconds: 10);
-
-  // ─── Rate Limit ───
-  static const int _maxDailyShares = 10;
+  static const Duration debounceDuration = Duration(seconds: 3);
 
   // ─── Getters ───
   String? get selectedSexualDesire => _selectedSexualDesire;
@@ -59,12 +63,9 @@ class IntimacyViewModel extends ChangeNotifier {
       List.unmodifiable(_selectedAffectionNeeds);
   bool get isAutoShareEnabled => _isAutoShareEnabled;
   DateTime? get lastSharedAt => _lastSharedAt;
-  int get dailyShareCount => _dailyShareCount;
   bool get isSharing => _isSharing;
   String? get shareError => _shareError;
   bool get isLoaded => _isLoaded;
-  bool get canShare => _dailyShareCount < _maxDailyShares;
-  int get remainingShares => _maxDailyShares - _dailyShareCount;
 
   /// Kullanıcı açık rıza verdi ve paylaşım açık.
   bool get sharingOn => _sharingOn;
@@ -88,7 +89,6 @@ class IntimacyViewModel extends ChangeNotifier {
     _selectedAffectionNeeds = await _repository.getAffectionNeeds();
     _isAutoShareEnabled = await _repository.getAutoShareEnabled();
     _lastSharedAt = await _repository.getLastSharedAt();
-    _dailyShareCount = await _repository.getDailyShareCount();
     _sharingOn = (await _shareSettings.load()).sharesAnything;
     _retractPending = await _repository.getFlag(_retractPendingKey);
     _isLoaded = true;
@@ -135,13 +135,58 @@ class IntimacyViewModel extends ChangeNotifier {
   }
 
   /// Açık rıza alındıktan sonra paylaşımı açar. Rıza metni ekranın işi
-  /// (bkz. `IntimacyConsentDialog`); burada yalnızca kaydı tutuluyor.
+  /// (bkz. `askIntimacyConsent`); burada yalnızca kaydı tutuluyor.
+  ///
+  /// Partner varsa mevcut seçimler hemen gidiyor: önceden paylaşımı açmak
+  /// bir sonraki seçim değişikliğini bekliyordu.
   Future<void> startSharing() async {
     await _ready;
     await _shareSettings.grantConsent();
     _sharingOn = true;
     _shareError = null;
     notifyListeners();
+    if (_hasPartner) await _performShare();
+  }
+
+  /// Partner onaylanırken: onay sayfasında gösterilen seçimler kaydedilir,
+  /// rıza ve otomatik paylaşım açılır, durum **hemen** gönderilir.
+  ///
+  /// Önceden onaydan sonra hiçbir şey gitmiyordu: partnerin ekranı sahip
+  /// "Partnerinle Paylaş"a basana ya da bir seçimi değiştirene kadar
+  /// "Henüz veri yok" diyordu. Sahip de onaylarken partnerin neyi
+  /// göreceğini görmüyordu.
+  ///
+  /// Gönderilemezse `false`; durum kuyrukta kalıyor.
+  Future<bool> approveAndShare(
+    String uid, {
+    String? sexualDesire,
+    required List<String> affectionNeeds,
+  }) async {
+    await _ready;
+    _debounceTimer?.cancel();
+    // Onay `UserViewModel`'den yeni geçti; sağlayıcının bunu buraya
+    // taşıması bir sonraki kareyi bekliyor.
+    _currentUserId = uid;
+    _hasPartner = true;
+
+    _selectedSexualDesire = sexualDesire;
+    _selectedAffectionNeeds = List.of(affectionNeeds);
+    if (sexualDesire == null) {
+      await _repository.clearSexualDesire();
+    } else {
+      await _repository.saveSexualDesire(sexualDesire);
+    }
+    await _repository.saveAffectionNeeds(_selectedAffectionNeeds);
+
+    await _shareSettings.grantConsent();
+    _sharingOn = true;
+    _isAutoShareEnabled = true;
+    await _repository.saveAutoShareEnabled(true);
+    _shareError = null;
+    notifyListeners();
+
+    await _performShare();
+    return _shareError == null;
   }
 
   /// Paylaşımı kapatır, rızayı geri alır ve sunucudaki durumu siler.
@@ -178,7 +223,7 @@ class IntimacyViewModel extends ChangeNotifier {
 
   void _startDebounce() {
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(_debounceDuration, _performShare);
+    _debounceTimer = Timer(debounceDuration, _performShare);
   }
 
   /// Manuel paylaşım tetikler.
@@ -197,12 +242,6 @@ class IntimacyViewModel extends ChangeNotifier {
     _sharingOn = settings.sharesAnything;
     if (!_sharingOn) {
       _shareError = 'sharing_disabled';
-      notifyListeners();
-      return;
-    }
-
-    if (!canShare) {
-      _shareError = 'rate_limit_exceeded';
       notifyListeners();
       return;
     }
@@ -228,9 +267,7 @@ class IntimacyViewModel extends ChangeNotifier {
     );
     if (success) {
       _lastSharedAt = DateTime.now();
-      _dailyShareCount++;
       await _repository.saveLastSharedAt(_lastSharedAt!);
-      await _repository.incrementDailyShareCount();
       await _repository.clearOfflineQueue();
     } else {
       await _repository.saveOfflineQueue(status.toJsonString());

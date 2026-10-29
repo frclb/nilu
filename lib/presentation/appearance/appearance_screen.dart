@@ -248,11 +248,13 @@ class _IconOption extends StatelessWidget {
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 180),
                     padding: const EdgeInsets.all(4),
+                    // Kalınlık iki durumda da aynı: seçili kutu 2 pt
+                    // büyüyünce altındaki ad komşusundan aşağıda kalıyordu.
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
                         color: selected ? primary : AppCard.borderColor(t),
-                        width: selected ? 2 : 1,
+                        width: 2,
                       ),
                     ),
                     child: ClipRRect(

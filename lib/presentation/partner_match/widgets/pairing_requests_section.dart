@@ -13,7 +13,7 @@ import '../../../domain/services/pairing_token.dart';
 import '../../../domain/view_models/intimacy_view_model.dart';
 import '../../../domain/view_models/user_view_model.dart';
 import '../../../localization/app_localizations.dart';
-import 'intimacy_consent.dart';
+import 'approve_partner_sheet.dart';
 import 'partner_ui.dart';
 
 /// Bekleyen eşleştirme istekleri ve onayları.
@@ -56,25 +56,63 @@ class _PairingRequestsSectionState extends State<PairingRequestsSection> {
     setState(() => _token = token);
   }
 
+  /// Önce sahip partnerin neyi göreceğini görüyor ve seçiyor; sonra
+  /// onay ve — seçtiyse — paylaşım birlikte.
+  ///
+  /// Önceden onay erişimi veriyor ama hiçbir şey göndermiyordu; partner
+  /// sahip ayrıca paylaşana kadar boş bir ekran gördü.
   Future<void> _approve(String requesterUid) async {
     final userViewModel = context.read<UserViewModel>();
     final intimacy = context.read<IntimacyViewModel>();
     final snack = AppSnack.of(context);
     final approved = context.tr('partner_request_approved');
+    final approvedShared = context.tr('partner_request_approved_shared');
+    final approvedEmpty = context.tr('partner_request_approved_empty');
     final failed = context.tr('partner_request_failed');
+    final shareFailed = context.tr('intimacy_share_failed_msg');
+
+    final karar = await showApprovePartnerSheet(
+      context,
+      code: PairingToken.confirmationCode(requesterUid),
+      sexualDesire: intimacy.selectedSexualDesire,
+      affectionNeeds: intimacy.selectedAffectionNeeds,
+      consentGiven: intimacy.sharingOn,
+    );
+    if (karar == null || !mounted) return;
 
     setState(() => _busy.add(requesterUid));
     final ok = await userViewModel.approvePartnerRequest(
       requesterUid,
       token: _token!,
     );
-    if (!mounted) return;
-    setState(() => _busy.remove(requesterUid));
-    ok ? snack.success(approved) : snack.error(failed);
-    // Onay erişimi veriyor ama paylaşımı başlatmıyor: paylaşım ayrı bir
-    // açık rıza istiyor.
-    if (ok && !intimacy.sharingOn && await askIntimacyConsent(context)) {
-      await intimacy.startSharing();
+    // Onaydan sonra bu bölüm ağaçtan kalkabilir (ekran "bağlı" hâline
+    // geçiyor); paylaşım ona bağlı değil.
+    if (mounted) setState(() => _busy.remove(requesterUid));
+    if (!ok) {
+      snack.error(failed);
+      return;
+    }
+
+    if (!karar.share) {
+      // Daha önce verilmiş bir rıza açık kalmasın: "paylaşmadan" dendi.
+      if (intimacy.sharingOn) await intimacy.stopSharing();
+      snack.success(approved);
+      return;
+    }
+    final myId = userViewModel.myId;
+    final sent =
+        myId != null &&
+        await intimacy.approveAndShare(
+          myId,
+          sexualDesire: karar.sexualDesire,
+          affectionNeeds: karar.affectionNeeds,
+        );
+    if (!sent) {
+      snack.error(shareFailed);
+    } else if (karar.sexualDesire == null && karar.affectionNeeds.isEmpty) {
+      snack.success(approvedEmpty);
+    } else {
+      snack.success(approvedShared);
     }
   }
 

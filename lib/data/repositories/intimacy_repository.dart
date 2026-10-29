@@ -10,8 +10,6 @@ class IntimacyRepository {
   static const String _affectionNeedsKey = 'intimacy_affection_needs';
   static const String _autoShareKey = 'intimacy_auto_share';
   static const String _lastSharedAtKey = 'intimacy_last_shared_at';
-  static const String _dailyShareCountKey = 'intimacy_daily_share_count';
-  static const String _dailyShareDateKey = 'intimacy_daily_share_date';
   static const String _offlineQueueKey = 'intimacy_offline_queue';
 
   final SecureStore _store;
@@ -24,6 +22,9 @@ class IntimacyRepository {
   /// Son seçilen cinsel istek değerini kaydeder.
   Future<void> saveSexualDesire(String value) =>
       _store.setString(_sexualDesireKey, value);
+
+  /// Cinsel istek seçimini kaldırır.
+  Future<void> clearSexualDesire() => _store.remove(_sexualDesireKey);
 
   /// Son seçilen cinsel istek değerini döndürür.
   Future<String?> getSexualDesire() => _store.getString(_sexualDesireKey);
@@ -56,33 +57,6 @@ class IntimacyRepository {
     if (dateStr == null) return null;
     return DateTime.tryParse(dateStr);
   }
-
-  // ─── Rate Limiting ───
-
-  /// Günlük paylaşım sayacını günceller.
-  Future<void> incrementDailyShareCount() async {
-    final today = _todayKey();
-    final savedDate = await _store.getString(_dailyShareDateKey);
-
-    if (savedDate != today) {
-      // Yeni gün, sayaç sıfırla
-      await _store.setString(_dailyShareDateKey, today);
-      await _store.setInt(_dailyShareCountKey, 1);
-    } else {
-      final count = await _store.getInt(_dailyShareCountKey) ?? 0;
-      await _store.setInt(_dailyShareCountKey, count + 1);
-    }
-  }
-
-  /// Günlük paylaşım sayısını döndürür.
-  Future<int> getDailyShareCount() async {
-    final savedDate = await _store.getString(_dailyShareDateKey);
-    if (savedDate != _todayKey()) return 0;
-    return await _store.getInt(_dailyShareCountKey) ?? 0;
-  }
-
-  static String _todayKey() =>
-      DateTime.now().toIso8601String().substring(0, 10);
 
   // ─── Offline Queue ───
 

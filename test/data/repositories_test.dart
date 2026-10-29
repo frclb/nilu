@@ -116,28 +116,6 @@ void main() {
       expect(await repo.getAffectionNeeds(), isEmpty);
       expect(await repo.getAutoShareEnabled(), isFalse);
       expect(await repo.getLastSharedAt(), isNull);
-      expect(await repo.getDailyShareCount(), 0);
-    });
-
-    test('günlük paylaşım sayacı artar', () async {
-      await repo.incrementDailyShareCount();
-      await repo.incrementDailyShareCount();
-      expect(await repo.getDailyShareCount(), 2);
-    });
-
-    test('sayaç farklı bir güne ait kayıtta sıfırlanır', () async {
-      await repo.incrementDailyShareCount();
-      expect(await repo.getDailyShareCount(), 1);
-
-      // Kaydı dünkü tarihe çevir.
-      const store = FlutterSecureStorage();
-      final yesterday = DateTime.now().subtract(const Duration(days: 1));
-      await store.write(
-        key: 'intimacy_daily_share_date',
-        value: yesterday.toIso8601String().substring(0, 10),
-      );
-
-      expect(await repo.getDailyShareCount(), 0);
     });
 
     test('offline kuyruk yazılır ve temizlenir', () async {

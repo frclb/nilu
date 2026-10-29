@@ -58,6 +58,9 @@ class PartnerViewModel extends ChangeNotifier {
   String? _listeningTo;
   bool _initialized = false;
 
+  /// Son `init`'te eşleşme sunucusu hazır mıydı?
+  bool _wasAvailable = false;
+
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
   _statusSubscription;
   Timer? _retryTimer;
@@ -111,17 +114,25 @@ class PartnerViewModel extends ChangeNotifier {
   /// faturalandırılıyor.
   void init(String? ownerUid, {String? requestToken, String? myUid}) {
     final id = (ownerUid != null && ownerUid.isNotEmpty) ? ownerUid : null;
+    final available = _firestoreDS.isAvailable;
     _requestToken = requestToken;
     _myUid = myUid;
-    if (_initialized && id == _listeningTo) return;
+    // Sunucunun hazır olup olmadığı da karara giriyor. Soğuk açılışta
+    // partner ekranı Firebase başlamadan kuruluyor; önceden ilk `init`
+    // "sunucu yok" deyip kalıyordu, Firebase hazır olunca gelen çağrı aynı
+    // sahip için erken dönüyordu.
+    if (_initialized && id == _listeningTo && available == _wasAvailable) {
+      return;
+    }
     _initialized = true;
     _listeningTo = id;
+    _wasAvailable = available;
     _reset();
 
     if (id == null) {
       _state = PartnerLinkState.notConnected;
       _isLoaded = true;
-    } else if (!_firestoreDS.isAvailable) {
+    } else if (!available) {
       _state = PartnerLinkState.unavailable;
       _isLoaded = true;
     } else {

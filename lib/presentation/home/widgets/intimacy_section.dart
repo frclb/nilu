@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../domain/view_models/intimacy_view_model.dart';
 import '../../../localization/app_localizations.dart';
 import '../../../localization/relative_time.dart';
+import 'intimacy_options.dart';
 
 /// Ana ekrandaki duygusal yakınlık bölümü — iki küçük kompakt kart.
 /// Tıklandığında BottomSheet ile detaylı seçim yapılır.
@@ -58,7 +59,7 @@ class IntimacySection extends StatelessWidget {
 // Bu bölüm eksikti: kullanıcı seçimlerini yapıyor ama partnerine hiç
 // gönderilmiyordu. Otomatik paylaşım varsayılan olarak kapalıydı ve açacak
 // bir arayüz yoktu; manuel gönderme düğmesi de yoktu. ViewModel tarafındaki
-// manualShare / isSharing / shareError / remainingShares hiçbir yerde
+// manualShare / isSharing / shareError hiçbir yerde
 // kullanılmıyordu.
 // ══════════════════════════════════════════════════════════════
 
@@ -73,8 +74,6 @@ class _ShareControls extends StatelessWidget {
 
   String? _errorMessage(BuildContext context) {
     switch (viewModel.shareError) {
-      case 'rate_limit_exceeded':
-        return context.tr('intimacy_rate_limit_msg');
       case 'share_failed':
         return context.tr('intimacy_share_failed_msg');
       case 'sharing_disabled':
@@ -141,25 +140,12 @@ class _ShareControls extends StatelessWidget {
             label: Text(context.tr('intimacy_share_button')),
           ),
 
-          // Son paylaşım / kalan hak
+          // Son paylaşım
           if (viewModel.lastSharedAt != null) ...[
             const SizedBox(height: 8),
             Text(
               '${context.tr('intimacy_last_shared')}: '
               '${context.relativeTime(DateTime.now().difference(viewModel.lastSharedAt!))}',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall,
-            ),
-          ],
-          if (viewModel.canShare && viewModel.lastSharedAt != null) ...[
-            const SizedBox(height: 2),
-            Text(
-              context.tr(
-                viewModel.remainingShares == 1
-                    ? 'intimacy_remaining_shares_one'
-                    : 'intimacy_remaining_shares',
-                params: {'count': '${viewModel.remainingShares}'},
-              ),
               textAlign: TextAlign.center,
               style: theme.textTheme.bodySmall,
             ),
@@ -206,29 +192,16 @@ class _MiniDesireCard extends StatelessWidget {
   final IntimacyViewModel viewModel;
   const _MiniDesireCard({required this.viewModel});
 
-  static const _desireIcons = {
-    'no_interest': Icons.do_not_disturb_on_outlined,
-    'slight_closeness': Icons.sentiment_neutral_outlined,
-    'feel_closer': Icons.favorite_border_rounded,
-    'passionate': Icons.local_fire_department_rounded,
-  };
-
-  String _getDesireLabel(BuildContext context, String? key) {
-    if (key == null) return context.tr('intimacy_desire_no_interest');
-    final map = {
-      'no_interest': context.tr('intimacy_desire_no_interest'),
-      'slight_closeness': context.tr('intimacy_desire_slight'),
-      'feel_closer': context.tr('intimacy_desire_closer'),
-      'passionate': context.tr('intimacy_desire_passionate'),
-    };
-    return map[key] ?? context.tr('intimacy_desire_no_interest');
-  }
+  String _getDesireLabel(BuildContext context, String? key) => context.tr(
+    intimacyOptionOf(key)?.labelKey ?? desireOptions.first.labelKey,
+  );
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final selected = viewModel.selectedSexualDesire;
-    final icon = _desireIcons[selected] ?? Icons.favorite_border_rounded;
+    final icon =
+        intimacyOptionOf(selected)?.icon ?? Icons.favorite_border_rounded;
     final hasSelection = selected != null;
 
     return AppTappable(
@@ -329,26 +302,8 @@ class _MiniDesireCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     final options = [
-      _Option(
-        'no_interest',
-        context.tr('intimacy_desire_no_interest'),
-        Icons.do_not_disturb_on_outlined,
-      ),
-      _Option(
-        'slight_closeness',
-        context.tr('intimacy_desire_slight'),
-        Icons.sentiment_neutral_outlined,
-      ),
-      _Option(
-        'feel_closer',
-        context.tr('intimacy_desire_closer'),
-        Icons.favorite_border_rounded,
-      ),
-      _Option(
-        'passionate',
-        context.tr('intimacy_desire_passionate'),
-        Icons.local_fire_department_rounded,
-      ),
+      for (final o in desireOptions)
+        _Option(o.value, context.tr(o.labelKey), o.icon),
     ];
 
     showModalBottomSheet(
@@ -527,63 +482,16 @@ class _MiniAffectionCard extends StatelessWidget {
   }
 
   String _getNeedLabel(BuildContext context, String key) {
-    final map = {
-      'hug': context.tr('intimacy_need_hug'),
-      'kiss': context.tr('intimacy_need_kiss'),
-      'be_together': context.tr('intimacy_need_together'),
-      'hear_voice': context.tr('intimacy_need_voice'),
-      'text': context.tr('intimacy_need_text'),
-      'spend_time': context.tr('intimacy_need_spend_time'),
-      'attention': context.tr('intimacy_need_attention'),
-      'alone_time': context.tr('intimacy_need_alone'),
-    };
-    return map[key] ?? key;
+    final option = intimacyOptionOf(key);
+    return option == null ? key : context.tr(option.labelKey);
   }
 
   void _showAffectionSheet(BuildContext context) {
     final theme = Theme.of(context);
 
     final options = [
-      _Option(
-        'hug',
-        context.tr('intimacy_need_hug'),
-        Icons.accessibility_new_rounded,
-      ),
-      _Option(
-        'kiss',
-        context.tr('intimacy_need_kiss'),
-        Icons.emoji_emotions_outlined,
-      ),
-      _Option(
-        'be_together',
-        context.tr('intimacy_need_together'),
-        Icons.people_outline_rounded,
-      ),
-      _Option(
-        'hear_voice',
-        context.tr('intimacy_need_voice'),
-        Icons.phone_in_talk_outlined,
-      ),
-      _Option(
-        'text',
-        context.tr('intimacy_need_text'),
-        Icons.chat_bubble_outline_rounded,
-      ),
-      _Option(
-        'spend_time',
-        context.tr('intimacy_need_spend_time'),
-        Icons.coffee_outlined,
-      ),
-      _Option(
-        'attention',
-        context.tr('intimacy_need_attention'),
-        Icons.visibility_outlined,
-      ),
-      _Option(
-        'alone_time',
-        context.tr('intimacy_need_alone'),
-        Icons.self_improvement_rounded,
-      ),
+      for (final o in affectionNeedOptions)
+        _Option(o.value, context.tr(o.labelKey), o.icon),
     ];
 
     showModalBottomSheet(

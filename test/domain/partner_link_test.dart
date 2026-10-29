@@ -244,11 +244,54 @@ void main() {
 
     test('sunucu yazmazsa "gönderildi" denmiyor', () async {
       final vm = await yakinlik();
-      await vm.startSharing();
       remote.writesSucceed = false;
+      await vm.startSharing();
       await vm.manualShare();
       expect(vm.shareError, 'share_failed');
       expect(vm.lastSharedAt, isNull);
+    });
+
+    // TestFlight: paylaşım açıldıktan sonra da partnerin ekranı boş kaldı;
+    // seçim ancak değişince ya da düğmeye basınca gidiyordu.
+    test('paylaşımı açmak mevcut seçimi hemen gönderiyor', () async {
+      final vm = await yakinlik();
+      await vm.startSharing();
+      expect(remote.intimacy['sahip']?['sexualDesire'], 'passionate');
+    });
+
+    // TestFlight: onaylarken sahip neyi paylaştığını görmüyordu, onaydan
+    // sonra da hiçbir şey gitmiyordu.
+    test('onaylarken seçilenler hemen gidiyor; rıza ve otomatik paylaşım '
+        'açılıyor', () async {
+      // Sağlayıcı onayı henüz taşımamış: partner yok görünüyor.
+      final vm = await yakinlik(partner: false);
+      final ok = await vm.approveAndShare(
+        'sahip',
+        sexualDesire: null,
+        affectionNeeds: ['attention'],
+      );
+      expect(ok, isTrue);
+      expect(remote.intimacy['sahip']?['affectionNeeds'], ['attention']);
+      expect(remote.intimacy['sahip']?['sexualDesire'], '');
+      expect(vm.hasPartner, isTrue);
+      expect(vm.sharingOn, isTrue);
+      expect(vm.isAutoShareEnabled, isTrue);
+      expect(await const ShareSettingsRepository().consentedAt(), isNotNull);
+      // Onay sayfasında kaldırılan seçim kayıttan da kalkıyor.
+      expect(vm.selectedSexualDesire, isNull);
+      expect(await const IntimacyRepository().getSexualDesire(), isNull);
+    });
+
+    // "Bugün 9 paylaşım hakkın kaldı": yalnızca bu cihazda sayılan bir
+    // sınırdı; otomatik paylaşımda her seçim bir hak yiyordu.
+    test('günlük paylaşım sınırı yok', () async {
+      final vm = await yakinlik();
+      await vm.startSharing();
+      for (var i = 0; i < 12; i++) {
+        await vm.selectSexualDesire(i.isEven ? 'feel_closer' : 'passionate');
+        await vm.manualShare();
+        expect(vm.shareError, isNull, reason: '${i + 1}. paylaşım');
+      }
     });
 
     test('silinemeyen durum sonraki açılışta yeniden siliniyor', () async {
@@ -300,6 +343,20 @@ void main() {
       expect(vm.state, PartnerLinkState.unavailable);
       expect(vm.isLoaded, isTrue);
       expect(remote.subscriptions, 0);
+    });
+
+    // Soğuk açılışta partner ekranı Firebase başlamadan kuruluyor.
+    test('sunucu sonradan hazır olunca dinlemeye başlıyor', () {
+      remote.available = false;
+      final vm = PartnerViewModel(firestore: remote);
+      vm.init('sahip');
+      expect(vm.state, PartnerLinkState.unavailable);
+
+      remote.available = true;
+      vm.init('sahip');
+      expect(vm.state, PartnerLinkState.connected);
+      expect(remote.subscriptions, 1);
+      vm.dispose();
     });
 
     test('onay beklerken reddedilince yeniden deniyor', () async {
