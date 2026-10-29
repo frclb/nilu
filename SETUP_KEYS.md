@@ -437,7 +437,7 @@ tıklama** — geçersiz trafik hesabı kapattırıyor ve geri dönüşü zor.
 
 ## 7. Firebase
 
-Hesap (zorunlu giriş), partner eşleşmesi ve bulut eşitleme için.
+Hesap (isteğe bağlı giriş), partner eşleşmesi ve bulut eşitleme için.
 Yapılandırılmazsa uygulama yerel modda çalışıyor: giriş istenmiyor, partner
 ekranı eşleşmenin, hesap ekranı girişin kullanılamadığını söylüyor.
 
@@ -527,9 +527,13 @@ kabul ettiği için Podfile.lock'ta 3.5.0. Yerel ayarı UTF-8 olmayan kabukta
 - Settings → **User account linking** → "Link accounts that use the same
   email" (varsayılan).
 
-Giriş zorunlu (2026-10-29'dan beri; `resolveRedirect`, `sign_in_screen.dart`)
-ama tek başına hiçbir sağlık verisi göndermiyor; bulut eşitleme ayrı bir açık
-rızayla açılıyor (`sync_consent_sheet.dart`).
+Giriş isteğe bağlı: karşılamadan sonra giriş ekranı bir kez geliyor ve
+"Hesap olmadan devam et" ile geçiliyor (`resolveRedirect`,
+`UserViewModel.needsSignIn`, `sign_in_screen.dart`). 29 Ekim 2026'da bir gün
+zorunluydu; App Store 5.1.1(v) riski yüzünden geri alındı. Partner eşleşmesi
+yine hesap istiyor (`needsAccountForPairing`). Giriş tek başına hiçbir sağlık
+verisi göndermiyor; bulut eşitleme ayrı bir açık rızayla açılıyor
+(`sync_consent_sheet.dart`).
 
 **7.4 Firestore ve kurallar:**
 

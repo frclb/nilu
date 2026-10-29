@@ -276,8 +276,9 @@ ama satın alma çalışmaz; ürünler "Missing Metadata"da bekler.
   demo hesabı verilebilir; onu hesap sahibi uygulamadan açıp şifresini
   yalnızca bu alana yazar.
 - Notes alanına yaz:
-  - Girişin zorunlu olduğunu ve neden: kayıtları yeni telefona taşımak
-    (bulut yedeği), partner eşleşmesi; hesap silme uygulama içinde
+  - Girişin isteğe bağlı olduğunu ("Continue without an account"); hesabın
+    yalnızca bulut yedeği, yeni telefona taşıma ve partner eşleşmesi için
+    gerektiğini; hesap silme uygulama içinde
   - Verinin cihazda kaldığını; partner eşlemesinin isteğe bağlı olduğunu
     ve sunucuya yalnızca paylaşılmayı seçilen yakınlık durumunun gittiğini
   - Girişin tek başına sağlık verisi göndermediğini, bulut eşitlemenin

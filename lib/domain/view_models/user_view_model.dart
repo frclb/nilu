@@ -53,6 +53,7 @@ class UserViewModel extends ChangeNotifier {
   /// Partner olarak okutulan kod; onaylanmadan ayrılırsa istek geri
   /// çekilsin diye saklanıyor.
   static const String _requestTokenKey = 'pairing_request_token';
+  static const String _signInSkippedKey = 'sign_in_skipped';
 
   Future<void> _loadState() async {
     final prefs = await SharedPreferences.getInstance();
@@ -62,6 +63,7 @@ class UserViewModel extends ChangeNotifier {
     _myId = prefs.getString('myId');
     _hasPartner = prefs.getBool('hasPartner') ?? (_partnerId != null);
     _requestToken = prefs.getString(_requestTokenKey);
+    _signInSkipped = prefs.getBool(_signInSkippedKey) ?? false;
 
     // Hesapla giriş yapılmışsa kimlik onun uid'si.
     final uid = _accountUid;
@@ -95,18 +97,38 @@ class UserViewModel extends ChangeNotifier {
 
   String? get _accountUid => _authDS.accountUid;
 
-  /// Hesap hizmeti hazır ama oturum yok: uygulama girişten sonra
-  /// kullanılıyor (bkz. `resolveRedirect`). Firebase yapılandırılmamışsa
-  /// (testler, yerel mod) giriş istenmiyor.
-  bool get needsSignIn => _firestoreDS.isAvailable && _accountUid == null;
+  /// Giriş ekranı bir kez gösteriliyor: "Hesap olmadan devam et" denince
+  /// bir daha sorulmuyor.
+  bool _signInSkipped = false;
+
+  /// Hesap hizmeti hazır, oturum yok ve giriş ekranı henüz geçilmedi:
+  /// karşılamadan sonra giriş ekranı geliyor (bkz. `resolveRedirect`).
+  ///
+  /// Hesap isteğe bağlı (App Store 5.1.1(v)): takip, gebelik modu ve
+  /// yedekleme hesapsız çalışıyor; hesap yalnızca bulut yedeği, yeni
+  /// telefona taşıma ve partner eşleşmesi için gerekiyor. 29 Ekim'de bir
+  /// gün boyunca zorunluydu. Firebase yapılandırılmamışsa (testler, yerel
+  /// mod) giriş istenmiyor.
+  bool get needsSignIn => needsAccountForPairing && !_signInSkipped;
+
+  /// "Hesap olmadan devam et": giriş ekranı bir daha zorla açılmıyor;
+  /// giriş Profil → Hesap ve bulut yedeği'nden yapılabiliyor.
+  Future<void> skipSignIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_signInSkippedKey, true);
+    _signInSkipped = true;
+    notifyListeners();
+  }
 
   /// E-postayla giriş yapılmış ama adres doğrulanmamış: uygulama
   /// doğrulanana kadar kullanılmıyor (bkz. `resolveRedirect`).
   bool get needsEmailVerification =>
       _firestoreDS.isAvailable && _authDS.needsEmailVerification;
 
-  /// Eşleşme sunucusu var ama hesap yok: eşleşmeden önce giriş gerekiyor.
-  bool get needsAccountForPairing => needsSignIn;
+  /// Eşleşme sunucusu var ama hesap yok: eşleşmeden önce giriş gerekiyor
+  /// (giriş ekranı geçilmiş olsa da).
+  bool get needsAccountForPairing =>
+      _firestoreDS.isAvailable && _accountUid == null;
 
   /// Eşleşmede kullanılan kimlik; **tek bir yerden**.
   ///

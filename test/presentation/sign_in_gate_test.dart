@@ -151,6 +151,43 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  // Hesap isteğe bağlı (App Store 5.1.1(v)): giriş ekranı bir kez geliyor
+  // ve geçilebiliyor; partner eşleşmesi yine hesap istiyor.
+  testWidgets('hesapsız devam: kurulum başlıyor, giriş bir daha zorlanmıyor', (
+    tester,
+  ) async {
+    await tester.runAsync(() => kur(onboarded: false));
+    await pumpRouter(
+      tester,
+      routes: const [],
+      router: yonlendirici('/onboarding'),
+      userViewModel: user,
+      accountViewModel: hesap,
+    );
+    await tester.tap(find.text('karşılama'));
+    await settleAsync(tester);
+    expect(find.byKey(const Key('sign_in')), findsOneWidget);
+
+    final gec = find.byKey(const Key('sign_in_skip'));
+    await tester.scrollUntilVisible(
+      gec,
+      200,
+      scrollable: find.descendant(
+        of: find.byKey(const Key('sign_in')),
+        matching: find.byType(Scrollable),
+      ),
+    );
+    await tester.tap(gec);
+    await settleAsync(tester);
+
+    expect(find.text('kurulum'), findsOneWidget);
+    expect(user.needsSignIn, isFalse);
+    expect(user.needsAccountForPairing, isTrue, reason: 'Partner yine hesap');
+    final prefs = await tester.runAsync(SharedPreferences.getInstance);
+    expect(prefs!.getBool('sign_in_skipped'), isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('vazgeçilen giriş ekranda bırakıyor', (tester) async {
     await tester.runAsync(() => kur(onboarded: true));
     auth.nextStatus = SignInStatus.cancelled;
@@ -192,6 +229,9 @@ void main() {
           matching: find.byType(Scrollable),
         ),
       );
+      // Kenarda kalmasın: uzun dillerde yalnızca bir parçası görünüyordu.
+      await tester.ensureVisible(dugme);
+      await tester.pumpAndSettle();
       await tester.tap(dugme);
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('email_sign_in_sheet')), findsOneWidget);

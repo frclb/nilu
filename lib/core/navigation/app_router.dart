@@ -96,8 +96,9 @@ const String resetPasswordPath = '/reset_password';
 
 /// Oturum açmadan da erişilebilen yollar.
 ///
-/// Uygulama Apple, Google ya da e-posta hesabıyla kullanılıyor. Karşılama
-/// ekranı, giriş ekranı ve yasal metinler girişten önce okunabilmeli.
+/// Giriş ekranı karşılamadan sonra bir kez geliyor (hesap isteğe bağlı,
+/// "Hesap olmadan devam et" ile geçiliyor). Karşılama ekranı, giriş ekranı
+/// ve yasal metinler ondan önce de okunabilmeli.
 /// Partner okutma ekranı ve buluttan geri yükleme kendi giriş düğmelerini
 /// gösteriyor: oradan girişe yönlendirmek akışı ikiye bölerdi. Şifre
 /// yenileme bağlantısı da oturum yokken açılıyor.
@@ -166,8 +167,9 @@ String? resolveRedirect({
     return onboardingPath;
   }
 
-  // Oturum yoksa giriş ekranı. Kurulumdan önce de sonra da: çıkış yapan
-  // ya da hesabını silen kullanıcı da buraya düşüyor.
+  // Oturum yoksa ve giriş ekranı henüz geçilmediyse giriş ekranı. Hesap
+  // isteğe bağlı: ekranda "Hesap olmadan devam et" var ve geçildikten sonra
+  // bir daha zorla açılmıyor (bkz. `UserViewModel.needsSignIn`).
   //
   // [needsSignIn] yalnızca hesap hizmeti hazırken doğru: Firebase
   // başlamadan karar verilmiyor, başlayınca `refreshListenable` yönlendirmeyi

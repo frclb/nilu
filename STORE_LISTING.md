@@ -87,7 +87,7 @@ Bedenini tanımak için sakin bir yer. Döngün, gebeliğin ve notların telefon
 ```
 Yazdıkların sende kalıyor. Gerçekten.
 
-Regl uygulamalarının çoğu işaretlediğin günleri, belirtilerini ve notlarını kendi sunucularına taşır. Nilu taşımıyor. Hepsi telefonunda, şifreli duruyor. Apple, Google ya da e-posta hesabınla giriş yaparsın ama giriş tek başına hiçbir sağlık verisi göndermez; buluta yedeklemek isteğe bağlı ve yalnızca senin açık rızanla.
+Regl uygulamalarının çoğu işaretlediğin günleri, belirtilerini ve notlarını kendi sunucularına taşır. Nilu taşımıyor. Hepsi telefonunda, şifreli duruyor. Hesap açman gerekmez; istersen Apple, Google ya da e-postayla giriş yaparsın ve giriş tek başına hiçbir sağlık verisi göndermez; buluta yedeklemek isteğe bağlı ve yalnızca senin açık rızanla.
 
 Çünkü bunlar senin. Kimsenin okumasına, saklamasına ya da satmasına gerek yok.
 
@@ -174,7 +174,7 @@ Log your period, understand your cycle. Your data is written to your device, not
 ```
 Your cycle data stays on your phone.
 
-Most period apps move the days you log, your symptoms and your notes to their own servers. Nilu doesn't. It all stays on your device, encrypted. You sign in with Apple, Google or email, but signing in alone sends no health data; cloud backup is optional and only with your explicit consent.
+Most period apps move the days you log, your symptoms and your notes to their own servers. Nilu doesn't. It all stays on your device, encrypted. You don't need an account; if you sign in with Apple, Google or email, signing in alone sends no health data; cloud backup is optional and only with your explicit consent.
 
 WHAT IT DOES
 
@@ -255,7 +255,7 @@ Periode eintragen, Zyklus verstehen. Deine Daten liegen auf deinem Gerät, nicht
 ```
 Deine Zyklusdaten bleiben auf deinem Telefon.
 
-Die meisten Perioden-Apps übertragen deine eingetragenen Tage, Symptome und Notizen auf eigene Server. Nilu nicht. Alles bleibt verschlüsselt auf deinem Gerät. Du meldest dich mit Apple, Google oder E-Mail an, aber die Anmeldung allein sendet keine Gesundheitsdaten; ein Cloud-Backup ist freiwillig und nur mit deiner ausdrücklichen Einwilligung.
+Die meisten Perioden-Apps übertragen deine eingetragenen Tage, Symptome und Notizen auf eigene Server. Nilu nicht. Alles bleibt verschlüsselt auf deinem Gerät. Ein Konto brauchst du nicht; meldest du dich mit Apple, Google oder E-Mail an, sendet die Anmeldung allein keine Gesundheitsdaten; ein Cloud-Backup ist freiwillig und nur mit deiner ausdrücklichen Einwilligung.
 
 WAS DIE APP KANN
 
@@ -336,7 +336,7 @@ Registra tu regla y entiende tu ciclo. Tus datos se guardan en tu dispositivo, n
 ```
 Los datos de tu ciclo se quedan en tu teléfono.
 
-La mayoría de las apps de regla llevan los días que registras, tus síntomas y tus notas a sus propios servidores. Nilu no. Todo se queda cifrado en tu dispositivo. Inicias sesión con Apple, Google o tu correo, pero iniciar sesión no envía por sí solo ningún dato de salud; la copia en la nube es opcional y solo con tu consentimiento explícito.
+La mayoría de las apps de regla llevan los días que registras, tus síntomas y tus notas a sus propios servidores. Nilu no. Todo se queda cifrado en tu dispositivo. No necesitas cuenta; si inicias sesión con Apple, Google o tu correo, iniciar sesión no envía por sí solo ningún dato de salud; la copia en la nube es opcional y solo con tu consentimiento explícito.
 
 QUÉ HACE
 
@@ -417,7 +417,7 @@ Note tes règles, comprends ton cycle. Tes données sont écrites sur ton appare
 ```
 Les données de ton cycle restent sur ton téléphone.
 
-La plupart des applis de règles envoient les jours que tu notes, tes symptômes et tes notes sur leurs propres serveurs. Nilu non. Tout reste chiffré sur ton appareil. Tu te connectes avec Apple, Google ou ton e-mail, mais la connexion n'envoie à elle seule aucune donnée de santé ; la sauvegarde cloud est facultative et uniquement avec ton consentement explicite.
+La plupart des applis de règles envoient les jours que tu notes, tes symptômes et tes notes sur leurs propres serveurs. Nilu non. Tout reste chiffré sur ton appareil. Pas besoin de compte ; si tu te connectes avec Apple, Google ou ton e-mail, la connexion n'envoie à elle seule aucune donnée de santé ; la sauvegarde cloud est facultative et uniquement avec ton consentement explicite.
 
 CE QU'ELLE FAIT
 
@@ -498,7 +498,7 @@ Registre a menstruação e entenda seu ciclo. Seus dados ficam no seu aparelho, 
 ```
 Os dados do seu ciclo ficam no seu celular.
 
-A maioria dos apps de menstruação leva os dias que você registra, seus sintomas e suas anotações para os próprios servidores. O Nilu não. Tudo fica criptografado no seu aparelho. Você entra com a Apple, o Google ou seu e-mail, mas entrar não envia por si só nenhum dado de saúde; o backup na nuvem é opcional e só com seu consentimento explícito.
+A maioria dos apps de menstruação leva os dias que você registra, seus sintomas e suas anotações para os próprios servidores. O Nilu não. Tudo fica criptografado no seu aparelho. Você não precisa de conta; se entrar com a Apple, o Google ou seu e-mail, entrar não envia por si só nenhum dado de saúde; o backup na nuvem é opcional e só com seu consentimento explícito.
 
 O QUE ELE FAZ
 
@@ -617,7 +617,7 @@ Regl takvimi, gebelik ve lohusalık takibi. Verin telefonunda kalır.
 ```
 Yazdıkların sende kalıyor. Gerçekten.
 
-Regl uygulamalarının çoğu işaretlediğin günleri, belirtilerini ve notlarını kendi sunucularına taşır. Nilu taşımıyor. Hepsi telefonunda, şifreli duruyor. Apple, Google ya da e-posta hesabınla giriş yaparsın ama giriş tek başına hiçbir sağlık verisi göndermez; buluta yedeklemek isteğe bağlı ve yalnızca senin açık rızanla.
+Regl uygulamalarının çoğu işaretlediğin günleri, belirtilerini ve notlarını kendi sunucularına taşır. Nilu taşımıyor. Hepsi telefonunda, şifreli duruyor. Hesap açman gerekmez; istersen Apple, Google ya da e-postayla giriş yaparsın ve giriş tek başına hiçbir sağlık verisi göndermez; buluta yedeklemek isteğe bağlı ve yalnızca senin açık rızanla.
 
 Çünkü bunlar senin. Kimsenin okumasına, saklamasına ya da satmasına gerek yok.
 
@@ -694,7 +694,7 @@ Period, pregnancy & postnatal tracking. Your data stays on your phone.
 ```
 Your cycle data stays on your phone.
 
-Most period apps move the days you log, your symptoms and your notes to their own servers. Nilu doesn't. It all stays on your device, encrypted. You sign in with Apple, Google or email, but signing in alone sends no health data; cloud backup is optional and only with your explicit consent.
+Most period apps move the days you log, your symptoms and your notes to their own servers. Nilu doesn't. It all stays on your device, encrypted. You don't need an account; if you sign in with Apple, Google or email, signing in alone sends no health data; cloud backup is optional and only with your explicit consent.
 
 WHAT IT DOES
 
@@ -765,7 +765,7 @@ Zyklus, Schwangerschaft & Wochenbett. Deine Daten bleiben auf deinem Handy.
 ```
 Deine Zyklusdaten bleiben auf deinem Telefon.
 
-Die meisten Perioden-Apps übertragen deine eingetragenen Tage, Symptome und Notizen auf eigene Server. Nilu nicht. Alles bleibt verschlüsselt auf deinem Gerät. Du meldest dich mit Apple, Google oder E-Mail an, aber die Anmeldung allein sendet keine Gesundheitsdaten; ein Cloud-Backup ist freiwillig und nur mit deiner ausdrücklichen Einwilligung.
+Die meisten Perioden-Apps übertragen deine eingetragenen Tage, Symptome und Notizen auf eigene Server. Nilu nicht. Alles bleibt verschlüsselt auf deinem Gerät. Ein Konto brauchst du nicht; meldest du dich mit Apple, Google oder E-Mail an, sendet die Anmeldung allein keine Gesundheitsdaten; ein Cloud-Backup ist freiwillig und nur mit deiner ausdrücklichen Einwilligung.
 
 WAS DIE APP KANN
 
@@ -836,7 +836,7 @@ Regla, embarazo y posparto en una app. Tus datos se quedan en tu móvil.
 ```
 Los datos de tu ciclo se quedan en tu teléfono.
 
-La mayoría de las apps de regla llevan los días que registras, tus síntomas y tus notas a sus propios servidores. Nilu no. Todo se queda cifrado en tu dispositivo. Inicias sesión con Apple, Google o tu correo, pero iniciar sesión no envía por sí solo ningún dato de salud; la copia en la nube es opcional y solo con tu consentimiento explícito.
+La mayoría de las apps de regla llevan los días que registras, tus síntomas y tus notas a sus propios servidores. Nilu no. Todo se queda cifrado en tu dispositivo. No necesitas cuenta; si inicias sesión con Apple, Google o tu correo, iniciar sesión no envía por sí solo ningún dato de salud; la copia en la nube es opcional y solo con tu consentimiento explícito.
 
 QUÉ HACE
 
@@ -907,7 +907,7 @@ Règles, grossesse et post-partum. Tes données restent sur ton téléphone.
 ```
 Les données de ton cycle restent sur ton téléphone.
 
-La plupart des applis de règles envoient les jours que tu notes, tes symptômes et tes notes sur leurs propres serveurs. Nilu non. Tout reste chiffré sur ton appareil. Tu te connectes avec Apple, Google ou ton e-mail, mais la connexion n'envoie à elle seule aucune donnée de santé ; la sauvegarde cloud est facultative et uniquement avec ton consentement explicite.
+La plupart des applis de règles envoient les jours que tu notes, tes symptômes et tes notes sur leurs propres serveurs. Nilu non. Tout reste chiffré sur ton appareil. Pas besoin de compte ; si tu te connectes avec Apple, Google ou ton e-mail, la connexion n'envoie à elle seule aucune donnée de santé ; la sauvegarde cloud est facultative et uniquement avec ton consentement explicite.
 
 CE QU'ELLE FAIT
 
@@ -978,7 +978,7 @@ Ciclo, gravidez e pós-parto num só app. Seus dados ficam no seu celular.
 ```
 Os dados do seu ciclo ficam no seu celular.
 
-A maioria dos apps de menstruação leva os dias que você registra, seus sintomas e suas anotações para os próprios servidores. O Nilu não. Tudo fica criptografado no seu aparelho. Você entra com a Apple, o Google ou seu e-mail, mas entrar não envia por si só nenhum dado de saúde; o backup na nuvem é opcional e só com seu consentimento explícito.
+A maioria dos apps de menstruação leva os dias que você registra, seus sintomas e suas anotações para os próprios servidores. O Nilu não. Tudo fica criptografado no seu aparelho. Você não precisa de conta; se entrar com a Apple, o Google ou seu e-mail, entrar não envia por si só nenhum dado de saúde; o backup na nuvem é opcional e só com seu consentimento explícito.
 
 O QUE ELE FAZ
 

@@ -35,11 +35,11 @@ void continueAfterSignIn(BuildContext context) {
   }
 }
 
-/// Apple, Google ya da e-postayla giriş: uygulama hesapla kullanılıyor.
+/// Apple, Google ya da e-postayla giriş — isteğe bağlı.
 ///
-/// Karşılama sayfalarından sonra, kurulumdan önce geliyor; çıkış yapan ya
-/// da hesabını silen kullanıcı da buraya düşüyor (bkz. `resolveRedirect`).
-/// Giriş bitince kaldığı yerden devam: kurulum ya da ana ekran.
+/// Karşılama sayfalarından sonra, kurulumdan önce bir kez geliyor (bkz.
+/// `resolveRedirect`); "Hesap olmadan devam et" ile geçiliyor. Giriş ya da
+/// geçiş bitince kaldığı yerden devam: kurulum ya da ana ekran.
 ///
 /// Giriş tek başına sağlık verisi göndermiyor: kayıtlar cihazda kalıyor,
 /// bulut yedeği ayrı bir rızayla açılıyor (Profil → Hesap ve bulut yedeği).
@@ -69,6 +69,12 @@ class SignInScreen extends StatelessWidget {
   }
 
   void _continue(BuildContext context) => continueAfterSignIn(context);
+
+  /// Hesapsız devam: giriş ekranı bir daha zorla açılmıyor.
+  Future<void> _skip(BuildContext context) async {
+    await context.read<UserViewModel>().skipSignIn();
+    if (context.mounted) continueAfterSignIn(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -176,7 +182,16 @@ class SignInScreen extends StatelessWidget {
                   const SizedBox(height: AppSpacing.lg),
                   const Center(child: CircularProgressIndicator()),
                 ],
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: AppSpacing.sm),
+                // Hesap isteğe bağlı (App Store 5.1.1(v)): takip hesapsız
+                // çalışıyor, kayıtlar cihazda kalıyor.
+                TextButton(
+                  key: const Key('sign_in_skip'),
+                  onPressed: busy ? null : () => _skip(context),
+                  style: TextButton.styleFrom(minimumSize: const Size(0, 48)),
+                  child: Text(context.tr('sign_in_skip')),
+                ),
+                const SizedBox(height: AppSpacing.sm),
                 const SignInNotice(),
                 const SizedBox(height: AppSpacing.sm),
                 Wrap(
