@@ -65,6 +65,7 @@ dependencies:
   google_mobile_ads: ^9.1.0
   cryptography: ^2.9.0
   crypto: ^3.0.7
+  google_sign_in: ^7.2.0
 
 
 dev_dependencies:

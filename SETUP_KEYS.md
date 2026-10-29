@@ -476,6 +476,15 @@ Ardından `ios/Runner/Info.plist` → `CFBundleURLSchemes` içindeki
 `com.googleusercontent.apps.YER-TUTUCU` yerine dosyadaki
 `REVERSED_CLIENT_ID`'yi yaz. Denetleyici ikisinin aynı olduğuna bakıyor.
 
+Google ile giriş iOS'ta Google'ın kendi kitaplığıyla (`google_sign_in`):
+istemci kimliğini bu dosyanın `CLIENT_ID`'sinden okuyor, dönüş için yukarıdaki
+şemayı kullanıyor; Info.plist'e ayrıca `GIDClientID` gerekmiyor. Sistem sayfası
+doğrudan accounts.google.com'u açıyor. (2026-10-29'a kadar Firebase'in web
+akışıydı ve kullanıcı önce `nilu-3b870.firebaseapp.com` adresini görüyordu.)
+GoogleSignIn 9.x `GTMSessionFetcher` 3.x istiyor; Firebase 12 de 3.4–6 arasını
+kabul ettiği için Podfile.lock'ta 3.5.0. Yerel ayarı UTF-8 olmayan kabukta
+`pod install` Ruby kodlama hatası veriyor: `LANG=en_US.UTF-8` ile çalıştır.
+
 **7.3 Giriş yöntemleri:** Authentication → Sign-in method:
 
 - **Anonymous** → **kapalı** kalsın. Partner eşleşmesi Apple ya da Google
