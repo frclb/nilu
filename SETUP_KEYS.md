@@ -487,10 +487,18 @@ kabul ettiği için Podfile.lock'ta 3.5.0. Yerel ayarı UTF-8 olmayan kabukta
 
 **7.3 Giriş yöntemleri:** Authentication → Sign-in method:
 
-- **Anonymous** → **kapalı** kalsın. Partner eşleşmesi Apple ya da Google
-  hesabı istiyor; giriş yoksa kod ve okutma ekranı önce girişi soruyor.
+- **Anonymous** → **kapalı** kalsın. Partner eşleşmesi Apple, Google ya da
+  e-posta hesabı istiyor; giriş yoksa kod ve okutma ekranı önce girişi soruyor.
   Kurallar da anonim oturumu reddediyor (`isSignedIn`).
 - **Google** → aç, destek e-postasını seç.
+- **Email/Password** → aç; "Email link (passwordless)" **kapalı** kalsın.
+  Yapıldı (2026-10-29, Firebase CLI oturumuyla, yalnızca `signIn.email`).
+  Sıfırlama ve doğrulama e-postalarını Firebase gönderiyor; bağlantılar
+  Firebase'in barındırdığı sayfaya (`nilu-3b870.firebaseapp.com/__/auth/action`)
+  gidiyor, ek kurulum yok. E-postadaki uygulama adı Project settings →
+  General → **Public-facing name**: "Nilu" olmalı, proje kimliği değil.
+  E-posta numaralandırma koruması açık (`emailPrivacyConfig`): yanlış şifre
+  ile kayıtlı olmayan adres aynı hatayı veriyor.
 - **Apple** → aç. iOS'ta yerel "Apple ile giriş" kullanılıyor, Services ID
   gerekmiyor. Ama hesap silinirken Apple jetonunun iptali (App Store kuralı
   5.1.1(v)) için **OAuth code flow** alanları doldurulmalı: Apple Developer →

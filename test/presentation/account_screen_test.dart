@@ -187,6 +187,57 @@ void main() {
     expect(ctx.read<AccountViewModel>().isSignedIn, isTrue);
   });
 
+  testWidgets('e-posta hesabını silmek şifre istiyor', (tester) async {
+    resetStores();
+    final ctx = await ac(tester);
+    final eposta = find.byKey(const Key('account_email'));
+    await tester.scrollUntilVisible(eposta, 200);
+    await tester.ensureVisible(eposta);
+    await tester.pumpAndSettle();
+    await tester.tap(eposta);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('email_field')),
+      'ada@ornek.com',
+    );
+    await tester.enterText(
+      find.byKey(const Key('password_field')),
+      'gizli-sifre',
+    );
+    await tester.ensureVisible(find.byKey(const Key('email_submit')));
+    await tester.tap(find.byKey(const Key('email_submit')));
+    await settleAsync(tester);
+    expect(find.text(ctx.tr('account_provider_email')), findsOneWidget);
+
+    final sil = find.byKey(const Key('account_delete'));
+    Future<void> silmeyiOnayla() async {
+      await tester.scrollUntilVisible(sil, 200);
+      await tester.tap(sil);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(ctx.tr('account_delete')).last);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('account_delete_password')), findsOneWidget);
+    }
+
+    // Şifreden vazgeçilirse hiçbir şey silinmiyor.
+    await silmeyiOnayla();
+    await tester.tap(find.text(ctx.tr('cancel')).last);
+    await settleAsync(tester);
+    expect(auth.reauthCalls, 0);
+    expect(ctx.read<AccountViewModel>().isSignedIn, isTrue);
+
+    await silmeyiOnayla();
+    await tester.enterText(
+      find.byKey(const Key('account_delete_password')),
+      'gizli-sifre',
+    );
+    await tester.tap(find.text(ctx.tr('account_delete')).last);
+    await settleAsync(tester);
+    expect(auth.reauthPassword, 'gizli-sifre');
+    expect(find.text(ctx.tr('account_delete_done')), findsOneWidget);
+    expect(ctx.read<AccountViewModel>().isSignedIn, isFalse);
+  });
+
   group('geri yükleme (yeni cihaz)', () {
     testWidgets('bulutta kayıt varsa kurulum atlanıyor', (tester) async {
       resetStores(onboarded: false);

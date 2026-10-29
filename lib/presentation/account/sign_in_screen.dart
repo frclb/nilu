@@ -14,8 +14,9 @@ import '../../design_system/sign_in_buttons.dart';
 import '../../domain/view_models/account_view_model.dart';
 import '../../domain/view_models/user_view_model.dart';
 import '../../localization/app_localizations.dart';
+import 'email_sign_in_sheet.dart';
 
-/// Apple ya da Google ile giriş: uygulama hesapla kullanılıyor.
+/// Apple, Google ya da e-postayla giriş: uygulama hesapla kullanılıyor.
 ///
 /// Karşılama sayfalarından sonra, kurulumdan önce geliyor; çıkış yapan ya
 /// da hesabını silen kullanıcı da buraya düşüyor (bkz. `resolveRedirect`).
@@ -31,22 +32,34 @@ class SignInScreen extends StatelessWidget {
     if (!context.mounted) return;
     switch (sonuc.status) {
       case SignInStatus.signedIn:
-        // Kimlik `signIn` içinde tazelendi; yönlendirme artık geçiyor.
-        final router = GoRouter.of(context);
-        if (context.read<UserViewModel>().onboardingComplete) {
-          router.goNamed(RouteNames.home);
-        } else if (router.canPop()) {
-          // Karşılama altta kalsın: kurulumun geri düğmesi oraya dönüyor.
-          router.pushReplacementNamed(RouteNames.onboardingGoal);
-        } else {
-          router.goNamed(RouteNames.onboardingGoal);
-        }
+        _continue(context);
       case SignInStatus.cancelled:
         break;
       case SignInStatus.failed:
         AppSnack.error(context, context.tr('account_sign_in_failed'));
       case SignInStatus.unavailable:
         AppSnack.error(context, context.tr('account_unavailable'));
+    }
+  }
+
+  /// Hatalar sayfanın içinde; buraya yalnızca giriş olunca dönülüyor.
+  Future<void> _signInWithEmail(BuildContext context) async {
+    if (await showEmailSignInSheet(context) && context.mounted) {
+      _continue(context);
+    }
+  }
+
+  /// Giriş bitti: kaldığı yerden devam.
+  void _continue(BuildContext context) {
+    // Kimlik girişte tazelendi; yönlendirme artık geçiyor.
+    final router = GoRouter.of(context);
+    if (context.read<UserViewModel>().onboardingComplete) {
+      router.goNamed(RouteNames.home);
+    } else if (router.canPop()) {
+      // Karşılama altta kalsın: kurulumun geri düğmesi oraya dönüyor.
+      router.pushReplacementNamed(RouteNames.onboardingGoal);
+    } else {
+      router.goNamed(RouteNames.onboardingGoal);
     }
   }
 
@@ -145,6 +158,12 @@ class SignInScreen extends StatelessWidget {
                   onPressed: busy
                       ? null
                       : () => _signIn(context, AccountProvider.google),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                EmailSignInButton(
+                  key: const Key('sign_in_email'),
+                  label: context.tr('account_continue_email'),
+                  onPressed: busy ? null : () => _signInWithEmail(context),
                 ),
                 if (busy) ...[
                   const SizedBox(height: AppSpacing.lg),

@@ -235,6 +235,54 @@ void main() {
     });
   });
 
+  group('e-posta', () {
+    test(
+      'giriş hesabı e-posta sağlayıcısıyla açıyor, veri göndermiyor',
+      () async {
+        final v = await vm();
+        final sonuc = await v.signInWithEmail(
+          'ada@ornek.com',
+          'gizli-sifre',
+          create: true,
+          languageCode: 'tr',
+        );
+
+        expect(sonuc.status, SignInStatus.signedIn);
+        expect(v.account?.provider, AccountProvider.email);
+        expect(auth.emailSignIns.single.create, isTrue);
+        expect(auth.emailSignIns.single.lang, 'tr');
+        expect(v.syncEnabled, isFalse, reason: 'Rıza alınmadı');
+        expect(bulut.uploads, 0);
+      },
+    );
+
+    test('yanlış şifrede giriş yok, sebep dönüyor', () async {
+      auth.nextEmailError = EmailAuthError.invalidCredential;
+      final v = await vm();
+      final sonuc = await v.signInWithEmail(
+        'ada@ornek.com',
+        'yanlis',
+        create: false,
+      );
+
+      expect(sonuc.status, SignInStatus.failed);
+      expect(sonuc.emailError, EmailAuthError.invalidCredential);
+      expect(v.isSignedIn, isFalse);
+    });
+
+    test('hesap silme şifreyi doğrulamaya veriyor', () async {
+      final v = await vm();
+      await v.signInWithEmail('ada@ornek.com', 'gizli-sifre', create: false);
+
+      expect(
+        await v.deleteAccount(password: 'gizli-sifre'),
+        AccountDeleteResult.deleted,
+      );
+      expect(auth.reauthPassword, 'gizli-sifre');
+      expect(v.isSignedIn, isFalse);
+    });
+  });
+
   test('Firebase yoksa giriş "kullanılamıyor" diyor', () async {
     auth.available = false;
     final v = await vm();

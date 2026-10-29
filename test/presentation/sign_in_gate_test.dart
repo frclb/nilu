@@ -11,6 +11,7 @@ import 'package:period_tracker/data/datasources/remote/account_auth.dart';
 import 'package:period_tracker/data/datasources/remote/firebase_auth_datasource.dart';
 import 'package:period_tracker/domain/view_models/account_view_model.dart';
 import 'package:period_tracker/domain/view_models/user_view_model.dart';
+import 'package:period_tracker/localization/app_localizations.dart';
 import 'package:period_tracker/presentation/account/sign_in_screen.dart';
 
 import '../support/fake_partner_remote.dart';
@@ -149,6 +150,169 @@ void main() {
     await girisYap(tester);
     expect(find.byKey(const Key('sign_in')), findsOneWidget);
     expect(find.text('ana ekran'), findsNothing);
+  });
+
+  group('e-posta', () {
+    Future<BuildContext> ac(
+      WidgetTester tester, {
+      Size size = const Size(390, 844),
+      Locale locale = const Locale('tr'),
+    }) async {
+      await tester.runAsync(() => kur(onboarded: false));
+      await pumpRouter(
+        tester,
+        routes: const [],
+        router: yonlendirici('/sign_in'),
+        size: size,
+        locale: locale,
+        userViewModel: user,
+        accountViewModel: hesap,
+      );
+      // Liste görünmeyen satırı kurmuyor: önce kaydır.
+      final dugme = find.byKey(const Key('sign_in_email'));
+      await tester.scrollUntilVisible(
+        dugme,
+        200,
+        scrollable: find.descendant(
+          of: find.byKey(const Key('sign_in')),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      await tester.tap(dugme);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('email_sign_in_sheet')), findsOneWidget);
+      return tester.element(find.byKey(const Key('sign_in')));
+    }
+
+    Future<void> doldur(
+      WidgetTester tester,
+      String eposta,
+      String sifre,
+    ) async {
+      await tester.enterText(find.byKey(const Key('email_field')), eposta);
+      await tester.enterText(find.byKey(const Key('password_field')), sifre);
+    }
+
+    Future<void> bas(WidgetTester tester, Key key) async {
+      await tester.ensureVisible(find.byKey(key));
+      await tester.tap(find.byKey(key));
+      await settleAsync(tester);
+    }
+
+    testWidgets('Apple önce, e-posta en sonda', (tester) async {
+      await tester.runAsync(() => kur(onboarded: false));
+      await pumpRouter(
+        tester,
+        routes: const [],
+        router: yonlendirici('/sign_in'),
+        userViewModel: user,
+        accountViewModel: hesap,
+      );
+      double y(String key) => tester.getTopLeft(find.byKey(Key(key))).dy;
+      expect(y('sign_in_apple'), lessThan(y('sign_in_google')));
+      expect(y('sign_in_google'), lessThan(y('sign_in_email')));
+    });
+
+    testWidgets('girişten sonra kurulum başlıyor', (tester) async {
+      await ac(tester);
+      await doldur(tester, 'ada@ornek.com', 'gizli-sifre');
+      await bas(tester, const Key('email_submit'));
+
+      expect(find.text('kurulum'), findsOneWidget);
+      expect(find.byKey(const Key('email_sign_in_sheet')), findsNothing);
+      final giris = auth.emailSignIns.single;
+      expect(giris.email, 'ada@ornek.com');
+      expect(giris.create, isFalse);
+      expect(
+        giris.lang,
+        'tr',
+        reason: 'Firebase e-postaları uygulamanın dilinde',
+      );
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('hesap oluşturma yeni hesap olarak gidiyor', (tester) async {
+      final ctx = await ac(tester);
+      await tester.tap(find.text(ctx.tr('email_mode_create')));
+      await tester.pumpAndSettle();
+      expect(find.text(ctx.tr('email_create_note')), findsOneWidget);
+
+      await doldur(tester, 'ada@ornek.com', 'gizli-sifre');
+      await bas(tester, const Key('email_submit'));
+
+      expect(auth.emailSignIns.single.create, isTrue);
+      expect(find.text('kurulum'), findsOneWidget);
+    });
+
+    testWidgets('biçim hatasında Firebase\'e gidilmiyor', (tester) async {
+      final ctx = await ac(tester);
+      await doldur(tester, 'ada', '');
+      await bas(tester, const Key('email_submit'));
+      expect(find.text(ctx.tr('email_error_invalid_email')), findsOneWidget);
+      expect(find.text(ctx.tr('email_error_password_empty')), findsOneWidget);
+
+      // Yeni hesapta kısa şifre de geri çevriliyor.
+      await tester.tap(find.text(ctx.tr('email_mode_create')));
+      await tester.pumpAndSettle();
+      await doldur(tester, 'ada@ornek.com', 'kisa');
+      await bas(tester, const Key('email_submit'));
+      expect(find.text(ctx.tr('email_error_password_short')), findsOneWidget);
+
+      expect(auth.emailSignIns, isEmpty);
+      expect(find.text('kurulum'), findsNothing);
+    });
+
+    testWidgets('yanlış şifrede sayfa açık kalıyor, sebep yazıyor', (
+      tester,
+    ) async {
+      final ctx = await ac(tester);
+      auth.nextEmailError = EmailAuthError.invalidCredential;
+      await doldur(tester, 'ada@ornek.com', 'yanlis-sifre');
+      await bas(tester, const Key('email_submit'));
+
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('email_error')),
+          matching: find.text(ctx.tr('email_error_invalid_credential')),
+        ),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('email_sign_in_sheet')), findsOneWidget);
+      expect(find.text('kurulum'), findsNothing);
+    });
+
+    testWidgets('şifremi unuttum: önce adres, sonra bağlantı', (tester) async {
+      final ctx = await ac(tester);
+      await bas(tester, const Key('email_forgot'));
+      expect(find.text(ctx.tr('email_reset_need_email')), findsOneWidget);
+      expect(auth.resetEmails, isEmpty);
+
+      await tester.enterText(
+        find.byKey(const Key('email_field')),
+        ' ada@ornek.com ',
+      );
+      await bas(tester, const Key('email_forgot'));
+      expect(auth.resetEmails, ['ada@ornek.com']);
+      expect(find.byKey(const Key('email_notice')), findsOneWidget);
+      expect(find.text(ctx.tr('email_reset_sent')), findsOneWidget);
+    });
+
+    for (final dil in ['tr', 'en', 'de', 'es', 'fr', 'pt']) {
+      testWidgets('$dil: e-posta sayfası küçük ekranda taşmıyor', (
+        tester,
+      ) async {
+        final ctx = await ac(
+          tester,
+          size: const Size(320, 568),
+          locale: Locale(dil),
+        );
+        await tester.tap(find.text(ctx.tr('email_mode_create')));
+        await tester.pumpAndSettle();
+        await bas(tester, const Key('email_submit'));
+        expect(find.text(ctx.tr('email_error_invalid_email')), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    }
   });
 
   // Uzun dillerde ve küçük ekranda taşma yok: ekran kayıyor.

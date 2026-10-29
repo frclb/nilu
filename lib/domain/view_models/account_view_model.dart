@@ -145,15 +145,39 @@ class AccountViewModel extends ChangeNotifier {
 
   // ─── Giriş ───
 
-  Future<SignInResult> signIn(AccountProvider provider) => _withBusy(() async {
-    final sonuc = await _auth.signIn(provider);
+  Future<SignInResult> signIn(AccountProvider provider) =>
+      _withBusy(() async => _signedIn(await _auth.signIn(provider)));
+
+  /// E-posta ve şifreyle giriş; [create] ise yeni hesap.
+  Future<SignInResult> signInWithEmail(
+    String email,
+    String password, {
+    required bool create,
+    String? languageCode,
+  }) => _withBusy(
+    () async => _signedIn(
+      await _auth.signInWithEmail(
+        email,
+        password,
+        create: create,
+        languageCode: languageCode,
+      ),
+    ),
+  );
+
+  Future<bool> sendPasswordReset(String email, {String? languageCode}) =>
+      _withBusy(
+        () => _auth.sendPasswordReset(email, languageCode: languageCode),
+      );
+
+  Future<SignInResult> _signedIn(SignInResult sonuc) async {
     if (sonuc.status == SignInStatus.signedIn) {
       _account = sonuc.user ?? _auth.currentAccount;
       await _readConsent();
       await onIdentityChanged?.call();
     }
     return sonuc;
-  });
+  }
 
   /// Çıkış: eşitleme durur, bu cihazdaki kayıtlar kalır.
   Future<void> signOut() => _withBusy(() async {
@@ -289,14 +313,17 @@ class AccountViewModel extends ChangeNotifier {
 
   /// Hesabı ve buluttaki her şeyi siler. Bu cihazdaki kayıtlara dokunmaz.
   ///
-  /// Sıra: kimlik yeniden doğrulanıyor (Apple'da jeton iptali), sonra bulut
-  /// kopyası, partner verisi ve kimliğin kendisi. Doğrulamadan vazgeçilirse
-  /// hiçbir şey silinmiyor.
-  Future<AccountDeleteResult> deleteAccount() => _withBusy(() async {
+  /// Sıra: kimlik yeniden doğrulanıyor (Apple'da jeton iptali; e-posta
+  /// hesabında [password] ile), sonra bulut kopyası, partner verisi ve
+  /// kimliğin kendisi. Doğrulamadan vazgeçilirse hiçbir şey silinmiyor.
+  Future<AccountDeleteResult> deleteAccount({String? password}) =>
+      _withBusy(() => _deleteAccount(password));
+
+  Future<AccountDeleteResult> _deleteAccount(String? password) async {
     final uid = _account?.uid;
     if (uid == null) return AccountDeleteResult.deleted;
     _timer?.cancel();
-    if (!await _auth.reauthenticateForDeletion()) {
+    if (!await _auth.reauthenticateForDeletion(password: password)) {
       return AccountDeleteResult.cancelled;
     }
     try {
@@ -315,7 +342,7 @@ class AccountViewModel extends ChangeNotifier {
     _status = SyncStatus.idle;
     await onIdentityChanged?.call();
     return AccountDeleteResult.deleted;
-  });
+  }
 
   @override
   void dispose() {

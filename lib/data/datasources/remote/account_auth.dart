@@ -6,10 +6,10 @@ import '../../../core/firebase/firebase_config.dart';
 import '../../../core/platform/app_platform.dart';
 
 /// Giriş sağlayıcısı.
-enum AccountProvider { apple, google }
+enum AccountProvider { apple, google, email }
 
-/// Apple ya da Google ile giriş yapmış kullanıcı. Eski sürümlerden kalmış
-/// anonim bir kimlik hesap sayılmıyor.
+/// Apple, Google ya da e-postayla giriş yapmış kullanıcı. Eski sürümlerden
+/// kalmış anonim bir kimlik hesap sayılmıyor.
 @immutable
 class AccountUser {
   final String uid;
@@ -27,11 +27,25 @@ class AccountUser {
 
 enum SignInStatus { signedIn, cancelled, failed, unavailable }
 
+/// E-postayla girişte kullanıcıya söylenebilecek sebep. Bilinmeyen bir
+/// hata `null`: genel "giriş yapılamadı".
+enum EmailAuthError {
+  /// E-posta ya da şifre yanlış. Firebase'in e-posta numaralandırma
+  /// koruması açık: "böyle bir hesap yok" ile "şifre yanlış" ayrılmıyor.
+  invalidCredential,
+  emailInUse,
+  weakPassword,
+  invalidEmail,
+  tooManyRequests,
+  network,
+}
+
 class SignInResult {
   final SignInStatus status;
   final AccountUser? user;
+  final EmailAuthError? emailError;
 
-  const SignInResult(this.status, {this.user});
+  const SignInResult(this.status, {this.user, this.emailError});
 }
 
 /// Hesap girişi. Testte sahtesiyle değiştiriliyor.
@@ -40,13 +54,31 @@ abstract class AccountAuth {
   AccountUser? get currentAccount;
   Stream<AccountUser?> get accountChanges;
 
+  /// Apple ya da Google ile giriş.
   Future<SignInResult> signIn(AccountProvider provider);
+
+  /// E-posta ve şifreyle giriş; [create] ise yeni hesap. Yeni hesaba
+  /// doğrulama e-postası gidiyor, ama giriş onu beklemiyor.
+  ///
+  /// [languageCode] Firebase'in göndereceği e-postanın dili.
+  Future<SignInResult> signInWithEmail(
+    String email,
+    String password, {
+    required bool create,
+    String? languageCode,
+  });
+
+  /// Şifre sıfırlama bağlantısı gönderir. Adrese kayıtlı hesap olmasa da
+  /// `true`: hangi adreslerin kayıtlı olduğu böylece öğrenilemiyor.
+  Future<bool> sendPasswordReset(String email, {String? languageCode});
+
   Future<void> signOut();
 
   /// Hesap silmeden önce: kimliği yeniden doğrular ve Apple ile girildiyse
-  /// Apple jetonunu iptal eder (Apple'ın şartı). Kullanıcı vazgeçerse ya
-  /// da doğrulama başarısızsa `false`.
-  Future<bool> reauthenticateForDeletion();
+  /// Apple jetonunu iptal eder (Apple'ın şartı). E-posta hesabında
+  /// [password] gerekiyor. Kullanıcı vazgeçerse ya da doğrulama başarısızsa
+  /// `false`.
+  Future<bool> reauthenticateForDeletion({String? password});
 }
 
 /// Firebase Authentication ile giriş.
@@ -63,6 +95,10 @@ abstract class AccountAuth {
 /// Info.plist'teki REVERSED_CLIENT_ID şemasından. Android'de şimdilik
 /// Firebase'in akışı: yerel kitaplık orada google-services.json istiyor.
 ///
+/// E-posta ve şifre Firebase'in kendi sağlayıcısı (`password`). Sıfırlama
+/// ve doğrulama e-postalarını Firebase gönderiyor; bağlantılar Firebase'in
+/// barındırdığı sayfaya (`nilu-3b870.firebaseapp.com/__/auth/action`) gidiyor.
+///
 /// Partner eşleşmesi de hesap istiyor; anonim kimlik yok. Eskiden eşleşme
 /// için açılan anonim kimliğe hesap bağlanıyordu (`linkWithProvider`).
 class FirebaseAccountAuth implements AccountAuth {
@@ -77,6 +113,11 @@ class FirebaseAccountAuth implements AccountAuth {
         ..addScope('email')
         ..addScope('name'),
     AccountProvider.google => GoogleAuthProvider()..addScope('email'),
+    AccountProvider.email => throw ArgumentError.value(
+      p,
+      'provider',
+      'e-posta signInWithEmail ile',
+    ),
   };
 
   static AccountUser? fromUser(User? u) {
@@ -85,6 +126,7 @@ class FirebaseAccountAuth implements AccountAuth {
       final provider = switch (info.providerId) {
         'apple.com' => AccountProvider.apple,
         'google.com' => AccountProvider.google,
+        'password' => AccountProvider.email,
         _ => null,
       };
       if (provider == null) continue;
@@ -159,6 +201,85 @@ class FirebaseAccountAuth implements AccountAuth {
     }
   }
 
+  static EmailAuthError? _emailError(FirebaseAuthException e) =>
+      switch (e.code) {
+        'invalid-credential' ||
+        'wrong-password' ||
+        'user-not-found' ||
+        'INVALID_LOGIN_CREDENTIALS' => EmailAuthError.invalidCredential,
+        'email-already-in-use' => EmailAuthError.emailInUse,
+        'weak-password' ||
+        'password-does-not-meet-requirements' => EmailAuthError.weakPassword,
+        'invalid-email' => EmailAuthError.invalidEmail,
+        'too-many-requests' => EmailAuthError.tooManyRequests,
+        'network-request-failed' => EmailAuthError.network,
+        _ => null,
+      };
+
+  Future<void> _setLanguage(String? languageCode) async {
+    if (languageCode == null) return;
+    try {
+      await _auth.setLanguageCode(languageCode);
+    } catch (e) {
+      debugPrint('Auth language not set: $e');
+    }
+  }
+
+  @override
+  Future<SignInResult> signInWithEmail(
+    String email,
+    String password, {
+    required bool create,
+    String? languageCode,
+  }) async {
+    if (!isAvailable) return const SignInResult(SignInStatus.unavailable);
+    final adres = email.trim();
+    try {
+      final UserCredential c;
+      if (create) {
+        c = await _auth.createUserWithEmailAndPassword(
+          email: adres,
+          password: password,
+        );
+        await _setLanguage(languageCode);
+        try {
+          await c.user?.sendEmailVerification();
+        } catch (e) {
+          debugPrint('Verification email failed: $e');
+        }
+      } else {
+        c = await _auth.signInWithEmailAndPassword(
+          email: adres,
+          password: password,
+        );
+      }
+      return SignInResult(SignInStatus.signedIn, user: fromUser(c.user));
+    } on FirebaseAuthException catch (e) {
+      debugPrint('Email sign-in failed: ${e.code}');
+      return SignInResult(SignInStatus.failed, emailError: _emailError(e));
+    } catch (e) {
+      debugPrint('Email sign-in failed: $e');
+      return const SignInResult(SignInStatus.failed);
+    }
+  }
+
+  @override
+  Future<bool> sendPasswordReset(String email, {String? languageCode}) async {
+    if (!isAvailable) return false;
+    await _setLanguage(languageCode);
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      return true;
+    } on FirebaseAuthException catch (e) {
+      debugPrint('Password reset failed: ${e.code}');
+      // Kayıtlı olmayan adres de başarı gibi: bkz. arayüz belgesi.
+      return e.code == 'user-not-found';
+    } catch (e) {
+      debugPrint('Password reset failed: $e');
+      return false;
+    }
+  }
+
   @override
   Future<void> signOut() async {
     if (!isAvailable) return;
@@ -179,15 +300,24 @@ class FirebaseAccountAuth implements AccountAuth {
   }
 
   @override
-  Future<bool> reauthenticateForDeletion() async {
+  Future<bool> reauthenticateForDeletion({String? password}) async {
     if (!isAvailable) return false;
     final user = _auth.currentUser;
     final hesap = fromUser(user);
     if (user == null || hesap == null) return true;
     try {
-      final c = hesap.provider == AccountProvider.google && _nativeGoogle
-          ? await user.reauthenticateWithCredential(await _googleCredential())
-          : await user.reauthenticateWithProvider(_provider(hesap.provider));
+      final UserCredential c;
+      if (hesap.provider == AccountProvider.email) {
+        final adres = user.email;
+        if (password == null || adres == null) return false;
+        c = await user.reauthenticateWithCredential(
+          EmailAuthProvider.credential(email: adres, password: password),
+        );
+      } else if (hesap.provider == AccountProvider.google && _nativeGoogle) {
+        c = await user.reauthenticateWithCredential(await _googleCredential());
+      } else {
+        c = await user.reauthenticateWithProvider(_provider(hesap.provider));
+      }
       if (hesap.provider == AccountProvider.apple) {
         // Apple, "Apple ile giriş" kullanan uygulamaların hesap silinirken
         // jetonu iptal etmesini istiyor (App Store kuralı 5.1.1(v)).

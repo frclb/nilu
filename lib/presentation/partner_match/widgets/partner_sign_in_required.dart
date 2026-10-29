@@ -8,8 +8,9 @@ import '../../../design_system/app_tokens.dart';
 import '../../../design_system/sign_in_buttons.dart';
 import '../../../domain/view_models/account_view_model.dart';
 import '../../../localization/app_localizations.dart';
+import '../../account/email_sign_in_sheet.dart';
 
-/// Partner eşleşmesi hesap istiyor: Apple ya da Google ile giriş.
+/// Partner eşleşmesi hesap istiyor: Apple, Google ya da e-postayla giriş.
 ///
 /// Eşleşme eskiden anonim bir Firebase kimliğiyle kuruluyordu. Artık hesap
 /// şart: eşleşme ve paylaşılan durum hesaba bağlı kalıyor ve "Hesabı sil"
@@ -34,6 +35,10 @@ class PartnerSignInRequired extends StatelessWidget {
       case SignInStatus.unavailable:
         AppSnack.error(context, context.tr('account_unavailable'));
     }
+  }
+
+  Future<void> _signInWithEmail(BuildContext context) async {
+    if (await showEmailSignInSheet(context)) onSignedIn();
   }
 
   @override
@@ -92,6 +97,12 @@ class PartnerSignInRequired extends StatelessWidget {
               onPressed: busy
                   ? null
                   : () => _signIn(context, AccountProvider.google),
+            ),
+            const SizedBox(height: 12),
+            EmailSignInButton(
+              key: const Key('partner_sign_in_email'),
+              label: context.tr('account_continue_email'),
+              onPressed: busy ? null : () => _signInWithEmail(context),
             ),
             if (busy) ...[
               const SizedBox(height: 20),

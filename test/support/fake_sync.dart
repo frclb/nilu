@@ -90,7 +90,14 @@ class FakeAccountAuth implements AccountAuth {
   SignInStatus nextStatus = SignInStatus.signedIn;
   bool reauthOk = true;
   int reauthCalls = 0;
+  String? reauthPassword;
   String nextUid = 'hesap-1';
+
+  /// E-postayla girişte dönecek hata; `null` ise giriş başarılı.
+  EmailAuthError? nextEmailError;
+  final List<({String email, String password, bool create, String? lang})>
+  emailSignIns = [];
+  final List<String> resetEmails = [];
   final _changes = StreamController<AccountUser?>.broadcast();
 
   @override
@@ -115,11 +122,43 @@ class FakeAccountAuth implements AccountAuth {
   }
 
   @override
+  Future<SignInResult> signInWithEmail(
+    String email,
+    String password, {
+    required bool create,
+    String? languageCode,
+  }) async {
+    if (!available) return const SignInResult(SignInStatus.unavailable);
+    emailSignIns.add((
+      email: email,
+      password: password,
+      create: create,
+      lang: languageCode,
+    ));
+    if (nextEmailError case final hata?) {
+      return SignInResult(SignInStatus.failed, emailError: hata);
+    }
+    _current = AccountUser(
+      uid: nextUid,
+      provider: AccountProvider.email,
+      email: email.trim(),
+    );
+    return SignInResult(SignInStatus.signedIn, user: _current);
+  }
+
+  @override
+  Future<bool> sendPasswordReset(String email, {String? languageCode}) async {
+    resetEmails.add(email);
+    return available;
+  }
+
+  @override
   Future<void> signOut() async => _current = null;
 
   @override
-  Future<bool> reauthenticateForDeletion() async {
+  Future<bool> reauthenticateForDeletion({String? password}) async {
     reauthCalls++;
+    reauthPassword = password;
     return reauthOk;
   }
 }

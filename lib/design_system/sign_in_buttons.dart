@@ -2,7 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-/// "Apple ile devam et" ve "Google ile devam et" düğmeleri.
+/// "Apple ile devam et" ve "Google ile devam et" düğmeleri; e-posta için
+/// [EmailSignInButton].
 ///
 /// Renkler **bilerek sabit**: ikisi de başka şirketlerin markası ve
 /// görünüşleri kurala bağlı. Apple'ın İnsan Arayüzü Yönergeleri açık zeminde
@@ -145,6 +146,58 @@ class SignInButton extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// "E-posta ile devam et": Apple ya da Google kullanmayanlar için.
+///
+/// Marka düğmesi değil, uygulamanın kendi renkleriyle; ama ötekilerle aynı
+/// boyda ve yazı ölçüsünde. Kenarlıklı ve zeminsiz: Apple düğmesinden
+/// belirgin olmamalı (Yönergeler 4.8).
+class EmailSignInButton extends StatelessWidget {
+  const EmailSignInButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+  });
+
+  final String label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return SizedBox(
+      width: double.infinity,
+      height: SignInButton.height,
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: scheme.onSurface,
+          // Temanın kenarlıklı düğmesi renkli zeminli; burada zemin yok.
+          backgroundColor: Colors.transparent,
+          side: BorderSide(color: scheme.outline),
+          minimumSize: const Size.fromHeight(SignInButton.height),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        icon: const Icon(Icons.mail_outline_rounded, size: 20),
+        label: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textScaler: MediaQuery.textScalerOf(
+            context,
+          ).clamp(maxScaleFactor: 1.2),
+          style: const TextStyle(
+            fontSize: SignInButton._titleSize,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),

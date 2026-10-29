@@ -220,7 +220,7 @@ Aşağıdakiler **koddan çıkarılmıştır** — formu buna göre doldurun.
 | Sağlık ve fitness | Regl tarihleri, semptomlar, ruh hâli, akış yoğunluğu, cinsel aktivite, gebelik testi, gebelik/lohusalık kayıtları, ölçümler, notlar, döngü ayarları | Cihazda **şifreli** (`SecureStore`); **bulut eşitleme açıksa** (açık rızayla) hesaba bağlı olarak Firestore'da (`syncData/{uid}`) | Hayır |
 | Hassas kişisel | Yakınlık/cinsel istek seçimleri | Cihazda **şifreli** | Yalnızca kullanıcı açıkça eşleşirse partnerine |
 | Kişisel bilgi | Profildeki ad, e-posta, doğum tarihi | Cihazda **şifreli**; bulut eşitleme açıksa Firestore'da | Hayır |
-| İletişim bilgisi | Hesabın e-postası ve adı — Apple ya da Google ile giriş **zorunlu** (2026-10-29'dan beri); Apple'da e-posta gizlenebilir, ad paylaşılmayabilir | Firebase Authentication | Hayır |
+| İletişim bilgisi | Hesabın e-postası ve adı — Apple, Google ya da e-postayla giriş **zorunlu** (2026-10-29'dan beri); Apple'da e-posta gizlenebilir, ad paylaşılmayabilir; e-posta hesabının şifresi yalnızca Firebase'de karma olarak | Firebase Authentication | Hayır |
 | Tanımlayıcı | Hesap kimliği ve partner kimliği | Cihaz + Firebase | Hayır |
 | Cihaz kimliği | Reklam SDK'sı (kişiselleştirilmemiş reklam) | Google AdMob | Hayır |
 | Satın alma | Abonelik durumu | RevenueCat açıksa | Hayır |
@@ -240,7 +240,7 @@ eklenen kodun topladığını da beyan istiyor.
   dosyası Device ID'yi "tracking" diye geçiyor ama bu yalnızca ATT izni
   verilince ve kişiselleştirilmiş reklamda geçerli).
 - "Data Linked to You":
-  - App Functionality: **Name, Email Address** (Apple/Google ile giriş),
+  - App Functionality: **Name, Email Address** (Apple/Google/e-posta ile giriş),
     **Health**, **Sensitive Info** (gebelik verisi; bulut yedeği açıksa),
     **Other User Content** (notlar), **User ID**, **Purchase History**
   - Third-Party Advertising + Analytics (AdMob): **Coarse Location** (IP'den;
@@ -265,7 +265,7 @@ Crashlytics, Messaging) uygulamada yok.
 |---|---|
 | Gerekli kullanıcı verisi türlerinden birini topluyor ya da paylaşıyor mu? | **Evet** |
 | Toplanan bütün veri aktarımda şifreli mi? | **Evet** (Firebase HTTPS, AdMob ve RevenueCat TLS) |
-| Kullanıcılar hesap oluşturabiliyor mu? | **Evet — OAuth** (Apple ya da Google ile giriş; zorunlu) |
+| Kullanıcılar hesap oluşturabiliyor mu? | **Evet — "Kullanıcı adı ve şifre" ve OAuth** (e-posta ve şifre, Apple ya da Google; zorunlu) |
 | Hesap silme bağlantısı | `…/tr/support/#delete-account` |
 | Hesabı silmeden veri silme isteme yolu var mı? | **Evet** — eşitlemeyi kapatınca buluttaki kopya, partner paylaşımını kapatınca sunucudaki durum siliniyor; sitede aynı sayfa |
 
@@ -454,7 +454,7 @@ Beyan edilenler koddan çıkarıldı:
 | Veri | Nereye gidiyor |
 |---|---|
 | Yakınlık durumu (sağlık) | `intimacy/{uid}` — yalnızca partner paylaşımı açıkken |
-| Kullanıcı kimliği | Firebase hesap UID'si (Apple ya da Google ile giriş) |
+| Kullanıcı kimliği | Firebase hesap UID'si (Apple, Google ya da e-postayla giriş) |
 | Cihaz kimliği | Reklam (AdMob; bağlantısız, üçüncü taraf reklam amacı) |
 | Satın alma geçmişi | RevenueCat |
 

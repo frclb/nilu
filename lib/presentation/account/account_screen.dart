@@ -16,6 +16,7 @@ import '../../domain/view_models/account_view_model.dart';
 import '../../domain/view_models/user_view_model.dart';
 import '../../localization/app_localizations.dart';
 import '../../localization/relative_time.dart';
+import 'email_sign_in_sheet.dart';
 import 'sync_consent_sheet.dart';
 
 /// Hesap ve bulut yedeği.
@@ -158,20 +159,32 @@ class _SignedOut extends StatelessWidget {
 
     switch (sonuc.status) {
       case SignInStatus.signedIn:
-        if (!restore) return;
-        // Geri yüklemede bir sonraki adım zaten belli: rıza ve indirme.
-        if (vm.syncEnabled) {
-          final s = await vm.syncNow();
-          if (context.mounted) await _finishRestore(context, s);
-        } else {
-          await _enableSync(context, restore: true);
-        }
+        await _signedIn(context, vm);
       case SignInStatus.cancelled:
         break;
       case SignInStatus.failed:
         AppSnack.error(context, context.tr('account_sign_in_failed'));
       case SignInStatus.unavailable:
         AppSnack.error(context, context.tr('account_unavailable'));
+    }
+  }
+
+  /// Hatalar sayfanın içinde; buraya yalnızca giriş olunca dönülüyor.
+  Future<void> _signInWithEmail(BuildContext context) async {
+    final vm = context.read<AccountViewModel>();
+    if (await showEmailSignInSheet(context) && context.mounted) {
+      await _signedIn(context, vm);
+    }
+  }
+
+  Future<void> _signedIn(BuildContext context, AccountViewModel vm) async {
+    if (!restore) return;
+    // Geri yüklemede bir sonraki adım zaten belli: rıza ve indirme.
+    if (vm.syncEnabled) {
+      final s = await vm.syncNow();
+      if (context.mounted) await _finishRestore(context, s);
+    } else {
+      await _enableSync(context, restore: true);
     }
   }
 
@@ -273,6 +286,12 @@ class _SignedOut extends StatelessWidget {
             onPressed: busy
                 ? null
                 : () => _signIn(host, AccountProvider.google),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          EmailSignInButton(
+            key: const Key('account_email'),
+            label: context.tr('account_continue_email'),
+            onPressed: busy ? null : () => _signInWithEmail(host),
           ),
           if (busy) ...[
             const SizedBox(height: AppSpacing.lg),
@@ -442,7 +461,15 @@ class _SignedIn extends StatelessWidget {
       action: 'account_delete',
     );
     if (!onay || !context.mounted) return;
-    final sonuc = await context.read<AccountViewModel>().deleteAccount();
+    final vm = context.read<AccountViewModel>();
+    // E-posta hesabında kimlik şifreyle doğrulanıyor; Apple ve Google kendi
+    // sayfalarını açıyor.
+    String? sifre;
+    if (vm.account?.provider == AccountProvider.email) {
+      sifre = await _askPassword(context);
+      if (sifre == null || !context.mounted) return;
+    }
+    final sonuc = await vm.deleteAccount(password: sifre);
     if (!context.mounted) return;
     switch (sonuc) {
       case AccountDeleteResult.deleted:
@@ -468,6 +495,7 @@ class _SignedIn extends StatelessWidget {
     final saglayici = context.tr(switch (account.provider) {
       AccountProvider.apple => 'account_provider_apple',
       AccountProvider.google => 'account_provider_google',
+      AccountProvider.email => 'account_provider_email',
     });
 
     final String durum;
@@ -543,9 +571,11 @@ class _SignedIn extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  account.provider == AccountProvider.apple
-                      ? Icons.apple
-                      : Icons.account_circle_outlined,
+                  switch (account.provider) {
+                    AccountProvider.apple => Icons.apple,
+                    AccountProvider.email => Icons.mail_outline_rounded,
+                    AccountProvider.google => Icons.account_circle_outlined,
+                  },
                   size: 26,
                   color: t.surface,
                 ),
@@ -803,6 +833,78 @@ class _ConsentScope extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Hesap silmeden önce e-posta hesabının şifresi. Vazgeçilirse `null`.
+Future<String?> _askPassword(BuildContext context) => showDialog<String>(
+  context: context,
+  builder: (_) => const _PasswordDialog(),
+);
+
+/// Denetleyici kutunun kendi durumunda: kutu kapanırken (animasyon
+/// sürerken) hâlâ kullanılıyor, dışarıda atılırsa hata veriyordu.
+class _PasswordDialog extends StatefulWidget {
+  const _PasswordDialog();
+
+  @override
+  State<_PasswordDialog> createState() => _PasswordDialogState();
+}
+
+class _PasswordDialogState extends State<_PasswordDialog> {
+  final _alan = TextEditingController();
+
+  @override
+  void dispose() {
+    _alan.dispose();
+    super.dispose();
+  }
+
+  void _gonder() {
+    if (_alan.text.isNotEmpty) Navigator.of(context).pop(_alan.text);
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: Text(context.tr('account_delete_password_title')),
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(context.tr('account_delete_password_body')),
+        const SizedBox(height: AppSpacing.md),
+        TextField(
+          key: const Key('account_delete_password'),
+          controller: _alan,
+          autofocus: true,
+          obscureText: true,
+          autocorrect: false,
+          enableSuggestions: false,
+          autofillHints: const [AutofillHints.password],
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => _gonder(),
+          decoration: InputDecoration(
+            labelText: context.tr('email_password_label'),
+          ),
+        ),
+      ],
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.of(context).pop(),
+        child: Text(context.tr('cancel')),
+      ),
+      FilledButton(
+        onPressed: _gonder,
+        style: AppTheme.dialogAction().copyWith(
+          backgroundColor: WidgetStatePropertyAll(context.tokens.danger),
+          foregroundColor: WidgetStatePropertyAll(
+            Theme.of(context).colorScheme.onPrimary,
+          ),
+        ),
+        child: Text(context.tr('account_delete')),
+      ),
+    ],
+  );
 }
 
 /// Onay kutusu. Onaylandıysa `true`.
