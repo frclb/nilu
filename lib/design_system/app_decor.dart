@@ -17,25 +17,64 @@ class AppGradients {
 
   /// Ana eylem: marka → ikincil (erikte böğürtlen gülü). Yalnızca dolgu;
   /// üstündeki yazı her zaman `onPrimary`.
+  ///
+  /// Üç renk, iki temada da: çağıranlar `colors`'ı kendi duraklarıyla
+  /// kullanıyor.
   static LinearGradient primary(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final t = context.tokens;
-    final deep = Color.lerp(scheme.primary, Colors.black, 0.18)!;
+    // Koyu temada marka açık bir pembe ve yazı koyu. Açık temadaki gibi
+    // karartılmış bir baş eklemek pembeyi çamurlaştırıyordu: düğme soluk,
+    // grimsi bir leylaktan başlıyordu.
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final start = dark
+        ? scheme.primary
+        : Color.lerp(scheme.primary, Colors.black, 0.18)!;
+    final middle = dark
+        ? Color.lerp(scheme.primary, t.secondary, 0.5)!
+        : scheme.primary;
     return LinearGradient(
       begin: Alignment.centerLeft,
       end: Alignment.centerRight,
-      colors: [deep, scheme.primary, t.secondary],
+      colors: [start, middle, t.secondary],
       stops: const [0, 0.45, 1],
     );
   }
 
-  /// Simge ve logo dairesi: marka → ikincil, çapraz.
+  /// Simge ve logo dairesi: marka → ikincil, çapraz. Üstündeki her şey
+  /// [onMark].
+  ///
+  /// Koyu temada aynı rengin derin tonları (`AppTokens.markStart`): açık
+  /// pembe daireler gece zemininde parlıyor, beyaz lotus üstünde
+  /// kayboluyordu.
   static LinearGradient mark(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
+    final t = context.tokens;
     return LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: [scheme.primary, context.tokens.secondary],
+      colors: [t.markStart, t.markEnd],
+    );
+  }
+
+  /// [mark] ve [hero] üstündeki yazı ve simge. Degrade iki temada da koyu.
+  static const Color onMark = Colors.white;
+
+  /// Büyük vurgu kartı (gebelik başlığı, partner kartı): [mark]'ın
+  /// koyulaşarak başlayan hâli, çapraz. Üstündeki yazı [onMark].
+  ///
+  /// Koyu temada bu kartlar ana düğmenin açık pembesiyle doluyordu; ekranın
+  /// en parlak yüzeyi bir bilgi kartı oluyordu.
+  static LinearGradient hero(BuildContext context) {
+    final t = context.tokens;
+    return LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color.lerp(t.markStart, Colors.black, 0.18)!,
+        t.markStart,
+        t.markEnd,
+      ],
+      stops: const [0, 0.55, 1],
     );
   }
 
@@ -270,7 +309,7 @@ class AppLogoMark extends StatelessWidget {
         gradient: AppGradients.mark(context),
         boxShadow: AppShadows.soft(context),
       ),
-      child: const BrandLotus(color: Colors.white, sideOpacity: 0.8),
+      child: const BrandLotus(color: AppGradients.onMark, sideOpacity: 0.8),
     );
   }
 }
@@ -445,9 +484,9 @@ class AppIconTile extends StatelessWidget {
       child: Icon(
         icon,
         size: size * 0.5,
-        // Degradenin üstünde `onPrimary`: koyu temada marka açık pembe ve
-        // beyaz simge üstünde okunmuyordu.
-        color: color ?? (gradient != null ? scheme.onPrimary : scheme.primary),
+        // Degrade marka degradesi; iki temada da koyu (bkz. `AppGradients`).
+        color:
+            color ?? (gradient != null ? AppGradients.onMark : scheme.primary),
       ),
     );
   }
@@ -457,7 +496,9 @@ class AppIconTile extends StatelessWidget {
 ///
 /// Bulanıklık filtresi yerine radyal degrade: kaydırırken her karede
 /// yeniden bulanıklaştırmak pahalı, degrade aynı izlenimi bedavaya veriyor.
-/// Yalnızca açık temada; koyu temada parlama göz yoruyor.
+///
+/// Koyu temada parlama değil, derin ve kısık bir marka ışığı: zemin düz
+/// siyah kaldığında ekranlar derinliksiz görünüyordu.
 class AmbientBackground extends StatelessWidget {
   const AmbientBackground({super.key, required this.child});
 
@@ -466,32 +507,80 @@ class AmbientBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    if (dark) return child;
+    final t = context.tokens;
+    final colors = dark
+        ? [
+            t.markStart.withAlpha(72),
+            t.markEnd.withAlpha(30),
+            t.ovulation.withAlpha(14),
+            t.background.withAlpha(0),
+          ]
+        : [
+            AppPalette.rose200.withAlpha(90),
+            const Color(0xFFFDE8D0).withAlpha(70),
+            AppPalette.iris100.withAlpha(40),
+            AppPalette.sand50.withAlpha(0),
+          ];
+    const top = -120.0;
+    const height = 420.0;
+    Widget glow = DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: RadialGradient(
+          center: const Alignment(-0.2, -0.3),
+          radius: 0.9,
+          colors: colors,
+          stops: const [0, 0.35, 0.6, 1],
+        ),
+      ),
+    );
+    if (dark) {
+      // Üst çubuk düz zemin renginde; ışıma gövdenin tepesinde başlayınca
+      // koyu zeminde kesik bir çizgi gibi duruyordu. İlk 80 pt'de sıfırdan
+      // açılıyor.
+      glow = ShaderMask(
+        blendMode: BlendMode.dstIn,
+        shaderCallback: (rect) => const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Colors.transparent, Colors.transparent, Colors.white],
+          stops: [0, -top / height, (80 - top) / height],
+        ).createShader(rect),
+        child: glow,
+      );
+    }
     return Stack(
       children: [
         Positioned(
-          top: -120,
+          top: top,
           left: -60,
           right: -60,
-          height: 420,
-          child: IgnorePointer(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(-0.2, -0.3),
-                  radius: 0.9,
-                  colors: [
-                    AppPalette.rose200.withAlpha(90),
-                    const Color(0xFFFDE8D0).withAlpha(70),
-                    AppPalette.iris100.withAlpha(40),
-                    AppPalette.sand50.withAlpha(0),
-                  ],
-                  stops: const [0, 0.35, 0.6, 1],
+          height: height,
+          child: IgnorePointer(child: glow),
+        ),
+        // Koyu temada ikinci, menekşe bir ışık: sağda, ekranın ortasına
+        // doğru. Tek ışıma sayfanın yalnızca tepesini renklendiriyordu;
+        // aşağısı yine düz siyahtı.
+        if (dark)
+          Positioned(
+            top: 260,
+            right: -160,
+            width: 420,
+            height: 420,
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    colors: [
+                      t.ovulation.withAlpha(30),
+                      t.markEnd.withAlpha(12),
+                      t.background.withAlpha(0),
+                    ],
+                    stops: const [0, 0.45, 1],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
         child,
       ],
     );

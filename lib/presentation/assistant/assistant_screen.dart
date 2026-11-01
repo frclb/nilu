@@ -131,15 +131,17 @@ class _AssistantScreenState extends State<AssistantScreen> {
           ),
         ),
       ),
-      // Giriş çubuğu gövdenin değil `Scaffold`'un altında: içerik
-      // sütununun içinde kalınca zemini geniş ekranda 600 pt'de
-      // kesilip sayfanın üstünde sert kenarlı bir dikdörtgen
-      // bırakıyordu.
-      bottomNavigationBar: _InputBar(controller: _controller, onAsk: _ask),
-      body: AppContentWidth(
-        child: Column(
-          children: [
-            Expanded(
+      // Giriş çubuğu gövdenin dibinde ama içerik sütununun dışında.
+      //
+      // Önce `bottomNavigationBar`'daydı. `Scaffold` o bölümü klavyeyle
+      // birlikte yukarı taşımıyor: klavye açılınca soru alanı altında
+      // kalıyor, yazılan hiç görünmüyordu. Sütunun içine konunca da zemini
+      // geniş ekranda 600 pt'de kesilip sert kenarlı bir dikdörtgen
+      // bırakıyordu; o yüzden sütunun dışında, kendi içinde ortalı.
+      body: Column(
+        children: [
+          Expanded(
+            child: AppContentWidth(
               child: _turns.isEmpty
                   ? _Intro(onPick: _ask, intentOf: (q) => _parse(q).intent)
                   : ListView.builder(
@@ -162,8 +164,9 @@ class _AssistantScreenState extends State<AssistantScreen> {
                       },
                     ),
             ),
-          ],
-        ),
+          ),
+          _InputBar(controller: _controller, onAsk: _ask),
+        ],
       ),
     );
   }
@@ -231,6 +234,10 @@ class _InputBar extends StatelessWidget {
                 controller: controller,
                 textInputAction: TextInputAction.send,
                 onSubmitted: onAsk,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(fontSize: 16, color: t.text),
+                cursorColor: t.secondary,
                 decoration: InputDecoration(
                   hintText: context.tr('assistant_hint'),
                   filled: true,

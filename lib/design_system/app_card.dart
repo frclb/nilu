@@ -36,8 +36,12 @@ class AppCard extends StatelessWidget {
 
   /// Kart kenarlığı — beyaz kartı sıcak zeminden ayıran çok açık pembe.
   /// Asıl ayrımı gölge yapıyor (bkz. [shadow]).
-  static Color borderColor(AppTokens t) =>
-      _isLight(t) ? const Color(0xFFF5E4EB) : t.border;
+  ///
+  /// Koyu temada erik tonlu ince çizgi: gri çizgi kartı bir tel kafes gibi
+  /// gösteriyordu.
+  static Color borderColor(AppTokens t) => _isLight(t)
+      ? const Color(0xFFF5E4EB)
+      : Color.lerp(t.border, t.markStart, 0.3)!;
 
   /// Bölümleri ayıran çizgi.
   static Color dividerColor(AppTokens t) =>
@@ -65,8 +69,27 @@ class AppCard extends StatelessWidget {
     ];
   }
 
+  /// Koyu temada sol üst köşeden yayılan, çok hafif bir marka ışıltısı.
+  ///
+  /// Düz yüzeyler gece zemininde birbirinin aynısı, renksiz kutular gibi
+  /// duruyordu. Işıltı üstteki yazının kontrastını değiştirmeyecek kadar
+  /// hafif (yüzeye %10 marka).
+  static Gradient? sheen(AppTokens t) => _isLight(t)
+      ? null
+      : LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color.lerp(t.surface, t.markStart, 0.10)!,
+            t.surface,
+            Color.lerp(t.surface, t.background, 0.3)!,
+          ],
+          stops: const [0, 0.5, 1],
+        );
+
   static BoxDecoration decoration(AppTokens t) => BoxDecoration(
     color: t.surface,
+    gradient: sheen(t),
     borderRadius: BorderRadius.circular(radius),
     border: Border.all(color: borderColor(t)),
     boxShadow: shadow(t),

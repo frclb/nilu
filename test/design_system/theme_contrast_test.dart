@@ -104,6 +104,20 @@ void main() {
           );
         });
 
+        test('logo degradesinin üstündeki beyaz okunur', () {
+          // Simge kutuları, logo, seçili gün ve vurgu kartları bu degradenin
+          // üstüne beyaz yazıyor. Koyu temada degrade eskiden açık pembeydi
+          // ve beyaz lotus üstünde kayboluyordu.
+          final t = build().extension<AppTokens>()!;
+          for (final end in {'baş': t.markStart, 'son': t.markEnd}.entries) {
+            expect(
+              _contrast(end.value, Colors.white),
+              greaterThanOrEqualTo(textMinimum),
+              reason: '$label: degradenin ${end.key} ucunda beyaz okunmuyor',
+            );
+          }
+        });
+
         test('dolu düğmenin yazısı okunur', () {
           // Uygulamadaki bütün dolu düğmeler bu çifti kullanıyor. Sabit
           // renkler token'lara taşınırken çok sayıda `Colors.white`

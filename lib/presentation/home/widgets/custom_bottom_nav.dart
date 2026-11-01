@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../domain/view_models/user_view_model.dart';
 import '../../../localization/app_localizations.dart';
+import '../../tour/app_tour.dart';
 
 /// Alt menüdeki tek bir hedef.
 ///
@@ -190,83 +191,86 @@ class _NavItem extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final muted = context.tokens.textMuted;
-    final color = isActive ? scheme.onPrimary : muted;
+    final color = isActive ? AppGradients.onMark : muted;
     final label = context.tr(destination.labelKey);
 
-    return Semantics(
-      // Ekran okuyucu "sekme, seçili" diye okusun. Önce yalnızca bir
-      // GestureDetector vardı: ne düğme olduğu ne de hangisinin seçili
-      // olduğu duyuruluyordu.
-      button: true,
-      selected: isActive,
-      label: label,
-      excludeSemantics: true,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 2),
-        child: Material(
-          type: MaterialType.transparency,
-          child: InkWell(
-            onTap: () {
-              if (isActive) {
-                // Seçili sekmeye tekrar basmak kök ekrana döner; bu bir
-                // gezinme değil, o yüzden hafif geri bildirim.
-                HapticFeedback.selectionClick();
-              } else {
-                HapticFeedback.lightImpact();
-              }
-              onTap();
-            },
-            borderRadius: BorderRadius.circular(16),
-            // Seçili sekme dolu bir erik hap: yalnızca renkle değil şekille
-            // de ayrışıyor.
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOut,
-              constraints: const BoxConstraints(minHeight: 48),
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: isActive ? AppGradients.mark(context) : null,
-                boxShadow: isActive
-                    ? [
-                        BoxShadow(
-                          color: scheme.primary.withAlpha(64),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
+    return TourAnchor(
+      id: 'nav_${destination.branchIndex}',
+      child: Semantics(
+        // Ekran okuyucu "sekme, seçili" diye okusun. Önce yalnızca bir
+        // GestureDetector vardı: ne düğme olduğu ne de hangisinin seçili
+        // olduğu duyuruluyordu.
+        button: true,
+        selected: isActive,
+        label: label,
+        excludeSemantics: true,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          child: Material(
+            type: MaterialType.transparency,
+            child: InkWell(
+              onTap: () {
+                if (isActive) {
+                  // Seçili sekmeye tekrar basmak kök ekrana döner; bu bir
+                  // gezinme değil, o yüzden hafif geri bildirim.
+                  HapticFeedback.selectionClick();
+                } else {
+                  HapticFeedback.lightImpact();
+                }
+                onTap();
+              },
+              borderRadius: BorderRadius.circular(16),
+              // Seçili sekme dolu bir erik hap: yalnızca renkle değil şekille
+              // de ayrışıyor.
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut,
+                constraints: const BoxConstraints(minHeight: 48),
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: isActive ? AppGradients.mark(context) : null,
+                  boxShadow: isActive
+                      ? [
+                          BoxShadow(
+                            color: scheme.primary.withAlpha(64),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isActive ? destination.activeIcon : destination.icon,
+                      color: color,
+                      size: 21,
+                    ),
+                    const SizedBox(height: 2),
+                    // Etiket sistem yazı ölçeğiyle büyüyor ama bir yere kadar:
+                    // ölçeksiz bırakılırsa en büyük erişilebilirlik ayarında
+                    // satır taşıyor, tamamen sabitlenirse düşük görmeyen
+                    // kullanıcı için okunmuyor.
+                    MediaQuery.withClampedTextScaling(
+                      maxScaleFactor: 1.3,
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontSize: 10,
+                          fontWeight: isActive
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                          color: color,
                         ),
-                      ]
-                    : null,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    isActive ? destination.activeIcon : destination.icon,
-                    color: color,
-                    size: 21,
-                  ),
-                  const SizedBox(height: 2),
-                  // Etiket sistem yazı ölçeğiyle büyüyor ama bir yere kadar:
-                  // ölçeksiz bırakılırsa en büyük erişilebilirlik ayarında
-                  // satır taşıyor, tamamen sabitlenirse düşük görmeyen
-                  // kullanıcı için okunmuyor.
-                  MediaQuery.withClampedTextScaling(
-                    maxScaleFactor: 1.3,
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontSize: 10,
-                        fontWeight: isActive
-                            ? FontWeight.w700
-                            : FontWeight.w500,
-                        color: color,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_decor.dart';
+import '../../../design_system/app_scrim.dart';
 import '../../../design_system/app_tokens.dart';
 import '../../../domain/services/session_plan.dart';
 import '../../../localization/app_localizations.dart';
+import 'exercise_media.dart';
 
 /// Yoga akışının gövdesi: başlık, süre ve seviye, faydalar, pozlar.
 ///
@@ -95,6 +97,7 @@ class YogaContentSection extends StatelessWidget {
             if (i > 0) const SizedBox(height: 10),
             _PoseCard(
               index: i + 1,
+              mediaKey: steps[i].mediaKey,
               name: context.tr(steps[i].nameKey),
               description: context.tr(steps[i].descriptionKey),
               duration: context.tr(
@@ -103,6 +106,17 @@ class YogaContentSection extends StatelessWidget {
               ),
             ),
           ],
+          const SizedBox(height: 12),
+          // Pexels lisansı künye istemiyor ama teşekkür yerinde; kişilerin
+          // uygulamayı önerdiği izlenimi de vermiyor.
+          Text(
+            context.tr('exercise_media_credit'),
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              fontSize: 11.5,
+              color: context.tokens.textFaint,
+            ),
+          ),
           // Burada bir "Eğitmen" bölümü vardı: fotoğraf, "Elif Yılmaz —
           // Yoga Eğitmeni" ve bir "Profili Gör" bağlantısı. Böyle bir kişi
           // yok, profil ekranı da yok — bağlantı "yakında" uyarısı basıyordu.
@@ -250,12 +264,14 @@ class _BenefitCard extends StatelessWidget {
 class _PoseCard extends StatelessWidget {
   const _PoseCard({
     required this.index,
+    required this.mediaKey,
     required this.name,
     required this.description,
     required this.duration,
   });
 
   final int index;
+  final String? mediaKey;
   final String name;
   final String description;
   final String duration;
@@ -264,24 +280,67 @@ class _PoseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
     final theme = Theme.of(context);
+    final key = mediaKey;
     return AppCard(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
+      // Dokununca hareketin mini videosu açılıyor.
+      onTap: key == null ? null : () => _showPreview(context, key),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 42,
-            height: 42,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: t.surfaceAlt,
+          // Fotoğraf; köşesinde sıra numarası ve oynat işareti.
+          SizedBox(
+            width: 92,
+            height: 72,
+            child: ClipRRect(
               borderRadius: BorderRadius.circular(AppRadius.sm),
-            ),
-            child: Text(
-              index.toString().padLeft(2, '0'),
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: theme.colorScheme.primary,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  if (key != null)
+                    ExercisePhoto(asset: ExerciseMedia.photo(key))
+                  else
+                    ColoredBox(color: t.surfaceAlt),
+                  Positioned(
+                    left: 6,
+                    top: 6,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppScrim.veil(110),
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
+                      child: Text(
+                        index.toString().padLeft(2, '0'),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppScrim.ink,
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (key != null)
+                    Positioned(
+                      right: 6,
+                      bottom: 6,
+                      child: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: AppScrim.veil(110),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.play_arrow_rounded,
+                          size: 16,
+                          color: AppScrim.ink,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
@@ -324,6 +383,62 @@ class _PoseCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Hareketin mini videosu, adı ve anlatımı — alttan açılan sayfada.
+  void _showPreview(BuildContext context, String key) {
+    final theme = Theme.of(context);
+    final t = context.tokens;
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                child: AspectRatio(
+                  aspectRatio: 16 / 10,
+                  child: ExerciseClip(mediaKey: key),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                name,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontSize: 22,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                description,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 15,
+                  height: 1.5,
+                  color: t.textMuted,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: AppTag(
+                  label: duration,
+                  icon: Icons.timer_outlined,
+                  background: t.surfaceAlt,
+                  foreground: t.textMuted,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

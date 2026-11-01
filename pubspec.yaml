@@ -67,6 +67,7 @@ dependencies:
   crypto: ^3.0.7
   google_sign_in: ^7.2.0
   app_links: ^7.0.0
+  video_player: ^2.11.1
 
 
 dev_dependencies:
@@ -118,6 +119,9 @@ flutter:
     # Apple ile giriş düğmesinin logosu: Apple Design Resources'tan,
     # Apple'ın lisansıyla yalnızca uygulama arayüzünde (bkz. SignInButton).
     - assets/brand/apple/
+    # Egzersiz fotoğrafları ve sessiz mini videolar: Pexels lisansıyla
+    # (ticari kullanıma ücretsiz; bkz. `ExerciseMedia`).
+    - assets/exercise/
 
   # Yazı tipleri pakete gömülü.
   #

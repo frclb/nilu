@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/datasources/remote/account_auth.dart';
 import '../../data/datasources/remote/firestore_sync_remote.dart';
+import '../../data/repositories/profile_repository.dart';
 import '../../data/sync/prefs_sync_state_store.dart';
 import '../../data/sync/repository_sync_local.dart';
 import '../services/sync_engine.dart';
@@ -31,9 +32,11 @@ class AccountViewModel extends ChangeNotifier {
     SyncRemote? remote,
     SyncLocal? local,
     SyncStateStore? stateStore,
+    ProfileRepository profile = const ProfileRepository(),
     this.debounce = const Duration(seconds: 4),
     DateTime Function()? clock,
   }) : _auth = auth ?? FirebaseAccountAuth(),
+       _profile = profile,
        _remote = remote ?? FirestoreSyncRemote(),
        _local = local ?? const RepositorySyncLocal(),
        _stateStore = stateStore ?? const PrefsSyncStateStore(),
@@ -51,6 +54,7 @@ class AccountViewModel extends ChangeNotifier {
   final SyncRemote _remote;
   final SyncLocal _local;
   final SyncStateStore _stateStore;
+  final ProfileRepository _profile;
   final DateTime Function() _clock;
   late final SyncEngine _engine;
 
@@ -108,13 +112,31 @@ class AccountViewModel extends ChangeNotifier {
   Future<void> _load() async {
     _account = _auth.currentAccount;
     await _readConsent();
+    await _applyIdentity();
     notifyListeners();
     _sub ??= _auth.accountChanges.listen((a) async {
       if (a?.uid == _account?.uid) return;
       _account = a;
       await _readConsent();
+      await _applyIdentity();
       notifyListeners();
     });
+  }
+
+  /// Ad ve e-posta giriş yönteminden geliyor; kullanıcı elle yazmıyor.
+  ///
+  /// Önce Kişisel Bilgiler'de serbestçe değiştirilebiliyordu: hesapta bir
+  /// ad, uygulamada başka bir ad duruyordu. Artık hesap varsa profil
+  /// hesaptan yazılıyor, hesap yoksa (hesapsız kullanım, çıkış, silme) ad
+  /// ve e-posta profilden kalkıyor. Doğum tarihi sağlayıcıdan gelmiyor;
+  /// ona dokunulmuyor.
+  ///
+  /// Firebase hazır değilken hesap bilinmiyor: o anda silmek, giriş yapmış
+  /// kullanıcının adını her açılışta bir an için siliyordu.
+  Future<void> _applyIdentity() async {
+    if (!_auth.isAvailable) return;
+    final a = _account;
+    await _profile.save(name: a?.displayName ?? '', email: a?.email ?? '');
   }
 
   /// Firebase açılıştan sonra hazır olunca (bkz. `main.dart`).
@@ -152,12 +174,14 @@ class AccountViewModel extends ChangeNotifier {
   Future<SignInResult> signIn(AccountProvider provider) =>
       _withBusy(() async => _signedIn(await _auth.signIn(provider)));
 
-  /// E-posta ve şifreyle giriş; [create] ise yeni hesap.
+  /// E-posta ve şifreyle giriş; [create] ise yeni hesap ve [displayName]
+  /// hesabın adı (yalnızca kayıtta bir kez soruluyor).
   Future<SignInResult> signInWithEmail(
     String email,
     String password, {
     required bool create,
     String? languageCode,
+    String? displayName,
   }) => _withBusy(
     () async => _signedIn(
       await _auth.signInWithEmail(
@@ -165,6 +189,7 @@ class AccountViewModel extends ChangeNotifier {
         password,
         create: create,
         languageCode: languageCode,
+        displayName: displayName,
       ),
     ),
   );
@@ -173,6 +198,28 @@ class AccountViewModel extends ChangeNotifier {
       _withBusy(
         () => _auth.sendPasswordReset(email, languageCode: languageCode),
       );
+
+  /// Hesabında adı olmayan kullanıcı adını bir kez ekliyor.
+  ///
+  /// Ad kaydında soruluyor ama bu kural gelmeden e-postayla açılmış
+  /// hesaplarda ve Apple'da adını paylaşmayanlarda hiç yok; ad elle
+  /// değiştirilemediği için bu kişiler ad ekleyemiyordu. Ad hesaba yazılıyor
+  /// ve oradan okunuyor. Adı olan hesapta hiçbir şey yapmıyor.
+  Future<bool> addMissingName(String name) async {
+    final a = _account;
+    final ad = name.trim();
+    if (a == null || ad.length < 2) return false;
+    if ((a.displayName ?? '').trim().isNotEmpty) return false;
+    return _withBusy(() async {
+      final guncel = await _auth.setDisplayName(ad);
+      if (guncel == null || (guncel.displayName ?? '').trim().isEmpty) {
+        return false;
+      }
+      _account = guncel;
+      await _applyIdentity();
+      return true;
+    });
+  }
 
   /// E-posta hesabı doğrulanmadı: uygulama doğrulanana kadar kapalı.
   bool get needsEmailVerification => _account?.needsEmailVerification ?? false;
@@ -185,7 +232,10 @@ class AccountViewModel extends ChangeNotifier {
   Future<bool> checkEmailVerified() async {
     final onceden = needsEmailVerification;
     final guncel = await _auth.reloadAccount();
-    if (guncel != null) _account = guncel;
+    if (guncel != null) {
+      _account = guncel;
+      await _applyIdentity();
+    }
     if (onceden && !needsEmailVerification) {
       await onIdentityChanged?.call();
     }
@@ -232,6 +282,7 @@ class AccountViewModel extends ChangeNotifier {
     if (sonuc.status == SignInStatus.signedIn) {
       _account = sonuc.user ?? _auth.currentAccount;
       await _readConsent();
+      await _applyIdentity();
       await onIdentityChanged?.call();
     }
     return sonuc;
@@ -247,6 +298,7 @@ class AccountViewModel extends ChangeNotifier {
     _syncEnabled = false;
     _lastSyncAt = null;
     _status = SyncStatus.idle;
+    await _applyIdentity();
     await onIdentityChanged?.call();
   });
 
@@ -333,6 +385,9 @@ class AccountViewModel extends ChangeNotifier {
       switch (sonuc) {
         case SyncOutcome.downloaded:
         case SyncOutcome.merged:
+          // Buluttaki profil eski bir sürümden elle yazılmış bir ad
+          // taşıyabilir; ad yine hesaptan.
+          await _applyIdentity();
           await onRemoteApplied?.call();
         case SyncOutcome.disabledRemotely:
           await _clearConsent();
@@ -398,6 +453,7 @@ class AccountViewModel extends ChangeNotifier {
     _syncEnabled = false;
     _lastSyncAt = null;
     _status = SyncStatus.idle;
+    await _applyIdentity();
     await onIdentityChanged?.call();
     return AccountDeleteResult.deleted;
   }

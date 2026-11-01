@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
-import '../../../design_system/content_illustration.dart';
+import 'exercise_media.dart';
 import '../../../localization/app_localizations.dart';
 
 /// Yoga akışının kapağı: illüstrasyon, altında zemine eriyen geçiş ve
@@ -11,13 +11,12 @@ import '../../../localization/app_localizations.dart';
 /// ortada hiçbir yere bağlı olmayan bir oynat düğmesi. Uygulamada video yok;
 /// oynatıcı görüntüsü olmayan bir içerik vaat ediyordu. Kapak bir görsel,
 /// rehberli seans aşağıdaki "Başlat" düğmesinden açılıyor.
+///
+/// Kapak artık gerçek bir fotoğraf (Pexels, uygulamaya gömülü; bkz.
+/// `ExerciseMedia`). Daha önce burada Google'ın geçici mockup adresi
+/// duruyordu, sonra çizilmiş bir illüstrasyon.
 class YogaCover extends StatelessWidget {
-  /// Gerçek fotoğraf tedarik edilince buraya bir adres verilir; adres ölürse
-  /// ya da cihaz çevrimdışıysa uygulama içinde çizilen illüstrasyona düşer.
-  /// Daha önce burada Google'ın geçici mockup adresi sabit olarak duruyordu.
-  final String? imageUrl;
-
-  const YogaCover({super.key, this.imageUrl});
+  const YogaCover({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,13 +35,7 @@ class YogaCover extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                SafeNetworkImage(
-                  url: imageUrl,
-                  fallback: const ContentIllustration(
-                    seed: 'yoga_hero',
-                    icon: Icons.self_improvement,
-                  ),
-                ),
+                const ExercisePhoto(asset: ExerciseMedia.cover),
                 // Alttan zemine eriyen geçiş: etiketler okunur kalsın.
                 DecoratedBox(
                   decoration: BoxDecoration(

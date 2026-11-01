@@ -31,7 +31,7 @@ class LogEntryFab extends StatelessWidget {
         tooltip: context.tr('log_title'),
         onPressed: () => NavigationService().push(RouteNames.logEntry),
         backgroundColor: scheme.primary,
-        foregroundColor: scheme.onPrimary,
+        foregroundColor: AppGradients.onMark,
         elevation: 0,
         focusElevation: 0,
         hoverElevation: 0,

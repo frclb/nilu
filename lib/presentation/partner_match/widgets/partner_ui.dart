@@ -11,16 +11,10 @@ import '../../../design_system/app_tokens.dart';
 class PartnerUi {
   const PartnerUi._();
 
-  /// Koyu erik kart: durum kartı ve rehberin girişi.
-  ///
-  /// Markanın ana degradesiyle aynı renkler, kartta çapraz. Üstündeki yazı
-  /// her zaman `onPrimary`.
-  static LinearGradient plum(BuildContext context) => LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: AppGradients.primary(context).colors,
-    stops: const [0, 0.55, 1],
-  );
+  /// Koyu erik kart: durum kartı ve rehberin girişi. Üstündeki yazı
+  /// `AppGradients.onMark`.
+  static LinearGradient plum(BuildContext context) =>
+      AppGradients.hero(context);
 
   /// [full] içindeki [part]'ı (doğrulama kodu) kalın gösterir.
   ///

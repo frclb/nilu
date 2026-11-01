@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import '../../core/navigation/route_names.dart';
 import '../../data/datasources/remote/account_auth.dart';
-import '../../design_system/app_card.dart';
 import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
 import '../../design_system/app_snack.dart';
@@ -83,6 +82,9 @@ class SignInScreen extends StatelessWidget {
     final scheme = theme.colorScheme;
     final busy = context.watch<AccountViewModel>().busy;
 
+    // Tek ekran: kaydırma yok. Önce bir liste vardı; küçük telefonda
+    // "Hesap olmadan devam et" ve şartlar katlamanın altında kalıyordu,
+    // isteğe bağlı olduğu söylenen girişin atlanma yolu görünmüyordu.
     return Scaffold(
       backgroundColor: t.background,
       appBar: AppBar(backgroundColor: Colors.transparent),
@@ -90,138 +92,185 @@ class SignInScreen extends StatelessWidget {
       body: AmbientBackground(
         child: SafeArea(
           child: AppContentWidth(
-            child: ListView(
-              key: const Key('sign_in'),
-              padding: const EdgeInsets.fromLTRB(24, AppSpacing.xl, 24, 24),
-              children: [
-                Center(
-                  child: Container(
-                    width: 104,
-                    height: 104,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: t.surface,
-                      boxShadow: AppShadows.soft(context),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final d = FitDensity.of(constraints.maxHeight);
+                final gap = d.pick(12.0, 18.0, 24.0);
+                return AppFitToScreen(
+                  key: const Key('sign_in'),
+                  fitKey: const Key('sign_in_fit'),
+                  maxHeight: 880,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      24,
+                      // Geri düğmesinin satırı zaten güvenli alanda:
+                      // `extendBodyBehindAppBar` üst çubuğu boşluğa ekliyor.
+                      d.pick(0.0, 4.0, 8.0),
+                      24,
+                      8,
                     ),
-                    child: BrandLotus(
-                      color: scheme.primary,
-                      sideColor: t.secondary,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Spacer(),
+                        // En küçük telefonda logo yok: başlık ve bilgi
+                        // sığsın diye süs çıkıyor, bilgi kalıyor.
+                        if (d != FitDensity.compact) ...[
+                          Center(child: _Mark(size: d.pick(0.0, 60.0, 84.0))),
+                          SizedBox(height: d.pick(0.0, 14.0, 20.0)),
+                        ],
+                        Text(
+                          context.tr('sign_in_title'),
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontSize: d.pick(25.0, 28.0, 30.0),
+                            height: 1.15,
+                            color: scheme.primary,
+                          ),
+                        ),
+                        SizedBox(height: d.pick(6.0, 10.0, 12.0)),
+                        Text(
+                          context.tr('sign_in_body'),
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontSize: 14,
+                            height: 1.4,
+                            color: t.textMuted,
+                          ),
+                        ),
+                        SizedBox(height: gap),
+                        const Spacer(),
+                        // Güvenceler kartsız, sıkı satırlar: kart ve
+                        // geniş satırlar ekranın dörtte birini alıyordu.
+                        const _Point(
+                          icon: Icons.phone_iphone_rounded,
+                          textKey: 'sign_in_point_device',
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        const _Point(
+                          icon: Icons.verified_user_outlined,
+                          textKey: 'sign_in_point_no_health',
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        const _Point(
+                          icon: Icons.auto_delete_outlined,
+                          textKey: 'sign_in_point_delete',
+                        ),
+                        SizedBox(height: gap),
+                        const Spacer(),
+                        // Apple önce ve en az Google kadar belirgin
+                        // (Yönergeler 4.8).
+                        SignInButton.apple(
+                          key: const Key('sign_in_apple'),
+                          label: context.tr('account_continue_apple'),
+                          onPressed: busy
+                              ? null
+                              : () => _signIn(context, AccountProvider.apple),
+                        ),
+                        const SizedBox(height: 10),
+                        SignInButton.google(
+                          key: const Key('sign_in_google'),
+                          label: context.tr('account_continue_google'),
+                          onPressed: busy
+                              ? null
+                              : () => _signIn(context, AccountProvider.google),
+                        ),
+                        const SizedBox(height: 10),
+                        EmailSignInButton(
+                          key: const Key('sign_in_email'),
+                          label: context.tr('account_continue_email'),
+                          onPressed: busy
+                              ? null
+                              : () => _signInWithEmail(context),
+                        ),
+                        const SizedBox(height: 4),
+                        // Hesap isteğe bağlı (App Store 5.1.1(v)): takip
+                        // hesapsız çalışıyor, kayıtlar cihazda kalıyor.
+                        // Giriş sürerken düğmenin yerinde gösterge: ekran
+                        // zıplamasın.
+                        SizedBox(
+                          height: 48,
+                          child: busy
+                              ? const Center(
+                                  child: SizedBox.square(
+                                    dimension: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                    ),
+                                  ),
+                                )
+                              : TextButton(
+                                  key: const Key('sign_in_skip'),
+                                  onPressed: () => _skip(context),
+                                  style: TextButton.styleFrom(
+                                    minimumSize: const Size(0, 48),
+                                  ),
+                                  child: Text(context.tr('sign_in_skip')),
+                                ),
+                        ),
+                        const SignInNotice(),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          children: [
+                            TextButton(
+                              onPressed: () =>
+                                  context.pushNamed(RouteNames.privacyPolicy),
+                              style: TextButton.styleFrom(
+                                foregroundColor: t.textMuted,
+                                minimumSize: const Size(44, 44),
+                              ),
+                              child: Text(context.tr('privacy_policy_title')),
+                            ),
+                            TextButton(
+                              onPressed: () =>
+                                  context.pushNamed(RouteNames.termsOfService),
+                              style: TextButton.styleFrom(
+                                foregroundColor: t.textMuted,
+                                minimumSize: const Size(44, 44),
+                              ),
+                              child: Text(context.tr('terms_of_service_title')),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(height: AppSpacing.xl),
-                Text(
-                  context.tr('sign_in_title'),
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontSize: 30,
-                    height: 1.15,
-                    color: scheme.primary,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  context.tr('sign_in_body'),
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontSize: 15,
-                    height: 1.5,
-                    color: t.textMuted,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xl),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                  ),
-                  decoration: AppCard.decoration(t),
-                  child: Column(
-                    children: [
-                      const _Point(
-                        icon: Icons.phone_iphone_rounded,
-                        textKey: 'sign_in_point_device',
-                      ),
-                      Divider(height: 1, color: AppCard.dividerColor(t)),
-                      const _Point(
-                        icon: Icons.verified_user_outlined,
-                        textKey: 'sign_in_point_no_health',
-                      ),
-                      Divider(height: 1, color: AppCard.dividerColor(t)),
-                      const _Point(
-                        icon: Icons.auto_delete_outlined,
-                        textKey: 'sign_in_point_delete',
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xl),
-                // Apple önce ve en az Google kadar belirgin (Yönergeler 4.8).
-                SignInButton.apple(
-                  key: const Key('sign_in_apple'),
-                  label: context.tr('account_continue_apple'),
-                  onPressed: busy
-                      ? null
-                      : () => _signIn(context, AccountProvider.apple),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                SignInButton.google(
-                  key: const Key('sign_in_google'),
-                  label: context.tr('account_continue_google'),
-                  onPressed: busy
-                      ? null
-                      : () => _signIn(context, AccountProvider.google),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                EmailSignInButton(
-                  key: const Key('sign_in_email'),
-                  label: context.tr('account_continue_email'),
-                  onPressed: busy ? null : () => _signInWithEmail(context),
-                ),
-                if (busy) ...[
-                  const SizedBox(height: AppSpacing.lg),
-                  const Center(child: CircularProgressIndicator()),
-                ],
-                const SizedBox(height: AppSpacing.sm),
-                // Hesap isteğe bağlı (App Store 5.1.1(v)): takip hesapsız
-                // çalışıyor, kayıtlar cihazda kalıyor.
-                TextButton(
-                  key: const Key('sign_in_skip'),
-                  onPressed: busy ? null : () => _skip(context),
-                  style: TextButton.styleFrom(minimumSize: const Size(0, 48)),
-                  child: Text(context.tr('sign_in_skip')),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                const SignInNotice(),
-                const SizedBox(height: AppSpacing.sm),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  children: [
-                    TextButton(
-                      onPressed: () =>
-                          context.pushNamed(RouteNames.privacyPolicy),
-                      style: TextButton.styleFrom(
-                        foregroundColor: t.textMuted,
-                        minimumSize: const Size(0, 44),
-                      ),
-                      child: Text(context.tr('privacy_policy_title')),
-                    ),
-                    TextButton(
-                      onPressed: () =>
-                          context.pushNamed(RouteNames.termsOfService),
-                      style: TextButton.styleFrom(
-                        foregroundColor: t.textMuted,
-                        minimumSize: const Size(0, 44),
-                      ),
-                      child: Text(context.tr('terms_of_service_title')),
-                    ),
-                  ],
-                ),
-              ],
+                );
+              },
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Logo: marka degradesinde beyaz lotus, arkasında kendi renginde ışıma.
+class _Mark extends StatelessWidget {
+  const _Mark({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      width: size,
+      height: size,
+      padding: EdgeInsets.all(size * 0.22),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: AppGradients.mark(context),
+        boxShadow: [
+          BoxShadow(
+            color: t.markStart.withAlpha(dark ? 110 : 60),
+            blurRadius: size * 0.5,
+            offset: Offset(0, size * 0.1),
+          ),
+        ],
+      ),
+      child: const BrandLotus(color: AppGradients.onMark, sideOpacity: 0.8),
     );
   }
 }
@@ -235,32 +284,27 @@ class _Point extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AppIconTile(
-            icon: icon,
-            size: 34,
-            circle: true,
-            background: t.secondaryTint,
-            color: t.secondary,
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: Text(
-                context.tr(textKey),
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: t.text, height: 1.45),
-              ),
+    return Row(
+      children: [
+        AppIconTile(
+          icon: icon,
+          size: 30,
+          circle: true,
+          background: t.secondaryTint,
+          color: t.secondary,
+        ),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: Text(
+            context.tr(textKey),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontSize: 13.5,
+              color: t.text,
+              height: 1.3,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

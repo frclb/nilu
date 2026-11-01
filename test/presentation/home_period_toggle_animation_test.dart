@@ -54,11 +54,13 @@ void main() {
       periodLength: 6,
     );
 
-    // Üç gündür süren dönem: kayıtlı (3) planlanandan (6) kısa.
+    // Beş gündür süren dönem: kayıtlı (5) planlanandan (6) kısa. Daha
+    // erken bir gün "Reglim bitti" önce onay soruyor (bkz.
+    // `period_early_end_test.dart`); burada konu çelenk.
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     await const PeriodRepository().savePeriodLogs([
-      PeriodLog(id: 'p', startDate: today.subtract(const Duration(days: 2))),
+      PeriodLog(id: 'p', startDate: today.subtract(const Duration(days: 4))),
     ]);
 
     const screen = HomeScreen();
@@ -116,8 +118,9 @@ void main() {
     );
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
+    // Beşinci gün: erken bitiş onayı sorulmuyor.
     await const PeriodRepository().savePeriodLogs([
-      PeriodLog(id: 'p', startDate: today.subtract(const Duration(days: 2))),
+      PeriodLog(id: 'p', startDate: today.subtract(const Duration(days: 4))),
     ]);
 
     const screen = HomeScreen();

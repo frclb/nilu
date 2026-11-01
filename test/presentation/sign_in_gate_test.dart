@@ -169,14 +169,8 @@ void main() {
     expect(find.byKey(const Key('sign_in')), findsOneWidget);
 
     final gec = find.byKey(const Key('sign_in_skip'));
-    await tester.scrollUntilVisible(
-      gec,
-      200,
-      scrollable: find.descendant(
-        of: find.byKey(const Key('sign_in')),
-        matching: find.byType(Scrollable),
-      ),
-    );
+    // Ekran kaydırılmıyor: gec ilk karede görünüyor.
+    expect(gec, findsOneWidget);
     await tester.tap(gec);
     await settleAsync(tester);
 
@@ -219,16 +213,9 @@ void main() {
         userViewModel: user,
         accountViewModel: hesap,
       );
-      // Liste görünmeyen satırı kurmuyor: önce kaydır.
       final dugme = find.byKey(const Key('sign_in_email'));
-      await tester.scrollUntilVisible(
-        dugme,
-        200,
-        scrollable: find.descendant(
-          of: find.byKey(const Key('sign_in')),
-          matching: find.byType(Scrollable),
-        ),
-      );
+      // Ekran kaydırılmıyor: dugme ilk karede görünüyor.
+      expect(dugme, findsOneWidget);
       // Kenarda kalmasın: uzun dillerde yalnızca bir parçası görünüyordu.
       await tester.ensureVisible(dugme);
       await tester.pumpAndSettle();
@@ -243,6 +230,9 @@ void main() {
       String eposta,
       String sifre,
     ) async {
+      // Kayıt modunda ad da soruluyor (e-posta sağlayıcısı ad vermiyor).
+      final ad = find.byKey(const Key('name_field'));
+      if (ad.evaluate().isNotEmpty) await tester.enterText(ad, 'Ada Yılmaz');
       await tester.enterText(find.byKey(const Key('email_field')), eposta);
       await tester.enterText(find.byKey(const Key('password_field')), sifre);
     }
@@ -265,14 +255,8 @@ void main() {
         accountViewModel: hesap,
       );
       final not = find.byKey(const Key('sign_in_notice'));
-      await tester.scrollUntilVisible(
-        not,
-        200,
-        scrollable: find.descendant(
-          of: find.byKey(const Key('sign_in')),
-          matching: find.byType(Scrollable),
-        ),
-      );
+      // Ekran kaydırılmıyor: not ilk karede görünüyor.
+      expect(not, findsOneWidget);
       final ctx = tester.element(find.byKey(const Key('sign_in')));
       expect(find.text(ctx.tr('sign_in_notice')), findsOneWidget);
       expect(
@@ -318,6 +302,23 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('kayıtta ad boşsa gönderilmiyor', (tester) async {
+      final ctx = await ac(tester);
+      await tester.tap(find.text(ctx.tr('email_mode_create')));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('email_field')),
+        'ada@ornek.com',
+      );
+      await tester.enterText(
+        find.byKey(const Key('password_field')),
+        'gizli-sifre',
+      );
+      await bas(tester, const Key('email_submit'));
+      expect(auth.emailSignIns, isEmpty);
+      expect(find.text(ctx.tr('email_error_name_empty')), findsOneWidget);
+    });
+
     testWidgets('hesap oluşturma yeni hesap olarak gidiyor', (tester) async {
       final ctx = await ac(tester);
       await tester.tap(find.text(ctx.tr('email_mode_create')));
@@ -328,6 +329,8 @@ void main() {
       await bas(tester, const Key('email_submit'));
 
       expect(auth.emailSignIns.single.create, isTrue);
+      // Ad hesaba yazılıyor; uygulamadaki ad hep hesaptan.
+      expect(auth.currentAccount?.displayName, 'Ada Yılmaz');
       // Adres doğrulanmadan uygulama açılmıyor.
       expect(find.byKey(const Key('verify_email')), findsOneWidget);
       expect(find.textContaining('ada@ornek.com'), findsOneWidget);

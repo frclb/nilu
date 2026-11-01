@@ -80,6 +80,7 @@ abstract class AccountAuth {
     String password, {
     required bool create,
     String? languageCode,
+    String? displayName,
   });
 
   /// Şifre sıfırlama bağlantısı gönderir. Adrese kayıtlı hesap olmasa da
@@ -93,6 +94,10 @@ abstract class AccountAuth {
   /// da yeniler (sunucu kuralları doğrulamaya bakıyor). Güncel hesabı
   /// döndürür.
   Future<AccountUser?> reloadAccount();
+
+  /// Hesabın adını yazar; güncel hesabı döndürür. Yalnızca adı olmayan
+  /// hesap için (bkz. `AccountViewModel.addMissingName`).
+  Future<AccountUser?> setDisplayName(String name);
 
   /// E-postadaki doğrulama bağlantısının kodunu uygular.
   Future<bool> applyEmailVerification(String code);
@@ -282,6 +287,7 @@ class FirebaseAccountAuth implements AccountAuth {
     String password, {
     required bool create,
     String? languageCode,
+    String? displayName,
   }) async {
     if (!isAvailable) return const SignInResult(SignInStatus.unavailable);
     final adres = email.trim();
@@ -293,6 +299,17 @@ class FirebaseAccountAuth implements AccountAuth {
           password: password,
         );
         await _setLanguage(languageCode);
+        // E-posta sağlayıcısı ad vermiyor: kayıtta bir kez sorulan ad
+        // hesaba yazılıyor; uygulamadaki ad hep hesaptan okunuyor.
+        final ad = displayName?.trim();
+        if (ad != null && ad.isNotEmpty) {
+          try {
+            await c.user?.updateDisplayName(ad);
+            await c.user?.reload();
+          } catch (e) {
+            debugPrint('Display name not set: $e');
+          }
+        }
         try {
           await c.user?.sendEmailVerification(_donus('verified'));
         } catch (e) {
@@ -304,7 +321,11 @@ class FirebaseAccountAuth implements AccountAuth {
           password: password,
         );
       }
-      return SignInResult(SignInStatus.signedIn, user: fromUser(c.user));
+      // Kayıtta ad yeni yazıldı; `c.user` onu taşımıyor olabilir.
+      return SignInResult(
+        SignInStatus.signedIn,
+        user: fromUser(_auth.currentUser ?? c.user),
+      );
     } on FirebaseAuthException catch (e) {
       debugPrint('Email sign-in failed: ${e.code}');
       return SignInResult(SignInStatus.failed, emailError: _emailError(e));
@@ -346,6 +367,19 @@ class FirebaseAccountAuth implements AccountAuth {
       debugPrint('Verification email failed: $e');
       return false;
     }
+  }
+
+  @override
+  Future<AccountUser?> setDisplayName(String name) async {
+    final user = isAvailable ? _auth.currentUser : null;
+    if (user == null) return null;
+    try {
+      await user.updateDisplayName(name.trim());
+      await user.reload();
+    } catch (e) {
+      debugPrint('Display name not set: $e');
+    }
+    return fromUser(_auth.currentUser);
   }
 
   @override

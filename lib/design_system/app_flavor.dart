@@ -17,6 +17,8 @@ enum AppFlavor {
     AppPalette.berry600,
     AppPalette.berry600,
     Color(0xFFFF8FAB),
+    Color(0xFFB32D7E),
+    Color(0xFFD6386A),
   ),
   ocean(
     'flavor_ocean',
@@ -26,6 +28,8 @@ enum AppFlavor {
     AppPalette.ocean500,
     Color(0xFF1A6E7C),
     AppPalette.ocean300,
+    Color(0xFF366F7A),
+    Color(0xFF267E8D),
   ),
   forest(
     'flavor_forest',
@@ -35,6 +39,8 @@ enum AppFlavor {
     AppPalette.forest500,
     Color(0xFF2E7D4F),
     AppPalette.forest300,
+    Color(0xFF40724F),
+    Color(0xFF388055),
   ),
   graphite(
     'flavor_graphite',
@@ -44,6 +50,8 @@ enum AppFlavor {
     AppPalette.graphite500,
     Color(0xFF4B5563),
     AppPalette.graphite300,
+    Color(0xFF5E687B),
+    Color(0xFF6A7488),
   );
 
   const AppFlavor(
@@ -54,6 +62,8 @@ enum AppFlavor {
     this.brandEnd,
     this.secondary,
     this.secondaryDark,
+    this.markDark,
+    this.markDarkEnd,
   );
 
   /// Ayar ekranında görünen adın lokalizasyon anahtarı.
@@ -74,6 +84,14 @@ enum AppFlavor {
   /// Bağlantı ve etkin durum metni (açık / koyu tema). AA.
   final Color secondary;
   final Color secondaryDark;
+
+  /// Koyu temada logo dairesi, simge kutusu ve vurgu kartının degradesi.
+  ///
+  /// Koyu temada marka rengi açık bir ton ([brandDark]); onunla dolan büyük
+  /// yüzeyler gece zemininde parlıyor, üstündeki beyaz lotus da
+  /// kayboluyordu. Bu iki ton aynı rengin derini: beyaz yazıyla en az 4.5:1.
+  final Color markDark;
+  final Color markDarkEnd;
 
   /// Varsayılan; ücretsiz kullanıcı bunu görür.
   static const free = AppFlavor.plum;

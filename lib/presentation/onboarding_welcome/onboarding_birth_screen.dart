@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/navigation/route_names.dart';
-import '../../design_system/app_card.dart';
 import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
 import '../../design_system/app_tokens.dart';
@@ -12,6 +11,7 @@ import '../../domain/models/life_stage.dart';
 import '../../domain/view_models/pregnancy_view_model.dart';
 import '../../localization/app_localizations.dart';
 import '../../localization/date_names.dart';
+import 'widgets/onboarding_calendar.dart';
 import 'widgets/onboarding_chrome.dart';
 
 /// "Yakın zamanda doğum yaptım" yolu: doğum günü.
@@ -80,9 +80,10 @@ class _OnboardingBirthScreenState extends State<OnboardingBirthScreen> {
               children: [
                 const OnboardingTopBar(),
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-                    child: Column(
+                  child: AppFitToScreen(
+                    fitKey: const Key('onboarding_fit'),
+                    child: OnboardingStagger(
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         OnboardingHeading(
@@ -94,85 +95,76 @@ class _OnboardingBirthScreenState extends State<OnboardingBirthScreen> {
                           title: context.tr('onb_birth_title'),
                           description: context.tr('onb_birth_desc'),
                         ),
-                        const SizedBox(height: AppSpacing.xl),
+                        const SizedBox(height: AppSpacing.lg),
+                        const Spacer(),
                         Center(
-                          child: Container(
-                            constraints: const BoxConstraints(maxWidth: 420),
-                            decoration: AppCard.decoration(t),
-                            clipBehavior: Clip.antiAlias,
-                            child: Column(
-                              children: [
-                                CalendarDatePicker(
-                                  key: const Key('onboarding_birth_calendar'),
-                                  initialDate: _dogum,
-                                  firstDate: _enEski,
-                                  lastDate: _bugun,
-                                  onDateChanged: (gun) =>
-                                      setState(() => _dogum = gun),
+                          child: OnboardingCalendar(
+                            key: const Key('onboarding_birth_calendar'),
+                            selected: _dogum,
+                            firstDate: _enEski,
+                            lastDate: _bugun,
+                            onSelected: (gun) => setState(() => _dogum = gun),
+                            // Seçilen gün ve lohusalığın kaçıncı günü:
+                            // tarihin ne anlama geldiği seçerken belli olsun.
+                            footer: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: t.brandTint,
+                                borderRadius: BorderRadius.circular(
+                                  AppRadius.md,
                                 ),
-                                // Seçilen gün ve lohusalığın kaçıncı günü:
-                                // tarihin ne anlama geldiği seçerken belli
-                                // olsun.
-                                Container(
-                                  margin: const EdgeInsets.fromLTRB(
-                                    12,
-                                    0,
-                                    12,
-                                    12,
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.event_outlined,
+                                    size: 20,
+                                    color: primary,
                                   ),
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: t.brandTint,
-                                    borderRadius: BorderRadius.circular(
-                                      AppRadius.md,
+                                  const SizedBox(width: AppSpacing.sm),
+                                  Expanded(
+                                    // Tek satır: kartın boyu genişlikten
+                                    // bağımsız kalsın (ekran onu ölçüp
+                                    // sığdırıyor; iPad'de kart daha dar
+                                    // çiziliyor).
+                                    child: Text(
+                                      context.dayMonthYear(_dogum),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: theme.textTheme.titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                            color: primary,
+                                          ),
                                     ),
                                   ),
-                                  child: Row(
-                                    children: [
-                                      AppIconTile(
-                                        icon: Icons.event_outlined,
-                                        size: 36,
-                                        circle: true,
-                                        background: t.surface,
-                                        color: primary,
-                                      ),
-                                      const SizedBox(width: AppSpacing.md),
-                                      Expanded(
-                                        child: Text(
-                                          context.dayMonthYear(_dogum),
-                                          style: theme.textTheme.titleMedium
-                                              ?.copyWith(
-                                                fontWeight: FontWeight.w700,
-                                                color: primary,
-                                              ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: AppSpacing.sm),
-                                      Flexible(
-                                        child: AppTag(
-                                          label: gun == 0
-                                              ? context.tr('pp_day_birth')
-                                              : context.tr(
-                                                  'pp_day',
-                                                  params: {'n': '$gun'},
-                                                ),
-                                          background: primary,
-                                          foreground:
-                                              theme.colorScheme.onPrimary,
-                                        ),
-                                      ),
-                                    ],
+                                  const SizedBox(width: AppSpacing.sm),
+                                  Flexible(
+                                    child: AppTag(
+                                      label: gun == 0
+                                          ? context.tr('pp_day_birth')
+                                          : context.tr(
+                                              'pp_day',
+                                              params: {'n': '$gun'},
+                                            ),
+                                      background: primary,
+                                      foreground: theme.colorScheme.onPrimary,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.lg),
-                        OnboardingNote(
+                        const SizedBox(height: AppSpacing.md),
+                        OnboardingHint(
                           icon: Icons.info_outline,
                           text: context.tr('onb_birth_older'),
                         ),
+                        const Spacer(),
                       ],
                     ),
                   ),

@@ -52,11 +52,11 @@ class RepositorySyncLocal implements SyncLocal {
       updatedAt: await _settings.getSettingsUpdatedAt(),
       hormonalContraception: await _settings.getHormonalContraception(),
     ),
-    profile: SyncProfile(
-      name: await _profile.getName(),
-      email: await _profile.getEmail(),
-      birthDate: await _profile.getBirthDate(),
-    ),
+    // Ad ve e-posta eşitlenmiyor: ikisi de hesaptan geliyor (bkz.
+    // `AccountViewModel._applyIdentity`). Buluta koymak kişisel veriyi
+    // gereksiz yere çoğaltıyordu; girişte profile yazılmaları da boş bir
+    // cihazı "verisi var" gösterip geri yüklemeyi şaşırtıyordu.
+    profile: SyncProfile(birthDate: await _profile.getBirthDate()),
   );
 
   @override
@@ -72,10 +72,7 @@ class RepositorySyncLocal implements SyncLocal {
       updatedAt: s.cycleSettings.updatedAt,
       hormonalContraception: s.cycleSettings.hormonalContraception,
     );
-    await _profile.replace(
-      name: s.profile.name,
-      email: s.profile.email,
-      birthDate: s.profile.birthDate,
-    );
+    // Eski sürümlerin kopyasındaki ad ve e-posta yok sayılıyor.
+    await _profile.replaceBirthDate(s.profile.birthDate);
   }
 }

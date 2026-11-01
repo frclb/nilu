@@ -316,9 +316,14 @@ class AppTheme {
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       ),
 
+      // Kapalı anahtar koyu temada görünmüyordu: koyu yüzey rengi top, bir
+      // ton açık iz ve kenarlık — üçü de zeminle 1.3:1'in altında. Orada top
+      // ve kenar soluk metin renginde (Material'ın koyu tema düzeni).
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith(
-          (s) => s.contains(WidgetState.selected) ? Colors.white : t.surface,
+          (s) => s.contains(WidgetState.selected)
+              ? Colors.white
+              : (isLight ? t.surface : t.textFaint),
         ),
         trackColor: WidgetStateProperty.resolveWith(
           (s) => s.contains(WidgetState.selected) ? t.secondary : t.surfaceAlt,
@@ -326,7 +331,7 @@ class AppTheme {
         trackOutlineColor: WidgetStateProperty.resolveWith(
           (s) => s.contains(WidgetState.selected)
               ? Colors.transparent
-              : fieldBorder,
+              : (isLight ? fieldBorder : t.textFaint),
         ),
       ),
 
@@ -335,7 +340,10 @@ class AppTheme {
         fillColor: WidgetStateProperty.resolveWith(
           (s) => s.contains(WidgetState.selected) ? t.secondary : null,
         ),
-        side: BorderSide(color: fieldBorder, width: 1.5),
+        side: BorderSide(
+          color: isLight ? fieldBorder : t.textFaint,
+          width: 1.5,
+        ),
       ),
 
       radioTheme: RadioThemeData(

@@ -14,6 +14,7 @@ import 'package:period_tracker/presentation/onboarding_welcome/onboarding_birth_
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_conception_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_goal_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_last_period_screen.dart';
+import 'package:period_tracker/presentation/onboarding_welcome/widgets/onboarding_calendar.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_success_screen.dart';
 import 'package:period_tracker/presentation/onboarding_welcome/onboarding_welcome_screen.dart';
 import 'package:period_tracker/presentation/pregnancy/postpartum_home_screen.dart';
@@ -196,13 +197,13 @@ void main() {
 
     // Seçim lohusalık süresiyle sınırlı: daha eski bir doğumla evre hiç
     // başlamazdı.
-    final takvim = tester.widget<CalendarDatePicker>(
+    final takvim = tester.widget<OnboardingCalendar>(
       find.byKey(const Key('onboarding_birth_calendar')),
     );
     final bugun = DateTime(today.year, today.month, today.day);
-    expect(takvim.lastDate, bugun);
+    expect(DateUtils.dateOnly(takvim.lastDate!), bugun);
     expect(
-      takvim.firstDate,
+      DateUtils.dateOnly(takvim.firstDate!),
       DateTime(
         bugun.year,
         bugun.month,

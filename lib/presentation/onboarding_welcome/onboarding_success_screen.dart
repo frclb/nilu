@@ -14,12 +14,14 @@ import '../../design_system/app_layout.dart';
 import '../../localization/date_names.dart';
 import '../calendar/view_models/calendar_view_model.dart';
 import 'widgets/onboarding_chrome.dart';
+import '../tour/app_tour.dart';
 
 class OnboardingSuccessScreen extends StatelessWidget {
   const OnboardingSuccessScreen({super.key});
 
   Future<void> _completeOnboarding(BuildContext context) async {
     final userViewModel = context.read<UserViewModel>();
+    final stage = context.read<PregnancyViewModel>().stage;
 
     // Normal kullanıcı girişinde partner modunu sıfırla
     await userViewModel.resetPartnerState();
@@ -28,6 +30,11 @@ class OnboardingSuccessScreen extends StatelessWidget {
     // yazmak bellek içi durumu da güncelliyor, aksi hâlde router eski değeri
     // görmeye devam ediyordu.
     await userViewModel.markOnboardingComplete();
+    // Ana ekrana ilk girişte neyin nerede olduğunu anlatan tur. Tur döngü
+    // takibinin ana ekranını anlatıyor; gebelik ve lohusalık panolarında
+    // onun hedefleri yok, işaret orada asılı kalıp sonra döngüye
+    // dönüldüğünde beklenmedik bir anda açılırdı.
+    if (stage == LifeStage.cycle) await AppTour.requestAfterOnboarding();
 
     if (context.mounted) {
       context.goNamed(RouteNames.home);
@@ -71,61 +78,50 @@ class OnboardingSuccessScreen extends StatelessWidget {
                   ),
                 ),
 
-                // Sığdığında ortalanır, sığmadığında kayar.
-                //
-                // Yalnızca `SingleChildScrollView` yetmiyordu: kaydırma
-                // görünümü çocuğunu kendi içeriği kadar yapıyor; içerik
-                // yukarı toplanıp altta büyük bir boşluk bırakıyordu — uzun
-                // ekranlı telefonlarda açıkça görünüyor. `minHeight` sütuna
-                // görünümün yüksekliğini geri veriyor.
+                // Tek ekran: sığdığında ortalanıyor, sığmadığında (en küçük
+                // telefon) orantılı küçülüyor; kaydırma yok.
                 Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) => SingleChildScrollView(
+                  child: AppFitToScreen(
+                    fitKey: const Key('onboarding_fit'),
+                    child: OnboardingStagger(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: constraints.maxHeight,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const SizedBox(height: 12),
-                            const _Medallion(),
-                            const SizedBox(height: 28),
-                            Semantics(
-                              header: true,
-                              child: Text(
-                                context.tr('onboarding_success_title'),
-                                textAlign: TextAlign.center,
-                                style: theme.textTheme.headlineMedium?.copyWith(
-                                  fontSize: 32,
-                                  color: primary,
-                                ),
-                              ),
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 12),
+                        const _Medallion(),
+                        const SizedBox(height: 28),
+                        Semantics(
+                          header: true,
+                          child: Text(
+                            context.tr('onboarding_success_title'),
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              fontSize: 32,
+                              color: primary,
                             ),
-                            const SizedBox(height: 10),
-                            ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 420),
-                              child: Text(
-                                context.tr(aciklama),
-                                textAlign: TextAlign.center,
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  fontSize: 15,
-                                  height: 1.5,
-                                  color: t.textMuted,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 18),
-                            const _PrivacyPill(),
-                            if (gebelik.stage == LifeStage.cycle) ...[
-                              const SizedBox(height: 24),
-                              const _CycleSummary(),
-                            ],
-                            const SizedBox(height: 16),
-                          ],
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 10),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 420),
+                          child: Text(
+                            context.tr(aciklama),
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              fontSize: 15,
+                              height: 1.5,
+                              color: t.textMuted,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        const _PrivacyPill(),
+                        if (gebelik.stage == LifeStage.cycle) ...[
+                          const SizedBox(height: 24),
+                          const _CycleSummary(),
+                        ],
+                        const SizedBox(height: 16),
+                      ],
                     ),
                   ),
                 ),
@@ -146,74 +142,157 @@ class OnboardingSuccessScreen extends StatelessWidget {
   }
 }
 
-/// Lotus madalyonu ve onay rozeti.
+/// Lotus madalyonu ve onay rozeti; kurulumun sonu küçük bir kutlama.
 ///
-/// Onboarding markanın lotusuyla açılıyor; aynı çiçekle kapanıyor.
-class _Medallion extends StatelessWidget {
+/// Onboarding markanın lotusuyla açılıyor; aynı işaretle kapanıyor:
+/// karşılamadaki ışıyan daire büyüyerek geliyor, ardından tik rozeti
+/// beliriyor ve çevresinden bir halka dalgası yayılıyor. "Hareketi azalt"
+/// açıksa son hâli doğrudan çiziliyor.
+class _Medallion extends StatefulWidget {
   const _Medallion();
+
+  @override
+  State<_Medallion> createState() => _MedallionState();
+}
+
+class _MedallionState extends State<_Medallion>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1400),
+  );
+  bool _started = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _c.value = 1;
+    } else {
+      _c.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
-    final scheme = Theme.of(context).colorScheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final mark = CurvedAnimation(
+      parent: _c,
+      curve: const Interval(0, 0.55, curve: Curves.easeOutBack),
+    );
+    final badge = CurvedAnimation(
+      parent: _c,
+      curve: const Interval(0.4, 0.75, curve: Curves.elasticOut),
+    );
+    final wave = CurvedAnimation(
+      parent: _c,
+      curve: const Interval(0.45, 1, curve: Curves.easeOutCubic),
+    );
+
     return SizedBox(
       width: 220,
       height: 220,
-      child: Stack(
-        children: [
-          // Dış hale ve iç halka.
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [t.surface, t.brandTint],
-              ),
-              boxShadow: AppCard.shadow(t),
-            ),
-            padding: const EdgeInsets.all(18),
-            child: Container(
+      child: AnimatedBuilder(
+        animation: _c,
+        builder: (context, _) => Stack(
+          alignment: Alignment.center,
+          children: [
+            // Dış hale.
+            Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: t.secondary.withAlpha(40)),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [t.surface, t.brandTint],
+                ),
+                boxShadow: AppCard.shadow(t),
               ),
-              padding: const EdgeInsets.all(22),
+            ),
+            // Rozetle birlikte yayılıp sönen halka.
+            if (wave.value > 0 && wave.value < 1)
+              Transform.scale(
+                scale: 0.62 + 0.38 * wave.value,
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: t.secondary.withAlpha(
+                        (110 * (1 - wave.value)).round(),
+                      ),
+                      width: 2,
+                    ),
+                  ),
+                ),
+              ),
+            // İç halka.
+            Padding(
+              padding: const EdgeInsets.all(18),
               child: Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: t.surface,
-                  boxShadow: AppShadows.soft(context),
-                ),
-                padding: const EdgeInsets.all(30),
-                child: BrandLotus(
-                  color: scheme.primary,
-                  sideColor: t.secondary,
+                  border: Border.all(color: t.secondary.withAlpha(40)),
                 ),
               ),
             ),
-          ),
-          // Onay rozeti
-          Positioned(
-            right: 8,
-            bottom: 14,
-            child: Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: AppGradients.mark(context),
-                boxShadow: AppShadows.floating(context),
-                border: Border.all(color: t.surface, width: 3),
-              ),
-              child: Icon(
-                Icons.check_rounded,
-                color: scheme.onPrimary,
-                size: 28,
+            // Işıyan logo dairesi: karşılamadakiyle aynı.
+            Transform.scale(
+              scale: mark.value,
+              child: Container(
+                width: 116,
+                height: 116,
+                padding: const EdgeInsets.all(28),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: AppGradients.mark(context),
+                  boxShadow: [
+                    BoxShadow(
+                      color: t.markStart.withAlpha(dark ? 120 : 70),
+                      blurRadius: 40,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: const BrandLotus(
+                  color: AppGradients.onMark,
+                  sideOpacity: 0.8,
+                ),
               ),
             ),
-          ),
-        ],
+            // Onay rozeti.
+            Positioned(
+              right: 8,
+              bottom: 14,
+              child: Transform.scale(
+                scale: badge.value,
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: AppGradients.mark(context),
+                    boxShadow: AppShadows.floating(context),
+                    border: Border.all(color: t.surface, width: 3),
+                  ),
+                  child: const Icon(
+                    Icons.check_rounded,
+                    color: AppGradients.onMark,
+                    size: 28,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

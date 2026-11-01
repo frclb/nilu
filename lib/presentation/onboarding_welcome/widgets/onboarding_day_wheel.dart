@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'onboarding_chrome.dart';
+
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_decor.dart';
 import '../../../design_system/app_tokens.dart';
@@ -39,8 +41,11 @@ class OnboardingDayWheel extends StatelessWidget {
   /// Çarkın satır yüksekliği. Testler sürüklemeyi buna göre ölçüyor.
   static const double itemExtent = 60;
 
-  /// Görünen yükseklik: seçili satırın üstünde ve altında ikişer satır.
-  static const double _height = 240;
+  /// Görünen yükseklik: büyük ekranda seçili satırın çevresinde dört satır,
+  /// küçük telefonda üç. Kurulum ekranı kaydırılmıyor; çark küçük telefonda
+  /// ekranın yarısını alıyordu.
+  static double _height(BuildContext context) =>
+      onboardingSize(context).pick(180.0, 210.0, 240.0);
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +83,7 @@ class OnboardingDayWheel extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           SizedBox(
-            height: _height,
+            height: _height(context),
             child: Stack(
               alignment: Alignment.center,
               children: [

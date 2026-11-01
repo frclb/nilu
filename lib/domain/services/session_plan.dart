@@ -9,10 +9,15 @@ class SessionStep {
   /// Bu adımda kalınacak süre.
   final Duration duration;
 
+  /// Fotoğrafın ve mini videonun adı (`assets/exercise/<ad>.jpg|mp4`);
+  /// yoksa illüstrasyon.
+  final String? mediaKey;
+
   const SessionStep({
     required this.nameKey,
     required this.descriptionKey,
     required this.duration,
+    this.mediaKey,
   });
 }
 
@@ -20,8 +25,8 @@ class SessionStep {
 ///
 /// Ekranlarda poz adları, açıklamaları ve süreleri zaten vardı ama "Başlat"
 /// düğmesi yalnızca bir bildirim çubuğu gösteriyordu — hiçbir şey
-/// başlamıyordu. Aynı içerikten zamanlayıcılı bir akış kuruluyor; yeni bir
-/// video ya da varlık gerekmiyor.
+/// başlamıyordu. Aynı içerikten zamanlayıcılı bir akış kuruluyor; her
+/// adımın fotoğrafı ve mini videosu var.
 class SessionPlan {
   final String titleKey;
   final List<SessionStep> steps;
@@ -58,31 +63,37 @@ class SessionPlan {
       SessionStep(
         nameKey: 'yoga_pose_child',
         descriptionKey: 'yoga_pose_child_desc',
+        mediaKey: 'child',
         duration: Duration(minutes: 3),
       ),
       SessionStep(
         nameKey: 'yoga_pose_cat_cow',
         descriptionKey: 'yoga_pose_cat_cow_desc',
+        mediaKey: 'cat_cow',
         duration: Duration(minutes: 3),
       ),
       SessionStep(
         nameKey: 'yoga_pose_butterfly',
         descriptionKey: 'yoga_pose_butterfly_desc',
+        mediaKey: 'butterfly',
         duration: Duration(minutes: 4),
       ),
       SessionStep(
         nameKey: 'yoga_pose_twist',
         descriptionKey: 'yoga_pose_twist_desc',
+        mediaKey: 'twist',
         duration: Duration(minutes: 3),
       ),
       SessionStep(
         nameKey: 'yoga_pose_legs_up',
         descriptionKey: 'yoga_pose_legs_up_desc',
+        mediaKey: 'legs_up',
         duration: Duration(minutes: 4),
       ),
       SessionStep(
         nameKey: 'yoga_pose_savasana',
         descriptionKey: 'yoga_pose_savasana_desc',
+        mediaKey: 'savasana',
         duration: Duration(minutes: 3),
       ),
     ],

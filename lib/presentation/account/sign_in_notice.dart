@@ -17,8 +17,8 @@ class SignInNotice extends StatelessWidget {
     key: const Key('sign_in_notice'),
     textAlign: TextAlign.center,
     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-      fontSize: 13,
-      height: 1.45,
+      fontSize: 12,
+      height: 1.4,
       color: context.tokens.textMuted,
     ),
   );

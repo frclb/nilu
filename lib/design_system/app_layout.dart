@@ -252,3 +252,98 @@ class ContentEndFloatFab extends FloatingActionButtonLocation {
   @override
   String toString() => 'ContentEndFloatFab($maxWidth)';
 }
+
+/// Çocuğu **kaydırmadan** verilen alana sığdırır.
+///
+/// Satış, giriş ve kurulum ekranları tek ekran olmalı: kullanıcı fiyatı,
+/// koşulları ya da "devam" düğmesini görmek için kaydırmak zorunda
+/// kalmamalı. İki kademe:
+///
+/// 1. Yer artarsa çocuktaki `Spacer`'lar paylaşıyor (`IntrinsicHeight`
+///    çocuğu en az alan boyu kadar uzatıyor).
+/// 2. Yer yetmezse (en küçük telefon, büyük yazı ayarı) çocuk doğal
+///    boyunda kuruluyor ve `FittedBox` onu orantılı olarak küçültüyor;
+///    taşma da kaydırma da yok.
+///
+/// Ekranlar önce yüksekliğe göre süslerini küçültüyor (bkz. [FitDensity]);
+/// küçültme yalnızca son güvence.
+///
+/// Çocukta `LayoutBuilder` ve kaydırma görünümü (`GridView`, takvim)
+/// olmamalı: iç ölçü sorgusunu desteklemiyorlar. Genişliği daraltan bir
+/// kutunun (`maxWidth`) içindeki metin tek satır olmalı: Flutter iç boyu
+/// dış genişlikle ölçüyor, dar kutuda kırılan satır taşıyordu.
+class AppFitToScreen extends StatelessWidget {
+  const AppFitToScreen({
+    super.key,
+    required this.child,
+    this.maxHeight = double.infinity,
+    this.fitKey,
+  });
+
+  final Widget child;
+
+  /// Bundan uzun alanda (iPad dikey) içerik ortada toplu duruyor; satırlar
+  /// ekranın boyuna dağılınca birbirinden kopuk görünüyordu.
+  final double maxHeight;
+
+  /// Küçültme kutusunun anahtarı: testler ne kadar küçültüldüğünü ölçüyor.
+  final Key? fitKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final height = constraints.maxHeight < maxHeight
+            ? constraints.maxHeight
+            : maxHeight;
+        return Center(
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: FittedBox(
+              key: fitKey,
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: width,
+                  maxWidth: width,
+                  minHeight: height,
+                ),
+                child: IntrinsicHeight(child: child),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Kullanılabilir yüksekliğe göre ekranın süs sınıfı.
+///
+/// Sınırlar telefonlardan (gezinme çubuğu düşülmüş içerik alanı): iPhone
+/// SE ~600 pt, 13 mini ~680, 16e ve 17 ~710–760, Pro Max ~800+; iPad mini
+/// yatayda ~650.
+enum FitDensity {
+  /// Süs en aza iniyor; bilgi kalıyor.
+  compact,
+  regular,
+
+  /// Büyük işaret, geniş boşluk.
+  roomy;
+
+  static FitDensity of(double height) {
+    if (height < 680) return compact;
+    if (height < 780) return regular;
+    return roomy;
+  }
+
+  /// Sınıfa göre bir değer seçer.
+  T pick<T>(T compact, T regular, T roomy) => switch (this) {
+    FitDensity.compact => compact,
+    FitDensity.regular => regular,
+    FitDensity.roomy => roomy,
+  };
+}

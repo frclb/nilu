@@ -11,6 +11,7 @@ import 'widgets/intimacy_section.dart';
 import 'widgets/log_entry_fab.dart';
 import '../../design_system/app_decor.dart';
 import '../../design_system/app_layout.dart';
+import '../tour/app_tour.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -23,14 +24,16 @@ class HomeScreen extends StatelessWidget {
     final isOwner = !context.watch<UserViewModel>().isPartner;
     final showFab = isOwner;
 
-    return Scaffold(
+    final screen = Scaffold(
       // FAB elle `Positioned` ile yerleştiriliyordu: güvenli alanı ve
       // klavyeyi hesaba katmıyordu. Scaffold'un kendi yuvası ikisini de
       // yapıyor.
       // Düğme ekranın sağ kenarına değil içerik sütununa hizalanıyor;
       // geniş ekranda aradaki boşlukta yapayalnız kalıyordu.
       floatingActionButtonLocation: const ContentEndFloatFab(),
-      floatingActionButton: showFab ? const LogEntryFab() : null,
+      floatingActionButton: showFab
+          ? const TourAnchor(id: 'log_fab', child: LogEntryFab())
+          : null,
       body: AmbientBackground(
         child: SafeArea(
           bottom: false,
@@ -49,8 +52,14 @@ class HomeScreen extends StatelessWidget {
                     padding: EdgeInsets.only(bottom: showFab ? 104 : 24),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
-                        const CycleMasthead(),
-                        const PeriodToggleButton(),
+                        const TourAnchor(
+                          id: 'masthead',
+                          child: CycleMasthead(),
+                        ),
+                        const TourAnchor(
+                          id: 'period',
+                          child: PeriodToggleButton(),
+                        ),
                         DailySuggestionCard(reserveFabSpace: showFab),
                         const TwoColumnWidgets(),
                         if (isOwner) const IntimacySection(),
@@ -64,5 +73,8 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
     );
+    // İlk girişte neyin nerede olduğunu anlatan tur (bkz. `AppTour`).
+    // Partnerin ana ekranında kayıt yok; tur onun için değil.
+    return isOwner ? HomeTourLauncher(child: screen) : screen;
   }
 }

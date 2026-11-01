@@ -117,28 +117,35 @@ void main() {
     expect(find.text(s('premium_period_monthly')), findsOneWidget);
     expect(find.text(s('premium_period_annual')), findsOneWidget);
 
+    // Otomatik yenileme bildirimi seçili planın özetinde; altındaki yasal
+    // not yalnızca orada yazmayanları (dijital hizmet, cayma, iade) taşıyor.
+    final ozet = tester
+        .widget<Text>(find.byKey(const Key('premium_renewal_summary')))
+        .data!;
+    expect(ozet, contains('otomatik yenilenir'), reason: 'yenileme bildirimi');
+    expect(ozet, contains('24 saat'), reason: 'iptal süresi');
+    expect(find.text(s('premium_disclaimer')), findsOneWidget);
+
+    // Geri yükleme üst çubukta, kısa adıyla; ekran okuyucu tam adını duyuyor.
     expect(
-      find.text(s('premium_disclaimer')),
-      findsOneWidget,
-      reason: 'otomatik yenileme bildirimi yok',
-    );
-    expect(
-      find.text(s('premium_restore_purchases')),
+      find.text(s('premium_restore_short')),
       findsOneWidget,
       reason: 'geri yükleme düğmesi yok',
     );
+    expect(
+      find.bySemanticsLabel(s('premium_restore_purchases')),
+      findsOneWidget,
+    );
     expect(find.text(s('premium_subscribe_button')), findsOneWidget);
 
-    // Bağlantılar listenin dibinde ve katlamanın altında kalıyor. Apple
-    // bunların paywall'da **bulunmasını** istiyor, ekranın ilk karesinde
-    // görünmesini değil — ama erişilebilir olmaları şart.
-    await tester.scrollUntilVisible(
-      find.text(s('premium_terms')),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
-    expect(find.text(s('premium_privacy')), findsOneWidget);
-    expect(find.text(s('premium_terms')), findsOneWidget);
+    // Ekran kaydırılmıyor: bağlantılar ilk karede görünüyor (her cihaz için
+    // bkz. `premium_fit_test.dart`).
+    expect(find.byType(Scrollable), findsNothing);
+    final ekran = Offset.zero & tester.view.physicalSize / 3;
+    for (final key in ['premium_privacy', 'premium_terms']) {
+      expect(find.text(s(key)), findsOneWidget, reason: key);
+      expect(ekran.contains(tester.getCenter(find.text(s(key)))), isTrue);
+    }
   });
 
   group('yenileme ve iptal düğmenin hemen üstünde', () {
@@ -256,7 +263,7 @@ void main() {
     await open(tester, brightness: Brightness.dark);
 
     expect(find.text(s('premium_disclaimer')), findsOneWidget);
-    expect(find.text(s('premium_restore_purchases')), findsOneWidget);
+    expect(find.text(s('premium_restore_short')), findsOneWidget);
     expect(find.byType(BrandLotus), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

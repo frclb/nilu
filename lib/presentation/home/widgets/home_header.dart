@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../widgets/account_identity.dart';
 
 import '../../../data/repositories/profile_repository.dart';
 import '../../../design_system/app_decor.dart';
@@ -36,6 +37,7 @@ class HomeHeader extends StatefulWidget {
 
 class _HomeHeaderState extends State<HomeHeader> {
   String? _name;
+  Object? _identity;
 
   @override
   void initState() {
@@ -51,6 +53,12 @@ class _HomeHeaderState extends State<HomeHeader> {
 
   @override
   Widget build(BuildContext context) {
+    // Ad hesaptan geliyor: giriş ya da çıkışta selamlama yenileniyor.
+    final identity = watchAccountIdentity(context);
+    if (identity != _identity) {
+      if (_identity != null || identity != null) _loadName();
+      _identity = identity;
+    }
     final t = context.tokens;
     final theme = Theme.of(context);
     final isPartner = context.watch<UserViewModel>().isPartner;

@@ -2,6 +2,7 @@ import '../../../domain/view_models/pregnancy_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../tour/app_tour.dart';
 
 import '../../../design_system/app_layout.dart';
 import '../../../design_system/app_tokens.dart';
@@ -58,8 +59,15 @@ class SideNavRail extends StatelessWidget {
       destinations: [
         for (final destination in destinations)
           NavigationRailDestination(
-            icon: Icon(destination.icon),
-            selectedIcon: Icon(destination.activeIcon),
+            // Uygulama turu geniş ekranda sekmeleri burada buluyor.
+            icon: TourAnchor(
+              id: 'nav_${destination.branchIndex}',
+              child: Icon(destination.icon),
+            ),
+            selectedIcon: TourAnchor(
+              id: 'nav_${destination.branchIndex}',
+              child: Icon(destination.activeIcon),
+            ),
             // Etiket alt menüdeki gibi ölçekleniyor ama bir yere kadar: yan
             // menü sabit genişlikte, en büyük erişilebilirlik ayarında metin
             // taşardı.

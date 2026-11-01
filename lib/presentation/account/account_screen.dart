@@ -335,7 +335,7 @@ class _CloudMark extends StatelessWidget {
               child: Icon(
                 restore ? Icons.cloud_download_outlined : Icons.cloud_outlined,
                 size: 40,
-                color: scheme.onPrimary,
+                color: AppGradients.onMark,
               ),
             ),
           ),

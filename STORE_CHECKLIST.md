@@ -219,7 +219,7 @@ Aşağıdakiler **koddan çıkarılmıştır** — formu buna göre doldurun.
 |---|---|---|---|
 | Sağlık ve fitness | Regl tarihleri, semptomlar, ruh hâli, akış yoğunluğu, cinsel aktivite, gebelik testi, gebelik/lohusalık kayıtları, ölçümler, notlar, döngü ayarları | Cihazda **şifreli** (`SecureStore`); **bulut eşitleme açıksa** (açık rızayla) hesaba bağlı olarak Firestore'da (`syncData/{uid}`) | Hayır |
 | Hassas kişisel | Yakınlık/cinsel istek seçimleri | Cihazda **şifreli** | Yalnızca kullanıcı açıkça eşleşirse partnerine |
-| Kişisel bilgi | Profildeki ad, e-posta, doğum tarihi | Cihazda **şifreli**; bulut eşitleme açıksa Firestore'da | Hayır |
+| Kişisel bilgi | Ad ve e-posta (yalnızca giriş yönteminden; elle girilmiyor), doğum tarihi (bir kez girilir) | Cihazda **şifreli**; ad ve e-posta ayrıca Firebase Authentication'da (hesap); bulut eşitleme açıksa Firestore'da **yalnızca doğum tarihi** | Hayır |
 | İletişim bilgisi | Hesabın e-postası ve adı — Apple, Google ya da e-postayla giriş **isteğe bağlı** (bulut yedeği ve partner için); Apple'da e-posta gizlenebilir, ad paylaşılmayabilir; e-posta hesabının şifresi yalnızca Firebase'de karma olarak | Firebase Authentication | Hayır |
 | Tanımlayıcı | Hesap kimliği ve partner kimliği | Cihaz + Firebase | Hayır |
 | Cihaz kimliği | Reklam SDK'sı (kişiselleştirilmemiş reklam) | Google AdMob | Hayır |

@@ -65,11 +65,7 @@ void main() {
       updatedAt: DateTime(2025, 11, 2),
       hormonalContraception: false,
     ),
-    profile: SyncProfile(
-      name: 'Ada',
-      email: 'ada@ornek.com',
-      birthDate: DateTime(1994, 4, 4),
-    ),
+    profile: SyncProfile(birthDate: DateTime(1994, 4, 4)),
   );
 
   test('yazılan kopya aynı özetle geri okunuyor', () async {
@@ -85,6 +81,26 @@ void main() {
     final kaynak = ornek();
     await local.write(SyncSnapshot.decode(kaynak.encode()));
     expect((await local.read()).hash, kaynak.hash);
+  });
+
+  test('ad ve e-posta eşitlenmiyor: ikisi de hesaptan geliyor', () async {
+    await const ProfileRepository().save(name: 'Ada', email: 'ada@ornek.com');
+    // Eski bir sürümün kopyası başka bir ad taşıyor.
+    await local.write(
+      SyncSnapshot(
+        profile: SyncProfile(
+          name: 'Elle yazılmış',
+          email: 'eski@ornek.com',
+          birthDate: DateTime(1994, 4, 4),
+        ),
+      ),
+    );
+    expect(await const ProfileRepository().getName(), 'Ada');
+    expect(await const ProfileRepository().getEmail(), 'ada@ornek.com');
+    final geri = await local.read();
+    expect(geri.profile.name, isNull, reason: 'buluta ad gitmiyor');
+    expect(geri.profile.email, isNull, reason: 'buluta e-posta gitmiyor');
+    expect(geri.profile.birthDate, DateTime(1994, 4, 4));
   });
 
   test('yazmak değiştirir: cihazda olup kopyada olmayan silinir', () async {
@@ -104,7 +120,11 @@ void main() {
     expect(geri.periodLogs.map((l) => l.id), ['p2']);
     expect(geri.pregnancies, isEmpty);
     expect(geri.conception, isNull);
-    expect(geri.profile.name, isNull, reason: 'Öbür cihazda silinen ad');
+    expect(
+      geri.profile.birthDate,
+      isNull,
+      reason: 'Öbür cihazda silinen doğum tarihi',
+    );
     expect(
       await const CycleSettingsRepository().hasCycleLength(),
       isFalse,
@@ -120,7 +140,10 @@ void main() {
         await const CycleSettingsRepository().getSettingsUpdatedAt(),
         DateTime(2025, 11, 2),
       );
-      expect(await const ProfileRepository().getEmail(), 'ada@ornek.com');
+      expect(
+        await const ProfileRepository().getBirthDate(),
+        DateTime(1994, 4, 4),
+      );
     },
   );
 }

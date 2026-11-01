@@ -349,7 +349,6 @@ class _HeartTile extends StatelessWidget {
     icon: Icons.favorite_rounded,
     size: 68,
     gradient: AppGradients.mark(context),
-    color: Theme.of(context).colorScheme.onPrimary,
   );
 }
 

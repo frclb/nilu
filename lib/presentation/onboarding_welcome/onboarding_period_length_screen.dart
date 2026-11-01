@@ -105,9 +105,10 @@ class _OnboardingPeriodLengthScreenState
                 ),
                 const OnboardingStepDots(step: OnboardingStep.periodLength),
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-                    child: Column(
+                  child: AppFitToScreen(
+                    fitKey: const Key('onboarding_fit'),
+                    child: OnboardingStagger(
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         OnboardingHeading(
@@ -116,7 +117,9 @@ class _OnboardingPeriodLengthScreenState
                           title: context.tr('onb_period_length_title'),
                           description: context.tr('onb_period_length_desc'),
                         ),
-                        const SizedBox(height: AppSpacing.xl),
+                        const SizedBox(height: AppSpacing.lg),
+                        // Çark başlığın altında boşlukta ortalı.
+                        const Spacer(),
                         OnboardingDayWheel(
                           controller: _scrollController,
                           min: _min,
@@ -132,6 +135,7 @@ class _OnboardingPeriodLengthScreenState
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         OnboardingDontKnowButton(onPressed: _resetToDefault),
+                        const Spacer(flex: 2),
                       ],
                     ),
                   ),

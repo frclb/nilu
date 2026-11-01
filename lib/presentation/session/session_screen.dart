@@ -1,14 +1,15 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 import '../../design_system/app_card.dart';
 import '../../design_system/app_decor.dart';
+import '../../design_system/app_scrim.dart';
 import '../../design_system/app_tokens.dart';
 import '../../domain/services/session_plan.dart';
 import '../../localization/app_localizations.dart';
 import '../../design_system/app_layout.dart';
+import '../yoga/widgets/exercise_media.dart';
 
 /// Rehberli seans: adımları sırayla, zamanlayıcıyla gösterir.
 ///
@@ -190,47 +191,58 @@ class _Active extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // Kalan süre halkası.
-              Center(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final size = math.min(230.0, constraints.maxWidth - 40);
-                    return SizedBox.square(
-                      dimension: size,
-                      child: CustomPaint(
-                        painter: _RingPainter(
-                          progress: progress.clamp(0.0, 1.0),
-                          track: t.secondaryTint,
-                          colors: [
-                            t.secondary.withAlpha(150),
-                            t.secondary,
-                            theme.colorScheme.primary,
-                          ],
-                        ),
-                        child: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(28),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                clock(remaining),
-                                style: theme.textTheme.displayMedium?.copyWith(
-                                  fontSize: 52,
-                                  fontFeatures: const [
-                                    FontFeature.tabularFigures(),
-                                  ],
-                                  color: theme.colorScheme.primary,
-                                ),
-                              ),
-                            ),
+              // Hareketin sessiz, döngülü mini videosu; üstünde kalan süre
+              // ve adımın ilerlemesi. Önce yalnızca bir sayaç halkası vardı:
+              // kullanıcı hareketi metinden tahmin ediyordu.
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppRadius.xl - 4),
+                child: AspectRatio(
+                  aspectRatio: 4 / 3,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      if (step.mediaKey case final key?)
+                        ExerciseClip(mediaKey: key, playing: running)
+                      else
+                        ColoredBox(color: t.surfaceAlt),
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.center,
+                            colors: [AppScrim.veil(170), AppScrim.veil(0)],
                           ),
                         ),
                       ),
-                    );
-                  },
+                      Positioned(
+                        left: 20,
+                        bottom: 20,
+                        child: Text(
+                          clock(remaining),
+                          style: theme.textTheme.displayMedium?.copyWith(
+                            fontSize: 44,
+                            height: 1,
+                            fontFeatures: const [FontFeature.tabularFigures()],
+                            color: AppScrim.ink,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: LinearProgressIndicator(
+                          value: progress.clamp(0.0, 1.0),
+                          minHeight: 5,
+                          color: t.secondary,
+                          backgroundColor: AppScrim.frost(50),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 20),
 
               AppCard(
                 padding: const EdgeInsets.all(22),
@@ -271,11 +283,23 @@ class _Active extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      AppIconTile(
-                        icon: Icons.skip_next_rounded,
-                        size: 40,
-                        background: t.surface,
-                      ),
+                      if (next.mediaKey case final key?)
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                          child: SizedBox(
+                            width: 52,
+                            height: 40,
+                            child: ExercisePhoto(
+                              asset: ExerciseMedia.photo(key),
+                            ),
+                          ),
+                        )
+                      else
+                        AppIconTile(
+                          icon: Icons.skip_next_rounded,
+                          size: 40,
+                          background: t.surface,
+                        ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -364,57 +388,7 @@ class _SkipButton extends StatelessWidget {
   }
 }
 
-/// Geri sayım halkası: soluk iz, üstünde gül → erik degradeli ilerleme.
-class _RingPainter extends CustomPainter {
-  const _RingPainter({
-    required this.progress,
-    required this.track,
-    required this.colors,
-  });
-
-  final double progress;
-  final Color track;
-  final List<Color> colors;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    const stroke = 11.0;
-    final rect = (Offset.zero & size).deflate(stroke / 2);
-    canvas.drawArc(
-      rect,
-      0,
-      math.pi * 2,
-      false,
-      Paint()
-        ..color = track
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = stroke,
-    );
-    if (progress <= 0) return;
-    final sweep = math.pi * 2 * progress;
-    canvas.drawArc(
-      rect,
-      -math.pi / 2,
-      sweep,
-      false,
-      Paint()
-        ..shader = SweepGradient(
-          startAngle: 0,
-          endAngle: math.pi * 2,
-          colors: colors,
-          transform: const GradientRotation(-math.pi / 2),
-        ).createShader(rect)
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeWidth = stroke,
-    );
-  }
-
-  @override
-  bool shouldRepaint(_RingPainter old) =>
-      old.progress != progress || old.track != track || old.colors != colors;
-}
-
+/// Seans bitti.
 class _Finished extends StatelessWidget {
   const _Finished({required this.total, required this.clock});
 
@@ -437,7 +411,6 @@ class _Finished extends StatelessWidget {
               size: 88,
               circle: true,
               gradient: AppGradients.mark(context),
-              color: theme.colorScheme.onPrimary,
             ),
             const SizedBox(height: 24),
             Text(

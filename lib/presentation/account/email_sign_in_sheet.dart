@@ -39,6 +39,7 @@ class EmailSignInSheet extends StatefulWidget {
 
 class _EmailSignInSheetState extends State<EmailSignInSheet> {
   final _form = GlobalKey<FormState>();
+  final _name = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
   bool _create = false;
@@ -50,10 +51,16 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
 
   @override
   void dispose() {
+    _name.dispose();
     _email.dispose();
     _password.dispose();
     super.dispose();
   }
+
+  /// Kayıtta ad bir kez soruluyor: e-posta sağlayıcısı ad vermiyor ve ad
+  /// uygulamada elle değiştirilmiyor.
+  String? _checkName(String? v) =>
+      (v ?? '').trim().length < 2 ? context.tr('email_error_name_empty') : null;
 
   String? _checkEmail(String? v) =>
       EmailSignInSheet.emailPattern.hasMatch((v ?? '').trim())
@@ -94,6 +101,7 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
       _password.text,
       create: _create,
       languageCode: dil,
+      displayName: _create ? _name.text.trim() : null,
     );
     if (!mounted) return;
     if (sonuc.status == SignInStatus.signedIn) {
@@ -235,6 +243,25 @@ class _EmailSignInSheetState extends State<EmailSignInSheet> {
                                   }),
                           ),
                           const SizedBox(height: 20),
+                          if (_create) ...[
+                            TextFormField(
+                              key: const Key('name_field'),
+                              controller: _name,
+                              enabled: !busy,
+                              textInputAction: TextInputAction.next,
+                              textCapitalization: TextCapitalization.words,
+                              autofillHints: const [AutofillHints.name],
+                              decoration: InputDecoration(
+                                labelText: context.tr('email_name_label'),
+                                helperText: context.tr('email_name_hint'),
+                                prefixIcon: const Icon(
+                                  Icons.person_outline_rounded,
+                                ),
+                              ),
+                              validator: _checkName,
+                            ),
+                            const SizedBox(height: 12),
+                          ],
                           TextFormField(
                             key: const Key('email_field'),
                             controller: _email,

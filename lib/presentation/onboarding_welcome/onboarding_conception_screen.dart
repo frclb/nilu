@@ -67,9 +67,10 @@ class OnboardingConceptionScreen extends StatelessWidget {
               children: [
                 const OnboardingTopBar(),
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-                    child: Column(
+                  child: AppFitToScreen(
+                    fitKey: const Key('onboarding_fit'),
+                    child: OnboardingStagger(
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // Bu adım "Bebek istiyorum" yolunun içinde: etiket
@@ -100,7 +101,9 @@ class OnboardingConceptionScreen extends StatelessWidget {
                           body: context.tr('onb_ttc_since_body'),
                           onTap: () => _tarihSec(context),
                         ),
-                        const SizedBox(height: AppSpacing.xl),
+                        const SizedBox(height: AppSpacing.lg),
+                        // Güvence notu ekranın dibinde; seçenekler yukarıda toplu.
+                        const Spacer(),
                         const OnboardingPrivacyNote(),
                       ],
                     ),

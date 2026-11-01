@@ -51,8 +51,14 @@ void main() {
                 ChangeNotifierProvider(create: (_) => PregnancyViewModel()),
                 ChangeNotifierProvider(create: (_) => CalendarViewModel()),
               ],
-              child: Center(
-                child: SizedBox(width: width, child: const CalendarGrid()),
+              // Uygulamadaki gibi kaydırılan bir alanda. Önce sabit
+              // yükseklikteki test ekranına konuyordu: altı satırlı aylarda
+              // (ör. Kasım 2026) geniş ızgara ekranın boyunu aşıyor ve
+              // hücre taşması olmadığı hâlde test düşüyordu.
+              child: SingleChildScrollView(
+                child: Center(
+                  child: SizedBox(width: width, child: const CalendarGrid()),
+                ),
               ),
             ),
           ),

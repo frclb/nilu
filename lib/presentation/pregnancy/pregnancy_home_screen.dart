@@ -561,7 +561,7 @@ class _AylarKarti extends StatelessWidget {
                                 style: sayi?.copyWith(
                                   fontSize: m.number == ay.number ? 14 : 11.5,
                                   color: m.number == ay.number
-                                      ? theme.colorScheme.onPrimary
+                                      ? AppGradients.onMark
                                       : m.number < ay.number
                                       ? t.secondary
                                       : t.textFaint,

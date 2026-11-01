@@ -180,7 +180,7 @@ class _Hero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final on = theme.colorScheme.onPrimary;
+    const on = AppGradients.onMark;
 
     final String etiket;
     final String baslik;
@@ -213,12 +213,7 @@ class _Hero extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: AppGradients.primary(context).colors,
-            stops: const [0, 0.55, 1],
-          ),
+          gradient: AppGradients.hero(context),
           borderRadius: BorderRadius.circular(AppCard.radius),
           boxShadow: AppShadows.floating(context),
         ),

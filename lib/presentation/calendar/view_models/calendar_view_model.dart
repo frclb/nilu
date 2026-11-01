@@ -287,6 +287,20 @@ class CalendarViewModel extends ChangeNotifier {
     return PeriodAction.start;
   }
 
+  /// Süren dönemin bugün kaçıncı günü; bugün süren bir dönem yoksa null.
+  ///
+  /// "Reglim bitti"de erken bitiş onayı için: kullanıcının ayarladığı regl
+  /// süresiyle karşılaştırılıyor.
+  int? get currentPeriodDay {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    for (final log in _periodLogs) {
+      if (!log.containsRecorded(today, today: today)) continue;
+      return today.daysSince(log.firstDay) + 1;
+    }
+    return null;
+  }
+
   /// Bugünkü kayıt bugün mü açıldı?
   ///
   /// Geri alma düğmesi yalnızca bunun doğru olduğu gün gösteriliyor: dün

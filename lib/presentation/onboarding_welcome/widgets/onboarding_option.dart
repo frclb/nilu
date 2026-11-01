@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'onboarding_chrome.dart';
+
 import '../../../design_system/app_card.dart';
 import '../../../design_system/app_tokens.dart';
 
@@ -46,7 +48,10 @@ class OnboardingOption extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 18, 14, 18),
+              // Küçük telefonda sıkı: kurulum ekranı kaydırılmıyor.
+              padding: EdgeInsets.symmetric(
+                vertical: onboardingSize(context).pick(12.0, 15.0, 18.0),
+              ).copyWith(left: 16, right: 14),
               child: Row(
                 children: [
                   Container(

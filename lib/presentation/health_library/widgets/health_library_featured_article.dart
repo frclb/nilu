@@ -168,9 +168,11 @@ class HealthLibraryFeaturedArticle extends StatelessWidget {
   final primary = theme.colorScheme.primary;
   final t = context.tokens;
   if (theme.brightness == Brightness.dark) {
+    // Logonun derin tonu: açık pembeyle karışınca kart grimsi bir leylak
+    // kalıyordu.
     return (
-      Color.lerp(t.surface, primary, 0.34)!,
-      Color.lerp(t.surface, primary, 0.16)!,
+      Color.lerp(t.surface, t.markStart, 0.5)!,
+      Color.lerp(t.surface, t.markStart, 0.22)!,
       t.text,
     );
   }

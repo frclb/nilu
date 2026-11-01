@@ -25,6 +25,8 @@ import 'widgets/premium_banner.dart';
 import 'widgets/settings_group.dart';
 import 'widgets/settings_surface.dart';
 import '../../design_system/app_layout.dart';
+import '../tour/app_tour.dart';
+import '../widgets/account_identity.dart';
 
 class ProfileSettingsScreen extends StatefulWidget {
   const ProfileSettingsScreen({super.key});
@@ -38,6 +40,9 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
 
   String? _name;
   String? _email;
+
+  /// Son okunan hesap kimliği; değişince kart yenileniyor.
+  Object? _identity;
 
   @override
   void initState() {
@@ -64,6 +69,12 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final identity = watchAccountIdentity(context);
+    if (identity != _identity) {
+      // İlk kare `initState` okuyor; sonrakiler giriş, çıkış ya da silme.
+      if (_identity != null || identity != null) _loadIdentity();
+      _identity = identity;
+    }
     final isPartner = context.watch<UserViewModel>().isPartner;
     final primary = Theme.of(context).colorScheme.primary;
     final tint = context.tokens.brandTint;
@@ -284,6 +295,22 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                                   context.pushNamed(RouteNames.appearance);
                                 },
                               ),
+                              // Tur döngü takibinin ana ekranını anlatıyor;
+                              // gebelik ve lohusalık panosunda hedefleri yok.
+                              if (!isPartner &&
+                                  context.watch<PregnancyViewModel>().stage ==
+                                      LifeStage.cycle)
+                                SettingsItem(
+                                  title: context.tr('profile_app_tour'),
+                                  subtitle: context.tr('profile_app_tour_sub'),
+                                  icon: Icons.tour_outlined,
+                                  iconColor: primary,
+                                  iconBgColor: tint,
+                                  onTap: () {
+                                    AppTour.replay();
+                                    context.goNamed(RouteNames.home);
+                                  },
+                                ),
                               SettingsItem(
                                 title: context.tr('profile_privacy_security'),
                                 icon: Icons.lock_outline_rounded,
@@ -403,10 +430,10 @@ class _IdentityCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        // Ad girilmemişse alanın kendi etiketi. "Kişisel
-                        // Bilgiler" yazmak, aşağıdaki satırın metnini
-                        // ekranda ikinci kez göstermek olurdu.
-                        hasName ? name! : context.tr('personal_info_name'),
+                        // Ad hesaptan geliyor; hesapsız kullanımda ad yok.
+                        hasName
+                            ? name!
+                            : context.tr('personal_info_guest_title'),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.titleLarge?.copyWith(
@@ -466,9 +493,9 @@ class _IdentityCard extends StatelessWidget {
                       foregroundColor: theme.colorScheme.primary,
                       minimumSize: const Size(44, 44),
                     ),
-                    // `edit_outlined` değil: tarih seçicinin "elle yaz"
-                    // düğmesi o simgeyi kullanıyor.
-                    icon: const Icon(Icons.edit_rounded, size: 18),
+                    // Kalem değil ok: ad ve e-posta hesaptan geliyor,
+                    // burada düzenlenmiyor; düğme bilgileri gösteriyor.
+                    icon: const Icon(Icons.chevron_right_rounded, size: 22),
                   ),
                 ],
               ],

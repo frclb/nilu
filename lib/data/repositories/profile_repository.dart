@@ -43,6 +43,11 @@ class ProfileRepository {
         : await _store.setString(birthDateKey, birthDate.toIso8601String());
   }
 
+  /// Yalnızca doğum tarihini yazar; `null` siler (bulut eşitleme).
+  Future<void> replaceBirthDate(DateTime? birthDate) => birthDate == null
+      ? _store.remove(birthDateKey)
+      : _store.setString(birthDateKey, birthDate.toIso8601String());
+
   Future<void> save({String? name, String? email, DateTime? birthDate}) async {
     if (name != null) {
       name.trim().isEmpty

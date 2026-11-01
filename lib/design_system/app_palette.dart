@@ -66,10 +66,17 @@ class AppPalette {
   static const ink400 = Color(0xFF83737A);
 
   // ── Koyu tema ──
+  //
+  // Yüzeyler gece zemininden erik yönünde ayrışıyor: eskiden gri-kahveye
+  // yakındı ve koyu tema "renksiz" duruyordu. Zemin aynı kaldı (açılış
+  // ekranı onunla çiziliyor).
   static const night900 = Color(0xFF150E12);
-  static const night800 = Color(0xFF20171C);
-  static const night700 = Color(0xFF2C2027);
-  static const night600 = Color(0xFF3E2F38);
+  static const night800 = Color(0xFF221520);
+  static const night700 = Color(0xFF301D2B);
+  static const night600 = Color(0xFF45303F);
+
+  /// Koyu temada seçili ve vurgulu zeminler: gri değil, erik tülü.
+  static const nightPlum = Color(0xFF3D1A31);
 
   static const nightInk = Color(0xFFF7E9F0);
   static const nightInkMuted = Color(0xFFCDB8C3);

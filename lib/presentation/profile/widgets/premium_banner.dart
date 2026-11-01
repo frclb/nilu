@@ -43,11 +43,13 @@ class _OfferColors {
     final t = context.tokens;
     final scheme = Theme.of(context).colorScheme;
     if (Theme.of(context).brightness == Brightness.dark) {
-      final start = Color.alphaBlend(scheme.primary.withAlpha(70), t.surface);
+      // Logonun derin tonları yüzeye karışmış: açık pembeyle karışınca kart
+      // grimsi bir leylak kalıyordu, saf hâliyle de parlıyordu.
+      final start = Color.alphaBlend(t.markStart.withAlpha(140), t.surface);
       return _OfferColors(
         gradient: [
           start,
-          Color.alphaBlend(t.secondary.withAlpha(60), t.surface),
+          Color.alphaBlend(t.markEnd.withAlpha(110), t.surface),
         ],
         on: t.text,
         ctaBackground: scheme.primary,
@@ -322,7 +324,6 @@ class _ActiveRow extends StatelessWidget {
                 AppIconTile(
                   icon: Icons.workspace_premium_rounded,
                   gradient: AppGradients.mark(context),
-                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
                 const SizedBox(width: 14),
                 Expanded(

@@ -65,12 +65,15 @@ class ContentIllustration extends StatelessWidget {
     _Palette(Color(0xFFFDF0E4), Color(0xFFF3D6B8), Color(0x669A3412)),
   ];
 
+  // Koyu temada mücevher tonları: aynı beş aile (erik, gül, menekşe, deniz,
+  // kehribar) ama doygun. Önceki tonlar gri-kahveye yakındı; kart gece
+  // zemininde sönük, gri-mavi bir leke gibi duruyordu.
   static const List<_Palette> _darkPalettes = [
-    _Palette(Color(0xFF2A1F20), Color(0xFF3E2A2F), Color(0x99E9C4CD)),
-    _Palette(Color(0xFF2B181D), Color(0xFF43242C), Color(0x99EFC9CF)),
-    _Palette(Color(0xFF241C2E), Color(0xFF362A45), Color(0x99DCC9EA)),
-    _Palette(Color(0xFF16262A), Color(0xFF21393D), Color(0x99C5E5DD)),
-    _Palette(Color(0xFF2C2118), Color(0xFF443224), Color(0x99F3D6B8)),
+    _Palette(Color(0xFF3A1530), Color(0xFF5C2049), Color(0x99F7C5E4)),
+    _Palette(Color(0xFF3D1420), Color(0xFF66223A), Color(0x99FFC9D4)),
+    _Palette(Color(0xFF261A45), Color(0xFF42306E), Color(0x99D9CCFF)),
+    _Palette(Color(0xFF10303A), Color(0xFF1D4E5A), Color(0x99C2E8EE)),
+    _Palette(Color(0xFF3A2416), Color(0xFF5E3A1E), Color(0x99F6D6B5)),
   ];
 }
 

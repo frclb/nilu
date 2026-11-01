@@ -47,7 +47,7 @@ class _Brand extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
-    final onMark = Theme.of(context).colorScheme.onPrimary;
+    const onMark = AppGradients.onMark;
     return SizedBox.fromSize(
       size: _canvas,
       child: Center(
@@ -222,7 +222,6 @@ class _Partner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final t = context.tokens;
     final primary = Theme.of(context).colorScheme.primary;
 
     return SizedBox.fromSize(
@@ -231,7 +230,17 @@ class _Partner extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _ring(primary, filled: true, child: BrandLotus(color: t.surface)),
+            // Dolu halka logonun kendisi: ilk sayfadaki daireyle aynı
+            // degrade ve beyaz lotus. Koyu temada düz marka rengi açık bir
+            // pembeydi ve sayfada tek parlak leke oluyordu.
+            _ring(
+              primary,
+              gradient: AppGradients.mark(context),
+              child: const BrandLotus(
+                color: AppGradients.onMark,
+                sideOpacity: 0.8,
+              ),
+            ),
             // Bağ: iki halkanın arasını dolduran çizgi.
             Container(
               width: 34,
@@ -240,7 +249,6 @@ class _Partner extends StatelessWidget {
             ),
             _ring(
               primary,
-              filled: false,
               child: Icon(
                 Icons.favorite,
                 size: 34,
@@ -253,15 +261,17 @@ class _Partner extends StatelessWidget {
     );
   }
 
-  Widget _ring(Color primary, {required bool filled, required Widget child}) =>
+  /// [gradient] verilirse dolu halka, verilmezse çerçeveli boş halka.
+  Widget _ring(Color primary, {Gradient? gradient, required Widget child}) =>
       Container(
         width: 76,
         height: 76,
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: filled ? primary : primary.withValues(alpha: 0.08),
-          border: filled
+          gradient: gradient,
+          color: gradient != null ? null : primary.withValues(alpha: 0.08),
+          border: gradient != null
               ? null
               : Border.all(color: primary.withValues(alpha: 0.35), width: 2),
         ),

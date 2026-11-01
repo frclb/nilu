@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:period_tracker/data/datasources/remote/account_auth.dart';
+import 'package:period_tracker/data/repositories/profile_repository.dart';
 import 'package:period_tracker/domain/models/period_log.dart';
 import 'package:period_tracker/domain/models/sync_snapshot.dart';
 import 'package:period_tracker/domain/services/sync_engine.dart';
@@ -49,6 +50,72 @@ void main() {
     await pumpEventQueue();
     return v;
   }
+
+  group('ad ve e-posta giriş yönteminden', () {
+    const profil = ProfileRepository();
+
+    test(
+      'girişte hesaptan yazılıyor, elle yazılanın üstüne yazılıyor',
+      () async {
+        await profil.save(name: 'Elle yazılmış', email: 'eski@ornek.com');
+        auth.nextDisplayName = 'Ada Yılmaz';
+        final v = await vm();
+        await v.signIn(AccountProvider.apple);
+        expect(await profil.getName(), 'Ada Yılmaz');
+        expect(await profil.getEmail(), 'ada@ornek.com');
+      },
+    );
+
+    test('çıkışta ad ve e-posta kalkıyor, doğum tarihi kalıyor', () async {
+      auth.nextDisplayName = 'Ada Yılmaz';
+      final v = await vm();
+      await v.signIn(AccountProvider.google);
+      await profil.save(birthDate: DateTime(1995, 5, 5));
+      await v.signOut();
+      expect(await profil.getName(), isNull);
+      expect(await profil.getEmail(), isNull);
+      expect(await profil.getBirthDate(), DateTime(1995, 5, 5));
+    });
+
+    test('hesapsız kullanımda elle yazılmış ad kalmıyor', () async {
+      await profil.save(name: 'Elle yazılmış');
+      await vm();
+      expect(await profil.getName(), isNull);
+    });
+
+    test('adı olmayan hesap adını bir kez ekleyebiliyor', () async {
+      // Ad kuralından önce e-postayla açılmış hesap: adı yok.
+      final v = await vm();
+      await v.signIn(AccountProvider.apple);
+      expect(await profil.getName(), isNull);
+
+      expect(await v.addMissingName('  Ada Yılmaz '), isTrue);
+      expect(v.account?.displayName, 'Ada Yılmaz');
+      expect(await profil.getName(), 'Ada Yılmaz');
+
+      // İkinci kez değiştirilemiyor.
+      expect(await v.addMissingName('Başka'), isFalse);
+      expect(await profil.getName(), 'Ada Yılmaz');
+    });
+
+    test('hesapsız ya da adı olan hesapta ad eklenmiyor', () async {
+      final v = await vm();
+      expect(await v.addMissingName('Ada'), isFalse, reason: 'hesap yok');
+      auth.nextDisplayName = 'Ada Yılmaz';
+      await v.signIn(AccountProvider.google);
+      expect(await v.addMissingName('Başka'), isFalse);
+      expect(await profil.getName(), 'Ada Yılmaz');
+    });
+
+    test('Firebase hazır değilken profile dokunulmuyor', () async {
+      // Açılışta hesap henüz bilinmiyor: silmek, giriş yapmış
+      // kullanıcının adını bir an için kaybettirirdi.
+      await profil.save(name: 'Ada Yılmaz');
+      auth.available = false;
+      await vm();
+      expect(await profil.getName(), 'Ada Yılmaz');
+    });
+  });
 
   test('giriş tek başına hiçbir veri göndermiyor', () async {
     final v = await vm();

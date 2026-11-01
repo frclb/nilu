@@ -93,6 +93,9 @@ class FakeAccountAuth implements AccountAuth {
   String? reauthPassword;
   String nextUid = 'hesap-1';
 
+  /// Apple ya da Google'ın vereceği ad.
+  String? nextDisplayName;
+
   /// E-postayla girişte dönecek hata; `null` ise giriş başarılı.
   EmailAuthError? nextEmailError;
   final List<({String email, String password, bool create, String? lang})>
@@ -128,6 +131,7 @@ class FakeAccountAuth implements AccountAuth {
       uid: nextUid,
       provider: provider,
       email: 'ada@ornek.com',
+      displayName: nextDisplayName,
     );
     return SignInResult(SignInStatus.signedIn, user: _current);
   }
@@ -138,6 +142,7 @@ class FakeAccountAuth implements AccountAuth {
     String password, {
     required bool create,
     String? languageCode,
+    String? displayName,
   }) async {
     if (!available) return const SignInResult(SignInStatus.unavailable);
     emailSignIns.add((
@@ -153,6 +158,7 @@ class FakeAccountAuth implements AccountAuth {
       uid: nextUid,
       provider: AccountProvider.email,
       email: email.trim(),
+      displayName: create ? displayName : null,
       emailVerified: emailVerified,
     );
     return SignInResult(SignInStatus.signedIn, user: _current);
@@ -162,6 +168,20 @@ class FakeAccountAuth implements AccountAuth {
   Future<bool> sendEmailVerification({String? languageCode}) async {
     verificationSends++;
     return available && _current != null;
+  }
+
+  @override
+  Future<AccountUser?> setDisplayName(String name) async {
+    final c = _current;
+    if (c == null) return null;
+    _current = AccountUser(
+      uid: c.uid,
+      provider: c.provider,
+      email: c.email,
+      displayName: name.trim(),
+      emailVerified: c.emailVerified,
+    );
+    return _current;
   }
 
   @override

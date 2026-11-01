@@ -51,7 +51,7 @@ class PartnerSupportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.tokens;
     final theme = Theme.of(context);
-    final on = theme.colorScheme.onPrimary;
+    const on = AppGradients.onMark;
     // Sekme kökü (partnerin "Rehber" sekmesi); ayrı rotadan açılırsa geri.
     final pushed = Navigator.of(context).canPop();
 

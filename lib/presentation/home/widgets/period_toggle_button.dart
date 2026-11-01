@@ -154,6 +154,46 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
     return confirmed ?? false;
   }
 
+  /// Dönem, kullanıcının ayarladığı süreden belirgin biçimde erken
+  /// bitiriliyorsa onay ister.
+  ///
+  /// Birinci günde "Reglim bitti"ye basmak çoğu zaman yanlış dokunuş ya da
+  /// kanamanın bir günlüğüne azalması; kayıt bir günlük kalınca ortalama
+  /// regl süresi ve tahminler kısalıyor. Eşik ayara göre: beş günlük
+  /// ayarda ilk üç gün, üç günlükte yalnızca ilk gün soruluyor. Bir-iki gün
+  /// erken bitmesi olağan, onda sorulmuyor.
+  Future<bool> _confirmEarlyEnd(CalendarViewModel viewModel) async {
+    final day = viewModel.currentPeriodDay;
+    final planned = viewModel.cycleInfo.plannedPeriodLength;
+    if (day == null || (day != 1 && day >= planned - 1)) return true;
+    if (planned <= 1) return true;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(ctx.tr('home_period_end_early_title')),
+        content: Text(
+          ctx.tr(
+            'home_period_end_early_body',
+            params: {'n': '$day', 'planned': '$planned'},
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.tr('home_period_end_early_keep')),
+          ),
+          FilledButton(
+            style: AppTheme.dialogAction(),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(ctx.tr('home_period_end_early_confirm')),
+          ),
+        ],
+      ),
+    );
+    return confirmed ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
@@ -212,7 +252,13 @@ class _PeriodToggleButtonState extends State<PeriodToggleButton> {
               // Bitirme yıkıcı bir eylem değil ama geri alınabilir olduğu belli
               // olsun diye daha sakin duruyor: degradesiz, ince kenarlı.
               PeriodAction.end => OutlinedButton.icon(
-                onPressed: _busy ? null : () => _run(viewModel.endPeriodToday),
+                onPressed: _busy
+                    ? null
+                    : () async {
+                        if (!await _confirmEarlyEnd(viewModel)) return;
+                        if (!mounted) return;
+                        await _run(viewModel.endPeriodToday);
+                      },
                 icon: const Icon(Icons.stop_circle_outlined, size: 20),
                 label: Text(context.tr('home_period_end')),
                 style: OutlinedButton.styleFrom(

@@ -95,6 +95,12 @@ class AppTokens extends ThemeExtension<AppTokens> {
   final Color flowText;
   final Color ovulationText;
 
+  /// Logo dairesi, simge kutusu ve vurgu kartının degradesi (baştan sona).
+  /// Her iki temada da koyu bir ton: üstündeki yazı ve simge beyaz
+  /// (`AppGradients.onMark`). Açık temada marka ile ikincil rengin kendisi.
+  final Color markStart;
+  final Color markEnd;
+
   const AppTokens({
     required this.background,
     required this.surface,
@@ -122,6 +128,8 @@ class AppTokens extends ThemeExtension<AppTokens> {
     required this.secondaryTint,
     required this.flowText,
     required this.ovulationText,
+    required this.markStart,
+    required this.markEnd,
   });
 
   /// Seçili çeşide göre rol renkleri.
@@ -134,6 +142,8 @@ class AppTokens extends ThemeExtension<AppTokens> {
     return base.copyWith(
       brandTint: isLight ? flavor.tint : base.brandTint,
       secondary: isLight ? flavor.secondary : flavor.secondaryDark,
+      markStart: isLight ? flavor.brand : flavor.markDark,
+      markEnd: isLight ? flavor.secondary : flavor.markDarkEnd,
     );
   }
 
@@ -164,13 +174,15 @@ class AppTokens extends ThemeExtension<AppTokens> {
     secondaryTint: AppPalette.berry100,
     flowText: AppPalette.rose800,
     ovulationText: AppPalette.iris700,
+    markStart: AppPalette.plum700,
+    markEnd: AppPalette.berry600,
   );
 
   static const dark = AppTokens(
     background: AppPalette.night900,
     surface: AppPalette.night800,
     surfaceAlt: AppPalette.night700,
-    brandTint: AppPalette.night700,
+    brandTint: AppPalette.nightPlum,
     text: AppPalette.nightInk,
     textMuted: AppPalette.nightInkMuted,
     textFaint: Color(0xFF9C8892),
@@ -197,6 +209,8 @@ class AppTokens extends ThemeExtension<AppTokens> {
     secondaryTint: Color(0xFF4A1F2E),
     flowText: AppPalette.rose400,
     ovulationText: Color(0xFFC4B5FD),
+    markStart: Color(0xFFB32D7E),
+    markEnd: Color(0xFFD6386A),
   );
 
   @override
@@ -227,6 +241,8 @@ class AppTokens extends ThemeExtension<AppTokens> {
     Color? secondaryTint,
     Color? flowText,
     Color? ovulationText,
+    Color? markStart,
+    Color? markEnd,
   }) {
     return AppTokens(
       background: background ?? this.background,
@@ -255,6 +271,8 @@ class AppTokens extends ThemeExtension<AppTokens> {
       secondaryTint: secondaryTint ?? this.secondaryTint,
       flowText: flowText ?? this.flowText,
       ovulationText: ovulationText ?? this.ovulationText,
+      markStart: markStart ?? this.markStart,
+      markEnd: markEnd ?? this.markEnd,
     );
   }
 
@@ -289,6 +307,8 @@ class AppTokens extends ThemeExtension<AppTokens> {
       secondaryTint: mix(secondaryTint, other.secondaryTint),
       flowText: mix(flowText, other.flowText),
       ovulationText: mix(ovulationText, other.ovulationText),
+      markStart: mix(markStart, other.markStart),
+      markEnd: mix(markEnd, other.markEnd),
     );
   }
 }

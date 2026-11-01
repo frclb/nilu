@@ -70,16 +70,17 @@ class OnboardingGoalScreen extends StatelessWidget {
                 const OnboardingTopBar(),
                 const OnboardingStepDots(step: OnboardingStep.goal),
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-                    child: Column(
+                  child: AppFitToScreen(
+                    fitKey: const Key('onboarding_fit'),
+                    child: OnboardingStagger(
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         OnboardingHeading(
                           title: context.tr('onb_goal_title'),
                           description: context.tr('onb_goal_desc'),
                         ),
-                        const SizedBox(height: AppSpacing.xl),
+                        const SizedBox(height: AppSpacing.lg),
                         OnboardingOption(
                           key: const Key('onboarding_goal_cycle'),
                           icon: Icons.water_drop_outlined,
@@ -89,7 +90,7 @@ class OnboardingGoalScreen extends StatelessWidget {
                           body: context.tr('onb_goal_cycle_body'),
                           onTap: () => _dongu(context),
                         ),
-                        const SizedBox(height: AppSpacing.md),
+                        const SizedBox(height: 10),
                         OnboardingOption(
                           key: const Key('onboarding_goal_ttc'),
                           icon: Icons.spa_outlined,
@@ -101,7 +102,7 @@ class OnboardingGoalScreen extends StatelessWidget {
                             RouteNames.onboardingConception,
                           ),
                         ),
-                        const SizedBox(height: AppSpacing.md),
+                        const SizedBox(height: 10),
                         OnboardingOption(
                           key: const Key('onboarding_goal_pregnancy'),
                           icon: Icons.pregnant_woman,
@@ -111,7 +112,7 @@ class OnboardingGoalScreen extends StatelessWidget {
                           body: context.tr('onb_goal_pregnancy_body'),
                           onTap: () => _hamileyim(context),
                         ),
-                        const SizedBox(height: AppSpacing.md),
+                        const SizedBox(height: 10),
                         OnboardingOption(
                           key: const Key('onboarding_goal_postpartum'),
                           icon: Icons.child_friendly_outlined,
@@ -121,7 +122,9 @@ class OnboardingGoalScreen extends StatelessWidget {
                           body: context.tr('onb_goal_postpartum_body'),
                           onTap: () => _dogumYaptim(context),
                         ),
-                        const SizedBox(height: AppSpacing.xl),
+                        const SizedBox(height: AppSpacing.lg),
+                        // Güvence notu ekranın dibinde; seçenekler yukarıda toplu.
+                        const Spacer(),
                         const OnboardingPrivacyNote(),
                       ],
                     ),

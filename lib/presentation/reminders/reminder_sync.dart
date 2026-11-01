@@ -2,6 +2,7 @@ import 'care_plan_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../tour/app_tour.dart';
 
 import '../../core/navigation/navigation_service.dart';
 import '../../data/local/reminder_scheduler.dart';
@@ -160,6 +161,10 @@ class _ReminderSyncState extends State<ReminderSync> {
       }
 
       if (await _askedBefore() || !mounted) return;
+
+      // İlk girişteki tur sürüyorsa gerekçe onun üstüne açılmasın.
+      await AppTour.whenIdle();
+      if (!mounted) return;
 
       final wantsToBeAsked = await _explainReminders(care.stage);
       if (!wantsToBeAsked) {

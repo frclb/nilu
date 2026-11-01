@@ -282,7 +282,7 @@ class _HeaderCard extends StatelessWidget {
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontSize: 24,
                   height: 1,
-                  color: theme.colorScheme.onPrimary,
+                  color: AppGradients.onMark,
                 ),
               ),
             ),
@@ -376,7 +376,7 @@ class _FeelingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final t = context.tokens;
-    final on = theme.colorScheme.onPrimary;
+    const on = AppGradients.onMark;
     final status = vm.currentStatus!;
     final desireKey = PartnerSuggestionEngine.getDesireKey(status.sexualDesire);
     final desireText = desireKey == null ? '' : context.tr(desireKey);
@@ -532,8 +532,7 @@ class _NeedPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final on = scheme.onPrimary;
+    const on = AppGradients.onMark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
       decoration: BoxDecoration(
@@ -545,7 +544,9 @@ class _NeedPill extends StatelessWidget {
         style: Theme.of(context).textTheme.labelLarge?.copyWith(
           fontSize: 13,
           fontWeight: first ? FontWeight.w700 : FontWeight.w600,
-          color: first ? scheme.primary : on,
+          // Beyaz hapın üstünde kartın kendi koyu tonu: koyu temada marka
+          // rengi açık pembe ve beyazda okunmuyor.
+          color: first ? context.tokens.markStart : on,
         ),
       ),
     );

@@ -5,6 +5,7 @@ import '../../core/navigation/route_names.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../design_system/content_illustration.dart';
 import '../../localization/app_localizations.dart';
+import 'account_identity.dart';
 
 /// Sekme köklerinin sağ üstündeki profil düğmesi: adın baş harfi, dokununca
 /// Profil sekmesi.
@@ -22,10 +23,15 @@ class ProfileAvatarButton extends StatefulWidget {
 
 class _ProfileAvatarButtonState extends State<ProfileAvatarButton> {
   String? _name;
+  Object? _identity;
 
   @override
   void initState() {
     super.initState();
+    _load();
+  }
+
+  void _load() {
     const ProfileRepository().getName().then((name) {
       if (mounted) setState(() => _name = name);
     });
@@ -33,6 +39,12 @@ class _ProfileAvatarButtonState extends State<ProfileAvatarButton> {
 
   @override
   Widget build(BuildContext context) {
+    // Ad hesaptan geliyor: giriş ya da çıkışta baş harf yenileniyor.
+    final identity = watchAccountIdentity(context);
+    if (identity != _identity) {
+      if (_identity != null || identity != null) _load();
+      _identity = identity;
+    }
     // VoiceOver'da "Profil, düğme": baş harf tek başına bir şey söylemiyor.
     return Semantics(
       button: true,
