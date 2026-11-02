@@ -144,6 +144,8 @@ Döngü geçmişinin listesi, gebelik modu, ekran kilidi ve yedek alma premium'd
 BİLMEN GEREKENLER
 
 Nilu tıbbi bir cihaz değildir: hiçbir rahatsızlığı teşhis etmez, tedavi etmez, iyileştirmez ya da önlemez ve bir doğum kontrol yöntemi değildir. Tahminler geçmiş kayıtlarından hesaplanır, yani yaklaşıktır. Gebelik modu hekim ve ebe izleminin yerini tutmaz. Tıbbi tavsiye, teşhis ve tedavi için bir hekime danış.
+
+Kullanım Koşulları (EULA): https://frclb.github.io/nilu/tr/terms/
 ```
 
 **Anahtar kelimeler**
@@ -225,6 +227,8 @@ Your cycle history list, pregnancy mode, app lock and backups are not behind the
 WHAT YOU SHOULD KNOW
 
 Nilu is not a medical device: it does not diagnose, treat, cure or prevent any medical condition, and it is not a contraceptive method. Predictions are calculated from your past entries and are approximate. Pregnancy mode does not replace care from your doctor or midwife. For medical advice, diagnosis or treatment, talk to a doctor.
+
+Terms of Use (EULA): https://frclb.github.io/nilu/en/terms/
 ```
 
 **Keywords**
@@ -306,6 +310,8 @@ Zyklusverlauf, Schwangerschaftsmodus, App-Sperre und Backup stehen nicht hinter 
 WAS DU WISSEN SOLLTEST
 
 Nilu ist kein Medizinprodukt: Es diagnostiziert, behandelt, heilt oder verhindert keine Erkrankung und ist kein Verhütungsmittel. Vorhersagen werden aus deinen früheren Einträgen berechnet und sind ungefähr. Der Schwangerschaftsmodus ersetzt nicht die Betreuung durch Ärztin, Arzt oder Hebamme. Für medizinischen Rat, eine Diagnose oder Behandlung wende dich an eine Ärztin oder einen Arzt.
+
+Nutzungsbedingungen (EULA): https://frclb.github.io/nilu/de/terms/
 ```
 
 **Keywords**
@@ -387,6 +393,8 @@ El historial de ciclos, el modo embarazo, el bloqueo de la app y las copias de s
 LO QUE DEBES SABER
 
 Nilu no es un dispositivo médico: no diagnostica, trata, cura ni previene ninguna enfermedad, y no es un método anticonceptivo. Las previsiones se calculan a partir de tus registros anteriores y son aproximadas. El modo embarazo no sustituye el seguimiento de tu médico o matrona. Para consejo, diagnóstico o tratamiento médico, consulta a un profesional sanitario.
+
+Términos de uso (EULA): https://frclb.github.io/nilu/es/terms/
 ```
 
 **Palabras clave**
@@ -468,6 +476,8 @@ L'historique des cycles, le mode grossesse, le verrouillage et les sauvegardes n
 CE QU'IL FAUT SAVOIR
 
 Nilu n'est pas un dispositif médical : il ne diagnostique, ne traite, ne guérit ni ne prévient aucune maladie, et n'est pas un moyen de contraception. Les prévisions sont calculées à partir de tes saisies passées et restent approximatives. Le mode grossesse ne remplace pas le suivi par ton médecin ou ta sage-femme. Pour un avis, un diagnostic ou un traitement médical, consulte un médecin.
+
+Conditions d'utilisation : https://frclb.github.io/nilu/fr/terms/
 ```
 
 **Mots-clés**
@@ -549,6 +559,8 @@ O histórico de ciclos, o modo gravidez, o bloqueio do app e os backups não fic
 O QUE VOCÊ PRECISA SABER
 
 O Nilu não é um dispositivo médico: não diagnostica, não trata, não cura nem previne nenhuma condição médica e não é um método contraceptivo. As previsões são calculadas a partir dos seus registros anteriores e são aproximadas. O modo gravidez não substitui o acompanhamento do seu médico ou da sua obstetriz. Para orientação, diagnóstico ou tratamento médico, fale com um médico.
+
+Termos de Uso (EULA): https://frclb.github.io/nilu/pt/terms/
 ```
 
 **Palavras-chave**
