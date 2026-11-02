@@ -491,7 +491,7 @@ def silk(size, xs, center, width, twist, phase, strands, strength, line_unit, k=
     inceldiği yer soluk — düz bir bant değil, dönen bir ipek. `line_unit`:
     tel kalınlığının ölçüsü (tuval genişliği).
     """
-    small = (size[0] // k + 1, size[1] // k + 1)
+    small = (int(size[0] / k) + 1, int(size[1] / k) + 1)
     lines, sheen = Image.new("L", small, 0), Image.new("L", small, 0)
     d, ds = ImageDraw.Draw(lines), ImageDraw.Draw(sheen)
 
@@ -596,11 +596,13 @@ def backdrop_silk(canvas, center, width, twist, phase, dot, line_unit):
     `center(x)`: orta çizgi; ölçüler ribbon'daki gibi.
     """
     w, h = canvas.size
-    k = 1 if w <= 1200 else 2
+    # İki kat çözünürlükte çizip küçültüyor: ImageDraw kenar yumuşatmıyor.
+    # Yarım çözünürlükten büyütülen şeridin kenarları 3840 px'lik başlık ve
+    # arama görsellerinde merdiven gibi görünüyordu.
+    k = 0.5
     lines, sheen, paths = silk((w, h), range(-w // 20, w + w // 20, 2), center, width, twist, phase, 7, 0.85,
                                line_unit, k)
-    mask = ImageChops.lighter(lines, sheen)
-    mask = mask.crop((0, 0, w, h)) if k == 1 else mask.resize((w, h), Image.BICUBIC)
+    mask = ImageChops.lighter(lines, sheen).crop((0, 0, w * 2, h * 2)).resize((w, h), Image.LANCZOS)
     colors = K.horizontal_gradient((max(2, w // 4), 1), RIBBON_STOPS[:3]).resize((w, h))
     silk_halo(canvas, colors, mask, w * 0.02, gain=1.5)
     canvas.paste(colors, (0, 0), mask)

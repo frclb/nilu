@@ -31,14 +31,38 @@ zorunda değil ama birbirinden uzak düşmemeli.
 App Store adı **her dil için ayrı** giriliyor. Marka kısmı sabit, arkasına
 gelen açıklama o pazarın aradığı kelime oluyor:
 
-| Dil | Ad |
-|---|---|
-| Türkçe | Nilu · Regl & Adet Takvimi |
-| English | Nilu · Period Tracker |
-| Deutsch | Nilu · Zyklus-Tracker |
-| Español | Nilu · Ciclo Menstrual |
-| Français | Nilu · Suivi de Règles |
-| Português | Nilu · Ciclo Menstrual |
+| Dil | Ad | Alt başlık |
+|---|---|---|
+| Türkçe | Nilu: Regl & Adet Takvimi | Gebelik ve Yumurtlama Takibi |
+| English (US) | Nilu: Period Tracker Calendar | Ovulation, Pregnancy & Cycle |
+| English (UK) | Nilu: Period & Cycle Tracker | Ovulation & Pregnancy Calendar |
+| Deutsch | Nilu: Perioden & Zyklus App | Eisprung & Schwangerschaft |
+| Español (España) | Nilu: Calendario Menstrual | Regla, ovulación y embarazo |
+| Español (México) | Nilu: Calendario Menstrual | Periodo, ovulación y embarazo |
+| Français | Nilu : Règles & Grossesse | Calendrier ovulation & cycle |
+| Português | Nilu: Calendário Menstrual | Ciclo, ovulação e gravidez |
+
+**ASO düzeni (2026-11-02).** Adlar ve alt başlıklar Apple'ın otomatik
+tamamlamasından ve her mağazanın ilk 12–20 rakibinin adından seçildi: adda
+o dilin bir numaralı arama terimi (period tracker, regl/adet takvimi,
+calendario menstrual…), alt başlıkta ikinci küme (gebelik, yumurtlama).
+Apple ad, alt başlık ve anahtar kelimeleri birleştirip arıyor; "tracker"
+adda, "ovulation" alt başlıktaysa "ovulation tracker" da tutuyor.
+
+- **English (UK) ve Español (México) yalnızca App Store Connect'te var**
+  (aşağıda ayrı bölümleri yok). en-GB; Türkiye, Almanya, Fransa, İspanya ve
+  Brezilya mağazalarında ikinci bir anahtar kelime kümesi olarak
+  dizinleniyor (Türkiye'nin varsayılan mağaza dili İngilizce (UK)). es-MX,
+  ABD ve 18 Latin Amerika mağazasını kapsıyor; o olmadan oradaki kullanıcı
+  sayfayı İngilizce görüyordu. Açıklama ve tanıtım metni en-US / es-ES'ten
+  ("móvil" → "celular"), ekran görüntüleri en / es setlerinden.
+- **Görünen alanlarda "private/gizli" yok.** Ücretsiz sürümde reklam var;
+  App Review bunu doğrulanamaz bir iddia sayabilir (2.3.7). Kelime yalnızca
+  gizli anahtar kelime alanında.
+- **Hiçbir alanda** rakip adı, fiyat kelimesi (free, ücretsiz…) ya da doğum
+  kontrolü iddiası yok; "tabelinha" (BR) bu yüzden alınmadı. Uygulamada
+  karşılığı olmayan konular (PCOS, emzirme, günlük) da yok.
+- Ana dil (primary) **English (U.S.)**.
 
 Açıklama eklemenin sebebi arama: Apple ad alanını dizinliyor ve kimsenin
 bilmediği bir markada "Nilu" tek başına hiçbir sonuçta çıkmaz.
@@ -53,16 +77,13 @@ ağır dizinlediği yer ve tanınmayan bir markada keşfedilebilirlik metnin
 zarafetinden önce geliyor. Bu kategoride standart bir kalıp.
 
 Karşılığında anahtar kelimelerde yer açıldı: regl, adet ve takvim oradan
-çıktı, yerlerine **takip**, **ağrı**, **gebelik** ve **hamilelik** girdi.
-Gebelik modu uygulamanın ikinci büyük parçası; aranıyor ve ad alanında yok.
+çıktı. Gebelik ve yumurtlama artık alt başlıkta; anahtar kelimelerde
+**takip**, **döngü**, **hamilelik**, **ovülasyon**, **hesaplama**, **lohusa**
+gibi otomatik tamamlamada görünen ama rakiplerin adında olmayan terimler var.
 
-Hangi terimin daha çok arandığını ölçemiyorum. Bedava bir sinyal var:
-App Store'un arama kutusuna "regl", "adet", "takvim", "takip" yazıp
-otomatik tamamlamaya bak — öneriler popülerliğe göre sıralı geliyor.
-Sıralama beklediğinden farklıysa addaki kelimeyi değiştirmek tek satır.
-
-Aynı mantık diğer beş dilde de uygulanabilir; her pazarın hangi eşanlamlı
-çifti aradığına oradaki otomatik tamamlamaya bakarak karar vermek gerekiyor.
+Arama hacmini ölçemiyorum; seçimler App Store'un otomatik tamamlamasına
+dayanıyor (öneriler popülerliğe göre sıralı). Apple her sürüm yayınında
+yeniden dizinliyor: değişiklikleri dil dil yapıp sıralamayı izlemek gerekiyor.
 
 ---
 
@@ -70,12 +91,12 @@ Aynı mantık diğer beş dilde de uygulanabilir; her pazarın hangi eşanlamlı
 
 **Ad**
 ```
-Nilu · Regl & Adet Takvimi
+Nilu: Regl & Adet Takvimi
 ```
 
 **Alt başlık**
 ```
-Döngün sende kalır
+Gebelik ve Yumurtlama Takibi
 ```
 
 **Tanıtım metni**
@@ -150,7 +171,7 @@ Kullanım Koşulları (EULA): https://frclb.github.io/nilu/tr/terms/
 
 **Anahtar kelimeler**
 ```
-takip,döngü,ovulasyon,yumurtlama,doğurganlık,gebelik,hamilelik,pms,semptom,kadın,ağrı
+takip,döngü,döngüsü,hamilelik,hamile,ovülasyon,hesaplama,dönemi,periyot,lohusa,haftası,kadın,ağrı
 ```
 
 ---
@@ -159,12 +180,12 @@ takip,döngü,ovulasyon,yumurtlama,doğurganlık,gebelik,hamilelik,pms,semptom,k
 
 **Name**
 ```
-Nilu · Period Tracker
+Nilu: Period Tracker Calendar
 ```
 
 **Subtitle**
 ```
-Your cycle stays on your phone
+Ovulation, Pregnancy & Cycle
 ```
 
 **Promotional text**
@@ -233,7 +254,7 @@ Terms of Use (EULA): https://frclb.github.io/nilu/en/terms/
 
 **Keywords**
 ```
-menstrual,ovulation,fertility,pregnancy,pms,symptom,calendar,privacy,women,diary,cramps
+menstrual,fertility,fertile,window,days,pms,symptom,cramps,pain,postpartum,week,due,date,private,log
 ```
 
 ---
@@ -242,12 +263,12 @@ menstrual,ovulation,fertility,pregnancy,pms,symptom,calendar,privacy,women,diary
 
 **Name**
 ```
-Nilu · Zyklus-Tracker
+Nilu: Perioden & Zyklus App
 ```
 
 **Untertitel**
 ```
-Dein Zyklus bleibt bei dir
+Eisprung & Schwangerschaft
 ```
 
 **Werbetext**
@@ -316,7 +337,7 @@ Nutzungsbedingungen (EULA): https://frclb.github.io/nilu/de/terms/
 
 **Keywords**
 ```
-periode,menstruation,eisprung,fruchtbar,pms,symptome,kalender,datenschutz,frau,tagebuch,regel
+periodenkalender,kalender,tracker,menstruation,fruchtbare,tage,ssw,rechner,wochenbett,regel,pms
 ```
 
 ---
@@ -325,12 +346,12 @@ periode,menstruation,eisprung,fruchtbar,pms,symptome,kalender,datenschutz,frau,t
 
 **Nombre**
 ```
-Nilu · Ciclo Menstrual
+Nilu: Calendario Menstrual
 ```
 
 **Subtítulo**
 ```
-Tu ciclo se queda en tu móvil
+Regla, ovulación y embarazo
 ```
 
 **Texto promocional**
@@ -399,7 +420,7 @@ Términos de uso (EULA): https://frclb.github.io/nilu/es/terms/
 
 **Palabras clave**
 ```
-regla,ovulacion,fertilidad,sintomas,calendario,mujer,periodo,privacidad,salud,diario,dolor
+periodo,ciclo,menstruación,días,fértiles,fertilidad,seguimiento,semana,embarazada,posparto,síntomas
 ```
 
 ---
@@ -408,12 +429,12 @@ regla,ovulacion,fertilidad,sintomas,calendario,mujer,periodo,privacidad,salud,di
 
 **Nom**
 ```
-Nilu · Suivi de Règles
+Nilu : Règles & Grossesse
 ```
 
 **Sous-titre**
 ```
-Ton cycle reste sur ton mobile
+Calendrier ovulation & cycle
 ```
 
 **Texte promotionnel**
@@ -482,7 +503,7 @@ Conditions d'utilisation : https://frclb.github.io/nilu/fr/terms/
 
 **Mots-clés**
 ```
-menstruel,ovulation,fertilite,spm,symptomes,calendrier,femme,confidentialite,journal,douleur
+menstruel,suivi,regles,jours,fertiles,fertilité,enceinte,semaine,post-partum,spm,symptômes,douleurs
 ```
 
 ---
@@ -491,12 +512,12 @@ menstruel,ovulation,fertilite,spm,symptomes,calendrier,femme,confidentialite,jou
 
 **Nome**
 ```
-Nilu · Ciclo Menstrual
+Nilu: Calendário Menstrual
 ```
 
 **Subtítulo**
 ```
-Seu ciclo fica no seu celular
+Ciclo, ovulação e gravidez
 ```
 
 **Texto promocional**
@@ -565,7 +586,7 @@ Termos de Uso (EULA): https://frclb.github.io/nilu/pt/terms/
 
 **Palavras-chave**
 ```
-menstruacao,periodo,ovulacao,fertilidade,tpm,sintomas,calendario,gravidez,saude,privacidade
+menstruação,período,fértil,dias,férteis,gestação,gestante,semana,pós-parto,tpm,sintomas,cólica,humor
 ```
 
 ---
