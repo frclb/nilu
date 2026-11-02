@@ -15,7 +15,7 @@ kuruyor:
     app_store/<dil>/iphone_6_9/01_home.png        1320×2868
     app_store/<dil>/iphone_6_3/01_home.png        1206×2622  (zorunlu boyut)
     app_store/<dil>/ipad_13/01_home.png           2064×2752
-    app_store/<dil>/header.jpg                    3840×1646  (21:9)
+    app_store/<dil>/header.png                    3840×1646  (21:9)
     app_store/<dil>/search_results.jpg            3840×2560  (3:2)
     google_play/<dil>/phone/01_home.png           1080×1920  (9:16)
     google_play/<dil>/tablet_10/01_home.png       1440×2560  (9:16)
@@ -920,11 +920,13 @@ def play_icon():
 
 
 def save(img, *parts):
-    """PNG; büyük yaratıcı görseller JPEG (Apple ikisini de kabul ediyor).
+    """PNG; arama görseli JPEG.
 
     Gren dokusu PNG sıkıştırmasını bozuyor: 3840 px'lik arama görseli PNG
     olarak 10 MB'ı geçiyordu. JPEG 4:4:4 ve yüksek kalitede yazı kenarları
-    bulanıklaşmıyor.
+    bulanıklaşmıyor. Başlık PNG: Asset Library aynı 3840×1646 ölçüdeki
+    JPEG'i "File dimensions are invalid" diye reddetti, PNG'yi kabul etti
+    (Kasım 2026); PNG'si ~6 MB.
     """
     path = os.path.join(OUT, *parts)
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -957,7 +959,7 @@ def main():
                         save(img.resize(IPHONE_6_3, Image.LANCZOS), "app_store", lang, "iphone_6_3", name)
                         count += 1
         if args.only in (None, "creative"):
-            save(header(lang), "app_store", lang, "header.jpg")
+            save(header(lang), "app_store", lang, "header.png")
             save(search_results(lang), "app_store", lang, "search_results.jpg")
             count += 2
         if args.only in (None, "google_play"):
