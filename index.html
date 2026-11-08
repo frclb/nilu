@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nilu</title>
+<meta name="theme-color" content="#22001a">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<script>
+(function () {
+  var codes = ["tr","en","de","es","fr","pt"];
+  var prefs = navigator.languages || [navigator.language || ''];
+  for (var i = 0; i < prefs.length; i++) {
+    var c = (prefs[i] || '').slice(0, 2).toLowerCase();
+    if (codes.indexOf(c) >= 0) { location.replace(c + '/'); return; }
+  }
+  location.replace('tr/');
+})();
+</script>
+</head>
+<body class="page-root">
+<main class="root-box">
+<img src="assets/icon-256.png" alt="" width="96" height="96">
+<h1>Nilu</h1>
+<ul class="langs-list">
+<li><a href="tr/" hreflang="tr" lang="tr">Türkçe</a></li>
+<li><a href="en/" hreflang="en" lang="en">English</a></li>
+<li><a href="de/" hreflang="de" lang="de">Deutsch</a></li>
+<li><a href="es/" hreflang="es" lang="es">Español</a></li>
+<li><a href="fr/" hreflang="fr" lang="fr">Français</a></li>
+<li><a href="pt/" hreflang="pt" lang="pt">Português (Brasil)</a></li>
+</ul>
+</main>
+</body>
+</html>

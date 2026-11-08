@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#22001a">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<title>Nilu</title>
+</head>
+<body class="page-root page-invite">
+<main class="root-box invite-box">
+<img src="../assets/icon-256.png" alt="" width="96" height="96">
+<h1 id="t">Nilu</h1>
+<p id="b"></p>
+<div id="kodlu">
+<p><a id="ac" class="button" href="#"></a></p>
+<p id="i" class="muted"></p>
+
+<p id="c" class="muted"></p>
+<p><span id="k" class="invite-code"></span></p>
+<p id="n" class="muted"></p>
+</div>
+</main>
+<script>
+(function () {
+  var t = {
+ "tr": {
+  "invite_title": "Nilu'da eşleşme daveti",
+  "invite_body": "Partnerin seni Nilu'da eşleşmeye davet etti. Nilu telefonunda yüklüyse aşağıdaki düğmeye dokun.",
+  "invite_open": "Nilu'da aç",
+  "invite_install": "Nilu yüklü değil mi? Önce uygulamayı indir, sonra bu bağlantıyı yeniden aç.",
+  "invite_code": "Ya da Nilu'da Partner Olarak Giriş Yap → Kodu elle gir ile bu kodu yaz:",
+  "invite_note": "Bağlantı 1 saat geçerli ve yalnızca bir kez kullanılabilir.",
+  "invite_missing": "Bu bağlantıda davet kodu yok. Partnerinden bağlantıyı yeniden göndermesini iste."
+ },
+ "en": {
+  "invite_title": "A Nilu pairing invite",
+  "invite_body": "Your partner invited you to pair on Nilu. If Nilu is installed on your phone, tap the button below.",
+  "invite_open": "Open in Nilu",
+  "invite_install": "Don’t have Nilu yet? Install the app first, then open this link again.",
+  "invite_code": "Or type this code in Nilu under Login as Partner → Enter code manually:",
+  "invite_note": "The link works for 1 hour and only once.",
+  "invite_missing": "This link has no invite code. Ask your partner to send it again."
+ },
+ "de": {
+  "invite_title": "Eine Kopplungseinladung für Nilu",
+  "invite_body": "Deine Partnerin hat dich eingeladen, dich in Nilu zu verbinden. Wenn Nilu auf deinem Handy installiert ist, tippe auf die Schaltfläche unten.",
+  "invite_open": "In Nilu öffnen",
+  "invite_install": "Noch kein Nilu? Installiere zuerst die App und öffne diesen Link dann noch einmal.",
+  "invite_code": "Oder gib diesen Code in Nilu unter Als Partner anmelden → Code manuell eingeben ein:",
+  "invite_note": "Der Link gilt 1 Stunde und nur einmal.",
+  "invite_missing": "Dieser Link enthält keinen Einladungscode. Bitte deine Partnerin, ihn noch einmal zu senden."
+ },
+ "es": {
+  "invite_title": "Una invitación para vincularte en Nilu",
+  "invite_body": "Tu pareja te invitó a vincularte en Nilu. Si tienes Nilu instalada en tu móvil, toca el botón de abajo.",
+  "invite_open": "Abrir en Nilu",
+  "invite_install": "¿Aún no tienes Nilu? Instala primero la app y vuelve a abrir este enlace.",
+  "invite_code": "O escribe este código en Nilu en Entrar como pareja → Introducir el código a mano:",
+  "invite_note": "El enlace vale 1 hora y solo una vez.",
+  "invite_missing": "Este enlace no tiene código de invitación. Pide a tu pareja que lo envíe de nuevo."
+ },
+ "fr": {
+  "invite_title": "Une invitation à t’associer sur Nilu",
+  "invite_body": "Ta partenaire t’a invité à vous associer sur Nilu. Si Nilu est installée sur ton téléphone, touche le bouton ci-dessous.",
+  "invite_open": "Ouvrir dans Nilu",
+  "invite_install": "Pas encore Nilu ? Installe d’abord l’application, puis rouvre ce lien.",
+  "invite_code": "Ou saisis ce code dans Nilu via Se connecter en tant que partenaire → Saisir le code manuellement :",
+  "invite_note": "Le lien est valable 1 heure et une seule fois.",
+  "invite_missing": "Ce lien ne contient pas de code d’invitation. Demande à ta partenaire de le renvoyer."
+ },
+ "pt": {
+  "invite_title": "Um convite para se conectar no Nilu",
+  "invite_body": "Sua parceira convidou você para se conectar no Nilu. Se o Nilu estiver instalado no seu celular, toque no botão abaixo.",
+  "invite_open": "Abrir no Nilu",
+  "invite_install": "Ainda não tem o Nilu? Instale o app primeiro e abra este link de novo.",
+  "invite_code": "Ou digite este código no Nilu em Entrar como parceiro → Digitar o código:",
+  "invite_note": "O link vale por 1 hora e só uma vez.",
+  "invite_missing": "Este link não tem código de convite. Peça à sua parceira para enviá-lo de novo."
+ }
+};
+  var prefs = navigator.languages || [navigator.language || ''];
+  var lang = 'tr';
+  for (var i = 0; i < prefs.length; i++) {
+    var c = (prefs[i] || '').slice(0, 2).toLowerCase();
+    if (t[c]) { lang = c; break; }
+  }
+  var s = t[lang];
+  document.documentElement.lang = lang;
+  document.title = s.invite_title;
+  function yaz(id, metin) { document.getElementById(id).textContent = metin; }
+  yaz('t', s.invite_title);
+  var kod = (location.hash || '').slice(1).replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+  if (!/^[A-HJKMNP-Z2-9]{20}$/.test(kod)) {
+    yaz('b', s.invite_missing);
+    document.getElementById('kodlu').hidden = true;
+    return;
+  }
+  yaz('b', s.invite_body);
+  var ac = document.getElementById('ac');
+  ac.textContent = s.invite_open;
+  ac.href = 'nilu://p#' + kod;
+  yaz('i', s.invite_install);
+  yaz('c', s.invite_code);
+  yaz('k', kod.replace(/(.{4})(?!$)/g, '$1 '));
+  yaz('n', s.invite_note);
+})();
+</script>
+</body>
+</html>
